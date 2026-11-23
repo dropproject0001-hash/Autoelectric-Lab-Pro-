@@ -4,6 +4,14 @@ import { WebSocketServer, WebSocket, type RawData } from 'ws';
 import { GoogleGenAI, Modality, type LiveServerMessage } from '@google/genai';
 import { verifyAnyAccessBearerToken } from './firebaseAuthMiddleware';
 import { classifyGeminiError } from './geminiErrorClassifier';
+import {
+  getGeminiClientForApiKey,
+  hasConfiguredGeminiKeys,
+  recordRouteAttemptStart,
+  recordRouteFailure,
+  recordRouteSuccess,
+  selectFreeTierRoutes,
+} from './geminiFreeTierRouter';
 
 const LIVE_VOICE_WS_PATH = '/api/autoelectric/live-voice-ws';
 const LIVE_VOICE_MODEL = 'gemini-3.8-live';
@@ -170,12 +178,23 @@ export function attachGeminiLiveVoiceWebSocket(httpServer: http.Server): Attache
           return;
         }
 
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
+        if (!hasConfiguredGeminiKeys()) {
           safeSendJson(ws, {
             type: 'error',
             code: 'MISSING_API_KEY',
             message: 'Gemini API Key is not configured on the server.',
+          });
+          cleanupSession();
+          return;
+        }
+
+        const routePlan = selectFreeTierRoutes(LIVE_VOICE_MODEL, []);
+        const selectedRoute = routePlan.selected;
+        if (routePlan.allInCooldown || !selectedRoute || !selectedRoute.apiKey) {
+          safeSendJson(ws, {
+            type: 'error',
+            code: 'RATE_LIMITED',
+            message: `Live voice quota is cooling down. Retry in ~${routePlan.earliestRetryAfterSec || 30}s.`,
           });
           cleanupSession();
           return;
@@ -195,10 +214,8 @@ Rules:
 ${cleanBenchContext ? `\nLive Bench Telemetry Context:\n${cleanBenchContext}` : ''}`;
 
         try {
-          const ai = new GoogleGenAI({
-            apiKey,
-            httpOptions: { headers: { 'User-Agent': 'aistudio-build' } },
-          });
+          recordRouteAttemptStart(selectedRoute);
+          const ai = getGeminiClientForApiKey(selectedRoute.apiKey);
 
           const session = await ai.live.connect({
             model: LIVE_VOICE_MODEL,
@@ -285,6 +302,7 @@ ${cleanBenchContext ? `\nLive Bench Telemetry Context:\n${cleanBenchContext}` : 
             return;
           }
 
+          recordRouteSuccess(selectedRoute);
           liveSession = session;
           // Ensure ready event is sent even if onopen fired synchronously before assignment
           if (!initialized) {
@@ -298,6 +316,7 @@ ${cleanBenchContext ? `\nLive Bench Telemetry Context:\n${cleanBenchContext}` : 
           }
         } catch (err: unknown) {
           const classified = classifyGeminiError(err);
+          recordRouteFailure(selectedRoute, classified);
           safeSendJson(ws, {
             type: 'error',
             code: classified.category,

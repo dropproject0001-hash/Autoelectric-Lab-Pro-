@@ -11,6 +11,21 @@ import {
   verifyFirebaseIdToken,
 } from '../../server/services/firebaseAuthMiddleware';
 import { classifyGeminiError } from '../../server/services/geminiErrorClassifier';
+import {
+  getFreeTierPoolSnapshot,
+  recordModelAttemptStart,
+  recordModelFailure,
+  recordModelSuccess,
+  resetFreeTierRouterForTests,
+  resolveAdjustedThinkingLevel,
+  selectFreeTierCandidates,
+} from '../../server/services/geminiFreeTierRouter';
+import {
+  QuotaManager,
+  computeSoftLimit,
+  loadConfiguredGeminiKeysFromEnv,
+} from '../../server/services/quotaManager';
+import { ThinkingLevel } from '@google/genai';
 import { validateImagePayload } from '../../server/services/imagePayloadValidator';
 import {
   cacheLocalDocument,
@@ -368,9 +383,10 @@ async function main() {
     assert.equal(c404.statusCode, 404);
     assert.equal(c404.retryNextModel, true);
 
-    const c429 = classifyGeminiError(new Error('429 RESOURCE_EXHAUSTED: Quota exceeded'));
+    const c429 = classifyGeminiError(new Error('429 RESOURCE_EXHAUSTED: Quota exceeded. Please retry in 27s.'));
     assert.equal(c429.statusCode, 429);
     assert.equal(c429.retryNextModel, true);
+    assert.equal(c429.retryAfterSec, 27);
 
     const c504 = classifyGeminiError(new Error('Request aborted'), true);
     assert.equal(c504.statusCode, 504);
@@ -379,6 +395,175 @@ async function main() {
     const c502 = classifyGeminiError(new Error('ECONNRESET socket hang up'));
     assert.equal(c502.statusCode, 502);
     assert.equal(c502.retryNextModel, true);
+  });
+
+  await runTest('geminiFreeTierRouter proactively switches BEFORE exceeding RPM soft limit, steps down ThinkingLevel, and short-circuits on full cooldown', () => {
+    resetFreeTierRouterForTests();
+    const baseNow = 1_760_000_000_000;
+
+    // 1. Fresh pool starts with gemini-4-hydrogen at HIGH thinking
+    const initial = selectFreeTierCandidates(
+      'gemini-4-hydrogen',
+      ['gemini-4-hydrogen', 'gemini-3.1-flash-lite'],
+      baseNow
+    );
+    assert.equal(initial.allInCooldown, false);
+    assert.equal(initial.preQuotaReroutedFrom, null);
+    assert.equal(initial.candidates[0], 'gemini-4-hydrogen');
+    assert.equal(resolveAdjustedThinkingLevel('gemini-4-hydrogen', ThinkingLevel.HIGH, baseNow), ThinkingLevel.HIGH);
+
+    // 2. At 50% (4/8) and 75% (6/8) soft cap, ThinkingLevel steps down HIGH -> MEDIUM -> LOW to conserve TPM
+    for (let i = 0; i < 4; i++) {
+      recordModelAttemptStart('gemini-4-hydrogen', baseNow + i * 100);
+    }
+    assert.equal(
+      resolveAdjustedThinkingLevel('gemini-4-hydrogen', ThinkingLevel.HIGH, baseNow + 500),
+      ThinkingLevel.MEDIUM
+    );
+    for (let i = 4; i < 6; i++) {
+      recordModelAttemptStart('gemini-4-hydrogen', baseNow + i * 100);
+    }
+    assert.equal(
+      resolveAdjustedThinkingLevel('gemini-4-hydrogen', ThinkingLevel.HIGH, baseNow + 700),
+      ThinkingLevel.LOW
+    );
+
+    // 3. At 8/8 soft limit on gemini-4-hydrogen, router MUST proactively reroute BEFORE quota to gemini-3.1-flash-lite
+    recordModelAttemptStart('gemini-4-hydrogen', baseNow + 800);
+    recordModelAttemptStart('gemini-4-hydrogen', baseNow + 900);
+    const rerouted = selectFreeTierCandidates(
+      'gemini-4-hydrogen',
+      ['gemini-4-hydrogen', 'gemini-3.1-flash-lite'],
+      baseNow + 1000
+    );
+    assert.equal(rerouted.allInCooldown, false);
+    assert.equal(rerouted.preQuotaReroutedFrom, 'gemini-4-hydrogen');
+    assert.equal(rerouted.candidates[0], 'gemini-3.1-flash-lite');
+
+    // 4. Simulated 429 with retryAfter=20s on flash-lite -> both models cooling down triggers allInCooldown fast-fail
+    recordModelFailure(
+      'gemini-4-hydrogen',
+      classifyGeminiError(new Error('429 RESOURCE_EXHAUSTED retry in 30s')),
+      baseNow + 1000
+    );
+    recordModelFailure(
+      'gemini-3.1-flash-lite',
+      classifyGeminiError(new Error('429 RESOURCE_EXHAUSTED retry in 20s')),
+      baseNow + 1000
+    );
+    const allCooldown = selectFreeTierCandidates(
+      'gemini-4-hydrogen',
+      ['gemini-4-hydrogen', 'gemini-3.1-flash-lite'],
+      baseNow + 2000
+    );
+    assert.equal(allCooldown.allInCooldown, true);
+    assert.equal(allCooldown.candidates.length, 0);
+    assert.equal(allCooldown.earliestRetryAfterSec, 19);
+
+    // 5. After 20s flash-lite recovers while hydrogen still has 10s left -> direct route to flash-lite
+    const partialRecovery = selectFreeTierCandidates(
+      'gemini-4-hydrogen',
+      ['gemini-4-hydrogen', 'gemini-3.1-flash-lite'],
+      baseNow + 22_000
+    );
+    assert.equal(partialRecovery.allInCooldown, false);
+    assert.deepEqual(partialRecovery.candidates, ['gemini-3.1-flash-lite']);
+    recordModelSuccess('gemini-3.1-flash-lite');
+    const snap = getFreeTierPoolSnapshot(['gemini-4-hydrogen', 'gemini-3.1-flash-lite'], baseNow + 22_000);
+    assert.equal(snap.find((s) => s.model === 'gemini-4-hydrogen')?.inCooldown, true);
+    assert.equal(snap.find((s) => s.model === 'gemini-3.1-flash-lite')?.inCooldown, false);
+
+    resetFreeTierRouterForTests();
+  });
+
+  await runTest('QuotaManager rotates keys on same tier, downgrades tiers after key saturation, switches on TPM threshold, isolates 401 keys, and never leaks secrets', () => {
+    assert.equal(computeSoftLimit(5, 0.8), 4);
+    assert.equal(computeSoftLimit(10, 0.8), 8);
+
+    const secretA = 'AIza-secret-alpha-001';
+    const secretB = 'AIza-secret-bravo-002';
+    const baseNow = 1_760_100_000_000;
+
+    const loaded = loadConfiguredGeminiKeysFromEnv({
+      GEMINI_API_KEY: secretA,
+      GEMINI_API_KEY_1: secretA, // duplicate should be deduplicated
+      GEMINI_API_KEY_2: secretB,
+      GEMINI_API_KEYS: `${secretB}, AIza-secret-charlie-003`,
+    } as NodeJS.ProcessEnv);
+    assert.equal(loaded.length, 3);
+    assert.deepEqual(
+      loaded.map((k) => k.id),
+      ['gemini-key-1', 'gemini-key-2', 'gemini-key-3']
+    );
+
+    const manager = new QuotaManager({
+      keys: [
+        { id: 'gemini-key-1', apiKey: secretA, label: 'Primary Key', rpmLimit: 5, tpmLimit: 1000, priority: 1 },
+        { id: 'gemini-key-2', apiKey: secretB, label: 'Backup Key', rpmLimit: 5, tpmLimit: 1000, priority: 2 },
+      ],
+      endpoints: [
+        { id: 'tier-primary', model: 'gemini-4-hydrogen', rpmLimit: 5, priority: 1 },
+        { id: 'tier-fallback', model: 'gemini-3.1-flash-lite', rpmLimit: 10, priority: 2 },
+      ],
+      switchThresholdRatio: 0.8,
+      windowMs: 60_000,
+    });
+
+    // 1. Fresh state starts on primary key + primary tier
+    const plan1 = manager.acquirePlan('tier-primary', ['tier-fallback'], baseNow);
+    assert.equal(plan1.selected?.keyId, 'gemini-key-1');
+    assert.equal(plan1.selected?.endpointId, 'tier-primary');
+    assert.equal(plan1.selected?.switchKind, 'PRIMARY');
+    assert.equal(plan1.preQuotaSwitched, false);
+
+    // 2. Hit 4/5 soft limit (80%) on gemini-key-1 -> automatically switch to gemini-key-2 while staying on tier-primary
+    for (let i = 0; i < 4; i++) {
+      manager.recordAttemptStart({ keyId: 'gemini-key-1', endpointId: 'tier-primary', nowMs: baseNow + i * 50 });
+    }
+    const planKeySwitch = manager.acquirePlan('tier-primary', ['tier-fallback'], baseNow + 300);
+    assert.equal(planKeySwitch.preQuotaSwitched, true);
+    assert.equal(planKeySwitch.switchedFromKeyId, 'gemini-key-1');
+    assert.equal(planKeySwitch.switchedFromEndpointId, null);
+    assert.equal(planKeySwitch.selected?.keyId, 'gemini-key-2');
+    assert.equal(planKeySwitch.selected?.endpointId, 'tier-primary');
+    assert.equal(planKeySwitch.selected?.switchKind, 'KEY_SWITCH');
+
+    // 3. Saturate gemini-key-2 on tier-primary via TPM (>= 800 tokens of 1000 limit) -> triggers tier downgrade
+    manager.recordAttemptStart({ keyId: 'gemini-key-2', endpointId: 'tier-primary', nowMs: baseNow + 400 });
+    manager.recordSuccess({
+      keyId: 'gemini-key-2',
+      endpointId: 'tier-primary',
+      tokensUsed: 850,
+      nowMs: baseNow + 450,
+    });
+    const planTierSwitch = manager.acquirePlan('tier-primary', ['tier-fallback'], baseNow + 500);
+    assert.equal(planTierSwitch.preQuotaSwitched, true);
+    assert.equal(planTierSwitch.switchedFromEndpointId, 'tier-primary');
+    // gemini-key-1 only has 4/5 RPM (0 TPM) on key-1 & 0/10 on tier-fallback, whereas gemini-key-2 has 850/1000 TPM approaching limit
+    assert.equal(planTierSwitch.selected?.keyId, 'gemini-key-1');
+    assert.equal(planTierSwitch.selected?.endpointId, 'tier-fallback');
+
+    // 4. Snapshot NEVER leaks raw API keys
+    const snapJson = JSON.stringify(manager.getSnapshot(['tier-primary', 'tier-fallback'], baseNow + 500));
+    assert.equal(snapJson.includes(secretA), false);
+    assert.equal(snapJson.includes(secretB), false);
+
+    // 5. Window expiry resets approaching state, and 401 UNAUTHENTICATED isolates bad key cleanly
+    const afterWindowMs = baseNow + 65_000;
+    const recoveredPlan = manager.acquirePlan('tier-primary', ['tier-fallback'], afterWindowMs);
+    assert.equal(recoveredPlan.selected?.keyId, 'gemini-key-1');
+    assert.equal(recoveredPlan.selected?.endpointId, 'tier-primary');
+
+    manager.recordFailure(
+      { keyId: 'gemini-key-1', endpointId: 'tier-primary' },
+      { category: 'UNAUTHENTICATED', statusCode: 401 },
+      afterWindowMs + 100
+    );
+    const failoverPlan = manager.acquirePlan('tier-primary', ['tier-fallback'], afterWindowMs + 200);
+    assert.equal(failoverPlan.allInCooldown, false);
+    assert.equal(failoverPlan.selected?.keyId, 'gemini-key-2');
+    assert.equal(failoverPlan.selected?.endpointId, 'tier-primary');
+    assert.equal(failoverPlan.switchedFromKeyId, 'gemini-key-1');
   });
 
   // -------------------------------------------------------------------------

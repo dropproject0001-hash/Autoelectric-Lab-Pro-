@@ -16,9 +16,18 @@ export class FaultManager {
 
     for (const fault of faults) {
       if (fault.pinId.toLowerCase() !== normPinId) continue;
+      if (fault.faultType === 'OPEN_CIRCUIT') {
+        return 1e9;
+      }
+      if (
+        typeof fault.customSeriesOhms === 'number' &&
+        Number.isFinite(fault.customSeriesOhms) &&
+        fault.customSeriesOhms > 0
+      ) {
+        extraOhms += fault.customSeriesOhms;
+        continue;
+      }
       switch (fault.faultType) {
-        case 'OPEN_CIRCUIT':
-          return 1e9;
         case 'HIGH_RESISTANCE_50R':
           extraOhms += 50.0;
           break;

@@ -272,7 +272,7 @@ export const AiDiagnosticAssistantPanel: React.FC<AiDiagnosticAssistantPanelProp
           <div className="space-y-3">
             {/* Provenance & Confidence Meta Bar */}
             <div className="flex flex-wrap items-center justify-between gap-2 rounded-[3px] border border-slate-800 bg-slate-900/80 px-3 py-2 font-mono text-[11px]">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <CheckCircle2
                   className={`w-3.5 h-3.5 ${
                     result.blockedByScoreGate ? 'text-amber-400' : 'text-emerald-400'
@@ -282,6 +282,26 @@ export const AiDiagnosticAssistantPanel: React.FC<AiDiagnosticAssistantPanelProp
                 <span className="text-slate-400">
                   · {Math.round(result.confidence * 100)}% conf
                 </span>
+                {result.attemptTrail.some((a) => a.outcome === 'PRE_QUOTA_REROUTED') &&
+                  result.tierUsed !== 'OFFLINE_AI' && (
+                    <span className="text-[10px] text-cyan-300">
+                      ·{' '}
+                      {lang === 'TL'
+                        ? 'Auto-rerouted bago mag-quota'
+                        : 'Auto-rerouted before quota'}
+                    </span>
+                  )}
+                {result.tierUsed === 'OFFLINE_AI' &&
+                  result.attemptTrail.some(
+                    (a) => a.outcome === 'SKIPPED_COOLDOWN' || a.outcome === 'QUOTA_429'
+                  ) && (
+                    <span className="text-[10px] text-amber-300">
+                      ·{' '}
+                      {lang === 'TL'
+                        ? 'Cloud quota cooldown · Offline AI aktibo'
+                        : 'Cloud quota cooling down · Offline AI active'}
+                    </span>
+                  )}
               </div>
               {result.cachedLocally && (
                 <span className="inline-flex items-center gap-1 text-[10px] text-emerald-300">

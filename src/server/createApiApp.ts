@@ -1,5 +1,5 @@
 import express from 'express';
-import { GoogleGenAI, ThinkingLevel } from '@google/genai';
+import { ThinkingLevel } from '@google/genai';
 import {
   getImageAnalysisProvider,
   resolveImageAnalysisProviderName,
@@ -17,6 +17,17 @@ import {
   probePostgresConnection,
 } from './services/connectionHealthService';
 import { classifyGeminiError } from './services/geminiErrorClassifier';
+import {
+  getFreeTierPoolSnapshot,
+  getGeminiClientForApiKey,
+  getQuotaManagerSnapshot,
+  hasConfiguredGeminiKeys,
+  recordRouteAttemptStart,
+  recordRouteFailure,
+  recordRouteSuccess,
+  resolveAdjustedThinkingLevel,
+  selectFreeTierRoutes,
+} from './services/geminiFreeTierRouter';
 import { validateImagePayload } from './services/imagePayloadValidator';
 import {
   buildNhtsaProvenance,
@@ -951,22 +962,12 @@ export function createAutoelectricApiApp(): express.Express {
           return res.status(400).json({ error: 'Search query exceeds 2000 character limit' });
         }
 
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
+        if (!hasConfiguredGeminiKeys()) {
           return res.status(503).json({
             error: 'Gemini API Key is not configured. Please check Settings > Secrets.',
             code: 'MISSING_API_KEY',
           });
         }
-
-        const ai = new GoogleGenAI({
-          apiKey,
-          httpOptions: {
-            headers: {
-              'User-Agent': 'aistudio-build',
-            },
-          },
-        });
 
         const cleanEcu = typeof ecuModel === 'string' ? ecuModel.slice(0, 160) : '';
         const cleanDtc = typeof dtcCode === 'string' ? dtcCode.slice(0, 40) : '';
@@ -1007,28 +1008,50 @@ Execute Google Search Grounding to retrieve ${
             : 'OEM technical service bulletins, factory wiring references, and documented technician diagnostics.'
         }`;
 
-        const candidateModels = [
-          resolveGeminiModelName(process.env.GEMINI_SEARCH_MODEL, 'gemini-4-hydrogen'),
-          'gemini-3.1-flash-lite',
-        ].filter((m, idx, arr) => arr.indexOf(m) === idx);
+        const preferredSearchModel = resolveGeminiModelName(
+          process.env.GEMINI_SEARCH_MODEL,
+          'gemini-4-hydrogen'
+        );
+        const plan = selectFreeTierRoutes(preferredSearchModel, ['gemini-3.1-flash-lite']);
+
+        if (plan.allInCooldown || plan.candidates.length === 0) {
+          res.setHeader('Retry-After', String(plan.earliestRetryAfterSec || 30));
+          return res.status(429).json({
+            error: `Free-tier Gemini Search models are cooling down after quota limits. Retry in ${plan.earliestRetryAfterSec}s.`,
+            code: 'ALL_FREE_TIERS_COOLDOWN',
+            retryAfterSec: plan.earliestRetryAfterSec,
+            attemptedModels: [],
+            allFreeTiersExhausted: true,
+            freeTierPoolStatus: getFreeTierPoolSnapshot(),
+          });
+        }
 
         let response = null;
-        let usedModel = candidateModels[0];
+        let usedRoute = plan.candidates[0];
         const attemptedModels: string[] = [];
+        const attemptedKeyIds: string[] = [];
         const modelErrors: Record<string, string> = {};
         let lastClassified = classifyGeminiError(new Error('No models attempted'));
+        let observedRetryAfterSec = 0;
 
-        for (let i = 0; i < candidateModels.length; i++) {
-          const currentModel = candidateModels[i];
-          usedModel = currentModel;
-          attemptedModels.push(currentModel);
+        for (let i = 0; i < plan.candidates.length; i++) {
+          const currentRoute = plan.candidates[i];
+          usedRoute = currentRoute;
+          if (!attemptedModels.includes(currentRoute.model)) {
+            attemptedModels.push(currentRoute.model);
+          }
+          if (!attemptedKeyIds.includes(currentRoute.keyId)) {
+            attemptedKeyIds.push(currentRoute.keyId);
+          }
+          recordRouteAttemptStart(currentRoute);
 
+          const ai = getGeminiClientForApiKey(currentRoute.apiKey);
           const controller = new AbortController();
           const timeoutHandle = setTimeout(() => controller.abort(), 25_000);
           try {
             response = await Promise.race([
               ai.models.generateContent({
-                model: currentModel,
+                model: currentRoute.model,
                 contents: prompt,
                 config: {
                   abortSignal: controller.signal,
@@ -1039,22 +1062,33 @@ Execute Google Search Grounding to retrieve ${
               new Promise<never>((_resolve, reject) => {
                 controller.signal.addEventListener(
                   'abort',
-                  () => reject(new Error(`Search grounding timed out on ${currentModel}`)),
+                  () => reject(new Error(`Search grounding timed out on ${currentRoute.model}`)),
                   { once: true }
                 );
               }),
             ]);
             if (response) {
+              recordRouteSuccess(currentRoute, response.usageMetadata?.totalTokenCount);
               break;
             }
           } catch (err: unknown) {
             const classified = classifyGeminiError(err, controller.signal.aborted);
-            lastClassified = classified;
-            modelErrors[currentModel] = `[${classified.category}/${classified.statusCode}] ${classified.rawMessage}`;
-            console.warn(
-              `[GroundedSearch] Model ${currentModel} failed (${classified.category} ${classified.statusCode}): ${classified.rawMessage}`
+            const failureResult = recordRouteFailure(
+              currentRoute,
+              classified,
+              Date.now(),
+              plan.candidates.length - 1 - i
             );
-            if (!classified.retryNextModel) {
+            if (failureResult.cooldownSec > observedRetryAfterSec) {
+              observedRetryAfterSec = failureResult.cooldownSec;
+            }
+            lastClassified = classified;
+            modelErrors[`${currentRoute.keyId}/${currentRoute.model}`] =
+              `[${classified.category}/${classified.statusCode}] ${classified.rawMessage}`;
+            console.warn(
+              `[GroundedSearch] Route ${currentRoute.keyId}/${currentRoute.model} failed (${classified.category} ${classified.statusCode}): ${classified.rawMessage}`
+            );
+            if (!failureResult.shouldTryNextRoute) {
               break;
             }
           } finally {
@@ -1063,11 +1097,18 @@ Execute Google Search Grounding to retrieve ${
         }
 
         if (!response) {
+          if (observedRetryAfterSec > 0 && lastClassified.statusCode === 429) {
+            res.setHeader('Retry-After', String(observedRetryAfterSec));
+          }
           return res.status(lastClassified.statusCode).json({
             error: lastClassified.userMessage,
             code: lastClassified.category,
             details: JSON.stringify(modelErrors),
             attemptedModels,
+            attemptedKeyIds,
+            retryAfterSec: observedRetryAfterSec || lastClassified.retryAfterSec,
+            allFreeTiersExhausted: lastClassified.statusCode === 429,
+            freeTierPoolStatus: getFreeTierPoolSnapshot(),
           });
         }
 
@@ -1101,16 +1142,25 @@ Execute Google Search Grounding to retrieve ${
           })
           .filter((s): s is { title: string; uri: string; domain: string } => s !== null);
 
-        const reroutedFrom = attemptedModels.length > 1 ? attemptedModels[0] : undefined;
+        const reroutedFrom =
+          plan.switchedFromEndpointId ||
+          (attemptedModels.length > 1 ? attemptedModels[0] : undefined);
 
         res.json({
           status: 'SUCCESS',
           answer: response.text || 'No diagnostic response generated.',
           sources: webSources,
           searchQueries,
-          model: usedModel,
+          model: usedRoute.model,
+          activeKeyId: usedRoute.keyId,
+          switchedKeyFrom:
+            plan.switchedFromKeyId ||
+            (attemptedKeyIds.length > 1 ? attemptedKeyIds[0] : undefined),
           attemptedModels,
           reroutedFrom,
+          preQuotaRerouted: plan.preQuotaSwitched,
+          rerouteReason: plan.switchReason || undefined,
+          freeTierPoolStatus: getFreeTierPoolSnapshot(),
           safetyVerification: {
             provenanceStatus: 'AI_INFERRED',
             canEnergizePhysicalBench: false,
@@ -1168,18 +1218,12 @@ Execute Google Search Grounding to retrieve ${
           });
         }
 
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
+        if (!hasConfiguredGeminiKeys()) {
           return res.status(503).json({
             error: 'Gemini API Key is not configured. Please check Settings > Secrets.',
             code: 'MISSING_API_KEY',
           });
         }
-
-        const ai = new GoogleGenAI({
-          apiKey,
-          httpOptions: { headers: { 'User-Agent': 'aistudio-build' } },
-        });
 
         // Role-based routing using verified free-tier Gemini 4 Hydrogen (with ThinkingLevel) & Flash-Lite
         let targetModel = 'gemini-4-hydrogen';
@@ -1211,19 +1255,47 @@ Execute Google Search Grounding to retrieve ${
           typeof benchContext === 'string' ? benchContext.trim().slice(0, 4000) : '';
         const systemText = `${roleInstruction}${cleanBenchContext ? `\n\n[Active Bench Telemetry Context]:\n${cleanBenchContext}` : ''}`;
 
+        const plan = selectFreeTierRoutes(targetModel, [
+          'gemini-4-hydrogen',
+          'gemini-3.1-flash-lite',
+        ]);
+
+        if (plan.allInCooldown || plan.candidates.length === 0) {
+          res.setHeader('Retry-After', String(plan.earliestRetryAfterSec || 30));
+          return res.status(429).json({
+            error: `All free-tier Gemini chat models are cooling down after quota limits. Retry in ${plan.earliestRetryAfterSec}s or use Offline AI.`,
+            code: 'ALL_FREE_TIERS_COOLDOWN',
+            retryAfterSec: plan.earliestRetryAfterSec,
+            attemptedModels: [],
+            allFreeTiersExhausted: true,
+            freeTierPoolStatus: getFreeTierPoolSnapshot(),
+          });
+        }
+
         let response = null;
-        let usedModel = targetModel;
+        let usedRoute = plan.candidates[0];
+        let appliedThinkingLevel: ThinkingLevel | undefined;
         let lastClassified = classifyGeminiError(new Error('No models attempted'));
+        const attemptedModels: string[] = [];
+        const attemptedKeyIds: string[] = [];
+        let observedRetryAfterSec = 0;
 
-        const candidateModels = [targetModel, 'gemini-4-hydrogen', 'gemini-3.1-flash-lite'].filter(
-          (m, idx, arr) => arr.indexOf(m) === idx
-        );
+        for (let i = 0; i < plan.candidates.length; i++) {
+          const currentRoute = plan.candidates[i];
+          usedRoute = currentRoute;
+          if (!attemptedModels.includes(currentRoute.model)) {
+            attemptedModels.push(currentRoute.model);
+          }
+          if (!attemptedKeyIds.includes(currentRoute.keyId)) {
+            attemptedKeyIds.push(currentRoute.keyId);
+          }
+          recordRouteAttemptStart(currentRoute);
 
-        for (const modelCandidate of candidateModels) {
-          usedModel = modelCandidate;
+          const ai = getGeminiClientForApiKey(currentRoute.apiKey);
           const controller = new AbortController();
           const timeoutHandle = setTimeout(() => controller.abort(), 45_000);
           try {
+            appliedThinkingLevel = resolveAdjustedThinkingLevel(currentRoute.model, thinkingLevel);
             const requestConfig: {
               abortSignal: AbortSignal;
               systemInstruction: string;
@@ -1232,32 +1304,44 @@ Execute Google Search Grounding to retrieve ${
               abortSignal: controller.signal,
               systemInstruction: systemText,
             };
-            if (thinkingLevel && modelCandidate === 'gemini-4-hydrogen') {
-              requestConfig.thinkingConfig = { thinkingLevel };
+            if (appliedThinkingLevel && currentRoute.model === 'gemini-4-hydrogen') {
+              requestConfig.thinkingConfig = { thinkingLevel: appliedThinkingLevel };
             }
 
             response = await Promise.race([
               ai.models.generateContent({
-                model: modelCandidate,
+                model: currentRoute.model,
                 contents: formattedContents,
                 config: requestConfig,
               }),
               new Promise<never>((_resolve, reject) => {
                 controller.signal.addEventListener(
                   'abort',
-                  () => reject(new Error(`Gemini chat timed out on ${modelCandidate}`)),
+                  () => reject(new Error(`Gemini chat timed out on ${currentRoute.model}`)),
                   { once: true }
                 );
               }),
             ]);
-            if (response && response.text) break;
+            if (response && response.text) {
+              recordRouteSuccess(currentRoute, response.usageMetadata?.totalTokenCount);
+              break;
+            }
           } catch (modelErr: unknown) {
             const classified = classifyGeminiError(modelErr, controller.signal.aborted);
+            const failureResult = recordRouteFailure(
+              currentRoute,
+              classified,
+              Date.now(),
+              plan.candidates.length - 1 - i
+            );
+            if (failureResult.cooldownSec > observedRetryAfterSec) {
+              observedRetryAfterSec = failureResult.cooldownSec;
+            }
             lastClassified = classified;
             console.warn(
-              `[GeminiChat] ${modelCandidate} failed (${classified.category} ${classified.statusCode}): ${classified.rawMessage}`
+              `[GeminiChat] ${currentRoute.keyId}/${currentRoute.model} failed (${classified.category} ${classified.statusCode}): ${classified.rawMessage}`
             );
-            if (!classified.retryNextModel) {
+            if (!failureResult.shouldTryNextRoute) {
               break;
             }
           } finally {
@@ -1266,17 +1350,39 @@ Execute Google Search Grounding to retrieve ${
         }
 
         if (!response || !response.text) {
+          if (observedRetryAfterSec > 0 && lastClassified.statusCode === 429) {
+            res.setHeader('Retry-After', String(observedRetryAfterSec));
+          }
           return res.status(lastClassified.statusCode).json({
             error: lastClassified.userMessage,
             code: lastClassified.category,
+            attemptedModels,
+            attemptedKeyIds,
+            retryAfterSec: observedRetryAfterSec || lastClassified.retryAfterSec,
+            allFreeTiersExhausted: lastClassified.statusCode === 429,
+            freeTierPoolStatus: getFreeTierPoolSnapshot(),
           });
         }
+
+        const reroutedFrom =
+          plan.switchedFromEndpointId ||
+          (attemptedModels.length > 1 ? attemptedModels[0] : undefined);
 
         return res.json({
           status: 'SUCCESS',
           reply: response.text,
-          model: usedModel,
-          thinkingLevel: usedModel === 'gemini-4-hydrogen' ? thinkingLevel : undefined,
+          model: usedRoute.model,
+          activeKeyId: usedRoute.keyId,
+          switchedKeyFrom:
+            plan.switchedFromKeyId ||
+            (attemptedKeyIds.length > 1 ? attemptedKeyIds[0] : undefined),
+          attemptedModels,
+          reroutedFrom,
+          preQuotaRerouted: plan.preQuotaSwitched,
+          rerouteReason: plan.switchReason || undefined,
+          thinkingLevel:
+            usedRoute.model === 'gemini-4-hydrogen' ? appliedThinkingLevel : undefined,
+          freeTierPoolStatus: getFreeTierPoolSnapshot(),
           timestamp: new Date().toISOString(),
         });
       } catch (err: unknown) {
@@ -1360,18 +1466,26 @@ Execute Google Search Grounding to retrieve ${
           });
         }
 
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
+        if (!hasConfiguredGeminiKeys()) {
           return res.status(503).json({
             error: 'Gemini API Key is not configured. Please check Settings > Secrets.',
             code: 'MISSING_API_KEY',
           });
         }
 
-        const ai = new GoogleGenAI({
-          apiKey,
-          httpOptions: { headers: { 'User-Agent': 'aistudio-build' } },
-        });
+        const plan = selectFreeTierRoutes('gemini-3.5-transcribe', []);
+        const selectedRoute = plan.selected;
+        if (plan.allInCooldown || !selectedRoute || !selectedRoute.apiKey) {
+          res.setHeader('Retry-After', String(plan.earliestRetryAfterSec || 30));
+          return res.status(429).json({
+            error: `Gemini transcription quota is cooling down. Retry in ${plan.earliestRetryAfterSec}s.`,
+            code: 'ALL_FREE_TIERS_COOLDOWN',
+            retryAfterSec: plan.earliestRetryAfterSec,
+          });
+        }
+
+        recordRouteAttemptStart(selectedRoute);
+        const ai = getGeminiClientForApiKey(selectedRoute.apiKey);
 
         const controller = new AbortController();
         const timeoutHandle = setTimeout(() => controller.abort(), 60_000);
@@ -1405,13 +1519,18 @@ Execute Google Search Grounding to retrieve ${
             }),
           ]);
 
+          recordRouteSuccess(selectedRoute, response.usageMetadata?.totalTokenCount);
           const transcription = response.text || '';
           return res.json({
             status: 'SUCCESS',
             transcription: transcription.trim(),
             model: 'gemini-3.5-transcribe',
+            activeKeyId: selectedRoute.keyId,
             timestamp: new Date().toISOString(),
           });
+        } catch (innerErr: unknown) {
+          recordRouteFailure(selectedRoute, classifyGeminiError(innerErr, controller.signal.aborted));
+          throw innerErr;
         } finally {
           clearTimeout(timeoutHandle);
         }
@@ -1454,37 +1573,52 @@ Execute Google Search Grounding to retrieve ${
         const cleanLocation =
           typeof location === 'string' ? location.trim().slice(0, 200) : '';
 
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
+        if (!hasConfiguredGeminiKeys()) {
           return res.status(503).json({
             error: 'Gemini API Key is not configured. Please check Settings > Secrets.',
             code: 'MISSING_API_KEY',
           });
         }
 
-        const ai = new GoogleGenAI({
-          apiKey,
-          httpOptions: { headers: { 'User-Agent': 'aistudio-build' } },
-        });
+        const plan = selectFreeTierRoutes('gemini-4-hydrogen', []);
+        const selectedRoute = plan.selected;
+        if (plan.allInCooldown || !selectedRoute || !selectedRoute.apiKey) {
+          res.setHeader('Retry-After', String(plan.earliestRetryAfterSec || 30));
+          return res.status(429).json({
+            error: `Gemini Maps grounding quota is cooling down. Retry in ${plan.earliestRetryAfterSec}s.`,
+            code: 'ALL_FREE_TIERS_COOLDOWN',
+            retryAfterSec: plan.earliestRetryAfterSec,
+          });
+        }
+
+        recordRouteAttemptStart(selectedRoute);
+        const ai = getGeminiClientForApiKey(selectedRoute.apiKey);
 
         const prompt = cleanLocation ? `${cleanQuery} in or near ${cleanLocation}` : cleanQuery;
 
-        const interaction = await ai.interactions.create(
-          {
-            model: 'gemini-4-hydrogen',
-            input: prompt,
-            tools: [{ type: 'google_maps' }],
-          },
-          { timeout: 45_000 }
-        );
+        try {
+          const interaction = await ai.interactions.create(
+            {
+              model: 'gemini-4-hydrogen',
+              input: prompt,
+              tools: [{ type: 'google_maps' }],
+            },
+            { timeout: 45_000 }
+          );
 
-        const answer = interaction.output_text || 'No location results found.';
-        return res.json({
-          status: 'SUCCESS',
-          answer,
-          model: 'gemini-4-hydrogen',
-          timestamp: new Date().toISOString(),
-        });
+          recordRouteSuccess(selectedRoute);
+          const answer = interaction.output_text || 'No location results found.';
+          return res.json({
+            status: 'SUCCESS',
+            answer,
+            model: 'gemini-4-hydrogen',
+            activeKeyId: selectedRoute.keyId,
+            timestamp: new Date().toISOString(),
+          });
+        } catch (innerErr: unknown) {
+          recordRouteFailure(selectedRoute, classifyGeminiError(innerErr));
+          throw innerErr;
+        }
       } catch (err: unknown) {
         const classified = classifyGeminiError(err);
         return res.status(classified.statusCode).json({
@@ -1525,18 +1659,22 @@ Execute Google Search Grounding to retrieve ${
           });
         }
 
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
+        if (!hasConfiguredGeminiKeys()) {
           return res.status(503).json({
             error: 'Gemini API Key is not configured. Please check Settings > Secrets.',
             code: 'MISSING_API_KEY',
           });
         }
 
-        const ai = new GoogleGenAI({
-          apiKey,
-          httpOptions: { headers: { 'User-Agent': 'aistudio-build' } },
-        });
+        const routePlan = selectFreeTierRoutes('gemini-omni-1.2-flash', []);
+        const selectedKey = routePlan.selected?.apiKey || process.env.GEMINI_API_KEY;
+        if (!selectedKey) {
+          return res.status(503).json({
+            error: 'Gemini API Key is not configured. Please check Settings > Secrets.',
+            code: 'MISSING_API_KEY',
+          });
+        }
+        const ai = getGeminiClientForApiKey(selectedKey);
 
         const cleanBase64 = imageBase64
           .replace(/^data:image\/[a-zA-Z0-9.+-]+;base64,/, '')
@@ -1666,18 +1804,22 @@ Execute Google Search Grounding to retrieve ${
           };
         }
 
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
+        if (!hasConfiguredGeminiKeys()) {
           return res.status(503).json({
             error: 'Gemini API Key is not configured. Please check Settings > Secrets.',
             code: 'MISSING_API_KEY',
           });
         }
 
-        const ai = new GoogleGenAI({
-          apiKey,
-          httpOptions: { headers: { 'User-Agent': 'aistudio-build' } },
-        });
+        const routePlan = selectFreeTierRoutes('gemini-nano-banana-2.1', []);
+        const selectedKey = routePlan.selected?.apiKey || process.env.GEMINI_API_KEY;
+        if (!selectedKey) {
+          return res.status(503).json({
+            error: 'Gemini API Key is not configured. Please check Settings > Secrets.',
+            code: 'MISSING_API_KEY',
+          });
+        }
+        const ai = getGeminiClientForApiKey(selectedKey);
 
         const selectedAspect =
           aspectRatio === '16:9' ? '16:9' : aspectRatio === '4:3' ? '4:3' : '1:1';
@@ -1794,18 +1936,12 @@ Execute Google Search Grounding to retrieve ${
           });
         }
 
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
+        if (!hasConfiguredGeminiKeys()) {
           return res.status(503).json({
             error: 'Gemini API Key is not configured. Please check Settings > Secrets.',
             code: 'MISSING_API_KEY',
           });
         }
-
-        const ai = new GoogleGenAI({
-          apiKey,
-          httpOptions: { headers: { 'User-Agent': 'aistudio-build' } },
-        });
 
         const cleanBenchContext =
           typeof benchContext === 'string' ? benchContext.trim().slice(0, 4000) : '';
@@ -1813,23 +1949,117 @@ Execute Google Search Grounding to retrieve ${
 Provide brief, direct, hands-free automotive test instructions suitable for voice readout while the technician is operating test probes. Never invent OEM pin numbers or wiring specs.
 ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
 
-        const interaction = await ai.interactions.create(
-          {
-            model: 'gemini-4-hydrogen',
-            input: cleanSpeech,
-            system_instruction: systemInstruction,
-            generation_config: {
-              thinking_level: 'low',
-            },
-          },
-          { timeout: 30_000 }
-        );
+        const plan = selectFreeTierRoutes('gemini-4-hydrogen', ['gemini-3.1-flash-lite']);
+        if (plan.allInCooldown || plan.candidates.length === 0) {
+          res.setHeader('Retry-After', String(plan.earliestRetryAfterSec || 30));
+          return res.status(429).json({
+            error: `Free-tier Gemini Voice models are cooling down after quota limits. Retry in ${plan.earliestRetryAfterSec}s.`,
+            code: 'ALL_FREE_TIERS_COOLDOWN',
+            retryAfterSec: plan.earliestRetryAfterSec,
+            allFreeTiersExhausted: true,
+            freeTierPoolStatus: getFreeTierPoolSnapshot(),
+          });
+        }
 
-        const reply = interaction.output_text || 'Acknowledged.';
+        let voiceReply = '';
+        let usedRoute = plan.candidates[0];
+        let lastClassified = classifyGeminiError(new Error('No voice models attempted'));
+        let observedRetryAfterSec = 0;
+
+        for (let i = 0; i < plan.candidates.length; i++) {
+          const currentRoute = plan.candidates[i];
+          usedRoute = currentRoute;
+          recordRouteAttemptStart(currentRoute);
+          const ai = getGeminiClientForApiKey(currentRoute.apiKey);
+
+          try {
+            if (currentRoute.model === 'gemini-4-hydrogen') {
+              const interaction = await ai.interactions.create(
+                {
+                  model: 'gemini-4-hydrogen',
+                  input: cleanSpeech,
+                  system_instruction: systemInstruction,
+                  generation_config: {
+                    thinking_level: 'low',
+                  },
+                },
+                { timeout: 30_000 }
+              );
+              voiceReply = interaction.output_text || '';
+              if (voiceReply.trim()) {
+                recordRouteSuccess(currentRoute);
+                break;
+              }
+            } else {
+              const controller = new AbortController();
+              const timeoutHandle = setTimeout(() => controller.abort(), 25_000);
+              try {
+                const genRes = await Promise.race([
+                  ai.models.generateContent({
+                    model: currentRoute.model,
+                    contents: cleanSpeech,
+                    config: {
+                      abortSignal: controller.signal,
+                      systemInstruction,
+                    },
+                  }),
+                  new Promise<never>((_resolve, reject) => {
+                    controller.signal.addEventListener(
+                      'abort',
+                      () => reject(new Error(`Voice turn timed out on ${currentRoute.model}`)),
+                      { once: true }
+                    );
+                  }),
+                ]);
+                voiceReply = genRes.text || '';
+                if (voiceReply.trim()) {
+                  recordRouteSuccess(currentRoute, genRes.usageMetadata?.totalTokenCount);
+                  break;
+                }
+              } finally {
+                clearTimeout(timeoutHandle);
+              }
+            }
+          } catch (modelErr: unknown) {
+            const classified = classifyGeminiError(modelErr);
+            const failureResult = recordRouteFailure(
+              currentRoute,
+              classified,
+              Date.now(),
+              plan.candidates.length - 1 - i
+            );
+            if (failureResult.cooldownSec > observedRetryAfterSec) {
+              observedRetryAfterSec = failureResult.cooldownSec;
+            }
+            lastClassified = classified;
+            if (!failureResult.shouldTryNextRoute) {
+              break;
+            }
+          }
+        }
+
+        if (!voiceReply.trim()) {
+          if (observedRetryAfterSec > 0 && lastClassified.statusCode === 429) {
+            res.setHeader('Retry-After', String(observedRetryAfterSec));
+          }
+          return res.status(lastClassified.statusCode).json({
+            error: lastClassified.userMessage,
+            code: lastClassified.category,
+            retryAfterSec: observedRetryAfterSec || lastClassified.retryAfterSec,
+            allFreeTiersExhausted: lastClassified.statusCode === 429,
+          });
+        }
+
         return res.json({
           status: 'SUCCESS',
-          reply,
-          model: 'gemini-4-hydrogen',
+          reply: voiceReply.trim(),
+          model: usedRoute.model,
+          activeKeyId: usedRoute.keyId,
+          switchedKeyFrom: plan.switchedFromKeyId || undefined,
+          reroutedFrom: plan.switchedFromEndpointId || undefined,
+          preQuotaRerouted: plan.preQuotaSwitched,
+          rerouteReason: plan.switchReason || undefined,
+          freeTierPoolStatus: getFreeTierPoolSnapshot(),
           timestamp: new Date().toISOString(),
         });
       } catch (err: unknown) {
@@ -2045,7 +2275,7 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
 
   app.get('/api/autoelectric/health', (_req, res) => {
     const provider = resolveImageAnalysisProviderName();
-    const hasGeminiKey = Boolean(process.env.GEMINI_API_KEY);
+    const hasGeminiKey = hasConfiguredGeminiKeys();
     const hasOpenAiKey = Boolean(process.env.OPENAI_API_KEY);
     res.json({
       status: 'ONLINE',
@@ -2058,6 +2288,19 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
       timestamp: new Date().toISOString(),
     });
   });
+
+  app.get(
+    '/api/autoelectric/ai/quota-status',
+    requireAuthOrTrialSession,
+    (_req: AuthenticatedRequest, res) => {
+      return res.json({
+        status: 'SUCCESS',
+        pool: getFreeTierPoolSnapshot(),
+        quotaManager: getQuotaManagerSnapshot(),
+        checkedAt: new Date().toISOString(),
+      });
+    }
+  );
 
   app.get(
     '/api/autoelectric/diagnostics/connection-health',

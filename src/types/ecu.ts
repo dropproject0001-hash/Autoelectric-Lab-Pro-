@@ -19,6 +19,8 @@ export interface InjectedFault {
   faultType: FaultType;
   description: string;
   timestamp: number;
+  /** Optional custom series contact/corrosion resistance in Ohms (used by Fault Builder resistance buildup). */
+  customSeriesOhms?: number;
 }
 
 export interface WireConnection {

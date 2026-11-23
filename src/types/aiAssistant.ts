@@ -19,7 +19,15 @@ export interface AiTierMetadata {
 
 export interface AiTierAttemptLog {
   tier: AiTierId;
-  outcome: 'SUCCESS' | 'QUOTA_429' | 'TIMEOUT' | 'AUTH_OR_TIER_BLOCKED' | 'NETWORK_ERROR' | 'SKIPPED_OFFLINE';
+  outcome:
+    | 'SUCCESS'
+    | 'QUOTA_429'
+    | 'TIMEOUT'
+    | 'AUTH_OR_TIER_BLOCKED'
+    | 'NETWORK_ERROR'
+    | 'SKIPPED_OFFLINE'
+    | 'SKIPPED_COOLDOWN'
+    | 'PRE_QUOTA_REROUTED';
   statusCode?: number;
   reason?: string;
 }
@@ -29,6 +37,9 @@ export interface AiRouterStatusSnapshot {
   phase: AiRouterPhase;
   lastUpdatedAt: number;
   isOfflineFallback: boolean;
+  preQuotaRerouted?: boolean;
+  rerouteReason?: string;
+  cooldownActiveUntilMs?: number;
   lastErrorSummary?: string;
   attemptTrail: AiTierAttemptLog[];
 }

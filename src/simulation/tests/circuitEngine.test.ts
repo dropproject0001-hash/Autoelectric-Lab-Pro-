@@ -73,6 +73,18 @@ import {
   parseAndExecuteVoiceCommand,
   type VoiceCommandActions,
 } from '../../utils/voiceCommandParser';
+import {
+  BUILT_IN_FAULT_SEQUENCES,
+  deleteCustomFaultSequence,
+  evaluateDiagnosticReasoning,
+  evaluateFaultSequenceFrame,
+  exportFaultSequenceJson,
+  importFaultSequenceJson,
+  loadSavedFaultSequences,
+  resetFaultSequenceStoreForTests,
+  saveCustomFaultSequence,
+  type CustomFaultSequence,
+} from '../faults/faultSequenceService';
 
 interface TestResult {
   name: string;
@@ -2539,6 +2551,242 @@ function testBulkPinContinuityCheck() {
 }
 
 // ==========================================
+// 16. CUSTOM FAULT BUILDER SEQUENCES & MNA INTEGRATION
+// ==========================================
+function testCustomFaultBuilderSequences() {
+  resetFaultSequenceStoreForTests();
+
+  const psuOn: PowerSupplyState = {
+    voltageSetting: 12.6,
+    currentLimit: 10.0,
+    isOutputEnabled: true,
+    preset: '12V_BENCH',
+  };
+  const dmmDc: MultimeterState = {
+    mode: 'V_DC',
+    redProbe: { attachedToPinId: 'ecu-pin-7', attachedLabel: 'TPS_SIG' },
+    blackProbe: { attachedToPinId: 'chassis-gnd', attachedLabel: 'CHASSIS_GND' },
+    isPowered: true,
+    rangeAuto: true,
+    holdValue: false,
+  };
+
+  // Baseline nominal TPS voltage for comparison
+  const nominalSim = solveCircuit(
+    psuOn,
+    DEFAULT_ECU_PINS,
+    [],
+    DEFAULT_WIRES,
+    DEFAULT_BENCH_COMPONENTS,
+    dmmDc,
+    { ckpSignalLost: false }
+  );
+  const nominalTpsV = nominalSim.nodeVoltages['ecu-pin-7'] ?? 0;
+
+  // 16.1 Built-in 3-stage sequence: Intermittent -> Resistance Buildup -> Hard Ground
+  const tpsSequence = BUILT_IN_FAULT_SEQUENCES[0];
+
+  // Stage 1 (0..6000ms): ON window (<700ms) -> OPEN_CIRCUIT on Pin 7
+  const frameStage1On = evaluateFaultSequenceFrame(tpsSequence, 200, DEFAULT_ECU_PINS);
+  const simStage1On = solveCircuit(
+    psuOn,
+    DEFAULT_ECU_PINS,
+    frameStage1On.injectedFaults,
+    DEFAULT_WIRES,
+    DEFAULT_BENCH_COMPONENTS,
+    dmmDc,
+    { ckpSignalLost: frameStage1On.ckpSignalLost }
+  );
+  // Stage 1 OFF recovery window (700..1600ms) -> clean signal
+  const frameStage1Off = evaluateFaultSequenceFrame(tpsSequence, 900, DEFAULT_ECU_PINS);
+  const simStage1Off = solveCircuit(
+    psuOn,
+    DEFAULT_ECU_PINS,
+    frameStage1Off.injectedFaults,
+    DEFAULT_WIRES,
+    DEFAULT_BENCH_COMPONENTS,
+    dmmDc,
+    { ckpSignalLost: frameStage1Off.ckpSignalLost }
+  );
+
+  assert(
+    'Fault Builder: Stage 1 intermittent cycles ON dropout and OFF nominal recovery in MNA solver',
+    'Fault Builder',
+    frameStage1On.activeStepIndex === 0 &&
+      frameStage1On.intermittentEngaged &&
+      frameStage1On.injectedFaults[0]?.faultType === 'OPEN_CIRCUIT' &&
+      (simStage1On.nodeVoltages['ecu-pin-7'] ?? 5) < 0.25 &&
+      !frameStage1Off.intermittentEngaged &&
+      frameStage1Off.injectedFaults.length === 0 &&
+      Math.abs((simStage1Off.nodeVoltages['ecu-pin-7'] ?? 0) - nominalTpsV) < 0.05,
+    `ON=OPEN_CIRCUIT (<0.25V), OFF=nominal (~${nominalTpsV.toFixed(2)}V)`,
+    `ON=${frameStage1On.injectedFaults[0]?.faultType} (${(simStage1On.nodeVoltages['ecu-pin-7'] ?? 0).toFixed(2)}V), OFF=${frameStage1Off.injectedFaults.length} faults (${(simStage1Off.nodeVoltages['ecu-pin-7'] ?? 0).toFixed(2)}V)`
+  );
+
+  // Stage 2 (6000..14000ms): Linear resistance buildup 25Ω -> 450Ω; midpoint at 10000ms = 237.5Ω
+  const frameStage2Mid = evaluateFaultSequenceFrame(tpsSequence, 10_000, DEFAULT_ECU_PINS);
+  const customOhmsMid = frameStage2Mid.injectedFaults[0]?.customSeriesOhms ?? 0;
+  const solverOhmsMid = FaultManager.getSeriesFaultOhms(frameStage2Mid.injectedFaults, 'ecu-pin-7');
+  const simStage2Mid = solveCircuit(
+    psuOn,
+    DEFAULT_ECU_PINS,
+    frameStage2Mid.injectedFaults,
+    DEFAULT_WIRES,
+    DEFAULT_BENCH_COMPONENTS,
+    dmmDc,
+    { ckpSignalLost: frameStage2Mid.ckpSignalLost }
+  );
+
+  assertCloseTo(
+    'Fault Builder: Stage 2 resistance buildup interpolates to 237.5Ω at midpoint and flows into FaultManager',
+    'Fault Builder',
+    solverOhmsMid,
+    237.5,
+    1.0
+  );
+  assert(
+    'Fault Builder: Stage 2 customSeriesOhms causes measurable MNA voltage drop',
+    'Fault Builder',
+    frameStage2Mid.activeStepIndex === 1 &&
+      customOhmsMid > 200 &&
+      customOhmsMid < 275 &&
+      (simStage2Mid.nodeVoltages['ecu-pin-7'] ?? nominalTpsV) < nominalTpsV,
+    `activeStepIndex=1, customSeriesOhms in (200, 275), Pin7 < ${nominalTpsV.toFixed(4)}V`,
+    `step=${frameStage2Mid.activeStepIndex}, customSeriesOhms=${customOhmsMid}, Pin7=${(simStage2Mid.nodeVoltages['ecu-pin-7'] ?? 0).toFixed(4)}V`
+  );
+
+  // Stage 3 (14000..20000ms): Hard short to ground -> <0.05V & P0122
+  const frameStage3 = evaluateFaultSequenceFrame(tpsSequence, 15_000, DEFAULT_ECU_PINS);
+  const simStage3 = solveCircuit(
+    psuOn,
+    DEFAULT_ECU_PINS,
+    frameStage3.injectedFaults,
+    DEFAULT_WIRES,
+    DEFAULT_BENCH_COMPONENTS,
+    dmmDc,
+    { ckpSignalLost: frameStage3.ckpSignalLost }
+  );
+  assert(
+    'Fault Builder: Stage 3 hard ground clamps TPS_SIG near 0V and raises P0122',
+    'Fault Builder',
+    frameStage3.activeStepIndex === 2 &&
+      frameStage3.injectedFaults[0]?.faultType === 'SHORT_TO_GND' &&
+      (simStage3.nodeVoltages['ecu-pin-7'] ?? 5) < 0.05 &&
+      simStage3.activeDTCs.some((dtc) => dtc.code === 'P0122'),
+    'SHORT_TO_GND, TPS<0.05V, DTC P0122',
+    `type=${frameStage3.injectedFaults[0]?.faultType}, V=${(simStage3.nodeVoltages['ecu-pin-7'] ?? 0).toFixed(3)}V, DTCs=${simStage3.activeDTCs.map((d) => d.code).join(',')}`
+  );
+
+  // 16.2 Multi-fault + CUT_WIRE + CKP_DROPOUT + Save/Load/Import/Export/Delete
+  const customSeq: CustomFaultSequence = {
+    id: 'custom-test-seq-1',
+    title: 'Dual Harness Cut & CKP Dropout Drill',
+    description: 'Tests simultaneous wire cut, CKP crank loss, and TPS resistance buildup.',
+    difficulty: 'MASTER',
+    loopPlayback: false,
+    steps: [
+      {
+        id: 'cstep-1',
+        name: 'Combined Multi-Fault',
+        durationSec: 5,
+        notes: 'Cut wire-2, kill CKP, and inject +120Ω on Pin 7',
+        items: [
+          {
+            id: 'citem-cut',
+            pinId: 'ecu-pin-7',
+            wireId: 'wire-2',
+            mode: 'CUT_WIRE',
+            label: 'Cut TPS Signal Wire',
+          },
+          {
+            id: 'citem-ckp',
+            pinId: 'ecu-pin-11',
+            mode: 'CKP_DROPOUT',
+            label: 'CKP Sensor Dropout',
+          },
+          {
+            id: 'citem-res',
+            pinId: 'ecu-pin-7',
+            mode: 'RESISTANCE_BUILDUP',
+            label: 'TPS Terminal Resistance',
+            startOhms: 120,
+            endOhms: 120,
+          },
+        ],
+      },
+    ],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+
+  const multiFrame = evaluateFaultSequenceFrame(customSeq, 1000, DEFAULT_ECU_PINS);
+  const completedFrame = evaluateFaultSequenceFrame(customSeq, 6000, DEFAULT_ECU_PINS);
+  assert(
+    'Fault Builder: Multi-fault stage activates CUT_WIRE, CKP_DROPOUT, and resistance simultaneously; non-loop stops cleanly',
+    'Fault Builder',
+    multiFrame.cutWireIds.includes('wire-2') &&
+      multiFrame.ckpSignalLost &&
+      multiFrame.injectedFaults[0]?.customSeriesOhms === 120 &&
+      completedFrame.completedNonLoop,
+    'cutWire=wire-2, ckpSignalLost=true, ohms=120, completedNonLoop=true',
+    `wires=${multiFrame.cutWireIds.join(',')}, ckp=${multiFrame.ckpSignalLost}, ohms=${multiFrame.injectedFaults[0]?.customSeriesOhms}, done=${completedFrame.completedNonLoop}`
+  );
+
+  const { saved, allSequences } = saveCustomFaultSequence(customSeq);
+  const json = exportFaultSequenceJson(saved);
+  const { imported } = importFaultSequenceJson(json);
+
+  let invalidRejected = false;
+  try {
+    importFaultSequenceJson('{"invalid": true}');
+  } catch {
+    invalidRejected = true;
+  }
+
+  const afterDelete = deleteCustomFaultSequence(imported.id);
+  const reloaded = loadSavedFaultSequences();
+  assert(
+    'Fault Builder: Save, JSON export/import round-trip, invalid JSON guard, and delete persist accurately',
+    'Fault Builder',
+    allSequences.some((s) => s.id === saved.id) &&
+      imported.title === saved.title &&
+      imported.id !== saved.id &&
+      invalidRejected &&
+      !afterDelete.some((s) => s.id === imported.id) &&
+      reloaded.some((s) => s.id === saved.id),
+    'saved present, imported cloned, invalid JSON rejected, deleted removed',
+    `savedFound=${allSequences.some((s) => s.id === saved.id)}, invalidRejected=${invalidRejected}, reloadedLen=${reloaded.length}`
+  );
+
+  // 16.3 Diagnostic Reasoning Check
+  const correctCheck = evaluateDiagnosticReasoning(
+    tpsSequence,
+    'ecu-pin-7',
+    'MULTI_FAULT',
+    DEFAULT_ECU_PINS
+  );
+  const wrongCheck = evaluateDiagnosticReasoning(
+    tpsSequence,
+    'ecu-pin-13',
+    'CKP_DROPOUT',
+    DEFAULT_ECU_PINS
+  );
+  assert(
+    'Fault Builder: Diagnostic Reasoning Check validates matching pin/mechanism and rejects incorrect guesses with evidence',
+    'Fault Builder',
+    correctCheck.overallCorrect &&
+      !wrongCheck.overallCorrect &&
+      !wrongCheck.pinMatched &&
+      !wrongCheck.mechanismMatched &&
+      wrongCheck.expectedPinLabels.some((lbl) => lbl.includes('TPS_SIG')),
+    'correct=true, wrong=false with TPS_SIG evidence',
+    `correct=${correctCheck.overallCorrect}, wrong=${wrongCheck.overallCorrect}, pins=${wrongCheck.expectedPinLabels.join(',')}`
+  );
+
+  resetFaultSequenceStoreForTests();
+}
+
+// ==========================================
 // RUNNER & REPORTING
 // ==========================================
 export function runAllTests(): { passed: number; failed: number; total: number; results: TestResult[] } {
@@ -2560,6 +2808,7 @@ export function runAllTests(): { passed: number; failed: number; total: number; 
     testLabDrawerIconSystem();
     testTroubleScenarioVoiceCoachIntegration();
     testBulkPinContinuityCheck();
+    testCustomFaultBuilderSequences();
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     testResults.push({

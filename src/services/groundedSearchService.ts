@@ -18,6 +18,9 @@ export interface GroundedSearchResult {
   model: string;
   attemptedModels?: string[];
   reroutedFrom?: string;
+  preQuotaRerouted?: boolean;
+  rerouteReason?: string;
+  retryAfterSec?: number;
   timestamp: string;
   error?: string;
   errorCode?: string;
@@ -68,6 +71,9 @@ export async function performGroundedSearch(
       model?: string;
       attemptedModels?: string[];
       reroutedFrom?: string;
+      preQuotaRerouted?: boolean;
+      rerouteReason?: string;
+      retryAfterSec?: number;
       timestamp?: string;
     };
 
@@ -78,13 +84,23 @@ export async function performGroundedSearch(
           ? data.error.trim()
           : `Grounded search failed (HTTP ${response.status}).`;
 
+      const headerRetry = Number(response.headers.get('Retry-After'));
+      const retryAfterSec =
+        typeof data.retryAfterSec === 'number' && data.retryAfterSec > 0
+          ? data.retryAfterSec
+          : Number.isFinite(headerRetry) && headerRetry > 0
+            ? headerRetry
+            : undefined;
+
       if (response.status === 401) {
         friendlyError =
           data.error || 'Authentication required or session expired. Enter an active 8-digit Trial PIN or Master Admin PIN.';
-      } else if (response.status === 429 && typeof data.details === 'string' && data.details) {
+      } else if (response.status === 429) {
         friendlyError =
           data.error ||
-          'Gemini API rate limit or quota exceeded (429). Please wait briefly before retrying.';
+          (retryAfterSec
+            ? `Gemini Search free-tier models are cooling down. Retry in ${retryAfterSec}s.`
+            : 'Gemini API rate limit or quota exceeded (429). Please wait briefly before retrying.');
       } else if (
         response.status !== 403 &&
         response.status !== 400 &&
@@ -102,7 +118,9 @@ export async function performGroundedSearch(
         answer: friendlyError,
         sources: [],
         searchQueries: [],
-        model: 'gemini-4-hydrogen',
+        model: data.model || 'gemini-4-hydrogen',
+        attemptedModels: data.attemptedModels,
+        retryAfterSec,
         timestamp: new Date().toISOString(),
         error: friendlyError,
         errorCode: data.code || `HTTP_${response.status}`,
@@ -117,6 +135,8 @@ export async function performGroundedSearch(
       model: data.model || 'gemini-4-hydrogen',
       attemptedModels: data.attemptedModels || [],
       reroutedFrom: data.reroutedFrom || undefined,
+      preQuotaRerouted: Boolean(data.preQuotaRerouted),
+      rerouteReason: data.rerouteReason,
       timestamp: data.timestamp || new Date().toISOString(),
     };
   } catch (err: unknown) {

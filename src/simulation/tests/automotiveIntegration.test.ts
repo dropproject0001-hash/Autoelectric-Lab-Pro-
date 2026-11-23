@@ -13,6 +13,11 @@ import {
   resolveFirebaseProjectId,
   setJwksFetcherForTests,
 } from '../../server/services/firebaseAuthMiddleware';
+import { classifyGeminiError } from '../../server/services/geminiErrorClassifier';
+import {
+  recordModelFailure,
+  resetFreeTierRouterForTests,
+} from '../../server/services/geminiFreeTierRouter';
 import {
   resetLicenseStoreForTests,
   setAdminUidForTests,
@@ -929,6 +934,84 @@ async function main() {
       assert.equal(blockedTrialAiRes.status, 403);
       const blockedTrialAiBody = (await blockedTrialAiRes.json()) as { code?: string };
       assert.equal(blockedTrialAiBody.code, 'TRIAL_REVOKED');
+
+      // Free-tier quota status endpoint enforces auth and returns live pool state + fast-fail cooldown protection
+      const unauthQuotaRes = await fetch(`${baseUrl}/api/autoelectric/ai/quota-status`);
+      assert.equal(unauthQuotaRes.status, 401);
+
+      resetFreeTierRouterForTests();
+      const prevQuotaKey1 = process.env.GEMINI_API_KEY;
+      const prevQuotaKey2 = process.env.GEMINI_API_KEY_2;
+      process.env.GEMINI_API_KEY = 'test-key-quota-slot-alpha-secret';
+      process.env.GEMINI_API_KEY_2 = 'test-key-quota-slot-beta-secret';
+      try {
+        const authQuotaRes = await fetch(`${baseUrl}/api/autoelectric/ai/quota-status`, {
+          headers: adminAiHeaders,
+        });
+        assert.equal(authQuotaRes.status, 200);
+        const authQuotaRaw = await authQuotaRes.text();
+        assert.equal(authQuotaRaw.includes('test-key-quota-slot-alpha-secret'), false);
+        assert.equal(authQuotaRaw.includes('test-key-quota-slot-beta-secret'), false);
+        const authQuotaBody = JSON.parse(authQuotaRaw) as {
+          status?: string;
+          pool?: Array<{ model: string; inCooldown: boolean }>;
+          quotaManager?: {
+            totalConfiguredKeys: number;
+            healthyKeys: number;
+            switchThresholdRatio: number;
+            keys: Array<{ keyId: string; inCooldown: boolean }>;
+            endpoints: Array<{ endpointId: string; model: string }>;
+          };
+        };
+        assert.equal(authQuotaBody.status, 'SUCCESS');
+        assert.ok(authQuotaBody.pool?.some((m) => m.model === 'gemini-4-hydrogen'));
+        assert.ok(authQuotaBody.pool?.some((m) => m.model === 'gemini-3.1-flash-lite'));
+        assert.equal(authQuotaBody.quotaManager?.totalConfiguredKeys, 2);
+        assert.equal(authQuotaBody.quotaManager?.healthyKeys, 2);
+        assert.ok((authQuotaBody.quotaManager?.switchThresholdRatio || 0) > 0);
+        assert.deepEqual(
+          authQuotaBody.quotaManager?.keys.map((k) => k.keyId),
+          ['gemini-key-1', 'gemini-key-2']
+        );
+      } finally {
+        if (prevQuotaKey1 === undefined) delete process.env.GEMINI_API_KEY;
+        else process.env.GEMINI_API_KEY = prevQuotaKey1;
+        if (prevQuotaKey2 === undefined) delete process.env.GEMINI_API_KEY_2;
+        else process.env.GEMINI_API_KEY_2 = prevQuotaKey2;
+        resetFreeTierRouterForTests();
+      }
+
+      // When all free-tier models are in cooldown, endpoints fast-fail with 429 ALL_FREE_TIERS_COOLDOWN + Retry-After before hitting upstream
+      const prevGeminiKey = process.env.GEMINI_API_KEY;
+      process.env.GEMINI_API_KEY = 'test-key-cooldown-check-only';
+      try {
+        const now = Date.now();
+        recordModelFailure('gemini-4-hydrogen', classifyGeminiError(new Error('429 retry in 25s')), now);
+        recordModelFailure('gemini-3.1-flash-lite', classifyGeminiError(new Error('429 retry in 25s')), now);
+
+        const cooldownChatRes = await fetch(`${baseUrl}/api/autoelectric/gemini-chat`, {
+          method: 'POST',
+          headers: adminAiHeaders,
+          body: JSON.stringify({
+            messages: [{ role: 'user', text: 'Check P0122' }],
+            role: 'DEEP_REASONING',
+          }),
+        });
+        assert.equal(cooldownChatRes.status, 429);
+        assert.ok(Number(cooldownChatRes.headers.get('retry-after')) >= 1);
+        const cooldownChatBody = (await cooldownChatRes.json()) as {
+          code?: string;
+          allFreeTiersExhausted?: boolean;
+          retryAfterSec?: number;
+        };
+        assert.equal(cooldownChatBody.code, 'ALL_FREE_TIERS_COOLDOWN');
+        assert.equal(cooldownChatBody.allFreeTiersExhausted, true);
+        assert.ok((cooldownChatBody.retryAfterSec || 0) >= 1);
+      } finally {
+        if (prevGeminiKey === undefined) delete process.env.GEMINI_API_KEY;
+        else process.env.GEMINI_API_KEY = prevGeminiKey;
+        resetFreeTierRouterForTests();
+      }
     } finally {
       if (prevProjectId === undefined) {
         delete process.env.FIREBASE_PROJECT_ID;

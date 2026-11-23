@@ -13,6 +13,7 @@ import {
   Activity,
   ChevronDown,
   ChevronUp,
+  Layers,
   Play,
 } from 'lucide-react';
 import { recordRenderCycle } from '../utils/perfMonitor';
@@ -32,6 +33,7 @@ interface FaultInjectorProps {
   onSearchDtc?: (dtcCode: string, description: string) => void;
   selectedBrandKey?: string;
   nodeVoltages?: Record<string, number>;
+  onOpenFaultBuilder?: () => void;
 }
 
 export const FaultInjector: React.FC<FaultInjectorProps> = React.memo(({
@@ -46,6 +48,7 @@ export const FaultInjector: React.FC<FaultInjectorProps> = React.memo(({
   onSearchDtc,
   selectedBrandKey,
   nodeVoltages = {},
+  onOpenFaultBuilder,
 }) => {
   const [scenariosOpen, setScenariosOpen] = useState(false);
   const [showAllBrands, setShowAllBrands] = useState(true);
@@ -122,21 +125,33 @@ export const FaultInjector: React.FC<FaultInjectorProps> = React.memo(({
 
       {/* Quick Scenario Presets */}
       <div className="flex flex-col gap-1.5">
-        <div className="flex items-center justify-between gap-1.5 text-[10px] font-mono text-[#91a4bd] uppercase tracking-wider">
+        <div className="flex flex-wrap items-center justify-between gap-1.5 text-[10px] font-mono text-[#91a4bd] uppercase tracking-wider">
           <div className="flex items-center gap-1.5">
             <Sparkles className="w-3 h-3 text-[#19c8f5]" />
             <span>Diagnostic Scenarios</span>
           </div>
-          <button
-            type="button"
-            onClick={() => setScenariosOpen((prev) => !prev)}
-            className="hw-btn flex items-center gap-1 px-2 py-1 rounded-lg text-[#ffb020] normal-case text-[10px] cursor-pointer"
-            aria-expanded={scenariosOpen}
-          >
-            <LabDrawerIcon name="expand" size={24} className="w-3.5 h-3.5" />
-            <span>OEM Scenarios DB ({BENCH_TEST_SCENARIOS.length})</span>
-            {scenariosOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-          </button>
+          <div className="flex items-center gap-1.5">
+            {onOpenFaultBuilder && (
+              <button
+                type="button"
+                onClick={onOpenFaultBuilder}
+                className="hw-btn hw-btn-blue flex items-center gap-1 px-2 py-1 rounded-lg text-[#19c8f5] normal-case text-[10px] font-semibold whitespace-nowrap shrink-0 cursor-pointer"
+              >
+                <Layers className="w-3 h-3" aria-hidden="true" />
+                <span>Fault Builder</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setScenariosOpen((prev) => !prev)}
+              className="hw-btn flex items-center gap-1 px-2 py-1 rounded-lg text-[#ffb020] normal-case text-[10px] whitespace-nowrap shrink-0 cursor-pointer"
+              aria-expanded={scenariosOpen}
+            >
+              <LabDrawerIcon name="expand" size={24} className="w-3.5 h-3.5" />
+              <span>OEM Scenarios DB ({BENCH_TEST_SCENARIOS.length})</span>
+              {scenariosOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-1.5 text-[10px] font-mono">

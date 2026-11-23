@@ -978,11 +978,29 @@ function AuthorizedBenchLabWorkspace() {
   }, []);
 
   // Fault management handlers
-  const handleAddFault = useCallback((pinId: string, faultType: FaultType, description: string) => {
-    setFaults((prev) => {
-      const filtered = prev.filter((f) => f.pinId !== pinId);
-      return [...filtered, { pinId, faultType, description, timestamp: Date.now() }];
-    });
+  const handleAddFault = useCallback(
+    (pinId: string, faultType: FaultType, description: string, customSeriesOhms?: number) => {
+      setFaults((prev) => {
+        const filtered = prev.filter((f) => f.pinId !== pinId);
+        return [
+          ...filtered,
+          {
+            pinId,
+            faultType,
+            description,
+            timestamp: Date.now(),
+            ...(typeof customSeriesOhms === 'number' && Number.isFinite(customSeriesOhms) && customSeriesOhms > 0
+              ? { customSeriesOhms }
+              : {}),
+          },
+        ];
+      });
+    },
+    []
+  );
+
+  const handleReplaceFaults = useCallback((nextFaults: InjectedFault[]) => {
+    setFaults(nextFaults);
   }, []);
 
   const handleRemoveFault = useCallback((pinId: string) => {
@@ -1591,6 +1609,7 @@ function AuthorizedBenchLabWorkspace() {
         selectedPinId={selectedPinId}
         onSelectPin={setSelectedPinId}
         onAddFault={handleAddFault}
+        onReplaceFaults={handleReplaceFaults}
         onRemoveFault={handleRemoveFault}
         onClearAllFaults={handleClearAllFaults}
         onSearchDtc={handleSearchDtcFromInjector}

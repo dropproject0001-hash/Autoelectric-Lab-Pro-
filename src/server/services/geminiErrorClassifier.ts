@@ -12,8 +12,27 @@ export interface ClassifiedUpstreamError {
     | 'UPSTREAM_ERROR';
   imageErrorCode: ImageAnalysisErrorCode;
   retryNextModel: boolean;
+  retryAfterSec?: number;
   userMessage: string;
   rawMessage: string;
+}
+
+function extractRetryAfterSeconds(err: unknown, rawMessage: string): number | undefined {
+  if (err && typeof err === 'object') {
+    const record = err as Record<string, unknown>;
+    const direct = Number(record.retryAfterSeconds ?? record.retryAfterSec);
+    if (Number.isFinite(direct) && direct > 0) {
+      return Math.max(1, Math.min(180, Math.ceil(direct)));
+    }
+  }
+  const msgMatch = rawMessage.match(/retry(?:\s+after|\s+in)?\s+(\d+(?:\.\d+)?)\s*s(?:ec(?:ond)?s?)?/i);
+  if (msgMatch) {
+    const parsed = Number(msgMatch[1]);
+    if (Number.isFinite(parsed) && parsed > 0) {
+      return Math.max(1, Math.min(180, Math.ceil(parsed)));
+    }
+  }
+  return undefined;
 }
 
 function extractNumericStatus(err: unknown): number | null {
@@ -35,6 +54,7 @@ export function classifyGeminiError(
   const rawMessage = err instanceof Error ? err.message : String(err);
   const lower = rawMessage.toLowerCase();
   const statusFromErr = extractNumericStatus(err);
+  const retryAfterSec = extractRetryAfterSeconds(err, rawMessage);
 
   if (
     wasAborted ||
@@ -135,6 +155,7 @@ export function classifyGeminiError(
       category: 'RATE_LIMITED',
       imageErrorCode: 'RATE_LIMITED',
       retryNextModel: true,
+      retryAfterSec,
       userMessage:
         'Upstream AI quota or rate limit exceeded (429). Wait briefly before retrying or verify API billing quota.',
       rawMessage,

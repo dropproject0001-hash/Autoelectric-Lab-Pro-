@@ -356,7 +356,11 @@ export const UnifiedAiAssistantDrawer: React.FC<UnifiedAiAssistantDrawerProps> =
             <div
               data-testid="ai-tier-status-badge"
               className={`inline-flex items-center gap-1 px-2 py-1 rounded border font-mono text-[10px] ${badgeTone}`}
-              title="Cascade: Carbon → Hydrogen → Argon → Flash Lite → Offline AI"
+              title={
+                routerSnapshot.rerouteReason ||
+                routerSnapshot.lastErrorSummary ||
+                'Cascade: Carbon → Hydrogen → Argon → Flash Lite → Offline AI'
+              }
             >
               {routerSnapshot.activeTier === 'OFFLINE_AI' ? (
                 <WifiOff className="w-3 h-3 shrink-0" />
@@ -365,7 +369,12 @@ export const UnifiedAiAssistantDrawer: React.FC<UnifiedAiAssistantDrawerProps> =
               ) : (
                 <Cpu className="w-3 h-3 shrink-0" />
               )}
-              <span className="font-semibold">AI: {activeTierMeta.label}</span>
+              <span className="font-semibold">
+                AI: {activeTierMeta.label}
+                {routerSnapshot.preQuotaRerouted && routerSnapshot.activeTier !== 'OFFLINE_AI'
+                  ? ' (Auto)'
+                  : ''}
+              </span>
             </div>
 
             {onVoiceTranscript && (

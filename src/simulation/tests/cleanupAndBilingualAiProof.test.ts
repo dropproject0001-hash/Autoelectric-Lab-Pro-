@@ -21,9 +21,11 @@ import {
 } from '../../services/ai/offlineEngine';
 import {
   AI_TIER_CASCADE,
+  getAiRouterStatus,
   queryAiDiagnosticRouter,
   resetAiRouterStateForTests,
   setAiRouterOnlineTransportForTests,
+  setAiRouterSoftLimitsForTests,
   subscribeAiRouterStatus,
 } from '../../services/ai/aiRouter';
 import {
@@ -476,6 +478,73 @@ async function main() {
     assert.ok(navDrawerSrc.includes('LicenseStatusBadge'), 'NavigationDrawer must host LicenseStatusBadge');
     assert.ok(navDrawerSrc.includes('onOpenAcademyCurriculum'), 'NavigationDrawer must host Academy Lab trigger');
     assert.ok(navDrawerSrc.includes('onOpenHelpDrawer'), 'NavigationDrawer must host Gabay at Tulong trigger');
+  });
+
+  // 10. Pre-Quota Auto-Reroute & Cooldown Circuit Breaker Proof
+  await runTest('AI Router proactively reroutes BEFORE hitting 429 soft quota and skips cooled-down tiers on subsequent calls', async () => {
+    resetAiRouterStateForTests();
+    await clearVerifiedKnowledgeStoreForTests();
+
+    // Configure low soft limit (2/min per tier) to trigger proactive pre-quota switch cleanly
+    setAiRouterSoftLimitsForTests({ perTierSoftRpm: 2 });
+    const attemptedCalls: AiTierId[] = [];
+    let should429Hydrogen = false;
+
+    setAiRouterOnlineTransportForTests(async ({ tier }) => {
+      attemptedCalls.push(tier.id);
+      if (should429Hydrogen && tier.id === 'HYDROGEN') {
+        const err = new Error('HTTP 429 Rate Limit on Hydrogen');
+        (err as Error & { status?: number }).status = 429;
+        throw err;
+      }
+      return {
+        model: `mock-${tier.id.toLowerCase()}`,
+        confidence: 0.92,
+        reply: [
+          'SAFETY_WARNING: Turn PSU OFF before measuring harness resistance.',
+          'ROOT_CAUSE: Simulated bench check passed on selected free tier.',
+          'VERIFICATION_ACTION: Verify 5.0V VREF with DMM in V_DC mode.',
+        ].join('\n'),
+      };
+    }, true);
+
+    // First 2 queries use CARBON cleanly (within 2/min soft cap)
+    const r1 = await queryAiDiagnosticRouter({ query: 'P0122 TPS Pin 7 volt check 1', lang: 'EN' });
+    const r2 = await queryAiDiagnosticRouter({ query: 'P0122 TPS Pin 7 volt check 2', lang: 'EN' });
+    assert.equal(r1.tierUsed, 'CARBON');
+    assert.equal(r2.tierUsed, 'CARBON');
+
+    // 3rd query: CARBON is at 2/2 soft limit -> MUST proactively reroute to HYDROGEN WITHOUT calling CARBON!
+    const r3 = await queryAiDiagnosticRouter({ query: 'P0122 TPS Pin 7 volt check 3', lang: 'EN' });
+    assert.equal(r3.tierUsed, 'HYDROGEN');
+    assert.deepEqual(
+      r3.attemptTrail.map((a) => `${a.tier}:${a.outcome}`),
+      ['CARBON:PRE_QUOTA_REROUTED', 'HYDROGEN:SUCCESS']
+    );
+    assert.deepEqual(attemptedCalls, ['CARBON', 'CARBON', 'HYDROGEN']);
+    assert.equal(getAiRouterStatus().preQuotaRerouted, true);
+
+    // 4th query: HYDROGEN throws 429 -> cascades to ARGON; 5th query MUST skip both CARBON (soft cap) and HYDROGEN (cooldown)
+    should429Hydrogen = true;
+    const r4 = await queryAiDiagnosticRouter({ query: 'U0100 CAN bus check 4', lang: 'EN' });
+    assert.equal(r4.tierUsed, 'ARGON');
+    assert.deepEqual(
+      r4.attemptTrail.map((a) => `${a.tier}:${a.outcome}`),
+      ['CARBON:PRE_QUOTA_REROUTED', 'HYDROGEN:QUOTA_429', 'ARGON:SUCCESS']
+    );
+
+    const callsBefore5 = attemptedCalls.length;
+    const r5 = await queryAiDiagnosticRouter({ query: 'U0100 CAN bus check 5', lang: 'EN' });
+    assert.equal(r5.tierUsed, 'ARGON');
+    assert.deepEqual(
+      r5.attemptTrail.map((a) => `${a.tier}:${a.outcome}`),
+      ['CARBON:PRE_QUOTA_REROUTED', 'HYDROGEN:SKIPPED_COOLDOWN', 'ARGON:SUCCESS']
+    );
+    // Only 1 transport call made for r5 (directly to ARGON), zero calls to cooled-down HYDROGEN
+    assert.equal(attemptedCalls.length - callsBefore5, 1);
+    assert.equal(attemptedCalls[attemptedCalls.length - 1], 'ARGON');
+
+    resetAiRouterStateForTests();
   });
 
   console.log(`\nSummary: ${passed} passed, ${failed} failed`);

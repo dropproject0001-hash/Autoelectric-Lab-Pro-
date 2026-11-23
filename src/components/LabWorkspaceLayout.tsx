@@ -12,6 +12,11 @@ import { lazyWithRetry } from "../utils/lazyWithRetry";
 import {
   Activity,
   AlertTriangle,
+  Layers,
+  Pause,
+  Play,
+  RotateCcw,
+  SkipForward,
 } from "lucide-react";
 import type {
   BenchComponent,
@@ -129,6 +134,15 @@ const UniversityLabPdfModal = lazyWithRetry(() =>
     default: m.UniversityLabPdfModal,
   })),
 );
+const FaultBuilderModal = lazyWithRetry(() =>
+  import("./FaultBuilderModal").then((m) => ({
+    default: m.FaultBuilderModal,
+  })),
+);
+import {
+  evaluateFaultSequenceFrame,
+  type CustomFaultSequence,
+} from "../simulation/faults/faultSequenceService";
 import {
   getUniversityLabModuleById,
   toBenchTroubleScenario,
@@ -226,7 +240,9 @@ export interface LabFaultCallbacks {
     pinId: string,
     faultType: FaultType,
     description: string,
+    customSeriesOhms?: number,
   ) => void;
+  onReplaceFaults?: (faults: InjectedFault[]) => void;
   onRemoveFault: (pinId: string) => void;
   onClearAllFaults: () => void;
   onSearchDtc: (code: string, desc: string) => void;
@@ -348,6 +364,7 @@ const OPTIONAL_CALLBACK_KEYS: readonly (keyof LabWorkspaceLayoutProps)[] = [
   "onRenameWire",
   "onOpenVoiceMacroLibrary",
   "onSetManualRangeLabel",
+  "onReplaceFaults",
 ];
 const PANEL_LABELS: Record<MobileBenchPane, string> = {
   INSTRUMENTS: "Instruments",
@@ -822,6 +839,12 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
   >({});
   const [isUniversityPdfModalOpen, setIsUniversityPdfModalOpen] = useState(false);
   const [universityPdfModalTab, setUniversityPdfModalTab] = useState<'EXPORT' | 'VERIFY'>('EXPORT');
+  const [isFaultBuilderOpen, setIsFaultBuilderOpen] = useState(false);
+  const [activeFaultSequence, setActiveFaultSequence] = useState<CustomFaultSequence | null>(null);
+  const [isSequencePlaying, setIsSequencePlaying] = useState(false);
+  const [sequenceElapsedMs, setSequenceElapsedMs] = useState(0);
+  const [isSequenceBlindMode, setIsSequenceBlindMode] = useState(false);
+  const lastAppliedSequenceSigRef = useRef<string>('');
   const [lookupInitialQuery, setLookupInitialQuery] = useState<string>("");
   const [activeLookupPhId, setActiveLookupPhId] = useState<string>(() => {
     const recent = loadRecentLookupIds();
@@ -1109,7 +1132,158 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
     [activeCapturedStepsMap],
   );
 
+  const {
+    onReplaceFaults,
+    onBypassPreBenchGate,
+  } = props;
+
+  const applyFaultSequenceEvaluation = useCallback(
+    (seq: CustomFaultSequence, elapsed: number) => {
+      const evalResult = evaluateFaultSequenceFrame(seq, elapsed, pins);
+      const sig = JSON.stringify({
+        faults: evalResult.injectedFaults.map((f) => ({
+          p: f.pinId,
+          t: f.faultType,
+          r: f.customSeriesOhms ?? null,
+        })),
+        cuts: evalResult.cutWireIds,
+        ckp: evalResult.ckpSignalLost,
+      });
+
+      if (sig === lastAppliedSequenceSigRef.current) {
+        return evalResult;
+      }
+      lastAppliedSequenceSigRef.current = sig;
+
+      if (onReplaceFaults) {
+        onReplaceFaults(evalResult.injectedFaults);
+      } else {
+        onClearAllFaults();
+        for (const f of evalResult.injectedFaults) {
+          onAddFault(f.pinId, f.faultType, f.description, f.customSeriesOhms);
+        }
+      }
+
+      const cutSet = new Set(evalResult.cutWireIds);
+      for (const wire of wires) {
+        const shouldBeCut = cutSet.has(wire.id);
+        if (wire.isCut !== shouldBeCut) {
+          onToggleCutWire(wire.id);
+        }
+      }
+
+      if (onChangeRpmEmulator) {
+        onChangeRpmEmulator((prev) =>
+          Boolean(prev.ckpSignalLost) === evalResult.ckpSignalLost
+            ? prev
+            : { ...prev, ckpSignalLost: evalResult.ckpSignalLost }
+        );
+      }
+      return evalResult;
+    },
+    [
+      pins,
+      onReplaceFaults,
+      onClearAllFaults,
+      onAddFault,
+      wires,
+      onToggleCutWire,
+      onChangeRpmEmulator,
+    ],
+  );
+
+  const handleRunFaultSequence = useCallback(
+    (seq: CustomFaultSequence, blindMode?: boolean) => {
+      onBypassPreBenchGate?.();
+      onChangePowerSupply((previous) => ({
+        ...previous,
+        isOutputEnabled: true,
+      }));
+      setActiveTroubleScenarioId(null);
+      setActiveUniversityModuleId(null);
+      setActiveFaultSequence(seq);
+      setSequenceElapsedMs(0);
+      setIsSequencePlaying(true);
+      if (blindMode !== undefined) {
+        setIsSequenceBlindMode(blindMode);
+      }
+      lastAppliedSequenceSigRef.current = '';
+      applyFaultSequenceEvaluation(seq, 0);
+    },
+    [onBypassPreBenchGate, onChangePowerSupply, applyFaultSequenceEvaluation],
+  );
+
+  const handleJumpFaultSequenceStage = useCallback(
+    (stageIndex: number) => {
+      if (!activeFaultSequence || activeFaultSequence.steps.length === 0) return;
+      const clampedIdx = Math.max(
+        0,
+        Math.min(activeFaultSequence.steps.length - 1, stageIndex),
+      );
+      let targetMs = 0;
+      for (let i = 0; i < clampedIdx; i++) {
+        targetMs += Math.max(2000, Math.round(activeFaultSequence.steps[i].durationSec * 1000));
+      }
+      setSequenceElapsedMs(targetMs);
+      lastAppliedSequenceSigRef.current = '';
+      applyFaultSequenceEvaluation(activeFaultSequence, targetMs);
+    },
+    [activeFaultSequence, applyFaultSequenceEvaluation],
+  );
+
+  const handleStopFaultSequence = useCallback(() => {
+    setActiveFaultSequence(null);
+    setIsSequencePlaying(false);
+    setSequenceElapsedMs(0);
+    lastAppliedSequenceSigRef.current = '';
+    onClearAllFaults();
+    for (const wire of wires) {
+      if (wire.isCut) {
+        onToggleCutWire(wire.id);
+      }
+    }
+    if (onChangeRpmEmulator) {
+      onChangeRpmEmulator((prev) =>
+        prev.ckpSignalLost ? { ...prev, ckpSignalLost: false } : prev
+      );
+    }
+  }, [onClearAllFaults, wires, onToggleCutWire, onChangeRpmEmulator]);
+
+  useEffect(() => {
+    if (!activeFaultSequence || !isSequencePlaying) return;
+    const tickMs = 150;
+    const timer = window.setInterval(() => {
+      setSequenceElapsedMs((prev) => {
+        const next = prev + tickMs * Math.max(0.5, simulationSpeed);
+        const evalRes = applyFaultSequenceEvaluation(activeFaultSequence, next);
+        if (evalRes.completedNonLoop) {
+          setIsSequencePlaying(false);
+          return evalRes.totalDurationMs;
+        }
+        return next;
+      });
+    }, tickMs);
+    return () => window.clearInterval(timer);
+  }, [
+    activeFaultSequence,
+    isSequencePlaying,
+    simulationSpeed,
+    applyFaultSequenceEvaluation,
+  ]);
+
+  const activeSequenceFrame = useMemo(
+    () =>
+      activeFaultSequence
+        ? evaluateFaultSequenceFrame(activeFaultSequence, sequenceElapsedMs, pins)
+        : null,
+    [activeFaultSequence, sequenceElapsedMs, pins],
+  );
+
   const handleClearTroubleScenarios = useCallback(() => {
+    setActiveFaultSequence(null);
+    setIsSequencePlaying(false);
+    setSequenceElapsedMs(0);
+    lastAppliedSequenceSigRef.current = '';
     onClearAllFaults();
     for (const wire of wires) {
       if (wire.isCut) {
@@ -1872,6 +2046,14 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
                 </span>
               )}
             </button>
+            <button
+              type="button"
+              onClick={() => setIsFaultBuilderOpen(true)}
+              className="hw-btn hw-btn-blue inline-flex min-h-[36px] lg:min-h-[32px] shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-wide whitespace-nowrap cursor-pointer"
+            >
+              <Layers className="h-3.5 w-3.5 text-[#19c8f5] shrink-0" aria-hidden="true" />
+              <span>Fault Builder</span>
+            </button>
 
             <span
               className={`inline-flex shrink-0 items-center gap-1.5 rounded-md border px-2 py-1 text-[10px] font-bold uppercase tabular-nums whitespace-nowrap ${
@@ -1941,7 +2123,7 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
               <LabDrawerIcon name="active-drawer" size={24} className="h-3.5 w-3.5 shrink-0" />
               <span>Pulse Scope</span>
             </button>
-            {(activeTroubleScenarioId || faults.length > 0 || isCkpSignalLost || cutWireCount > 0) && (
+            {(activeTroubleScenarioId || activeFaultSequence || faults.length > 0 || isCkpSignalLost || cutWireCount > 0) && (
               <button
                 type="button"
                 onClick={handleClearTroubleScenarios}
@@ -1950,6 +2132,71 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
                 Restore Nominal
               </button>
             )}
+          </div>
+        </section>
+      )}
+      {activeTab === "BENCH_LAB" && activeFaultSequence && activeSequenceFrame && (
+        <section
+          aria-label="Active custom fault sequence playback"
+          className="flex shrink-0 flex-wrap items-center justify-between gap-2 rounded-xl border border-[#19c8f5]/45 bg-[#081526] px-3 py-1.5 font-mono text-[11px] text-[#eaf3ff]"
+        >
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <Layers className="h-3.5 w-3.5 text-[#19c8f5] shrink-0" aria-hidden="true" />
+            <span className="font-bold text-[#19c8f5] truncate">
+              {isSequenceBlindMode ? "Blind Reasoning Drill" : activeFaultSequence.title}
+            </span>
+            <span aria-hidden="true" className="text-[#567093]">·</span>
+            <span className="tabular-nums text-[#d4e3f6]">
+              Stage {activeSequenceFrame.activeStepIndex + 1}/{activeFaultSequence.steps.length}
+              {!isSequenceBlindMode && `: ${activeSequenceFrame.activeStep.name}`}
+            </span>
+            <span aria-hidden="true" className="text-[#567093]">·</span>
+            <span className="tabular-nums text-[#91a4bd]">
+              {(activeSequenceFrame.stepElapsedMs / 1000).toFixed(1)}s / {(activeSequenceFrame.stepDurationMs / 1000).toFixed(0)}s
+            </span>
+            {!isSequenceBlindMode && activeSequenceFrame.activeSummaryItems.some((i) => i.mode === "INTERMITTENT_SIGNAL") && (
+              <span className={activeSequenceFrame.intermittentEngaged ? "font-bold text-[#ff8a99]" : "text-[#20d889]"}>
+                {activeSequenceFrame.intermittentEngaged ? "Pulse Fault Active" : "Clean Window"}
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => setIsSequencePlaying((p) => !p)}
+              className="hw-btn inline-flex min-h-[30px] items-center gap-1 rounded-md px-2 py-1 text-[10.5px] whitespace-nowrap shrink-0 cursor-pointer"
+            >
+              {isSequencePlaying ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+              <span>{isSequencePlaying ? "Pause" : "Resume"}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                handleJumpFaultSequenceStage(
+                  (activeSequenceFrame.activeStepIndex + 1) % activeFaultSequence.steps.length
+                )
+              }
+              className="hw-btn inline-flex min-h-[30px] items-center gap-1 rounded-md px-2 py-1 text-[10.5px] whitespace-nowrap shrink-0 cursor-pointer"
+            >
+              <SkipForward className="h-3 w-3" aria-hidden="true" />
+              <span>Next Stage</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsFaultBuilderOpen(true)}
+              className="hw-btn hw-btn-blue inline-flex min-h-[30px] items-center gap-1 rounded-md px-2 py-1 text-[10.5px] whitespace-nowrap shrink-0 cursor-pointer"
+            >
+              <span>{isSequenceBlindMode ? "Check Diagnosis" : "Open Builder"}</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleStopFaultSequence}
+              className="hw-btn inline-flex min-h-[30px] items-center gap-1 rounded-md border-[#20d889]/45 px-2 py-1 text-[10.5px] text-[#20d889] whitespace-nowrap shrink-0 cursor-pointer"
+            >
+              <RotateCcw className="h-3 w-3" aria-hidden="true" />
+              <span>Stop</span>
+            </button>
           </div>
         </section>
       )}
@@ -2084,6 +2331,7 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
                       onOpenGroundedSearch={onOpenGroundedSearch}
                       onOpenLookupDrawer={openLookupDrawer}
                       onOpenWiringTab={() => onNavigateTab("WIRING_DIAGRAM")}
+                      onOpenFaultBuilder={() => setIsFaultBuilderOpen(true)}
                     />
                   </React.Fragment>
                 );
@@ -2569,6 +2817,30 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
             onOpenEmulatorDrawer={() => {
               setIsTroubleDrawerOpen(true);
             }}
+          />
+        </Suspense>
+      )}
+      {isFaultBuilderOpen && (
+        <Suspense fallback={null}>
+          <FaultBuilderModal
+            isOpen={isFaultBuilderOpen}
+            onClose={() => setIsFaultBuilderOpen(false)}
+            pins={pins}
+            wires={wires}
+            nodeVoltages={circuitSolution.nodeVoltages}
+            activeDTCs={circuitSolution.activeDTCs}
+            supplyCurrentDrawAmps={circuitSolution.supplyCurrentDrawAmps}
+            isPowerOn={powerSupply.isOutputEnabled}
+            activeSequence={activeFaultSequence}
+            isPlaying={isSequencePlaying}
+            elapsedMs={sequenceElapsedMs}
+            isBlindMode={isSequenceBlindMode}
+            onToggleBlindMode={setIsSequenceBlindMode}
+            onRunSequence={handleRunFaultSequence}
+            onPauseToggle={() => setIsSequencePlaying((p) => !p)}
+            onJumpToStage={handleJumpFaultSequenceStage}
+            onStopSequence={handleStopFaultSequence}
+            onFocusPin={(pinId, label) => handleFocusProbePin(pinId, label, false)}
           />
         </Suspense>
       )}

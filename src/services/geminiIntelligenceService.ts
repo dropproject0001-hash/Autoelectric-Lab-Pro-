@@ -15,10 +15,24 @@ export interface ChatMessageEntry {
   timestamp?: number;
 }
 
+export interface FreeTierModelPoolStatusEntry {
+  model: string;
+  requestsInLast60s: number;
+  softRpmLimit: number;
+  remainingSoftBudget: number;
+  inCooldown: boolean;
+  cooldownRemainingSec: number;
+}
+
 export interface ChatResponsePayload {
   status: 'SUCCESS';
   reply: string;
   model: string;
+  attemptedModels?: string[];
+  reroutedFrom?: string;
+  preQuotaRerouted?: boolean;
+  rerouteReason?: string;
+  freeTierPoolStatus?: FreeTierModelPoolStatusEntry[];
   timestamp: string;
 }
 
@@ -51,6 +65,49 @@ export interface ImageGenerationPayload {
   timestamp: string;
 }
 
+export type StructuredAiHttpError = Error & {
+  status?: number;
+  code?: string;
+  retryAfterSec?: number;
+  attemptedModels?: string[];
+  allFreeTiersExhausted?: boolean;
+};
+
+function buildStructuredAiHttpError(
+  fallbackMessage: string,
+  res: Response,
+  data: Record<string, unknown> | null | undefined
+): StructuredAiHttpError {
+  const errMsg =
+    typeof data?.error === 'string' && data.error.trim().length > 0
+      ? data.error.trim()
+      : fallbackMessage;
+  const err = new Error(errMsg) as StructuredAiHttpError;
+  err.status = res.status;
+  if (typeof data?.code === 'string') err.code = data.code;
+
+  const headerRetry = Number(res.headers.get('Retry-After'));
+  const bodyRetry = Number(data?.retryAfterSec);
+  const retrySec = Number.isFinite(bodyRetry) && bodyRetry > 0
+    ? bodyRetry
+    : Number.isFinite(headerRetry) && headerRetry > 0
+      ? headerRetry
+      : undefined;
+  if (retrySec !== undefined) {
+    err.retryAfterSec = retrySec;
+  }
+
+  if (Array.isArray(data?.attemptedModels)) {
+    err.attemptedModels = data.attemptedModels.filter(
+      (m): m is string => typeof m === 'string'
+    );
+  }
+  if (typeof data?.allFreeTiersExhausted === 'boolean') {
+    err.allFreeTiersExhausted = data.allFreeTiersExhausted;
+  }
+  return err;
+}
+
 async function buildAuthHeaders(): Promise<Record<string, string>> {
   return buildUnifiedApiHeaders({ 'Content-Type': 'application/json' });
 }
@@ -74,9 +131,7 @@ export async function sendGeminiChat(params: {
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     inspectAndHandleTrialErrorPayload(res.status, data);
-    const err = new Error(data?.error || `Gemini Chat failed (${res.status})`);
-    (err as Error & { code?: string }).code = data?.code;
-    throw err;
+    throw buildStructuredAiHttpError(`Gemini Chat failed (${res.status})`, res, data);
   }
   return data as ChatResponsePayload;
 }
@@ -106,9 +161,7 @@ export async function transcribeAudioBlob(
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     inspectAndHandleTrialErrorPayload(res.status, data);
-    const err = new Error(data?.error || `Audio transcription failed (${res.status})`);
-    (err as Error & { code?: string }).code = data?.code;
-    throw err;
+    throw buildStructuredAiHttpError(`Audio transcription failed (${res.status})`, res, data);
   }
   return data as TranscribeAudioPayload;
 }
@@ -127,9 +180,7 @@ export async function searchMapsGrounding(params: {
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     inspectAndHandleTrialErrorPayload(res.status, data);
-    const err = new Error(data?.error || `Maps grounding search failed (${res.status})`);
-    (err as Error & { code?: string }).code = data?.code;
-    throw err;
+    throw buildStructuredAiHttpError(`Maps grounding search failed (${res.status})`, res, data);
   }
   return data as MapsGroundingPayload;
 }
@@ -150,9 +201,7 @@ export async function animateImageToVideo(params: {
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     inspectAndHandleTrialErrorPayload(res.status, data);
-    const err = new Error(data?.error || `Video animation failed (${res.status})`);
-    (err as Error & { code?: string }).code = data?.code;
-    throw err;
+    throw buildStructuredAiHttpError(`Video animation failed (${res.status})`, res, data);
   }
   return data as VideoAnimationPayload;
 }
@@ -173,9 +222,7 @@ export async function generateOrEditCircuitImage(params: {
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     inspectAndHandleTrialErrorPayload(res.status, data);
-    const err = new Error(data?.error || `Image generation failed (${res.status})`);
-    (err as Error & { code?: string }).code = data?.code;
-    throw err;
+    throw buildStructuredAiHttpError(`Image generation failed (${res.status})`, res, data);
   }
   return data as ImageGenerationPayload;
 }
@@ -183,7 +230,14 @@ export async function generateOrEditCircuitImage(params: {
 export async function sendLiveVoiceTurn(params: {
   speechText: string;
   benchContext?: string;
-}): Promise<{ status: 'SUCCESS'; reply: string; model: string }> {
+}): Promise<{
+  status: 'SUCCESS';
+  reply: string;
+  model: string;
+  reroutedFrom?: string;
+  preQuotaRerouted?: boolean;
+  rerouteReason?: string;
+}> {
   const headers = await buildAuthHeaders();
   const res = await fetch('/api/autoelectric/live-voice', {
     method: 'POST',
@@ -194,9 +248,7 @@ export async function sendLiveVoiceTurn(params: {
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     inspectAndHandleTrialErrorPayload(res.status, data);
-    const err = new Error(data?.error || `Live voice failed (${res.status})`);
-    (err as Error & { code?: string }).code = data?.code;
-    throw err;
+    throw buildStructuredAiHttpError(`Live voice failed (${res.status})`, res, data);
   }
   return data;
 }

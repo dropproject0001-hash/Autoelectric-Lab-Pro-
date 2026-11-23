@@ -76,6 +76,7 @@ interface InstrumentPanelsProps {
   onOpenGroundedSearch?: (query?: string, dtc?: string, ecu?: string) => void;
   onOpenLookupDrawer?: () => void;
   onOpenWiringTab?: () => void;
+  onOpenFaultBuilder?: () => void;
 }
 
 const FALLBACK_RPM_EMULATOR: RpmEmulatorState = {
@@ -137,6 +138,7 @@ export const InstrumentPanels: React.FC<InstrumentPanelsProps> = ({
   onOpenGroundedSearch,
   onOpenLookupDrawer,
   onOpenWiringTab,
+  onOpenFaultBuilder,
 }) => {
   const [fallbackGaugeMonitor, setFallbackGaugeMonitor] = useState<GaugeMonitorState>(
     DEFAULT_GAUGE_MONITOR_STATE
@@ -332,6 +334,7 @@ export const InstrumentPanels: React.FC<InstrumentPanelsProps> = ({
             onSearchDtc={onSearchDtc}
             selectedBrandKey={selectedBrandKey}
             nodeVoltages={circuitSolution.nodeVoltages}
+            onOpenFaultBuilder={onOpenFaultBuilder}
           />
         )}
 
