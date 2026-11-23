@@ -8,10 +8,16 @@ import {
   Lock,
   Printer,
   Save,
+  ShieldCheck,
   X,
 } from 'lucide-react';
 import { useTrialAccess } from '../context/TrialAccessContext';
 import { buildBenchReportText } from '../services/googleDocsService';
+import {
+  generateSignedClientDiagnosticPdf,
+  verifySignedClientDiagnosticToken,
+  type GeneratedClientDiagnosticPdfResult,
+} from '../services/clientDiagnosticPdfService';
 import { LOCAL_WORKSTATION_UID, saveDiagnosticLog } from '../services/benchStorageService';
 import {
   EcuPin,
@@ -31,6 +37,8 @@ interface GoogleDocsModalProps {
   faults: InjectedFault[];
   multimeter: MultimeterState;
   circuitSolution: CircuitSolution;
+  defaultVehicleLabel?: string;
+  defaultEcuProfileLabel?: string;
 }
 
 function sanitizeFileSlug(input: string): string {
@@ -65,15 +73,32 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
   faults,
   multimeter,
   circuitSolution,
+  defaultVehicleLabel,
+  defaultEcuProfileLabel,
 }) => {
   const { canUseExports, openAccessModal } = useTrialAccess();
 
   const [reportTitle, setReportTitle] = useState(
     () => `ECU Bench Report - ${new Date().toISOString().slice(0, 10)}`
   );
-  const [ecuProfileLabel, setEcuProfileLabel] = useState('Universal ECU Bench');
+  const [ecuProfileLabel, setEcuProfileLabel] = useState(
+    () => defaultEcuProfileLabel || 'Universal ECU Bench'
+  );
+  const [clientName, setClientName] = useState('');
+  const [workOrderNumber, setWorkOrderNumber] = useState(
+    () => `RO-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-01`
+  );
+  const [vehicleInfo, setVehicleInfo] = useState(
+    () => defaultVehicleLabel || 'Universal Automotive ECU Bench'
+  );
+  const [technicianName, setTechnicianName] = useState('');
   const [techNotes, setTechNotes] = useState('');
   const [isSavingLog, setIsSavingLog] = useState(false);
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+  const [signedPdfResult, setSignedPdfResult] = useState<{
+    result: GeneratedClientDiagnosticPdfResult;
+    selfVerified: boolean;
+  } | null>(null);
   const [statusMessage, setStatusMessage] = useState<{
     type: 'success' | 'error';
     text: string;
@@ -173,7 +198,51 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
     }
   };
 
-  const handlePrintReport = () => {
+  const handlePrintToSignedPdf = async () => {
+    setIsExportingPdf(true);
+    setStatusMessage(null);
+    try {
+      const result = await generateSignedClientDiagnosticPdf({
+        reportTitle: reportTitle.trim() || `ECU Bench Report - ${new Date().toISOString().slice(0, 10)}`,
+        clientName: clientName.trim() || undefined,
+        workOrderNumber: workOrderNumber.trim() || undefined,
+        vehicleInfo: vehicleInfo.trim() || undefined,
+        ecuProfileLabel: ecuProfileLabel.trim() || 'Universal ECU Bench',
+        technicianName: technicianName.trim() || undefined,
+        technicianNotes: techNotes.trim() || undefined,
+        powerSupply,
+        pins,
+        wires,
+        faults,
+        multimeter,
+        circuitSolution,
+      });
+      const verifyCheck = await verifySignedClientDiagnosticToken(result.envelope.qrToken);
+      setSignedPdfResult({ result, selfVerified: verifyCheck.valid });
+      setStatusMessage({
+        type: 'success',
+        text: `Generated cryptographically signed A4 PDF "${result.filename}" (${result.pageCount} page${result.pageCount > 1 ? 's' : ''}, SHA-256 sealed).`,
+      });
+    } catch (err) {
+      setStatusMessage({
+        type: 'error',
+        text: err instanceof Error ? err.message : 'Failed to generate signed A4 PDF report.',
+      });
+    } finally {
+      setIsExportingPdf(false);
+    }
+  };
+
+  const handleCopySealValue = async (label: string, value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setStatusMessage({ type: 'success', text: `Copied ${label} to clipboard.` });
+    } catch {
+      setStatusMessage({ type: 'error', text: `Clipboard blocked — copy ${label} manually.` });
+    }
+  };
+
+  const handleBrowserPrintReport = () => {
     window.print();
   };
 
@@ -318,6 +387,56 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
               </div>
             </div>
 
+            {/* Client Record Metadata Fields */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                  Client / Customer Name
+                </label>
+                <input
+                  type="text"
+                  value={clientName}
+                  onChange={(e) => setClientName(e.target.value)}
+                  placeholder="e.g. R. Santos Auto Works"
+                  className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                  Work Order / RO #
+                </label>
+                <input
+                  type="text"
+                  value={workOrderNumber}
+                  onChange={(e) => setWorkOrderNumber(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white font-mono focus:outline-none focus:border-sky-500"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                  Vehicle / VIN Reference
+                </label>
+                <input
+                  type="text"
+                  value={vehicleInfo}
+                  onChange={(e) => setVehicleInfo(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:border-sky-500"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                  Technician Name
+                </label>
+                <input
+                  type="text"
+                  value={technicianName}
+                  onChange={(e) => setTechnicianName(e.target.value)}
+                  placeholder="e.g. Master Tech A. Reyes"
+                  className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                />
+              </div>
+            </div>
+
             <div>
               <label className="block text-[11px] font-semibold text-slate-300 mb-1">
                 Technician Bench Notes (included in report)
@@ -333,6 +452,17 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
 
             {/* Action Toolbar */}
             <div className="flex flex-wrap items-center gap-2 pt-1">
+              <button
+                type="button"
+                data-testid="studio-print-to-pdf-btn"
+                disabled={isExportingPdf}
+                onClick={() => void handlePrintToSignedPdf()}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 disabled:opacity-55 text-slate-950 text-xs font-bold shadow-sm transition cursor-pointer"
+                title="Generate cryptographically signed A4 client PDF with bench measurements, fault logs, and vector pinout diagram"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                {isExportingPdf ? 'Signing A4 PDF...' : 'Print to PDF (Signed A4)'}
+              </button>
               <button
                 type="button"
                 onClick={handleDownloadTxt}
@@ -359,11 +489,12 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
               </button>
               <button
                 type="button"
-                onClick={handlePrintReport}
+                onClick={handleBrowserPrintReport}
                 className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold transition cursor-pointer"
+                title="Open native browser print dialog"
               >
                 <Printer className="w-3.5 h-3.5" />
-                Print / Save PDF
+                Browser Print
               </button>
               <button
                 type="button"
@@ -375,6 +506,71 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
                 {isSavingLog ? 'Saving...' : 'Save to Local Logs'}
               </button>
             </div>
+
+            {/* Cryptographic Signature Seal Summary (shown after Signed A4 PDF export) */}
+            {signedPdfResult && (
+              <div
+                data-testid="studio-signed-pdf-seal"
+                className="rounded-xl border border-emerald-500/45 bg-emerald-950/30 p-3.5 flex flex-col sm:flex-row items-start sm:items-center gap-3.5"
+              >
+                {signedPdfResult.result.qrDataUrl && (
+                  <div className="bg-white p-1.5 rounded-lg shrink-0 border border-emerald-400/50">
+                    <img
+                      src={signedPdfResult.result.qrDataUrl}
+                      alt="Signed A4 Client Report QR Code"
+                      className="w-16 h-16 block"
+                    />
+                  </div>
+                )}
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-300">
+                      <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                      SHA-256 Signed A4 Client PDF Ready
+                    </span>
+                    <span className="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/50 font-mono text-[10px] font-bold text-emerald-200">
+                      {signedPdfResult.result.envelope.reportId}
+                    </span>
+                    {signedPdfResult.selfVerified && (
+                      <span className="px-2 py-0.5 rounded bg-cyan-500/20 border border-cyan-500/50 font-mono text-[10px] font-bold text-cyan-200">
+                        SELF-VERIFIED GENUINE
+                      </span>
+                    )}
+                  </div>
+                  <div className="font-mono text-[10.5px] text-slate-300 break-all">
+                    SHA-256: <span className="text-emerald-200">{signedPdfResult.result.envelope.sha256Hash}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        void handleCopySealValue(
+                          'SHA-256 Hash',
+                          signedPdfResult.result.envelope.sha256Hash
+                        )
+                      }
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-emerald-500/50 bg-emerald-950/60 hover:bg-emerald-900/60 font-mono text-[10.5px] text-emerald-200 cursor-pointer"
+                    >
+                      <Copy className="w-3 h-3" />
+                      Copy SHA-256 Hash
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        void handleCopySealValue(
+                          'Verification Token',
+                          signedPdfResult.result.envelope.qrToken
+                        )
+                      }
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-cyan-500/50 bg-cyan-950/60 hover:bg-cyan-900/60 font-mono text-[10.5px] text-cyan-200 cursor-pointer"
+                    >
+                      <Copy className="w-3 h-3" />
+                      Copy Verification Token
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Live MNA Report Preview */}
             <div className="rounded-xl border border-slate-800 bg-slate-950/90 overflow-hidden">

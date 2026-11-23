@@ -148,6 +148,9 @@ async function main() {
       ? (JSON.parse(fs.readFileSync(cfgPath, 'utf8')).projectId as string) || 'gen-lang-client-0979131562'
       : 'gen-lang-client-0979131562';
 
+    const prevProjectId = process.env.FIREBASE_PROJECT_ID;
+    process.env.FIREBASE_PROJECT_ID = projectId;
+
     const { token, jwk } = createSignedFirebaseTestJwt(
       projectId,
       'firebase-uid-test-987654',
@@ -201,6 +204,11 @@ async function main() {
         ['CONNECTED', 'NOT_CONFIGURED', 'UNREACHABLE'].includes(payload.cloudSqlPostgres.status)
       );
     } finally {
+      if (prevProjectId === undefined) {
+        delete process.env.FIREBASE_PROJECT_ID;
+      } else {
+        process.env.FIREBASE_PROJECT_ID = prevProjectId;
+      }
       resetFirebaseAuthCacheForTests();
       await new Promise<void>((resolve) => server.close(() => resolve()));
     }

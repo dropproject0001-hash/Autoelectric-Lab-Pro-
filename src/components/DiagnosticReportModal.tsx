@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useTrialAccess } from '../context/TrialAccessContext';
 import { UniversityLabPdfModal } from './UniversityLabPdfModal';
+import { generateSignedClientDiagnosticPdf } from '../services/clientDiagnosticPdfService';
 import {
   DiagnosticTroubleCode,
   EcuPin,
@@ -82,6 +83,8 @@ export const DiagnosticReportModal: React.FC<DiagnosticReportModalProps> = ({
   const selectedPin = pins.find((p) => p.id === selectedPinId);
   const timestamp = new Date().toISOString();
 
+  const [isSigningClientPdf, setIsSigningClientPdf] = useState(false);
+
   const handlePrint = () => {
     if (!canUseExports) {
       openAccessModal({
@@ -91,6 +94,47 @@ export const DiagnosticReportModal: React.FC<DiagnosticReportModalProps> = ({
       return;
     }
     window.print();
+  };
+
+  const handlePrintSignedA4Pdf = async () => {
+    if (!canUseExports) {
+      openAccessModal({
+        tab: 'TRIAL_PIN',
+        notice: 'Signed A4 PDF exports are locked. Enter an active 8-digit Trial PIN or Master Admin PIN to unlock exports.',
+      });
+      return;
+    }
+    setIsSigningClientPdf(true);
+    try {
+      await generateSignedClientDiagnosticPdf({
+        reportTitle: `ECU Bench Client Diagnostic Record - ${new Date().toISOString().slice(0, 10)}`,
+        ecuProfileLabel: 'Universal ECU Bench',
+        powerSupply,
+        pins,
+        wires,
+        faults,
+        multimeter,
+        circuitSolution: {
+          nodeVoltages,
+          nodeResistances: {},
+          wireCurrentsMa: {},
+          supplyCurrentDrawAmps,
+          isSupplyCurrentTripped,
+          activeDTCs,
+          multimeterReading: {
+            display: multimeterReading.display,
+            value: Number.parseFloat(multimeterReading.display) || 0,
+            unit: multimeterReading.unit,
+            isOverLimit: multimeterReading.display === 'O.L',
+            isWarning: multimeterReading.isWarning,
+            warningMessage: multimeterReading.warningMessage,
+            shouldBeep: false,
+          },
+        },
+      });
+    } finally {
+      setIsSigningClientPdf(false);
+    }
   };
 
   const handleDownloadHtml = () => {
@@ -258,14 +302,26 @@ export const DiagnosticReportModal: React.FC<DiagnosticReportModalProps> = ({
             </button>
 
             <button
-              onClick={handlePrint}
+              onClick={() => void handlePrintSignedA4Pdf()}
+              disabled={isSigningClientPdf}
               className={`hw-btn flex items-center gap-1.5 px-3 py-1.5 rounded-[2px] text-xs font-bold transition ${
                 canUseExports ? 'hw-btn-amber' : 'text-rose-200 border-rose-700/60 bg-rose-950/40'
               }`}
-              title={canUseExports ? 'Print or Save as PDF via browser print dialog' : 'Exports locked — enter an active Trial PIN'}
+              title={canUseExports ? 'Generate cryptographically signed A4 PDF with measurements, fault logs, and pinout diagram' : 'Exports locked — enter an active Trial PIN'}
+            >
+              {canUseExports ? <ShieldCheck className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5 text-rose-400" />}
+              <span>{isSigningClientPdf ? 'Signing A4...' : 'Print to PDF (Signed A4)'}</span>
+            </button>
+
+            <button
+              onClick={handlePrint}
+              className={`hw-btn flex items-center gap-1.5 px-3 py-1.5 rounded-[2px] text-xs font-semibold transition ${
+                canUseExports ? 'text-slate-200' : 'text-rose-200 border-rose-700/60 bg-rose-950/40'
+              }`}
+              title={canUseExports ? 'Print via browser print dialog' : 'Exports locked — enter an active Trial PIN'}
             >
               {canUseExports ? <Printer className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5 text-rose-400" />}
-              <span>Print / Save PDF</span>
+              <span>Browser Print</span>
             </button>
 
             <button

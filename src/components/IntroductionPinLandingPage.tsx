@@ -17,7 +17,7 @@ import {
   RotateCcw,
   Unlock,
 } from 'lucide-react';
-import { APP_LOGO_SRC } from '../constants/branding';
+import { APP_HERO_BANNER_SRC, APP_LOGO_SRC } from '../constants/branding';
 import { useAuth } from '../context/AuthContext';
 import { useTrialAccess } from '../context/TrialAccessContext';
 import {
@@ -110,6 +110,7 @@ export const IntroductionPinLandingPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<LandingGateTab>('PIN_ENTRY');
   const [logoFailed, setLogoFailed] = useState(false);
   const [bgFailed, setBgFailed] = useState(false);
+  const [bannerFailed, setBannerFailed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -432,7 +433,24 @@ export const IntroductionPinLandingPage: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <main className="mx-auto w-full max-w-[1220px] flex-1 px-4 sm:px-6 py-8 sm:py-12 space-y-12">
+      <main className="mx-auto w-full max-w-[1220px] flex-1 px-4 sm:px-6 py-6 sm:py-8 space-y-8 sm:space-y-10">
+        {/* Featured Workshop Hero Banner */}
+        {!bannerFailed && (
+          <motion.div
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.2, ease: 'easeOut' }}
+            className="w-full overflow-hidden rounded-xl border border-[#203653] bg-[#0A1220] shadow-2xl"
+          >
+            <img
+              src={APP_HERO_BANNER_SRC}
+              alt="Auto-Electronics Repair — Expert Diagnostics & Wiring, Module & Computer Repair"
+              onError={() => setBannerFailed(true)}
+              className="w-full aspect-[21/7] sm:aspect-[24/7] object-cover object-center block"
+            />
+          </motion.div>
+        )}
+
         {/* Asymmetric Two-Column Hero & PIN Gate */}
         <section
           id="pin-verification-gate"

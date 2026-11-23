@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "test": "tsx src/simulation/tests/circuitEngine.test.ts && tsx src/simulation/tests/pcbDiagnostic.test.ts && tsx src/simulation/tests/securityAndOffline.test.ts && tsx src/simulation/tests/automotiveIntegration.test.ts && tsx src/simulation/tests/gaugeTelemetry.test.ts && tsx src/simulation/tests/harnessAndTwin.test.ts && tsx src/simulation/tests/cleanupAndBilingualAiProof.test.ts && tsx src/simulation/tests/connectionHealth.test.ts && tsx src/simulation/tests/blueprintMasterSuite.test.ts",
+    "test": "tsx src/simulation/tests/circuitEngine.test.ts && tsx src/simulation/tests/pcbDiagnostic.test.ts && tsx src/simulation/tests/securityAndOffline.test.ts && tsx src/simulation/tests/automotiveIntegration.test.ts && tsx src/simulation/tests/gaugeTelemetry.test.ts && tsx src/simulation/tests/harnessAndTwin.test.ts && tsx src/simulation/tests/cleanupAndBilingualAiProof.test.ts && tsx src/simulation/tests/connectionHealth.test.ts && tsx src/simulation/tests/blueprintMasterSuite.test.ts && tsx src/simulation/tests/clientDiagnosticPdf.test.ts",
     "start": "tsx server.ts"
   },
   "dependencies": {

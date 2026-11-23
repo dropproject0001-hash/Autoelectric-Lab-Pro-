@@ -1728,6 +1728,12 @@ function AuthorizedBenchLabWorkspace() {
               faults={faults}
               multimeter={multimeter}
               circuitSolution={circuitSolution}
+              defaultVehicleLabel={`${selectedBrandKey} ${selectedModelName}`.trim() || 'Universal Automotive ECU Bench'}
+              defaultEcuProfileLabel={
+                selectedEcuProfileObj
+                  ? `${selectedEcuProfileObj.brandName} ${selectedEcuProfileObj.modelName}`
+                  : 'Universal ECU Bench'
+              }
             />
           </Suspense>
         </AppErrorBoundary>
