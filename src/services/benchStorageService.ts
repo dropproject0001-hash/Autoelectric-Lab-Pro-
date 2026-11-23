@@ -52,6 +52,19 @@ import {
   ImageAnalysisPinSpec,
 } from '../server/services/imageAnalysisTypes';
 import { sanitizeWiresForSession } from '../utils/wireLabelUtils';
+import {
+  clearLegacyLocalFaultSequences,
+  MAX_ITEMS_PER_STEP,
+  MAX_STEPS_PER_SEQUENCE,
+  MIN_PULSE_WIDTH_MS,
+  readLegacyLocalFaultSequences,
+  sanitizeFaultSequence,
+  type CustomFaultMode,
+  type CustomFaultSequence,
+  type FaultBuilderStageItem,
+  type FaultSequenceStep,
+  type IntermittentEffect,
+} from '../simulation/faults/faultSequenceService';
 
 export enum OperationType {
   CREATE = 'create',
@@ -3832,7 +3845,661 @@ async function replayFirestoreMutation(record: OfflineMutationRecord): Promise<v
           : undefined,
     });
     await writeBenchSessionBundleToFirestore(uid, docId, headerDoc, wires, faults, componentStates);
+    return;
   }
+
+  if (colName === 'faultSequences') {
+    if (rawPayload._deleted === true) {
+      await deleteFaultSequenceFromFirestore(uid, docId);
+      return;
+    }
+    const sanitized = sanitizeFaultSequence(rawPayload);
+    if (!sanitized) return;
+    const normalizedSeq = sanitizeFaultSequenceForFirestore({
+      ...sanitized,
+      id: docId,
+      isBuiltInPreset: false,
+    });
+    await writeFaultSequenceBundleToFirestore(uid, docId, normalizedSeq);
+  }
+}
+
+function clampSeqNum(val: unknown, fallback: number, min: number, max: number): number {
+  const n = Number(val);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(min, Math.min(max, n));
+}
+
+function sanitizeFaultSequenceForFirestore(sequence: CustomFaultSequence): CustomFaultSequence {
+  const base = sanitizeFaultSequence({
+    ...sequence,
+    isBuiltInPreset: false,
+  });
+  const source = base ?? {
+    ...sequence,
+    isBuiltInPreset: false,
+    steps: sequence.steps.slice(0, MAX_STEPS_PER_SEQUENCE),
+  };
+
+  const steps: FaultSequenceStep[] = source.steps.slice(0, MAX_STEPS_PER_SEQUENCE).map((step, sIdx) => ({
+    id: toSafeFirestoreDocId(step.id, 'fstep', sIdx),
+    name: String(step.name || `Stage ${sIdx + 1}`).slice(0, 100) || `Stage ${sIdx + 1}`,
+    durationSec: clampSeqNum(step.durationSec, 6, 2, 120),
+    notes: String(step.notes || '').slice(0, 280),
+    items: (step.items || []).slice(0, MAX_ITEMS_PER_STEP).map((item, iIdx) => {
+      const startOhms = clampSeqNum(item.startOhms, 50, 0.5, 100_000);
+      const endOhms = clampSeqNum(item.endOhms ?? startOhms, startOhms, 0.5, 100_000);
+      const onDurationMs = clampSeqNum(item.onDurationMs, 700, MIN_PULSE_WIDTH_MS, 30_000);
+      const offDurationMs = clampSeqNum(item.offDurationMs, 900, MIN_PULSE_WIDTH_MS, 30_000);
+      const effect: IntermittentEffect =
+        item.intermittentEffect === 'SHORT_TO_GND' || item.intermittentEffect === 'HIGH_RESISTANCE'
+          ? item.intermittentEffect
+          : 'OPEN_DROPOUT';
+      return {
+        id: toSafeFirestoreDocId(item.id, 'fitem', iIdx),
+        pinId: String(item.pinId || 'ecu-pin-7').slice(0, 64) || 'ecu-pin-7',
+        ...(item.wireId ? { wireId: String(item.wireId).slice(0, 64) } : {}),
+        mode: item.mode,
+        label: String(item.label || item.mode).slice(0, 120) || item.mode,
+        startOhms,
+        endOhms,
+        onDurationMs,
+        offDurationMs,
+        intermittentEffect: effect,
+      };
+    }),
+  }));
+
+  const now = Date.now();
+  return {
+    id: toSafeFirestoreDocId(source.id, 'fseq', 0),
+    title: String(source.title || 'Custom Fault Sequence').slice(0, 100) || 'Custom Fault Sequence',
+    description: String(source.description || '').slice(0, 320),
+    difficulty:
+      source.difficulty === 'APPRENTICE' || source.difficulty === 'MASTER'
+        ? source.difficulty
+        : 'TECHNICIAN',
+    loopPlayback: Boolean(source.loopPlayback),
+    blindChallengeHint: String(source.blindChallengeHint || '').slice(0, 260),
+    steps,
+    isBuiltInPreset: false,
+    createdAt: Math.max(0, Number(source.createdAt) || now),
+    updatedAt: Math.max(0, Number(source.updatedAt) || now),
+  };
+}
+
+async function writeFaultSequenceBundleToFirestore(
+  uid: string,
+  seqId: string,
+  seq: CustomFaultSequence
+): Promise<void> {
+  const seqRef = doc(db, 'users', uid, 'faultSequences', seqId);
+  const [headerSnap, stagesSnap, itemsSnap] = await Promise.all([
+    getDoc(seqRef),
+    getDocs(
+      query(
+        collection(db, 'users', uid, 'faultSequences', seqId, 'stages'),
+        where('ownerId', '==', uid)
+      )
+    ),
+    getDocs(
+      query(
+        collection(db, 'users', uid, 'faultSequences', seqId, 'items'),
+        where('ownerId', '==', uid)
+      )
+    ),
+  ]);
+
+  const ops: BatchWriteOp[] = [];
+  const totalItemCount = seq.steps.reduce((acc, s) => acc + s.items.length, 0);
+  const mutableHeader: Record<string, unknown> = {
+    title: seq.title,
+    description: seq.description,
+    difficulty: seq.difficulty,
+    loopPlayback: seq.loopPlayback,
+    blindChallengeHint: seq.blindChallengeHint ?? '',
+    stageCount: seq.steps.length,
+    itemCount: totalItemCount,
+    schemaVersion: SCHEMA_VERSION_SUBCOLLECTIONS,
+    sequenceUpdatedAtMs: seq.updatedAt,
+    updatedAt: serverTimestamp(),
+  };
+
+  if (headerSnap.exists()) {
+    ops.push((batch) => {
+      batch.update(seqRef, mutableHeader);
+    });
+  } else {
+    ops.push((batch) => {
+      batch.set(seqRef, {
+        id: seqId,
+        ownerId: uid,
+        ...mutableHeader,
+        sequenceCreatedAtMs: seq.createdAt,
+        createdAt: serverTimestamp(),
+      });
+    });
+  }
+
+  const existingStageIds = new Set(stagesSnap.docs.map((d) => d.id));
+  const usedStageIds = new Set<string>();
+  const targetStageIds = new Set<string>();
+
+  const existingItemIds = new Set(itemsSnap.docs.map((d) => d.id));
+  const usedItemIds = new Set<string>();
+  const targetItemIds = new Set<string>();
+  let globalItemIdx = 0;
+
+  seq.steps.forEach((stage, sIdx) => {
+    const stageDocId = toSafeFirestoreDocId(stage.id, 'stage', sIdx, usedStageIds);
+    targetStageIds.add(stageDocId);
+    const stageRef = doc(db, 'users', uid, 'faultSequences', seqId, 'stages', stageDocId);
+    const mutableStageFields = {
+      orderIndex: sIdx,
+      name: stage.name,
+      durationSec: stage.durationSec,
+      notes: stage.notes,
+      itemCount: stage.items.length,
+      updatedAt: serverTimestamp(),
+    };
+
+    if (existingStageIds.has(stageDocId)) {
+      ops.push((batch) => {
+        batch.update(stageRef, mutableStageFields);
+      });
+    } else {
+      ops.push((batch) => {
+        batch.set(stageRef, {
+          id: stageDocId,
+          ownerId: uid,
+          sequenceId: seqId,
+          ...mutableStageFields,
+          createdAt: serverTimestamp(),
+        });
+      });
+    }
+
+    stage.items.forEach((item, iIdx) => {
+      const itemDocId = toSafeFirestoreDocId(item.id, 'item', globalItemIdx, usedItemIds);
+      targetItemIds.add(itemDocId);
+      const itemRef = doc(db, 'users', uid, 'faultSequences', seqId, 'items', itemDocId);
+      const mutableItemFields = {
+        stageId: stageDocId,
+        orderIndex: globalItemIdx,
+        pinId: item.pinId,
+        wireId: item.wireId ?? '',
+        mode: item.mode,
+        label: item.label,
+        startOhms: item.startOhms ?? 50,
+        endOhms: item.endOhms ?? item.startOhms ?? 50,
+        onDurationMs: item.onDurationMs ?? 700,
+        offDurationMs: item.offDurationMs ?? 900,
+        intermittentEffect: item.intermittentEffect ?? 'OPEN_DROPOUT',
+        updatedAt: serverTimestamp(),
+      };
+      globalItemIdx += 1;
+
+      if (existingItemIds.has(itemDocId)) {
+        ops.push((batch) => {
+          batch.update(itemRef, mutableItemFields);
+        });
+      } else {
+        ops.push((batch) => {
+          batch.set(itemRef, {
+            id: itemDocId,
+            ownerId: uid,
+            sequenceId: seqId,
+            ...mutableItemFields,
+            createdAt: serverTimestamp(),
+          });
+        });
+      }
+      void iIdx;
+    });
+  });
+
+  for (const d of stagesSnap.docs) {
+    if (!targetStageIds.has(d.id)) {
+      ops.push((batch) => batch.delete(d.ref));
+    }
+  }
+  for (const d of itemsSnap.docs) {
+    if (!targetItemIds.has(d.id)) {
+      ops.push((batch) => batch.delete(d.ref));
+    }
+  }
+
+  await commitWriteOpsInChunks(ops);
+}
+
+async function deleteFaultSequenceFromFirestore(uid: string, seqId: string): Promise<void> {
+  const [stagesSnap, itemsSnap] = await Promise.all([
+    getDocs(
+      query(
+        collection(db, 'users', uid, 'faultSequences', seqId, 'stages'),
+        where('ownerId', '==', uid)
+      )
+    ),
+    getDocs(
+      query(
+        collection(db, 'users', uid, 'faultSequences', seqId, 'items'),
+        where('ownerId', '==', uid)
+      )
+    ),
+  ]);
+
+  const ops: BatchWriteOp[] = [];
+  for (const d of itemsSnap.docs) ops.push((batch) => batch.delete(d.ref));
+  for (const d of stagesSnap.docs) ops.push((batch) => batch.delete(d.ref));
+  ops.push((batch) => batch.delete(doc(db, 'users', uid, 'faultSequences', seqId)));
+  await commitWriteOpsInChunks(ops);
+}
+
+/**
+ * Persists a custom Fault Builder sequence into IndexedDB immediately and queues/writes
+ * an atomic subcollection batch to Firestore (/users/{uid}/faultSequences/{sequenceId}).
+ */
+export async function saveFaultSequence(
+  uid: string,
+  sequence: CustomFaultSequence
+): Promise<SavePersistenceResult & { sequence: CustomFaultSequence }> {
+  const isPresetSource = Boolean(sequence.isBuiltInPreset);
+  const rawTargetId = isPresetSource ? makeSafeId('fseq') : sequence.id || makeSafeId('fseq');
+  const seqId = toSafeFirestoreDocId(rawTargetId, 'fseq', 0);
+  const path = `users/${uid}/faultSequences/${seqId}`;
+  const normalized = sanitizeFaultSequenceForFirestore({
+    ...sequence,
+    id: seqId,
+    title:
+      isPresetSource && !sequence.title.toLowerCase().includes('custom')
+        ? `${sequence.title} (Custom)`
+        : sequence.title,
+    isBuiltInPreset: false,
+    createdAt: isPresetSource ? Date.now() : sequence.createdAt || Date.now(),
+    updatedAt: Date.now(),
+  });
+
+  const payload = {
+    ...normalized,
+    ownerId: uid,
+    schemaVersion: SCHEMA_VERSION_SUBCOLLECTIONS,
+  };
+
+  const stamp = reserveMutationStamp(uid, 'faultSequences', seqId);
+
+  if (isLocalWorkstationUid(uid)) {
+    await cacheLocalDocument({
+      uid,
+      collection: 'faultSequences',
+      docId: seqId,
+      data: payload,
+      syncState: 'SYNCED_CLOUD',
+      version: stamp.version,
+      updatedAtMs: stamp.updatedAtMs,
+    });
+    notifyLocalCollectionChange('faultSequences');
+    return {
+      id: seqId,
+      syncedToCloud: false,
+      queuedOffline: false,
+      syncState: 'SYNCED_CLOUD',
+      sequence: { ...normalized, syncState: 'LOCAL_ONLY' },
+    };
+  }
+
+  if (!db || !auth?.currentUser || (typeof navigator !== 'undefined' && navigator.onLine === false)) {
+    await enqueueOfflineMutation({
+      uid,
+      collection: 'faultSequences',
+      docId: seqId,
+      payload,
+      lastError: 'Offline or unauthenticated — fault sequence queued for automatic cloud sync',
+      version: stamp.version,
+      updatedAtMs: stamp.updatedAtMs,
+    });
+    notifyLocalCollectionChange('faultSequences');
+    return {
+      id: seqId,
+      syncedToCloud: false,
+      queuedOffline: true,
+      syncState: 'QUEUED_OFFLINE',
+      sequence: { ...normalized, syncState: 'QUEUED_OFFLINE' },
+    };
+  }
+
+  try {
+    await writeFaultSequenceBundleToFirestore(uid, seqId, normalized);
+    await markMutationSynced(uid, 'faultSequences', seqId, payload, {
+      expectedVersion: stamp.version,
+      expectedUpdatedAtMs: stamp.updatedAtMs,
+    });
+    notifyLocalCollectionChange('faultSequences');
+    return {
+      id: seqId,
+      syncedToCloud: true,
+      queuedOffline: false,
+      syncState: 'SYNCED_CLOUD',
+      sequence: { ...normalized, syncState: 'SYNCED_CLOUD' },
+    };
+  } catch (error) {
+    if (isTransientOfflineError(error)) {
+      await enqueueOfflineMutation({
+        uid,
+        collection: 'faultSequences',
+        docId: seqId,
+        payload,
+        lastError: error instanceof Error ? error.message : String(error),
+        version: stamp.version,
+        updatedAtMs: stamp.updatedAtMs,
+      });
+      notifyLocalCollectionChange('faultSequences');
+      return {
+        id: seqId,
+        syncedToCloud: false,
+        queuedOffline: true,
+        syncState: 'QUEUED_OFFLINE',
+        sequence: { ...normalized, syncState: 'QUEUED_OFFLINE' },
+      };
+    }
+    handleFirestoreError(error, OperationType.WRITE, path);
+  }
+}
+
+export async function deleteFaultSequence(
+  uid: string,
+  sequenceId: string
+): Promise<{ syncedToCloud: boolean; queuedOffline: boolean }> {
+  const seqId = toSafeFirestoreDocId(sequenceId, 'fseq', 0);
+  const path = `users/${uid}/faultSequences/${seqId}`;
+  const stamp = reserveMutationStamp(uid, 'faultSequences', seqId);
+
+  if (isLocalWorkstationUid(uid)) {
+    await removeLocalCachedDocument(uid, 'faultSequences', seqId);
+    notifyLocalCollectionChange('faultSequences');
+    return { syncedToCloud: false, queuedOffline: false };
+  }
+
+  if (!db || !auth?.currentUser || (typeof navigator !== 'undefined' && navigator.onLine === false)) {
+    await enqueueOfflineMutation({
+      uid,
+      collection: 'faultSequences',
+      docId: seqId,
+      payload: { _deleted: true, id: seqId },
+      lastError: 'Offline — sequence deletion queued for cloud sync',
+      version: stamp.version,
+      updatedAtMs: stamp.updatedAtMs,
+    });
+    notifyLocalCollectionChange('faultSequences');
+    return { syncedToCloud: false, queuedOffline: true };
+  }
+
+  try {
+    await deleteFaultSequenceFromFirestore(uid, seqId);
+    await removeLocalCachedDocument(uid, 'faultSequences', seqId);
+    notifyLocalCollectionChange('faultSequences');
+    return { syncedToCloud: true, queuedOffline: false };
+  } catch (error) {
+    if (isTransientOfflineError(error)) {
+      await enqueueOfflineMutation({
+        uid,
+        collection: 'faultSequences',
+        docId: seqId,
+        payload: { _deleted: true, id: seqId },
+        lastError: error instanceof Error ? error.message : String(error),
+        version: stamp.version,
+        updatedAtMs: stamp.updatedAtMs,
+      });
+      notifyLocalCollectionChange('faultSequences');
+      return { syncedToCloud: false, queuedOffline: true };
+    }
+    handleFirestoreError(error, OperationType.DELETE, path);
+  }
+}
+
+const migratedFaultSequenceUids = new Set<string>();
+
+/**
+ * One-time idempotent migration from legacy localStorage (`autoelectric_fault_builder_sequences_v1`)
+ * into durable IndexedDB (+ Firestore cloud queue when signed in).
+ */
+export async function migrateLegacyLocalFaultSequencesToStore(uid: string): Promise<number> {
+  const legacyList = readLegacyLocalFaultSequences();
+  if (legacyList.length === 0) return 0;
+
+  const existingDocs = await getLocalCachedDocuments<Record<string, unknown>>(uid, 'faultSequences');
+  const existingIds = new Set(existingDocs.map((d) => d.docId));
+
+  let migratedCount = 0;
+  for (const seq of legacyList) {
+    const safeId = toSafeFirestoreDocId(seq.id, 'fseq', 0);
+    if (!existingIds.has(safeId)) {
+      await saveFaultSequence(uid, { ...seq, id: safeId, isBuiltInPreset: false });
+      migratedCount += 1;
+    }
+  }
+
+  clearLegacyLocalFaultSequences();
+  return migratedCount;
+}
+
+export function subscribeFaultSequences(
+  uid: string,
+  onData: (sequences: CustomFaultSequence[]) => void,
+  onError?: (err: Error) => void
+): () => void {
+  if (!migratedFaultSequenceUids.has(uid)) {
+    migratedFaultSequenceUids.add(uid);
+    void migrateLegacyLocalFaultSequencesToStore(uid).catch(() => {
+      // Non-fatal migration error
+    });
+  }
+
+  const readCachedSequences = async (localFallbackTone: 'LOCAL_ONLY' | 'SYNCED_CLOUD') => {
+    const docs = await getLocalCachedDocuments<Record<string, unknown>>(uid, 'faultSequences');
+    const deletedIds = new Set<string>();
+    const list: CustomFaultSequence[] = [];
+    for (const d of docs) {
+      if (d.data && d.data._deleted === true) {
+        deletedIds.add(d.docId);
+        continue;
+      }
+      const parsed = sanitizeFaultSequence(d.data);
+      if (!parsed) continue;
+      list.push({
+        ...parsed,
+        id: d.docId,
+        isBuiltInPreset: false,
+        syncState:
+          d.syncState === 'QUEUED_OFFLINE'
+            ? 'QUEUED_OFFLINE'
+            : localFallbackTone,
+      });
+    }
+    return { list, deletedIds };
+  };
+
+  if (isLocalWorkstationUid(uid) || !db || !auth?.currentUser) {
+    let isCancelled = false;
+    const emitLocal = async () => {
+      try {
+        const { list } = await readCachedSequences('LOCAL_ONLY');
+        if (!isCancelled) {
+          onData(list.sort((a, b) => b.updatedAt - a.updatedAt));
+        }
+      } catch (e) {
+        if (!isCancelled && onError && e instanceof Error) onError(e);
+      }
+    };
+    void emitLocal();
+    const unsubLocal = subscribeLocalCollectionChange('faultSequences', () => {
+      void emitLocal();
+    });
+    return () => {
+      isCancelled = true;
+      unsubLocal();
+    };
+  }
+
+  let isUnsubscribed = false;
+  let latestHeaderDocs: Array<{ id: string; data: Record<string, unknown> }> | null = null;
+  const path = `users/${uid}/faultSequences`;
+
+  const emitMerged = async () => {
+    try {
+      const { list: cachedList, deletedIds } = await readCachedSequences('SYNCED_CLOUD');
+      const byId = new Map<string, CustomFaultSequence>();
+
+      if (latestHeaderDocs && latestHeaderDocs.length > 0) {
+        const hydratedCloud = await Promise.all(
+          latestHeaderDocs.map(async (hdr) => {
+            if (deletedIds.has(hdr.id)) return null;
+            const d = hdr.data;
+            const [stagesSnap, itemsSnap] = await Promise.all([
+              getDocs(
+                query(
+                  collection(db, 'users', uid, 'faultSequences', hdr.id, 'stages'),
+                  where('ownerId', '==', uid)
+                )
+              ),
+              getDocs(
+                query(
+                  collection(db, 'users', uid, 'faultSequences', hdr.id, 'items'),
+                  where('ownerId', '==', uid)
+                )
+              ),
+            ]);
+
+            const itemsByStage = new Map<string, Array<{ orderIndex: number; item: FaultBuilderStageItem }>>();
+            for (const itemDoc of itemsSnap.docs) {
+              const idata = itemDoc.data();
+              const stageId = String(idata.stageId || '');
+              const bucket = itemsByStage.get(stageId) ?? [];
+              bucket.push({
+                orderIndex: Number(idata.orderIndex) || 0,
+                item: {
+                  id: String(idata.id || itemDoc.id),
+                  pinId: String(idata.pinId || 'ecu-pin-7'),
+                  ...(idata.wireId ? { wireId: String(idata.wireId) } : {}),
+                  mode: String(idata.mode || 'OPEN_CIRCUIT') as CustomFaultMode,
+                  label: String(idata.label || ''),
+                  startOhms: Number(idata.startOhms) || 50,
+                  endOhms: Number(idata.endOhms) || 50,
+                  onDurationMs: Number(idata.onDurationMs) || 700,
+                  offDurationMs: Number(idata.offDurationMs) || 900,
+                  intermittentEffect: String(idata.intermittentEffect || 'OPEN_DROPOUT') as IntermittentEffect,
+                },
+              });
+              itemsByStage.set(stageId, bucket);
+            }
+
+            const steps: FaultSequenceStep[] = stagesSnap.docs
+              .map((sDoc) => {
+                const sdata = sDoc.data();
+                const stageId = String(sdata.id || sDoc.id);
+                const rawItems = (itemsByStage.get(stageId) ?? [])
+                  .sort((a, b) => a.orderIndex - b.orderIndex)
+                  .map((entry) => entry.item);
+                return {
+                  orderIndex: Number(sdata.orderIndex) || 0,
+                  step: {
+                    id: stageId,
+                    name: String(sdata.name || 'Stage'),
+                    durationSec: Number(sdata.durationSec) || 6,
+                    notes: String(sdata.notes || ''),
+                    items: rawItems,
+                  },
+                };
+              })
+              .sort((a, b) => a.orderIndex - b.orderIndex)
+              .map((entry) => entry.step);
+
+            if (steps.length === 0) return null;
+
+            const reconstructed = sanitizeFaultSequence({
+              id: hdr.id,
+              title: String(d.title || 'Untitled Fault Sequence'),
+              description: String(d.description || ''),
+              difficulty: d.difficulty,
+              loopPlayback: Boolean(d.loopPlayback),
+              blindChallengeHint: typeof d.blindChallengeHint === 'string' ? d.blindChallengeHint : '',
+              steps,
+              isBuiltInPreset: false,
+              syncState: 'SYNCED_CLOUD',
+              createdAt: Number(d.sequenceCreatedAtMs) || Date.now(),
+              updatedAt: Number(d.sequenceUpdatedAtMs) || Date.now(),
+            });
+            return reconstructed;
+          })
+        );
+
+        for (const seq of hydratedCloud) {
+          if (!seq) continue;
+          byId.set(seq.id, seq);
+          await cacheLocalDocument({
+            uid,
+            collection: 'faultSequences',
+            docId: seq.id,
+            data: seq as unknown as Record<string, unknown>,
+            syncState: 'SYNCED_CLOUD',
+            updatedAtMs: seq.updatedAt,
+          });
+        }
+      }
+
+      // Overlay any locally cached / offline-queued sequences (queued edits always take precedence)
+      for (const localSeq of cachedList) {
+        const existing = byId.get(localSeq.id);
+        if (!existing || localSeq.syncState === 'QUEUED_OFFLINE' || localSeq.updatedAt > existing.updatedAt) {
+          byId.set(localSeq.id, localSeq);
+        }
+      }
+
+      if (!isUnsubscribed) {
+        onData(Array.from(byId.values()).sort((a, b) => b.updatedAt - a.updatedAt));
+      }
+    } catch (err) {
+      if (isTransientOfflineError(err)) {
+        const { list } = await readCachedSequences('SYNCED_CLOUD');
+        if (!isUnsubscribed) onData(list.sort((a, b) => b.updatedAt - a.updatedAt));
+        return;
+      }
+      if (!isUnsubscribed && onError && err instanceof Error) {
+        onError(err);
+      }
+    }
+  };
+
+  void emitMerged();
+  const unsubLocal = subscribeLocalCollectionChange('faultSequences', () => {
+    void emitMerged();
+  });
+
+  const q = query(collection(db, 'users', uid, 'faultSequences'), where('ownerId', '==', uid));
+  const unsub = onSnapshot(
+    q,
+    (snapshot) => {
+      latestHeaderDocs = snapshot.docs.map((d) => ({
+        id: d.id,
+        data: d.data() as Record<string, unknown>,
+      }));
+      void emitMerged();
+    },
+    (error) => {
+      void emitMerged();
+      if (isTransientOfflineError(error)) return;
+      try {
+        handleFirestoreError(error, OperationType.LIST, path);
+      } catch (e) {
+        if (!isUnsubscribed && onError && e instanceof Error) onError(e);
+      }
+    }
+  );
+
+  return () => {
+    isUnsubscribed = true;
+    unsubLocal();
+    unsub();
+  };
 }
 
 export async function flushQueuedBenchSync(

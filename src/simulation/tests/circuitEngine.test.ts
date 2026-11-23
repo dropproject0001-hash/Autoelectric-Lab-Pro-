@@ -75,12 +75,16 @@ import {
 } from '../../utils/voiceCommandParser';
 import {
   BUILT_IN_FAULT_SEQUENCES,
+  MIN_PULSE_WIDTH_MS,
+  computeNextFaultSequenceEdgeMs,
   deleteCustomFaultSequence,
   evaluateDiagnosticReasoning,
   evaluateFaultSequenceFrame,
   exportFaultSequenceJson,
   importFaultSequenceJson,
   loadSavedFaultSequences,
+  mergeFaultSequencesWithBuiltIns,
+  parseImportedFaultSequenceJson,
   resetFaultSequenceStoreForTests,
   saveCustomFaultSequence,
   type CustomFaultSequence,
@@ -2781,6 +2785,86 @@ function testCustomFaultBuilderSequences() {
       wrongCheck.expectedPinLabels.some((lbl) => lbl.includes('TPS_SIG')),
     'correct=true, wrong=false with TPS_SIG evidence',
     `correct=${correctCheck.overallCorrect}, wrong=${wrongCheck.overallCorrect}, pins=${wrongCheck.expectedPinLabels.join(',')}`
+  );
+
+  // 16.4 Sub-150ms Intermittent Chatter & Exact Edge Scheduling (computeNextFaultSequenceEdgeMs)
+  const microSeq = BUILT_IN_FAULT_SEQUENCES.find(
+    (s) => s.id === 'preset-tps-sub150-chatter-glitch'
+  );
+  assert(
+    'Fault Builder: Built-in 25ms TPS micro-chatter preset exists and MIN_PULSE_WIDTH_MS is 10ms',
+    'Fault Builder',
+    Boolean(microSeq) && MIN_PULSE_WIDTH_MS === 10,
+    'preset exists & MIN_PULSE_WIDTH_MS === 10',
+    `preset=${Boolean(microSeq)}, MIN_PULSE_WIDTH_MS=${MIN_PULSE_WIDTH_MS}`
+  );
+
+  if (microSeq) {
+    const microOn = evaluateFaultSequenceFrame(microSeq, 15, DEFAULT_ECU_PINS);
+    const microOff = evaluateFaultSequenceFrame(microSeq, 30, DEFAULT_ECU_PINS);
+    const microStage2On = evaluateFaultSequenceFrame(microSeq, 5020, DEFAULT_ECU_PINS);
+
+    const simMicroOn = solveCircuit(
+      psuOn,
+      DEFAULT_ECU_PINS,
+      microOn.injectedFaults,
+      DEFAULT_WIRES,
+      DEFAULT_BENCH_COMPONENTS,
+      dmmDc,
+      { ckpSignalLost: microOn.ckpSignalLost }
+    );
+    const simMicroOff = solveCircuit(
+      psuOn,
+      DEFAULT_ECU_PINS,
+      microOff.injectedFaults,
+      DEFAULT_WIRES,
+      DEFAULT_BENCH_COMPONENTS,
+      dmmDc,
+      { ckpSignalLost: microOff.ckpSignalLost }
+    );
+
+    assert(
+      'Fault Builder: 25ms ON / 75ms OFF sub-150ms glitch drops TPS in MNA during 15ms ON window and recovers cleanly at 30ms',
+      'Fault Builder',
+      microOn.intermittentEngaged &&
+        !microOff.intermittentEngaged &&
+        (simMicroOn.nodeVoltages['ecu-pin-7'] ?? 5) < 0.25 &&
+        Math.abs((simMicroOff.nodeVoltages['ecu-pin-7'] ?? 0) - nominalTpsV) < 0.05 &&
+        microStage2On.ckpSignalLost &&
+        microStage2On.intermittentEngaged,
+      '15ms ON (<0.25V), 30ms OFF (nominal), 5020ms Stage 2 CKP+TPS active',
+      `15ms=${(simMicroOn.nodeVoltages['ecu-pin-7'] ?? 0).toFixed(2)}V, 30ms=${(simMicroOff.nodeVoltages['ecu-pin-7'] ?? 0).toFixed(2)}V, stg2Ckp=${microStage2On.ckpSignalLost}`
+    );
+
+    const edgeAt0 = computeNextFaultSequenceEdgeMs(microSeq, 0);
+    const edgeAt25 = computeNextFaultSequenceEdgeMs(microSeq, 25);
+    const edgeBeforeStage2 = computeNextFaultSequenceEdgeMs(microSeq, 4980);
+    const rampEdge = computeNextFaultSequenceEdgeMs(tpsSequence, 6000, 50);
+    const completedEdge = computeNextFaultSequenceEdgeMs(customSeq, 5000);
+
+    assert(
+      'Fault Builder: computeNextFaultSequenceEdgeMs resolves exact 25ms/75ms pulse edges, stage boundary, ramp tick, and non-loop end',
+      'Fault Builder',
+      edgeAt0 === 25 &&
+        edgeAt25 === 75 &&
+        edgeBeforeStage2 === 20 &&
+        rampEdge === 50 &&
+        completedEdge === null,
+      'edge0=25, edge25=75, edge4980=20, ramp=50, nonLoopEnd=null',
+      `edge0=${edgeAt0}, edge25=${edgeAt25}, edge4980=${edgeBeforeStage2}, ramp=${rampEdge}, end=${completedEdge}`
+    );
+  }
+
+  const parsedPure = parseImportedFaultSequenceJson(json);
+  const merged = mergeFaultSequencesWithBuiltIns([parsedPure]);
+  assert(
+    'Fault Builder: parseImportedFaultSequenceJson + mergeFaultSequencesWithBuiltIns keeps custom drills first ahead of all built-in starters',
+    'Fault Builder',
+    merged[0]?.id === parsedPure.id &&
+      merged.length === BUILT_IN_FAULT_SEQUENCES.length + 1 &&
+      !parsedPure.isBuiltInPreset,
+    `custom first, total=${BUILT_IN_FAULT_SEQUENCES.length + 1}`,
+    `first=${merged[0]?.id}, total=${merged.length}`
   );
 
   resetFaultSequenceStoreForTests();

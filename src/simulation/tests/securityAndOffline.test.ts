@@ -75,14 +75,18 @@ import {
   BENCH_PREFERENCES_DOC_ID,
   buildBenchSessionUpdatePayload,
   buildConflictCopySessionPayload,
+  deleteFaultSequence,
   extractRemoteUpdatedAtMs,
   flushQueuedBenchSync,
   formatConflictCopyTitle,
   hasRemoteSessionConflict,
   LOCAL_WORKSTATION_UID,
+  migrateLegacyLocalFaultSequencesToStore,
+  saveFaultSequence,
   SCHEMA_VERSION_SUBCOLLECTIONS,
   subscribeBenchSessions,
   subscribeDiagnosticLogs,
+  subscribeFaultSequences,
   subscribePcbScans,
   subscribeUserBenchPreferences,
   syncFordOemPinoutsToDatabase,
@@ -90,6 +94,13 @@ import {
   syncUserProfile,
   toSafeFirestoreDocId,
 } from '../../services/benchStorageService';
+import {
+  BUILT_IN_FAULT_SEQUENCES,
+  CUSTOM_FAULT_SEQUENCES_STORAGE_KEY,
+  mergeFaultSequencesWithBuiltIns,
+  resetFaultSequenceStoreForTests,
+  saveCustomFaultSequence,
+} from '../faults/faultSequenceService';
 import {
   formatCloudSyncError,
   isSuppressedOfflineOrPinOnlyCloudError,
@@ -967,6 +978,9 @@ async function main() {
       '/users/{userId}/pcbScans/{scanId}/hotspots/{hotspotId}',
       '/users/{userId}/benchPreferences/{prefId}',
       '/users/{userId}/benchPreferences/{prefId}/voiceMacros/{macroId}',
+      '/users/{userId}/faultSequences/{sequenceId}',
+      '/users/{userId}/faultSequences/{sequenceId}/stages/{stageId}',
+      '/users/{userId}/faultSequences/{sequenceId}/items/{itemId}',
     ];
     for (const expectedPath of expectedPaths) {
       assert.equal(expectedPath in blueprint.firestore, true, `Missing blueprint path: ${expectedPath}`);
@@ -985,10 +999,14 @@ async function main() {
     assert.equal(rulesSrc.includes('function isValidPcbNetDoc(data, userId, scanId, netId)'), true);
     assert.equal(rulesSrc.includes('function isValidPcbHotspotDoc(data, userId, scanId, docId)'), true);
     assert.equal(rulesSrc.includes('function isValidVoiceMacroDoc(data, userId, prefId, macroId)'), true);
+    assert.equal(rulesSrc.includes('function isValidFaultSequence(data, userId, sequenceId)'), true);
+    assert.equal(rulesSrc.includes('function isValidFaultSequenceStageDoc(data, userId, sequenceId, stageId)'), true);
+    assert.equal(rulesSrc.includes('function isValidFaultSequenceItemDoc(data, userId, sequenceId, itemId)'), true);
     assert.equal(rulesSrc.includes('ownsSessionAfter(userId, sessionId)'), true);
     assert.equal(rulesSrc.includes('ownsPcbScanAfter(userId, scanId)'), true);
     assert.equal(rulesSrc.includes('ownsLogAfter(userId, logId)'), true);
     assert.equal(rulesSrc.includes('ownsPrefsAfter(userId, prefId)'), true);
+    assert.equal(rulesSrc.includes('ownsFaultSequenceAfter(userId, sequenceId)'), true);
     assert.equal(rulesSrc.includes('data.schemaVersion == 2'), true);
 
     // Ensure old array-index[0] parent validators are replaced by subcollections
@@ -2529,6 +2547,115 @@ async function main() {
     const verifiedPdfToken = await verifyOfflineLabReportToken(pdfOut.envelope.qrToken);
     assert.equal(verifiedPdfToken.valid, true);
     assert.equal(verifiedPdfToken.status, 'GENUINE');
+  });
+
+  await runTest('Fault Builder sequences persist to durable IndexedDB cache, queue offline mutations/tombstones cleanly, and migrate legacy localStorage records', async () => {
+    await resetOfflineQueueForTests();
+    resetFaultSequenceStoreForTests();
+
+    const samplePreset = BUILT_IN_FAULT_SEQUENCES[3] ?? BUILT_IN_FAULT_SEQUENCES[0];
+
+    // 1. Legacy localStorage -> durable store migration (when window.localStorage is shimmed or in-memory store is populated)
+    const { saved: legacySeq } = saveCustomFaultSequence({
+      ...samplePreset,
+      id: 'legacy-seq-001',
+      title: 'Legacy Local Drill',
+      isBuiltInPreset: false,
+    });
+    assert.equal(legacySeq.id, 'legacy-seq-001');
+    const migratedCount = await migrateLegacyLocalFaultSequencesToStore(LOCAL_WORKSTATION_UID);
+    assert.equal(migratedCount, 1);
+
+    const localDocsAfterMigration = await getLocalCachedDocuments<Record<string, unknown>>(
+      LOCAL_WORKSTATION_UID,
+      'faultSequences'
+    );
+    assert.equal(localDocsAfterMigration.some((d) => d.docId === toSafeFirestoreDocId('legacy-seq-001', 'fseq', 0)), true);
+
+    // 2. Local workstation save -> subscribe -> delete round-trip
+    const savedLocal = await saveFaultSequence(LOCAL_WORKSTATION_UID, {
+      ...samplePreset,
+      id: 'bench_custom_25ms',
+      title: 'Sub-150ms Pin 7 Chatter',
+      isBuiltInPreset: false,
+    });
+    assert.equal(savedLocal.sequence.syncState, 'LOCAL_ONLY');
+
+    let observedLocal: unknown[] = [];
+    const unsubLocal = subscribeFaultSequences(LOCAL_WORKSTATION_UID, (list) => {
+      observedLocal = list;
+    });
+    await new Promise((r) => setTimeout(r, 25));
+    unsubLocal();
+    assert.equal(
+      mergeFaultSequencesWithBuiltIns(observedLocal as typeof BUILT_IN_FAULT_SEQUENCES).some(
+        (s) => s.title === 'Sub-150ms Pin 7 Chatter'
+      ),
+      true
+    );
+
+    await deleteFaultSequence(LOCAL_WORKSTATION_UID, savedLocal.id);
+    const localAfterDelete = await getLocalCachedDocuments<Record<string, unknown>>(
+      LOCAL_WORKSTATION_UID,
+      'faultSequences'
+    );
+    assert.equal(localAfterDelete.some((d) => d.docId === savedLocal.id), false);
+
+    // 3. Authenticated offline UID save -> QUEUED_OFFLINE -> offline delete tombstone (_deleted: true) filtered from subscription
+    const authUid = 'uid_fault_sync_tech';
+    const queuedSave = await saveFaultSequence(authUid, {
+      ...samplePreset,
+      id: 'cloud_custom_chatter',
+      title: 'Cloud Chatter Drill',
+      isBuiltInPreset: false,
+    });
+    assert.equal(queuedSave.queuedOffline, true);
+    assert.equal(queuedSave.sequence.syncState, 'QUEUED_OFFLINE');
+
+    let authObservedBeforeDelete: Array<{ id: string; syncState?: string }> = [];
+    const unsubAuth1 = subscribeFaultSequences(authUid, (list) => {
+      authObservedBeforeDelete = list;
+    });
+    await new Promise((r) => setTimeout(r, 25));
+    unsubAuth1();
+    assert.equal(
+      authObservedBeforeDelete.some(
+        (s) => s.id === queuedSave.id && s.syncState === 'QUEUED_OFFLINE'
+      ),
+      true
+    );
+
+    const queuedDel = await deleteFaultSequence(authUid, queuedSave.id);
+    assert.equal(queuedDel.queuedOffline, true);
+
+    let authObservedAfterDelete: Array<{ id: string }> = [{ id: 'sentinel' }];
+    const unsubAuth2 = subscribeFaultSequences(authUid, (list) => {
+      authObservedAfterDelete = list;
+    });
+    await new Promise((r) => setTimeout(r, 25));
+    unsubAuth2();
+    assert.equal(
+      authObservedAfterDelete.some((s) => s.id === queuedSave.id),
+      false,
+      'Tombstoned _deleted sequence must not appear in subscription before flush'
+    );
+
+    const pendingMutations = await getPendingMutations(authUid);
+    assert.equal(
+      pendingMutations.some(
+        (m) =>
+          m.collection === 'faultSequences' &&
+          m.docId === queuedSave.id &&
+          (m.payload as { _deleted?: boolean })._deleted === true
+      ),
+      true
+    );
+
+    // Ensure custom storage key constant remains intact for migration checks
+    assert.equal(CUSTOM_FAULT_SEQUENCES_STORAGE_KEY, 'autoelectric_fault_builder_sequences_v1');
+
+    resetFaultSequenceStoreForTests();
+    await resetOfflineQueueForTests();
   });
 
   console.log(`\nSecurity & Offline Test Summary: ${passed} passed, ${failed} failed.`);

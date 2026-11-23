@@ -3,7 +3,8 @@ export type OfflineMutationCollection =
   | 'benchSessions'
   | 'diagnosticLogs'
   | 'pcbScans'
-  | 'benchPreferences';
+  | 'benchPreferences'
+  | 'faultSequences';
 
 export interface OfflineMutationRecord<T = Record<string, unknown>> {
   idempotencyKey: string;

@@ -48,6 +48,8 @@ export interface FaultSequenceStep {
   items: FaultBuilderStageItem[];
 }
 
+export type FaultSequenceSyncState = 'SYNCED_CLOUD' | 'QUEUED_OFFLINE' | 'LOCAL_ONLY';
+
 export interface CustomFaultSequence {
   id: string;
   title: string;
@@ -57,6 +59,7 @@ export interface CustomFaultSequence {
   blindChallengeHint?: string;
   steps: FaultSequenceStep[];
   isBuiltInPreset?: boolean;
+  syncState?: FaultSequenceSyncState;
   createdAt: number;
   updatedAt: number;
 }
@@ -100,9 +103,10 @@ export interface ReasoningCheckResult {
 
 export const CUSTOM_FAULT_SEQUENCES_STORAGE_KEY = 'autoelectric_fault_builder_sequences_v1';
 
-const MAX_SEQUENCE_COUNT = 40;
-const MAX_STEPS_PER_SEQUENCE = 16;
-const MAX_ITEMS_PER_STEP = 12;
+export const MIN_PULSE_WIDTH_MS = 10;
+export const MAX_SEQUENCE_COUNT = 40;
+export const MAX_STEPS_PER_SEQUENCE = 16;
+export const MAX_ITEMS_PER_STEP = 12;
 const MAX_IMPORT_JSON_BYTES = 128 * 1024;
 
 function clampNumber(val: unknown, fallback: number, min: number, max: number): number {
@@ -340,6 +344,63 @@ export const BUILT_IN_FAULT_SEQUENCES: readonly CustomFaultSequence[] = [
       },
     ],
   },
+  {
+    id: 'preset-tps-sub150-chatter-glitch',
+    title: 'Fast 25ms TPS Micro-Dropout & CKP Sync Glitch',
+    description:
+      'High-speed intermittent drill featuring 25ms/75ms harness terminal chatter that escapes coarse multimeters unless caught by edge triggers or oscilloscope trace.',
+    difficulty: 'MASTER',
+    loopPlayback: true,
+    blindChallengeHint:
+      'Watch the Pin Scope on TPS_SIG (Pin 7) and the transport pulse-edge latch counter for brief 25ms dropouts that return before an averaging DMM settles.',
+    isBuiltInPreset: true,
+    createdAt: 1_760_000_000_000,
+    updatedAt: 1_760_000_000_000,
+    steps: [
+      {
+        id: 'step-glitch-1',
+        name: 'Stage 1: 25ms TPS Terminal Micro-Chatter',
+        durationSec: 5,
+        notes: '25ms open dropout every 100ms (25% fault duty cycle) simulating high-frequency wiper bounce.',
+        items: [
+          {
+            id: 'item-tps-micro',
+            pinId: 'ecu-pin-7',
+            mode: 'INTERMITTENT_SIGNAL',
+            label: 'TPS_SIG 25ms Micro-Chatter',
+            onDurationMs: 25,
+            offDurationMs: 75,
+            intermittentEffect: 'OPEN_DROPOUT',
+          },
+        ],
+      },
+      {
+        id: 'step-glitch-2',
+        name: 'Stage 2: 40ms CKP Dropout + TPS Short Glitch',
+        durationSec: 5,
+        notes: 'Brief 40ms CKP signal loss overlapping 40ms TPS ground pinches.',
+        items: [
+          {
+            id: 'item-ckp-micro',
+            pinId: 'ecu-pin-11',
+            mode: 'CKP_DROPOUT',
+            label: 'CKP 40ms Sync Dropout',
+            onDurationMs: 40,
+            offDurationMs: 120,
+          },
+          {
+            id: 'item-tps-pinch-micro',
+            pinId: 'ecu-pin-7',
+            mode: 'INTERMITTENT_SIGNAL',
+            label: 'TPS_SIG 40ms Ground Pinch',
+            onDurationMs: 40,
+            offDurationMs: 120,
+            intermittentEffect: 'SHORT_TO_GND',
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 export function createEmptyFaultSequence(title = 'Custom Diagnostic Sequence'): CustomFaultSequence {
@@ -421,8 +482,8 @@ function sanitizeStageItem(raw: unknown): FaultBuilderStageItem | null {
     label,
     startOhms: clampNumber(obj.startOhms, 50, 0.5, 100_000),
     endOhms: clampNumber(obj.endOhms ?? obj.startOhms, clampNumber(obj.startOhms, 50, 0.5, 100_000), 0.5, 100_000),
-    onDurationMs: clampNumber(obj.onDurationMs, 700, 150, 30_000),
-    offDurationMs: clampNumber(obj.offDurationMs, 900, 150, 30_000),
+    onDurationMs: clampNumber(obj.onDurationMs, 700, MIN_PULSE_WIDTH_MS, 30_000),
+    offDurationMs: clampNumber(obj.offDurationMs, 900, MIN_PULSE_WIDTH_MS, 30_000),
     intermittentEffect,
   };
 }
@@ -454,6 +515,12 @@ export function sanitizeFaultSequence(raw: unknown): CustomFaultSequence | null 
   const difficulty: FaultDifficultyLevel =
     rawDiff === 'APPRENTICE' || rawDiff === 'MASTER' ? rawDiff : 'TECHNICIAN';
 
+  const rawSync = obj.syncState;
+  const syncState: FaultSequenceSyncState | undefined =
+    rawSync === 'SYNCED_CLOUD' || rawSync === 'QUEUED_OFFLINE' || rawSync === 'LOCAL_ONLY'
+      ? rawSync
+      : undefined;
+
   return {
     id: String(obj.id || makeUid('fseq')).slice(0, 64),
     title: String(obj.title || 'Untitled Fault Sequence').slice(0, 100) || 'Untitled Fault Sequence',
@@ -463,6 +530,7 @@ export function sanitizeFaultSequence(raw: unknown): CustomFaultSequence | null 
     blindChallengeHint: obj.blindChallengeHint ? String(obj.blindChallengeHint).slice(0, 260) : '',
     steps,
     isBuiltInPreset: Boolean(obj.isBuiltInPreset),
+    ...(syncState ? { syncState } : {}),
     createdAt: clampNumber(obj.createdAt, Date.now(), 0, Number.MAX_SAFE_INTEGER),
     updatedAt: clampNumber(obj.updatedAt, Date.now(), 0, Number.MAX_SAFE_INTEGER),
   };
@@ -509,20 +577,42 @@ function writeStoredCustomSequences(customList: CustomFaultSequence[]): void {
   }
 }
 
-export function resetFaultSequenceStoreForTests(): void {
-  memorySequenceStore.clear();
+export function readLegacyLocalFaultSequences(): CustomFaultSequence[] {
+  return readRawStoredCustomSequences();
+}
+
+export function clearLegacyLocalFaultSequences(): void {
   if (typeof window !== 'undefined' && window.localStorage) {
     try {
       window.localStorage.removeItem(CUSTOM_FAULT_SEQUENCES_STORAGE_KEY);
     } catch {
-      // Ignore
+      // Ignore storage errors
     }
   }
 }
 
+export function resetFaultSequenceStoreForTests(): void {
+  memorySequenceStore.clear();
+  clearLegacyLocalFaultSequences();
+}
+
+export function mergeFaultSequencesWithBuiltIns(
+  customList: readonly CustomFaultSequence[]
+): CustomFaultSequence[] {
+  const customOnly = customList
+    .filter((s) => !s.isBuiltInPreset)
+    .slice(0, MAX_SEQUENCE_COUNT);
+  return [
+    ...customOnly,
+    ...BUILT_IN_FAULT_SEQUENCES.map((p) => ({
+      ...p,
+      steps: p.steps.map((s) => ({ ...s, items: [...s.items] })),
+    })),
+  ];
+}
+
 export function loadSavedFaultSequences(): CustomFaultSequence[] {
-  const custom = readRawStoredCustomSequences();
-  return [...custom, ...BUILT_IN_FAULT_SEQUENCES.map((p) => ({ ...p, steps: p.steps.map((s) => ({ ...s, items: [...s.items] })) }))];
+  return mergeFaultSequencesWithBuiltIns(readRawStoredCustomSequences());
 }
 
 export function saveCustomFaultSequence(sequence: CustomFaultSequence): {
@@ -593,10 +683,7 @@ export function exportFaultSequenceJson(sequence: CustomFaultSequence): string {
   return JSON.stringify(sanitized ?? sequence, null, 2);
 }
 
-export function importFaultSequenceJson(rawJson: string): {
-  imported: CustomFaultSequence;
-  allSequences: CustomFaultSequence[];
-} {
+export function parseImportedFaultSequenceJson(rawJson: string): CustomFaultSequence {
   if (!rawJson || rawJson.length > MAX_IMPORT_JSON_BYTES) {
     throw new Error('Sequence JSON payload is empty or exceeds the 128 KB limit.');
   }
@@ -612,11 +699,19 @@ export function importFaultSequenceJson(rawJson: string): {
     throw new Error('JSON does not contain a valid Fault Builder sequence with at least one stage.');
   }
 
-  const savedResult = saveCustomFaultSequence({
+  return {
     ...sanitized,
     id: makeUid('fseq'),
     isBuiltInPreset: false,
-  });
+  };
+}
+
+export function importFaultSequenceJson(rawJson: string): {
+  imported: CustomFaultSequence;
+  allSequences: CustomFaultSequence[];
+} {
+  const candidate = parseImportedFaultSequenceJson(rawJson);
+  const savedResult = saveCustomFaultSequence(candidate);
 
   return {
     imported: savedResult.saved,
@@ -798,8 +893,8 @@ export function evaluateFaultSequenceFrame(
       }
 
       case 'INTERMITTENT_SIGNAL': {
-        const onMs = clampNumber(item.onDurationMs, 700, 150, 30_000);
-        const offMs = clampNumber(item.offDurationMs, 900, 150, 30_000);
+        const onMs = clampNumber(item.onDurationMs, 700, MIN_PULSE_WIDTH_MS, 30_000);
+        const offMs = clampNumber(item.offDurationMs, 900, MIN_PULSE_WIDTH_MS, 30_000);
         const cycleMs = onMs + offMs;
         const engaged = (stepElapsedMs % cycleMs) < onMs;
         if (engaged) {
@@ -879,6 +974,84 @@ export function evaluateFaultSequenceFrame(
     intermittentEngaged,
     activeSummaryItems,
   };
+}
+
+/**
+ * Computes the exact sequence-time delta (in ms) until the next fault edge transition
+ * (stage rollover, sub-150ms intermittent ON/OFF edge, CKP pulse toggle, or resistance ramp tick).
+ * Returns null if playback is non-looping and already completed.
+ */
+export function computeNextFaultSequenceEdgeMs(
+  sequence: CustomFaultSequence,
+  elapsedMs: number,
+  rampIntervalMs = 50
+): number | null {
+  const safeSteps = sequence.steps.length > 0 ? sequence.steps : createEmptyFaultSequence().steps;
+  const totalDurationMs = safeSteps.reduce(
+    (acc, step) => acc + Math.max(2000, Math.round(step.durationSec * 1000)),
+    0
+  );
+  if (totalDurationMs <= 0) return null;
+
+  const safeElapsed = Math.max(0, elapsedMs);
+  if (!sequence.loopPlayback && safeElapsed >= totalDurationMs) {
+    return null;
+  }
+
+  const effectiveElapsedMs = sequence.loopPlayback
+    ? safeElapsed % totalDurationMs
+    : Math.min(safeElapsed, totalDurationMs - 1);
+
+  let cursorMs = 0;
+  let activeStep = safeSteps[0];
+  let stepElapsedMs = 0;
+  let stepDurationMs = Math.max(2000, Math.round(safeSteps[0].durationSec * 1000));
+
+  for (let i = 0; i < safeSteps.length; i++) {
+    const dur = Math.max(2000, Math.round(safeSteps[i].durationSec * 1000));
+    if (effectiveElapsedMs < cursorMs + dur || i === safeSteps.length - 1) {
+      activeStep = safeSteps[i];
+      stepDurationMs = dur;
+      stepElapsedMs = Math.max(0, effectiveElapsedMs - cursorMs);
+      break;
+    }
+    cursorMs += dur;
+  }
+
+  let minDeltaMs = Math.max(1, stepDurationMs - stepElapsedMs);
+
+  for (const item of activeStep.items) {
+    if (item.mode === 'INTERMITTENT_SIGNAL') {
+      const onMs = clampNumber(item.onDurationMs, 700, MIN_PULSE_WIDTH_MS, 30_000);
+      const offMs = clampNumber(item.offDurationMs, 900, MIN_PULSE_WIDTH_MS, 30_000);
+      const cycleMs = onMs + offMs;
+      const posInCycle = stepElapsedMs % cycleMs;
+      const edgeDelta = posInCycle < onMs ? onMs - posInCycle : cycleMs - posInCycle;
+      if (edgeDelta > 0 && edgeDelta < minDeltaMs) {
+        minDeltaMs = edgeDelta;
+      }
+    } else if (item.mode === 'CKP_DROPOUT') {
+      const onMs = clampNumber(item.onDurationMs, 0, 0, 30_000);
+      const offMs = clampNumber(item.offDurationMs, 0, 0, 30_000);
+      if (onMs >= MIN_PULSE_WIDTH_MS && offMs >= MIN_PULSE_WIDTH_MS) {
+        const cycleMs = onMs + offMs;
+        const posInCycle = stepElapsedMs % cycleMs;
+        const edgeDelta = posInCycle < onMs ? onMs - posInCycle : cycleMs - posInCycle;
+        if (edgeDelta > 0 && edgeDelta < minDeltaMs) {
+          minDeltaMs = edgeDelta;
+        }
+      }
+    } else if (item.mode === 'RESISTANCE_BUILDUP') {
+      const startR = clampNumber(item.startOhms, 50, 0.5, 100_000);
+      const endR = clampNumber(item.endOhms ?? startR, startR, 0.5, 100_000);
+      if (Math.abs(endR - startR) > 0.05) {
+        const clampedRamp = Math.max(15, Math.min(rampIntervalMs, minDeltaMs));
+        minDeltaMs = Math.min(minDeltaMs, clampedRamp);
+      }
+    }
+  }
+
+  return Math.max(4, Math.ceil(minDeltaMs));
 }
 
 function mapModeToReasoningCategory(mode: CustomFaultMode): ReasoningFaultCategory {

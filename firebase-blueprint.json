@@ -988,6 +988,258 @@
         "createdAt",
         "updatedAt"
       ]
+    },
+    "FaultSequence": {
+      "title": "FaultSequence",
+      "description": "Custom multi-stage Fault Builder sequence header stored privately per owner; ordered stages and fault items live in /stages and /items subcollections.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "description": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 320
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": ["APPRENTICE", "TECHNICIAN", "MASTER"]
+        },
+        "loopPlayback": {
+          "type": "boolean"
+        },
+        "blindChallengeHint": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 260
+        },
+        "stageCount": {
+          "type": "integer",
+          "description": "Number of stages in /stages subcollection (1..16)."
+        },
+        "itemCount": {
+          "type": "integer",
+          "description": "Total fault items in /items subcollection (0..192)."
+        },
+        "schemaVersion": {
+          "type": "integer",
+          "description": "Subcollection storage schema version (2)."
+        },
+        "sequenceCreatedAtMs": {
+          "type": "number"
+        },
+        "sequenceUpdatedAtMs": {
+          "type": "number"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "title",
+        "description",
+        "difficulty",
+        "loopPlayback",
+        "stageCount",
+        "itemCount",
+        "schemaVersion",
+        "sequenceCreatedAtMs",
+        "sequenceUpdatedAtMs",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "FaultSequenceStage": {
+      "title": "FaultSequenceStage",
+      "description": "Individual ordered stage within a FaultSequence.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "sequenceId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "orderIndex": {
+          "type": "integer",
+          "description": "Stage sequence position (0..15)."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "durationSec": {
+          "type": "number",
+          "description": "Stage duration in seconds (2..120)."
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 280
+        },
+        "itemCount": {
+          "type": "integer",
+          "description": "Fault items belonging to this stage (0..12)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "sequenceId",
+        "orderIndex",
+        "name",
+        "durationSec",
+        "notes",
+        "itemCount",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "FaultSequenceItem": {
+      "title": "FaultSequenceItem",
+      "description": "Individual fault mechanism item attached to a FaultSequence stage.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "sequenceId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "stageId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "orderIndex": {
+          "type": "integer",
+          "description": "Global item index within the sequence (0..191)."
+        },
+        "pinId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "wireId": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 64
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "INTERMITTENT_SIGNAL",
+            "RESISTANCE_BUILDUP",
+            "HARD_GROUND",
+            "SHORT_TO_VBAT",
+            "OPEN_CIRCUIT",
+            "CUT_WIRE",
+            "CKP_DROPOUT"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "startOhms": {
+          "type": "number"
+        },
+        "endOhms": {
+          "type": "number"
+        },
+        "onDurationMs": {
+          "type": "number"
+        },
+        "offDurationMs": {
+          "type": "number"
+        },
+        "intermittentEffect": {
+          "type": "string",
+          "enum": ["OPEN_DROPOUT", "SHORT_TO_GND", "HIGH_RESISTANCE"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "sequenceId",
+        "stageId",
+        "orderIndex",
+        "pinId",
+        "mode",
+        "label",
+        "startOhms",
+        "endOhms",
+        "onDurationMs",
+        "offDurationMs",
+        "intermittentEffect",
+        "createdAt",
+        "updatedAt"
+      ]
     }
   },
   "firestore": {
@@ -1068,6 +1320,24 @@
         "$ref": "#/entities/VoiceMacroDoc"
       },
       "description": "Individual synced custom and preset Voice Macro documents under BenchPreferences."
+    },
+    "/users/{userId}/faultSequences/{sequenceId}": {
+      "schema": {
+        "$ref": "#/entities/FaultSequence"
+      },
+      "description": "Saved custom multi-stage Fault Builder sequence headers belonging to the authenticated user."
+    },
+    "/users/{userId}/faultSequences/{sequenceId}/stages/{stageId}": {
+      "schema": {
+        "$ref": "#/entities/FaultSequenceStage"
+      },
+      "description": "Individual ordered stages belonging to a saved Fault Builder sequence."
+    },
+    "/users/{userId}/faultSequences/{sequenceId}/items/{itemId}": {
+      "schema": {
+        "$ref": "#/entities/FaultSequenceItem"
+      },
+      "description": "Individual fault items belonging to a stage in a saved Fault Builder sequence."
     }
   }
 }

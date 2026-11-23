@@ -75,6 +75,16 @@ service cloud.firestore {
         getAfter(/databases/$(database)/documents/users/$(userId)/benchPreferences/$(prefId)).data.ownerId == request.auth.uid;
     }
 
+    function ownsFaultSequenceExisting(userId, sequenceId) {
+      return exists(/databases/$(database)/documents/users/$(userId)/faultSequences/$(sequenceId)) &&
+        get(/databases/$(database)/documents/users/$(userId)/faultSequences/$(sequenceId)).data.ownerId == request.auth.uid;
+    }
+
+    function ownsFaultSequenceAfter(userId, sequenceId) {
+      return existsAfter(/databases/$(database)/documents/users/$(userId)/faultSequences/$(sequenceId)) &&
+        getAfter(/databases/$(database)/documents/users/$(userId)/faultSequences/$(sequenceId)).data.ownerId == request.auth.uid;
+    }
+
     // Validation Helpers
     function isValidUserProfile(data, userId) {
       return data.keys().hasAll(['uid', 'email', 'createdAt', 'updatedAt']) &&
@@ -510,6 +520,88 @@ service cloud.firestore {
         data.updatedAt is timestamp;
     }
 
+    function isValidFaultSequence(data, userId, sequenceId) {
+      return data.keys().hasAll([
+          'id', 'ownerId', 'title', 'description', 'difficulty', 'loopPlayback',
+          'stageCount', 'itemCount', 'schemaVersion', 'sequenceCreatedAtMs',
+          'sequenceUpdatedAtMs', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'ownerId', 'title', 'description', 'difficulty', 'loopPlayback',
+          'blindChallengeHint', 'stageCount', 'itemCount', 'schemaVersion',
+          'sequenceCreatedAtMs', 'sequenceUpdatedAtMs', 'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.id) && data.id == sequenceId &&
+        isValidId(data.ownerId) && data.ownerId == userId && data.ownerId == request.auth.uid &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 100 &&
+        data.description is string && data.description.size() <= 320 &&
+        data.difficulty in ['APPRENTICE', 'TECHNICIAN', 'MASTER'] &&
+        data.loopPlayback is bool &&
+        (!('blindChallengeHint' in data) || (data.blindChallengeHint is string && data.blindChallengeHint.size() <= 260)) &&
+        data.stageCount is int && data.stageCount >= 1 && data.stageCount <= 16 &&
+        data.itemCount is int && data.itemCount >= 0 && data.itemCount <= 192 &&
+        data.schemaVersion == 2 &&
+        data.sequenceCreatedAtMs is number && data.sequenceCreatedAtMs >= 0 &&
+        data.sequenceUpdatedAtMs is number && data.sequenceUpdatedAtMs >= 0 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidFaultSequenceStageDoc(data, userId, sequenceId, stageId) {
+      return data.keys().hasAll([
+          'id', 'ownerId', 'sequenceId', 'orderIndex', 'name',
+          'durationSec', 'notes', 'itemCount', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'ownerId', 'sequenceId', 'orderIndex', 'name',
+          'durationSec', 'notes', 'itemCount', 'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.id) && data.id == stageId &&
+        isValidId(data.ownerId) && data.ownerId == userId && data.ownerId == request.auth.uid &&
+        isValidId(data.sequenceId) && data.sequenceId == sequenceId &&
+        data.orderIndex is int && data.orderIndex >= 0 && data.orderIndex <= 15 &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
+        data.durationSec is number && data.durationSec >= 2 && data.durationSec <= 120 &&
+        data.notes is string && data.notes.size() <= 280 &&
+        data.itemCount is int && data.itemCount >= 0 && data.itemCount <= 12 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidFaultSequenceItemDoc(data, userId, sequenceId, itemId) {
+      return data.keys().hasAll([
+          'id', 'ownerId', 'sequenceId', 'stageId', 'orderIndex',
+          'pinId', 'mode', 'label', 'startOhms', 'endOhms',
+          'onDurationMs', 'offDurationMs', 'intermittentEffect',
+          'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'ownerId', 'sequenceId', 'stageId', 'orderIndex',
+          'pinId', 'wireId', 'mode', 'label', 'startOhms', 'endOhms',
+          'onDurationMs', 'offDurationMs', 'intermittentEffect',
+          'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.id) && data.id == itemId &&
+        isValidId(data.ownerId) && data.ownerId == userId && data.ownerId == request.auth.uid &&
+        isValidId(data.sequenceId) && data.sequenceId == sequenceId &&
+        isValidId(data.stageId) &&
+        data.orderIndex is int && data.orderIndex >= 0 && data.orderIndex <= 191 &&
+        data.pinId is string && data.pinId.size() >= 1 && data.pinId.size() <= 64 &&
+        (!('wireId' in data) || (data.wireId is string && data.wireId.size() <= 64)) &&
+        data.mode in [
+          'INTERMITTENT_SIGNAL', 'RESISTANCE_BUILDUP', 'HARD_GROUND',
+          'SHORT_TO_VBAT', 'OPEN_CIRCUIT', 'CUT_WIRE', 'CKP_DROPOUT'
+        ] &&
+        data.label is string && data.label.size() >= 1 && data.label.size() <= 120 &&
+        data.startOhms is number && data.startOhms >= 0.5 && data.startOhms <= 100000 &&
+        data.endOhms is number && data.endOhms >= 0.5 && data.endOhms <= 100000 &&
+        data.onDurationMs is number && data.onDurationMs >= 10 && data.onDurationMs <= 30000 &&
+        data.offDurationMs is number && data.offDurationMs >= 10 && data.offDurationMs <= 30000 &&
+        data.intermittentEffect in ['OPEN_DROPOUT', 'SHORT_TO_GND', 'HIGH_RESISTANCE'] &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
     // Users private profile (PII isolated strictly to verified owner)
     match /users/{userId} {
       allow get: if isValidId(userId) && isVerified() && isOwner(userId);
@@ -852,6 +944,85 @@ service cloud.firestore {
             ownsPrefsAfter(userId, prefId);
           allow delete: if isValidId(userId) && isValidId(prefId) && isValidId(macroId) &&
             isVerified() && isOwner(userId) && ownsPrefsExisting(userId, prefId);
+        }
+      }
+
+      // Saved Custom Fault Builder Sequences (Header + Validated Stages & Items Subcollections)
+      match /faultSequences/{sequenceId} {
+        allow get: if isValidId(userId) && isValidId(sequenceId) && isVerified() && isOwner(userId);
+        allow list: if isVerified() && isOwner(userId) && resource.data.ownerId == request.auth.uid;
+        allow create: if isValidId(userId) && isValidId(sequenceId) &&
+          isVerified() &&
+          isOwner(userId) &&
+          isValidFaultSequence(incoming(), userId, sequenceId) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time;
+        allow update: if isValidId(userId) && isValidId(sequenceId) &&
+          isVerified() &&
+          isOwner(userId) &&
+          isValidFaultSequence(incoming(), userId, sequenceId) &&
+          incoming().id == existing().id &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'title', 'description', 'difficulty', 'loopPlayback', 'blindChallengeHint',
+            'stageCount', 'itemCount', 'schemaVersion', 'sequenceUpdatedAtMs', 'updatedAt'
+          ]);
+        allow delete: if isValidId(userId) && isValidId(sequenceId) && isVerified() && isOwner(userId);
+
+        match /stages/{stageId} {
+          allow get: if isValidId(userId) && isValidId(sequenceId) && isValidId(stageId) &&
+            isVerified() && isOwner(userId) && ownsFaultSequenceExisting(userId, sequenceId);
+          allow list: if isVerified() && isOwner(userId) && resource.data.ownerId == request.auth.uid;
+          allow create: if isValidId(userId) && isValidId(sequenceId) && isValidId(stageId) &&
+            isVerified() && isOwner(userId) &&
+            isValidFaultSequenceStageDoc(incoming(), userId, sequenceId, stageId) &&
+            incoming().createdAt == request.time &&
+            incoming().updatedAt == request.time &&
+            ownsFaultSequenceAfter(userId, sequenceId);
+          allow update: if isValidId(userId) && isValidId(sequenceId) && isValidId(stageId) &&
+            isVerified() && isOwner(userId) &&
+            isValidFaultSequenceStageDoc(incoming(), userId, sequenceId, stageId) &&
+            incoming().id == existing().id &&
+            incoming().ownerId == existing().ownerId &&
+            incoming().sequenceId == existing().sequenceId &&
+            incoming().createdAt == existing().createdAt &&
+            incoming().updatedAt == request.time &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'orderIndex', 'name', 'durationSec', 'notes', 'itemCount', 'updatedAt'
+            ]) &&
+            ownsFaultSequenceAfter(userId, sequenceId);
+          allow delete: if isValidId(userId) && isValidId(sequenceId) && isValidId(stageId) &&
+            isVerified() && isOwner(userId) && ownsFaultSequenceExisting(userId, sequenceId);
+        }
+
+        match /items/{itemId} {
+          allow get: if isValidId(userId) && isValidId(sequenceId) && isValidId(itemId) &&
+            isVerified() && isOwner(userId) && ownsFaultSequenceExisting(userId, sequenceId);
+          allow list: if isVerified() && isOwner(userId) && resource.data.ownerId == request.auth.uid;
+          allow create: if isValidId(userId) && isValidId(sequenceId) && isValidId(itemId) &&
+            isVerified() && isOwner(userId) &&
+            isValidFaultSequenceItemDoc(incoming(), userId, sequenceId, itemId) &&
+            incoming().createdAt == request.time &&
+            incoming().updatedAt == request.time &&
+            ownsFaultSequenceAfter(userId, sequenceId);
+          allow update: if isValidId(userId) && isValidId(sequenceId) && isValidId(itemId) &&
+            isVerified() && isOwner(userId) &&
+            isValidFaultSequenceItemDoc(incoming(), userId, sequenceId, itemId) &&
+            incoming().id == existing().id &&
+            incoming().ownerId == existing().ownerId &&
+            incoming().sequenceId == existing().sequenceId &&
+            incoming().createdAt == existing().createdAt &&
+            incoming().updatedAt == request.time &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'stageId', 'orderIndex', 'pinId', 'wireId', 'mode', 'label',
+              'startOhms', 'endOhms', 'onDurationMs', 'offDurationMs',
+              'intermittentEffect', 'updatedAt'
+            ]) &&
+            ownsFaultSequenceAfter(userId, sequenceId);
+          allow delete: if isValidId(userId) && isValidId(sequenceId) && isValidId(itemId) &&
+            isVerified() && isOwner(userId) && ownsFaultSequenceExisting(userId, sequenceId);
         }
       }
     }

@@ -140,6 +140,7 @@ const FaultBuilderModal = lazyWithRetry(() =>
   })),
 );
 import {
+  computeNextFaultSequenceEdgeMs,
   evaluateFaultSequenceFrame,
   type CustomFaultSequence,
 } from "../simulation/faults/faultSequenceService";
@@ -280,6 +281,9 @@ export interface LabToolCallbacks {
 export interface LabCloudDataProps {
   savedSessions: SavedBenchSession[];
   savedLogs: SavedDiagnosticLog[];
+  savedFaultSequences?: CustomFaultSequence[];
+  onSaveFaultSequence?: (sequence: CustomFaultSequence) => Promise<CustomFaultSequence>;
+  onDeleteFaultSequence?: (sequenceId: string) => Promise<void>;
 }
 export interface LabWorkspaceLayoutProps
   extends
@@ -365,6 +369,8 @@ const OPTIONAL_CALLBACK_KEYS: readonly (keyof LabWorkspaceLayoutProps)[] = [
   "onOpenVoiceMacroLibrary",
   "onSetManualRangeLabel",
   "onReplaceFaults",
+  "onSaveFaultSequence",
+  "onDeleteFaultSequence",
 ];
 const PANEL_LABELS: Record<MobileBenchPane, string> = {
   INSTRUMENTS: "Instruments",
@@ -843,8 +849,11 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
   const [activeFaultSequence, setActiveFaultSequence] = useState<CustomFaultSequence | null>(null);
   const [isSequencePlaying, setIsSequencePlaying] = useState(false);
   const [sequenceElapsedMs, setSequenceElapsedMs] = useState(0);
+  const [sequenceEdgeHits, setSequenceEdgeHits] = useState(0);
   const [isSequenceBlindMode, setIsSequenceBlindMode] = useState(false);
   const lastAppliedSequenceSigRef = useRef<string>('');
+  const sequenceElapsedRef = useRef<number>(0);
+  const wasPulseEngagedRef = useRef<boolean>(false);
   const [lookupInitialQuery, setLookupInitialQuery] = useState<string>("");
   const [activeLookupPhId, setActiveLookupPhId] = useState<string>(() => {
     const recent = loadRecentLookupIds();
@@ -1140,6 +1149,17 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
   const applyFaultSequenceEvaluation = useCallback(
     (seq: CustomFaultSequence, elapsed: number) => {
       const evalResult = evaluateFaultSequenceFrame(seq, elapsed, pins);
+      const isPulseEngaged =
+        evalResult.intermittentEngaged ||
+        (evalResult.ckpSignalLost &&
+          evalResult.activeSummaryItems.some(
+            (item) => item.mode === "CKP_DROPOUT" && item.engaged,
+          ));
+      if (isPulseEngaged && !wasPulseEngagedRef.current) {
+        setSequenceEdgeHits((count) => count + 1);
+      }
+      wasPulseEngagedRef.current = isPulseEngaged;
+
       const sig = JSON.stringify({
         faults: evalResult.injectedFaults.map((f) => ({
           p: f.pinId,
@@ -1202,7 +1222,10 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
       setActiveTroubleScenarioId(null);
       setActiveUniversityModuleId(null);
       setActiveFaultSequence(seq);
+      sequenceElapsedRef.current = 0;
+      wasPulseEngagedRef.current = false;
       setSequenceElapsedMs(0);
+      setSequenceEdgeHits(0);
       setIsSequencePlaying(true);
       if (blindMode !== undefined) {
         setIsSequenceBlindMode(blindMode);
@@ -1224,6 +1247,8 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
       for (let i = 0; i < clampedIdx; i++) {
         targetMs += Math.max(2000, Math.round(activeFaultSequence.steps[i].durationSec * 1000));
       }
+      sequenceElapsedRef.current = targetMs;
+      wasPulseEngagedRef.current = false;
       setSequenceElapsedMs(targetMs);
       lastAppliedSequenceSigRef.current = '';
       applyFaultSequenceEvaluation(activeFaultSequence, targetMs);
@@ -1234,7 +1259,10 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
   const handleStopFaultSequence = useCallback(() => {
     setActiveFaultSequence(null);
     setIsSequencePlaying(false);
+    sequenceElapsedRef.current = 0;
+    wasPulseEngagedRef.current = false;
     setSequenceElapsedMs(0);
+    setSequenceEdgeHits(0);
     lastAppliedSequenceSigRef.current = '';
     onClearAllFaults();
     for (const wire of wires) {
@@ -1250,20 +1278,60 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
   }, [onClearAllFaults, wires, onToggleCutWire, onChangeRpmEmulator]);
 
   useEffect(() => {
-    if (!activeFaultSequence || !isSequencePlaying) return;
-    const tickMs = 150;
-    const timer = window.setInterval(() => {
-      setSequenceElapsedMs((prev) => {
-        const next = prev + tickMs * Math.max(0.5, simulationSpeed);
-        const evalRes = applyFaultSequenceEvaluation(activeFaultSequence, next);
-        if (evalRes.completedNonLoop) {
-          setIsSequencePlaying(false);
-          return evalRes.totalDurationMs;
-        }
-        return next;
-      });
-    }, tickMs);
-    return () => window.clearInterval(timer);
+    if (!activeFaultSequence || !isSequencePlaying) {
+      setSequenceElapsedMs(sequenceElapsedRef.current);
+      return;
+    }
+
+    let cancelled = false;
+    let edgeTimeoutId: number | null = null;
+    const speed = Math.max(0.5, simulationSpeed);
+    const getNow = () => (typeof performance !== "undefined" ? performance.now() : Date.now());
+    let lastWallMs = getNow();
+
+    const advanceToNow = () => {
+      const now = getNow();
+      const wallDelta = Math.max(0, now - lastWallMs);
+      lastWallMs = now;
+      sequenceElapsedRef.current += wallDelta * speed;
+      return sequenceElapsedRef.current;
+    };
+
+    const scheduleNextEdge = () => {
+      if (cancelled) return;
+      const currentSeqMs = advanceToNow();
+      const evalRes = applyFaultSequenceEvaluation(activeFaultSequence, currentSeqMs);
+      if (evalRes.completedNonLoop) {
+        sequenceElapsedRef.current = evalRes.totalDurationMs;
+        setSequenceElapsedMs(evalRes.totalDurationMs);
+        setIsSequencePlaying(false);
+        return;
+      }
+
+      const nextEdgeSeqMs = computeNextFaultSequenceEdgeMs(activeFaultSequence, currentSeqMs, 50);
+      if (nextEdgeSeqMs === null) {
+        setIsSequencePlaying(false);
+        return;
+      }
+
+      const realDelayMs = Math.max(4, Math.ceil(nextEdgeSeqMs / speed));
+      edgeTimeoutId = window.setTimeout(scheduleNextEdge, realDelayMs);
+    };
+
+    scheduleNextEdge();
+
+    const uiRefreshTimerId = window.setInterval(() => {
+      if (cancelled) return;
+      setSequenceElapsedMs(advanceToNow());
+    }, 150);
+
+    return () => {
+      cancelled = true;
+      if (edgeTimeoutId !== null) {
+        window.clearTimeout(edgeTimeoutId);
+      }
+      window.clearInterval(uiRefreshTimerId);
+    };
   }, [
     activeFaultSequence,
     isSequencePlaying,
@@ -1282,7 +1350,10 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
   const handleClearTroubleScenarios = useCallback(() => {
     setActiveFaultSequence(null);
     setIsSequencePlaying(false);
+    sequenceElapsedRef.current = 0;
+    wasPulseEngagedRef.current = false;
     setSequenceElapsedMs(0);
+    setSequenceEdgeHits(0);
     lastAppliedSequenceSigRef.current = '';
     onClearAllFaults();
     for (const wire of wires) {
@@ -2159,6 +2230,14 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
                 {activeSequenceFrame.intermittentEngaged ? "Pulse Fault Active" : "Clean Window"}
               </span>
             )}
+            {sequenceEdgeHits > 0 && (
+              <>
+                <span aria-hidden="true" className="text-[#567093]">·</span>
+                <span className="tabular-nums text-[#ffb020]">
+                  Edges {sequenceEdgeHits}
+                </span>
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-1.5 shrink-0">
@@ -2834,8 +2913,12 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
             activeSequence={activeFaultSequence}
             isPlaying={isSequencePlaying}
             elapsedMs={sequenceElapsedMs}
+            edgeHitCount={sequenceEdgeHits}
             isBlindMode={isSequenceBlindMode}
             onToggleBlindMode={setIsSequenceBlindMode}
+            customSequences={props.savedFaultSequences}
+            onSaveSequence={props.onSaveFaultSequence}
+            onDeleteSequence={props.onDeleteFaultSequence}
             onRunSequence={handleRunFaultSequence}
             onPauseToggle={() => setIsSequencePlaying((p) => !p)}
             onJumpToStage={handleJumpFaultSequenceStage}

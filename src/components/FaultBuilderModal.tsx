@@ -27,6 +27,7 @@ import type {
   WireConnection,
 } from '../types/ecu';
 import {
+  MIN_PULSE_WIDTH_MS,
   createEmptyFaultSequence,
   deleteCustomFaultSequence,
   describeFaultMode,
@@ -36,6 +37,8 @@ import {
   exportFaultSequenceJson,
   importFaultSequenceJson,
   loadSavedFaultSequences,
+  mergeFaultSequencesWithBuiltIns,
+  parseImportedFaultSequenceJson,
   saveCustomFaultSequence,
   type CustomFaultMode,
   type CustomFaultSequence,
@@ -59,8 +62,12 @@ export interface FaultBuilderModalProps {
   activeSequence: CustomFaultSequence | null;
   isPlaying: boolean;
   elapsedMs: number;
+  edgeHitCount?: number;
   isBlindMode: boolean;
   onToggleBlindMode: (blind: boolean) => void;
+  customSequences?: CustomFaultSequence[];
+  onSaveSequence?: (sequence: CustomFaultSequence) => Promise<CustomFaultSequence>;
+  onDeleteSequence?: (sequenceId: string) => Promise<void>;
   onRunSequence: (sequence: CustomFaultSequence, blindMode?: boolean) => void;
   onPauseToggle: () => void;
   onJumpToStage: (stageIndex: number) => void;
@@ -133,6 +140,23 @@ function makeLocalId(prefix: string): string {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
 }
 
+function getSyncLabelMeta(seq: CustomFaultSequence): {
+  label: string;
+  className: string;
+} {
+  if (seq.isBuiltInPreset) {
+    return { label: 'Starter Drill', className: 'text-[#91a4bd]' };
+  }
+  switch (seq.syncState) {
+    case 'SYNCED_CLOUD':
+      return { label: 'Cloud Synced', className: 'text-[#20d889]' };
+    case 'QUEUED_OFFLINE':
+      return { label: 'Queued Offline', className: 'text-[#ffb020]' };
+    default:
+      return { label: 'Local IndexedDB', className: 'text-[#91a4bd]' };
+  }
+}
+
 export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
   isOpen,
   onClose,
@@ -145,21 +169,37 @@ export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
   activeSequence,
   isPlaying,
   elapsedMs,
+  edgeHitCount = 0,
   isBlindMode,
   onToggleBlindMode,
+  customSequences,
+  onSaveSequence,
+  onDeleteSequence,
   onRunSequence,
   onPauseToggle,
   onJumpToStage,
   onStopSequence,
   onFocusPin,
 }) => {
-  const [sequences, setSequences] = useState<CustomFaultSequence[]>(() =>
+  const [localSequences, setLocalSequences] = useState<CustomFaultSequence[]>(() =>
     loadSavedFaultSequences()
   );
+  const sequences = useMemo(
+    () =>
+      customSequences !== undefined
+        ? mergeFaultSequencesWithBuiltIns(customSequences)
+        : localSequences,
+    [customSequences, localSequences]
+  );
   const [draft, setDraft] = useState<CustomFaultSequence>(
-    () => activeSequence ?? loadSavedFaultSequences()[0] ?? createEmptyFaultSequence()
+    () =>
+      activeSequence ??
+      mergeFaultSequencesWithBuiltIns(customSequences ?? [])[0] ??
+      loadSavedFaultSequences()[0] ??
+      createEmptyFaultSequence()
   );
   const [selectedStageIdx, setSelectedStageIdx] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{
     tone: 'INFO' | 'SUCCESS' | 'ERROR';
     text: string;
@@ -171,7 +211,9 @@ export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
 
   useEffect(() => {
     if (!isOpen) return;
-    setSequences(loadSavedFaultSequences());
+    if (customSequences === undefined) {
+      setLocalSequences(loadSavedFaultSequences());
+    }
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
@@ -179,7 +221,7 @@ export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, customSequences]);
 
   useEffect(() => {
     if (selectedStageIdx >= draft.steps.length) {
@@ -217,10 +259,28 @@ export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
     setStatusMessage({ tone: 'INFO', text: 'New sequence draft ready. Add stages and save when complete.' });
   };
 
-  const handleSaveDraft = (): CustomFaultSequence | null => {
+  const handleSaveDraft = async (): Promise<CustomFaultSequence | null> => {
+    if (isSaving) return null;
+    setIsSaving(true);
     try {
+      if (onSaveSequence) {
+        const saved = await onSaveSequence(draft);
+        setDraft(saved);
+        const syncDetail =
+          saved.syncState === 'SYNCED_CLOUD'
+            ? 'to IndexedDB & synced to Firestore cloud.'
+            : saved.syncState === 'QUEUED_OFFLINE'
+              ? 'to IndexedDB offline cache (queued for automatic cloud sync).'
+              : 'to durable local IndexedDB storage.';
+        setStatusMessage({
+          tone: 'SUCCESS',
+          text: `Saved "${saved.title}" (${saved.steps.length} stages) ${syncDetail}`,
+        });
+        return saved;
+      }
+
       const { saved, allSequences } = saveCustomFaultSequence(draft);
-      setSequences(allSequences);
+      setLocalSequences(allSequences);
       setDraft(saved);
       setStatusMessage({
         tone: 'SUCCESS',
@@ -233,20 +293,75 @@ export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
         text: err instanceof Error ? err.message : 'Unable to save fault sequence.',
       });
       return null;
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  const handleDuplicate = (seq: CustomFaultSequence) => {
+  const handleDuplicate = async (seq: CustomFaultSequence) => {
+    if (onSaveSequence) {
+      setIsSaving(true);
+      try {
+        const now = Date.now();
+        const cloneInput: CustomFaultSequence = {
+          ...seq,
+          id: makeLocalId('fseq'),
+          title: `${seq.title} (Copy)`.slice(0, 100),
+          isBuiltInPreset: false,
+          createdAt: now,
+          updatedAt: now,
+          steps: seq.steps.map((step) => ({
+            ...step,
+            id: makeLocalId('fstep'),
+            items: step.items.map((item) => ({
+              ...item,
+              id: makeLocalId('fitem'),
+            })),
+          })),
+        };
+        const cloned = await onSaveSequence(cloneInput);
+        setDraft(cloned);
+        setSelectedStageIdx(0);
+        setStatusMessage({ tone: 'SUCCESS', text: `Cloned "${cloned.title}" for editing.` });
+      } catch (err) {
+        setStatusMessage({
+          tone: 'ERROR',
+          text: err instanceof Error ? err.message : 'Unable to clone fault sequence.',
+        });
+      } finally {
+        setIsSaving(false);
+      }
+      return;
+    }
+
     const { cloned, allSequences } = duplicateFaultSequence(seq);
-    setSequences(allSequences);
+    setLocalSequences(allSequences);
     setDraft(cloned);
     setSelectedStageIdx(0);
     setStatusMessage({ tone: 'SUCCESS', text: `Cloned "${cloned.title}" for editing.` });
   };
 
-  const handleDelete = (seqId: string) => {
+  const handleDelete = async (seqId: string) => {
+    if (onDeleteSequence) {
+      try {
+        await onDeleteSequence(seqId);
+        if (draft.id === seqId) {
+          const fallback = sequences.find((s) => s.id !== seqId) ?? createEmptyFaultSequence();
+          setDraft(fallback);
+          setSelectedStageIdx(0);
+        }
+        setStatusMessage({ tone: 'INFO', text: 'Deleted custom sequence from IndexedDB & cloud library.' });
+      } catch (err) {
+        setStatusMessage({
+          tone: 'ERROR',
+          text: err instanceof Error ? err.message : 'Failed to delete fault sequence.',
+        });
+      }
+      return;
+    }
+
     const nextList = deleteCustomFaultSequence(seqId);
-    setSequences(nextList);
+    setLocalSequences(nextList);
     if (draft.id === seqId) {
       const fallback = nextList[0] ?? createEmptyFaultSequence();
       setDraft(fallback);
@@ -275,11 +390,19 @@ export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
     if (!file) return;
     try {
       const raw = await file.text();
-      const { imported, allSequences } = importFaultSequenceJson(raw);
-      setSequences(allSequences);
-      setDraft(imported);
-      setSelectedStageIdx(0);
-      setStatusMessage({ tone: 'SUCCESS', text: `Imported "${imported.title}".` });
+      if (onSaveSequence) {
+        const candidate = parseImportedFaultSequenceJson(raw);
+        const imported = await onSaveSequence(candidate);
+        setDraft(imported);
+        setSelectedStageIdx(0);
+        setStatusMessage({ tone: 'SUCCESS', text: `Imported & saved "${imported.title}".` });
+      } else {
+        const { imported, allSequences } = importFaultSequenceJson(raw);
+        setLocalSequences(allSequences);
+        setDraft(imported);
+        setSelectedStageIdx(0);
+        setStatusMessage({ tone: 'SUCCESS', text: `Imported "${imported.title}".` });
+      }
     } catch (err) {
       setStatusMessage({
         tone: 'ERROR',
@@ -381,13 +504,13 @@ export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
     }));
   };
 
-  const handleRunCurrentDraft = () => {
-    const targetSeq = draft.isBuiltInPreset ? draft : handleSaveDraft() ?? draft;
+  const handleRunCurrentDraft = async () => {
+    const targetSeq = draft.isBuiltInPreset ? draft : (await handleSaveDraft()) ?? draft;
     onRunSequence(targetSeq, isBlindMode);
     setReasoningResult(null);
     setStatusMessage({
       tone: 'SUCCESS',
-      text: `Running "${targetSeq.title}" against the live MNA circuit solver.`,
+      text: `Running "${targetSeq.title}" against the live MNA circuit solver with exact edge timers.`,
     });
   };
 
@@ -431,13 +554,13 @@ export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
             </button>
             <button
               type="button"
-              onClick={handleSaveDraft}
-              disabled={draft.isBuiltInPreset}
-              title={draft.isBuiltInPreset ? 'Clone this preset first to save edits' : 'Save custom sequence'}
+              onClick={() => void handleSaveDraft()}
+              disabled={Boolean(draft.isBuiltInPreset) || isSaving}
+              title={draft.isBuiltInPreset ? 'Clone this preset first to save edits' : 'Save custom sequence to IndexedDB & cloud'}
               className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border border-[#19c8f5]/50 bg-[#0d2738] px-3 py-1.5 font-mono text-xs font-semibold text-[#19c8f5] hover:bg-[#13354b] disabled:opacity-40 whitespace-nowrap shrink-0 cursor-pointer"
             >
               <Save className="h-3.5 w-3.5" aria-hidden="true" />
-              <span>Save Sequence</span>
+              <span>{isSaving ? 'Saving…' : 'Save Sequence'}</span>
             </button>
             <button
               type="button"
@@ -518,6 +641,7 @@ export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
                 const isSelected = seq.id === draft.id;
                 const isRunningThis = activeSequence?.id === seq.id;
                 const seqTotalSec = seq.steps.reduce((a, s) => a + s.durationSec, 0);
+                const syncMeta = getSyncLabelMeta(seq);
                 return (
                   <div
                     key={seq.id}
@@ -536,7 +660,7 @@ export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
                         {seq.title}
                       </div>
                       <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] text-[#91a4bd] font-mono tabular-nums">
-                        <span>{seq.isBuiltInPreset ? 'Starter Drill' : 'Saved Custom'}</span>
+                        <span className={syncMeta.className}>{syncMeta.label}</span>
                         <span aria-hidden="true">·</span>
                         <span>{DIFFICULTY_LABELS[seq.difficulty]}</span>
                         <span aria-hidden="true">·</span>
@@ -563,7 +687,7 @@ export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleDuplicate(seq)}
+                        onClick={() => void handleDuplicate(seq)}
                         className="inline-flex min-h-[30px] items-center gap-1 rounded-md border border-[#203653] bg-[#0F1B2E] px-2 py-1 font-mono text-[11px] text-[#d4e3f6] hover:border-[#19c8f5]/50 whitespace-nowrap shrink-0 cursor-pointer"
                       >
                         <Copy className="h-3 w-3" aria-hidden="true" />
@@ -572,7 +696,7 @@ export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
                       {!seq.isBuiltInPreset && (
                         <button
                           type="button"
-                          onClick={() => handleDelete(seq.id)}
+                          onClick={() => void handleDelete(seq.id)}
                           aria-label={`Delete ${seq.title}`}
                           className="ml-auto inline-flex min-h-[30px] items-center gap-1 rounded-md border border-[#ff4d62]/40 bg-[#240d15] px-2 py-1 font-mono text-[11px] text-[#ff8a99] hover:bg-[#381320] whitespace-nowrap shrink-0 cursor-pointer"
                         >
@@ -1012,67 +1136,128 @@ export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
                         )}
 
                         {/* Intermittent Signal Controls */}
-                        {item.mode === 'INTERMITTENT_SIGNAL' && (
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                            <div className="flex flex-col gap-1">
-                              <label className="font-mono text-[11px] text-[#91a4bd]">
-                                Fault Pulse ON (ms)
-                              </label>
-                              <input
-                                type="number"
-                                min={150}
-                                max={30000}
-                                step={50}
-                                disabled={Boolean(draft.isBuiltInPreset)}
-                                value={item.onDurationMs ?? 700}
-                                onChange={(e) =>
-                                  handleUpdateFaultItem(item.id, {
-                                    onDurationMs: Math.max(150, Number(e.target.value) || 700),
-                                  })
-                                }
-                                className="min-h-[36px] rounded-md border border-[#203653] bg-[#0A1220] px-2.5 py-1.5 font-mono tabular-nums text-xs text-[#eaf3ff] disabled:opacity-60"
-                              />
+                        {item.mode === 'INTERMITTENT_SIGNAL' && (() => {
+                          const onMs = Math.max(MIN_PULSE_WIDTH_MS, item.onDurationMs ?? 700);
+                          const offMs = Math.max(MIN_PULSE_WIDTH_MS, item.offDurationMs ?? 900);
+                          const periodMs = onMs + offMs;
+                          const dutyPct = Math.round((onMs / Math.max(1, periodMs)) * 100);
+                          const freqHz = (1000 / Math.max(1, periodMs)).toFixed(1);
+                          return (
+                            <div className="flex flex-col gap-2">
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                                <div className="flex flex-col gap-1">
+                                  <label className="font-mono text-[11px] text-[#91a4bd]">
+                                    Fault Pulse ON (ms)
+                                  </label>
+                                  <input
+                                    type="number"
+                                    min={MIN_PULSE_WIDTH_MS}
+                                    max={30000}
+                                    step={5}
+                                    disabled={Boolean(draft.isBuiltInPreset)}
+                                    value={item.onDurationMs ?? 700}
+                                    onChange={(e) =>
+                                      handleUpdateFaultItem(item.id, {
+                                        onDurationMs: Math.max(
+                                          MIN_PULSE_WIDTH_MS,
+                                          Number(e.target.value) || MIN_PULSE_WIDTH_MS
+                                        ),
+                                      })
+                                    }
+                                    className="min-h-[36px] rounded-md border border-[#203653] bg-[#0A1220] px-2.5 py-1.5 font-mono tabular-nums text-xs text-[#eaf3ff] disabled:opacity-60"
+                                  />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                  <label className="font-mono text-[11px] text-[#91a4bd]">
+                                    Clean Recovery (ms)
+                                  </label>
+                                  <input
+                                    type="number"
+                                    min={MIN_PULSE_WIDTH_MS}
+                                    max={30000}
+                                    step={5}
+                                    disabled={Boolean(draft.isBuiltInPreset)}
+                                    value={item.offDurationMs ?? 900}
+                                    onChange={(e) =>
+                                      handleUpdateFaultItem(item.id, {
+                                        offDurationMs: Math.max(
+                                          MIN_PULSE_WIDTH_MS,
+                                          Number(e.target.value) || MIN_PULSE_WIDTH_MS
+                                        ),
+                                      })
+                                    }
+                                    className="min-h-[36px] rounded-md border border-[#203653] bg-[#0A1220] px-2.5 py-1.5 font-mono tabular-nums text-xs text-[#eaf3ff] disabled:opacity-60"
+                                  />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                  <label className="font-mono text-[11px] text-[#91a4bd]">
+                                    Dropout Behavior
+                                  </label>
+                                  <select
+                                    disabled={Boolean(draft.isBuiltInPreset)}
+                                    value={item.intermittentEffect ?? 'OPEN_DROPOUT'}
+                                    onChange={(e) =>
+                                      handleUpdateFaultItem(item.id, {
+                                        intermittentEffect: e.target.value as IntermittentEffect,
+                                      })
+                                    }
+                                    className="min-h-[36px] rounded-md border border-[#203653] bg-[#0A1220] px-2 py-1.5 text-xs text-[#eaf3ff] disabled:opacity-60"
+                                  >
+                                    <option value="OPEN_DROPOUT">Open Dropout</option>
+                                    <option value="SHORT_TO_GND">Short to GND</option>
+                                    <option value="HIGH_RESISTANCE">High Resistance (+250Ω)</option>
+                                  </select>
+                                </div>
+                              </div>
+
+                              <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono tabular-nums text-[#91a4bd]">
+                                <span>
+                                  Period {periodMs}ms · {dutyPct}% fault duty · {freqHz} Hz · Exact edge timer
+                                </span>
+                                {!draft.isBuiltInPreset && (
+                                  <div className="flex flex-wrap items-center gap-1.5">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        handleUpdateFaultItem(item.id, {
+                                          onDurationMs: 25,
+                                          offDurationMs: 75,
+                                        })
+                                      }
+                                      className="rounded border border-[#203653] bg-[#0A1220] px-2 py-0.5 text-[10.5px] text-[#19c8f5] hover:border-[#19c8f5]/60 cursor-pointer"
+                                    >
+                                      25ms Chatter
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        handleUpdateFaultItem(item.id, {
+                                          onDurationMs: 80,
+                                          offDurationMs: 220,
+                                        })
+                                      }
+                                      className="rounded border border-[#203653] bg-[#0A1220] px-2 py-0.5 text-[10.5px] text-[#d4e3f6] hover:border-[#19c8f5]/60 cursor-pointer"
+                                    >
+                                      80ms Glitch
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        handleUpdateFaultItem(item.id, {
+                                          onDurationMs: 700,
+                                          offDurationMs: 900,
+                                        })
+                                      }
+                                      className="rounded border border-[#203653] bg-[#0A1220] px-2 py-0.5 text-[10.5px] text-[#d4e3f6] hover:border-[#19c8f5]/60 cursor-pointer"
+                                    >
+                                      700ms Vibration
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                            <div className="flex flex-col gap-1">
-                              <label className="font-mono text-[11px] text-[#91a4bd]">
-                                Clean Recovery (ms)
-                              </label>
-                              <input
-                                type="number"
-                                min={150}
-                                max={30000}
-                                step={50}
-                                disabled={Boolean(draft.isBuiltInPreset)}
-                                value={item.offDurationMs ?? 900}
-                                onChange={(e) =>
-                                  handleUpdateFaultItem(item.id, {
-                                    offDurationMs: Math.max(150, Number(e.target.value) || 900),
-                                  })
-                                }
-                                className="min-h-[36px] rounded-md border border-[#203653] bg-[#0A1220] px-2.5 py-1.5 font-mono tabular-nums text-xs text-[#eaf3ff] disabled:opacity-60"
-                              />
-                            </div>
-                            <div className="flex flex-col gap-1">
-                              <label className="font-mono text-[11px] text-[#91a4bd]">
-                                Dropout Behavior
-                              </label>
-                              <select
-                                disabled={Boolean(draft.isBuiltInPreset)}
-                                value={item.intermittentEffect ?? 'OPEN_DROPOUT'}
-                                onChange={(e) =>
-                                  handleUpdateFaultItem(item.id, {
-                                    intermittentEffect: e.target.value as IntermittentEffect,
-                                  })
-                                }
-                                className="min-h-[36px] rounded-md border border-[#203653] bg-[#0A1220] px-2 py-1.5 text-xs text-[#eaf3ff] disabled:opacity-60"
-                              >
-                                <option value="OPEN_DROPOUT">Open Dropout</option>
-                                <option value="SHORT_TO_GND">Short to GND</option>
-                                <option value="HIGH_RESISTANCE">High Resistance (+250Ω)</option>
-                              </select>
-                            </div>
-                          </div>
-                        )}
+                          );
+                        })()}
                       </div>
                     ))}
                   </div>
@@ -1100,7 +1285,7 @@ export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
-                  onClick={handleRunCurrentDraft}
+                  onClick={() => void handleRunCurrentDraft()}
                   className="inline-flex min-h-[38px] flex-1 items-center justify-center gap-1.5 rounded-lg border border-[#ffb020]/60 bg-[#281d08] px-3 py-1.5 font-mono text-xs font-bold text-[#ffb020] hover:bg-[#3a2a0b] whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   <Play className="h-3.5 w-3.5" aria-hidden="true" />
@@ -1140,6 +1325,11 @@ export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
                           }}
                         />
                       </div>
+                      {edgeHitCount > 0 && (
+                        <div className="font-mono text-[11px] tabular-nums text-[#ffb020]">
+                          Pulse Edges Captured: {edgeHitCount}
+                        </div>
+                      )}
                     </div>
                   )}
 

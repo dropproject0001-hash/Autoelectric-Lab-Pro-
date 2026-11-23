@@ -27,12 +27,16 @@ import {
   LOCAL_WORKSTATION_UID,
   SavedBenchSession,
   SavedDiagnosticLog,
+  deleteFaultSequence,
+  saveFaultSequence,
   saveUserBenchPreferences,
   subscribeBenchSessions,
   subscribeDiagnosticLogs,
+  subscribeFaultSequences,
   subscribeUserBenchPreferences,
   updateBenchSessionWires,
 } from './services/benchStorageService';
+import type { CustomFaultSequence } from './simulation/faults/faultSequenceService';
 import { renameWireInList } from './utils/wireLabelUtils';
 import { useAuth } from './context/AuthContext';
 import { useTrialAccess } from './context/TrialAccessContext';
@@ -276,6 +280,7 @@ function AuthorizedBenchLabWorkspace() {
   );
   const [savedLogs, setSavedLogs] = useState<SavedDiagnosticLog[]>([]);
   const [savedSessions, setSavedSessions] = useState<SavedBenchSession[]>([]);
+  const [savedFaultSequences, setSavedFaultSequences] = useState<CustomFaultSequence[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
 
   const [cloudPrefsHydrated, setCloudPrefsHydrated] = useState(false);
@@ -347,6 +352,11 @@ function AuthorizedBenchLabWorkspace() {
       (sessions) => setSavedSessions(sessions),
       (err) => reportCloudSyncError('Bench sessions sync', err)
     );
+    const unsubFaultSequences = subscribeFaultSequences(
+      activeStorageUid,
+      (seqs) => setSavedFaultSequences(seqs),
+      (err) => reportCloudSyncError('Fault sequences sync', err)
+    );
     const unsubPrefs = subscribeUserBenchPreferences(
       activeStorageUid,
       (remotePrefs) => {
@@ -391,9 +401,35 @@ function AuthorizedBenchLabWorkspace() {
     return () => {
       unsubLogs();
       unsubSessions();
+      unsubFaultSequences();
       unsubPrefs();
     };
   }, [activeStorageUid, reportCloudSyncError]);
+
+  const handleSaveFaultSequence = useCallback(
+    async (sequence: CustomFaultSequence): Promise<CustomFaultSequence> => {
+      try {
+        const result = await saveFaultSequence(activeStorageUid, sequence);
+        return result.sequence;
+      } catch (err) {
+        reportCloudSyncError('Fault sequence save', err);
+        throw err;
+      }
+    },
+    [activeStorageUid, reportCloudSyncError]
+  );
+
+  const handleDeleteFaultSequence = useCallback(
+    async (sequenceId: string): Promise<void> => {
+      try {
+        await deleteFaultSequence(activeStorageUid, sequenceId);
+      } catch (err) {
+        reportCloudSyncError('Fault sequence delete', err);
+        throw err;
+      }
+    },
+    [activeStorageUid, reportCloudSyncError]
+  );
 
   useEffect(() => {
     if (!cloudPrefsHydrated || applyingRemotePrefsRef.current) {
@@ -1640,6 +1676,9 @@ function AuthorizedBenchLabWorkspace() {
         onChangeGaugeMonitor={setGaugeMonitor}
         savedSessions={savedSessions}
         savedLogs={savedLogs}
+        savedFaultSequences={savedFaultSequences}
+        onSaveFaultSequence={handleSaveFaultSequence}
+        onDeleteFaultSequence={handleDeleteFaultSequence}
         onOpenVoiceMacroLibrary={() => setShowVoiceMacroLibrary(true)}
         manualRangeLabel={manualRangeLabel}
         onSetManualRangeLabel={setManualRangeLabel}
