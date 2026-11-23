@@ -1,0 +1,28 @@
+# Dependencies & build outputs
+node_modules/
+build/
+dist/
+.next/
+coverage/
+
+# OS & editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+*.log
+
+# Environment secrets (keep template tracked)
+.env*
+!.env.example
+
+# Residual documents, backups & raw media dumps
+*.pdf
+*.bak
+*.tmp
+temp/
+uploads/
+
+# Local runtime secrets & license HMAC stores (never commit)
+.data/
+firebase-applet-config.json
+

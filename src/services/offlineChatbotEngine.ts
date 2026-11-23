@@ -1,0 +1,776 @@
+import MiniSearch from 'minisearch';
+import { ECU_BRAND_PROFILES } from '../components/EcuConnectorPinouts';
+import { REPAIR_KNOWLEDGE_BASE } from '../components/EcuRepairKnowledgeBase';
+import {
+  DiagnosticTroubleCode,
+  EcuPin,
+  InjectedFault,
+  MultimeterState,
+  PowerSupplyState,
+  WireConnection,
+} from '../types/ecu';
+import { SavedBenchSession, SavedDiagnosticLog } from './benchStorageService';
+import {
+  BENCH_TEST_SCENARIOS,
+  OCR_VERIFY_RULES,
+  OEM_PCB_HARDWARE_SPECS,
+  RESTRICTED_MODEL_DATABASE,
+  TABLE16_DLC_INTERFACES,
+  VERIFIED_VOICE_ECU_GUIDES,
+  matchRestrictedModelsForQuery,
+  matchSafetyGatesForQuery,
+} from '../utils/oemKnowledgeDatabase';
+import { PH_BENCH_TROUBLE_SCENARIOS } from '../simulation/faults/benchTroubleScenarios';
+
+export type KnowledgeSourceKind =
+  | 'OEM_MANUAL'
+  | 'ECU_PINOUT'
+  | 'PCB_HOTSPOT'
+  | 'BENCH_PLAYBOOK'
+  | 'PH_SCENARIO'
+  | 'SAVED_DB_LOG'
+  | 'SAVED_BENCH';
+
+export interface IndexedKnowledgeDoc {
+  id: string;
+  kind: KnowledgeSourceKind;
+  title: string;
+  subtitle: string;
+  dtcCode: string;
+  ecuModel: string;
+  body: string;
+  actionTab?: 'BENCH_LAB' | 'WIRING_DIAGRAM' | 'ECU_PINOUT' | 'OSCILLOSCOPE' | 'PCB_SCANNER' | 'REPAIR_GUIDE';
+  targetPinId?: string;
+}
+
+export interface LiveBenchContext {
+  powerSupply: PowerSupplyState;
+  pins: EcuPin[];
+  wires: WireConnection[];
+  faults: InjectedFault[];
+  activeDTCs: DiagnosticTroubleCode[];
+  nodeVoltages: Record<string, number>;
+  supplyCurrentDrawAmps: number;
+  isSupplyCurrentTripped: boolean;
+  multimeter: MultimeterState;
+  multimeterDisplay: string;
+  multimeterUnit: string;
+  multimeterWarning?: string;
+  selectedPinId: string | null;
+}
+
+export interface AssistantCitation {
+  id: string;
+  kind: KnowledgeSourceKind;
+  title: string;
+  subtitle: string;
+  snippet: string;
+  score: number;
+  actionTab?: IndexedKnowledgeDoc['actionTab'];
+  targetPinId?: string;
+}
+
+export interface OfflineAssistantReply {
+  answer: string;
+  citations: AssistantCitation[];
+  suggestedPrompts: string[];
+  indexedCount: number;
+}
+
+const BENCH_PLAYBOOKS: IndexedKnowledgeDoc[] = [
+  {
+    id: 'pb-p0122',
+    kind: 'BENCH_PLAYBOOK',
+    title: 'DTC P0122 — Throttle Position Sensor (TPS) Low Input (< 0.20V)',
+    subtitle: 'Virtual Bench MNA Diagnostic Playbook · Pin 7 (TPS_SIG)',
+    dtcCode: 'P0122',
+    ecuModel: 'Universal ECU Bench',
+    actionTab: 'BENCH_LAB',
+    targetPinId: 'ecu-pin-7',
+    body: [
+      'Trigger Condition: MNA solver detects TPS_SIG (Pin 7) voltage < 0.20V while ignition is ON.',
+      'Common Root Causes: Open circuit on TPS signal wire, broken 5V VREF supply (Pin 5), or TPS signal wire shorted directly to Chassis Ground (KL31).',
+      'Bench Verification Steps:',
+      '1. Attach Red (+) DMM probe to Pin 5 (VREF_5V) and Black (-) COM to Chassis GND (KL31). Verify 5.00V DC.',
+      '2. Attach Red (+) probe to Pin 7 (TPS_SIG). At 20% idle throttle it should measure ~1.30V (0.5V at 0% to 4.5V at 100% WOT).',
+      '3. Inspect the Wiring Canvas for a cut wire between comp-tps and ecu-pin-7, or check Fault Injection Matrix on Pin 7 for OPEN_CIRCUIT or SHORT_TO_GND.',
+      '4. Switch PSU OFF, set DMM to OHMS, and verify continuity between Pin 7 and TPS wiper (< 1 Ohm).',
+    ].join('\n'),
+  },
+  {
+    id: 'pb-p0123',
+    kind: 'BENCH_PLAYBOOK',
+    title: 'DTC P0123 — Throttle Position Sensor (TPS) High Input (> 4.80V)',
+    subtitle: 'Virtual Bench MNA Diagnostic Playbook · Pin 7 (TPS_SIG)',
+    dtcCode: 'P0123',
+    ecuModel: 'Universal ECU Bench',
+    actionTab: 'BENCH_LAB',
+    targetPinId: 'ecu-pin-7',
+    body: [
+      'Trigger Condition: MNA solver detects TPS_SIG (Pin 7) voltage > 4.80V while ignition is ON.',
+      'Common Root Causes: TPS signal harness shorted to +12V battery (KL30/KL15), shorted to 5V VREF, or missing Sensor Clean Ground (SGND Pin 6).',
+      'Bench Verification Steps:',
+      '1. Measure Pin 7 (TPS_SIG) with DMM in V_DC mode. If reading ~12.6V, there is a SHORT_TO_VBAT fault.',
+      '2. Measure Pin 6 (SGND) to Chassis GND. If floating above 0.2V, check for open ground or high resistance corrosion on Pin 6 / Pin 1.',
+      '3. Clear or repair injected faults on Pin 7 and verify voltage returns to 0.50V - 4.50V range.',
+    ].join('\n'),
+  },
+  {
+    id: 'pb-p0117-p0118',
+    kind: 'BENCH_PLAYBOOK',
+    title: 'DTC P0117 / P0118 — Engine Coolant Temperature (ECT) NTC Sensor Fault',
+    subtitle: 'Virtual Bench MNA Diagnostic Playbook · Pin 9 (ECT_SIG)',
+    dtcCode: 'P0117 P0118',
+    ecuModel: 'Universal ECU Bench',
+    actionTab: 'BENCH_LAB',
+    targetPinId: 'ecu-pin-9',
+    body: [
+      'Trigger Conditions: P0117 when ECT_SIG (Pin 9) < 0.15V (Short to GND). P0118 when ECT_SIG > 4.85V (Open Circuit pulled up to 5V via internal 2.2kOhm resistor).',
+      'NTC Physics: Resistance drops as temperature rises (~2500 Ohm at 25C, ~250 Ohm at 85-90C).',
+      'Bench Verification Steps:',
+      '1. Probe Pin 9 (ECT_SIG) in V_DC mode. Nominal warm engine (85C) reads ~0.5V - 1.95V. Reading 5.00V means open thermistor circuit (P0118). Reading 0.00V means short to ground (P0117).',
+      '2. Verify harness wire between comp-ect and Pin 9 is intact (not cut) and ECT ground return is bonded.',
+    ].join('\n'),
+  },
+  {
+    id: 'pb-u0001',
+    kind: 'BENCH_PLAYBOOK',
+    title: 'DTC U0001 — High-Speed CAN Bus Communication Malfunction (60Ω Termination)',
+    subtitle: 'Virtual Bench MNA Diagnostic Playbook · Pins 13 (CAN_H) & 14 (CAN_L)',
+    dtcCode: 'U0001',
+    ecuModel: 'Universal ECU Bench',
+    actionTab: 'OSCILLOSCOPE',
+    targetPinId: 'ecu-pin-13',
+    body: [
+      'Trigger Condition: CAN_H (Pin 13) or CAN_L (Pin 14) drops below 0.3V or differential exceeds 3.0V.',
+      'CAN Bus Physical Specification: Two 120 Ohm termination resistors wired in parallel must measure 60.0 Ohms across CAN_H and CAN_L with Power Supply OFF.',
+      'Bench Verification Steps:',
+      '1. Turn Bench Power Supply OFF (mandatory before using DMM Ohms mode to avoid live-circuit lockout).',
+      '2. Place Red (+) DMM probe on Pin 13 (CAN_H) and Black (-) probe on Pin 14 (CAN_L) in OHMS mode.',
+      '3. Expected reading: ~60 Ohms. Reading 120 Ohms means one terminator is open; reading < 5 Ohms means CAN lines are shorted together or to ground.',
+      '4. Turn Power Supply ON and inspect Oscilloscope CAN_BUS mode: CAN_H toggles 2.5V to 3.5V, CAN_L toggles 2.5V to 1.5V.',
+    ].join('\n'),
+  },
+  {
+    id: 'pb-dmm-ohms-lockout',
+    kind: 'BENCH_PLAYBOOK',
+    title: 'DMM Live-Circuit Resistance Lockout & Continuity Beeper Guide',
+    subtitle: 'Virtual Digital Multimeter Operation Rules',
+    dtcCode: 'DMM-SAFE',
+    ecuModel: 'Bench Multimeter',
+    actionTab: 'BENCH_LAB',
+    body: [
+      'Never measure Resistance (Ohms) or Continuity on an energized circuit! When Bench Power Supply Output is ON and voltage is present, the Virtual DMM triggers a protective warning & lockout just like a real Fluke automotive meter.',
+      'Procedure: Disable Power Supply Output (Key OFF) before switching DMM to OHMS or CONTINUITY (< 50 Ohm beeper).',
+    ].join('\n'),
+  },
+  {
+    id: 'pb-psu-ocp-trip',
+    kind: 'BENCH_PLAYBOOK',
+    title: 'Bench Power Supply Over-Current Protection (OCP) Trip & Short-Circuit Isolation',
+    subtitle: 'KL30 (Pin 3) / KL15 (Pin 4) / Short-Circuit Protection',
+    dtcCode: 'OCP-TRIP',
+    ecuModel: 'Bench Power Supply',
+    actionTab: 'BENCH_LAB',
+    targetPinId: 'ecu-pin-3',
+    body: [
+      'Symptom: Total supply current draw hits or exceeds the Current Limit (default 5.0A) and PSU enters OCP trip.',
+      'Cause: Direct short to Chassis Ground (KL31) on KL30 (+12V), KL15 Ignition, Injector driver, or shorted clamping diode (e.g., D301/D302 on Hitachi MEC22-251).',
+      'Steps: Check Fault Injection Matrix for SHORT_TO_GND on power or actuator pins, verify no misplaced jumper wires from +12V to GND on Wiring Canvas, and inspect current draw telemetry.',
+    ].join('\n'),
+  },
+  {
+    id: 'pb-hitachi-mec11-guide',
+    kind: 'BENCH_PLAYBOOK',
+    title: 'Hitachi MEC11-251 / MEC22-251 Pure K-Line Bench Wakeup & OBD2 Routing',
+    subtitle: 'Nissan Sentra / Almera / Sunny N16 (QG16DE) · ISO-9141',
+    dtcCode: 'MEC11 MEC22 K-LINE',
+    ecuModel: 'Nissan Hitachi MEC11-251 / MEC22-251',
+    actionTab: 'ECU_PINOUT',
+    body: [
+      'Critical Wiring Rule: Hitachi MEC11-251 / MEC22-251 uses pure ISO-9141 K-Line on Pin 88 (or Pin 85) wired to OBD2 Pin 7. Leave Pins 86 & 94 DISCONNECTED (they are internal TCU CAN lines, not OBD2 diagnostic CAN!).',
+      'Required Bench Hookup:',
+      '- ECU Pin 67 (or 121): +12V Constant Battery (+B) via 5A/10A inline fuse (also OBD2 Pin 16).',
+      '- ECU Pin 36 (or 109): +12V Switched Ignition toggle to wake internal EGI relay.',
+      '- ECU Pin 48 (or 1 / 57 / 115 / 116): Chassis Ground (-) & OBD2 Pins 4 & 5.',
+      '- ECU Pin 88 (or 85): K-Line Data to OBD2 Pin 7.',
+    ].join('\n'),
+  },
+  {
+    id: 'pb-ford-oem-pinout-master',
+    kind: 'BENCH_PLAYBOOK',
+    title: 'Ford / FoMoCo Master OEM Bench Pinouts (Ranger, Everest, EcoBlue, EcoSport, Fiesta, Focus, PowerShift TCM, Territory, Explorer, Transit)',
+    subtitle: 'Verified OEM Power, Switched Ignition & Ground Pinout Reference · 10 Ford Platforms',
+    dtcCode: 'FORD PINOUT C1E148 CBR B20',
+    ecuModel: 'Ford Ranger Everest T6 EcoBlue EcoSport Fiesta Focus PowerShift TCM Territory Explorer Transit',
+    actionTab: 'ECU_PINOUT',
+    targetPinId: 'ecu-pin-3',
+    body: [
+      'For the Ranger and Everest T6, power goes to Pin C1E148, switched ignition to Pin C1E142, and grounds to Pins C1E139 and C1E140.',
+      'For the Next-Gen Ranger and Everest EcoBlue, constant power connects to Pin CBR pin 1, ignition to CBR pin 3, and grounds to CBR pins 2 and 4.',
+      'For the EcoSport and Fiesta 1.5L, connect power to Pin 1, ignition to Pin 2, and ground to Pins 3 and 4.',
+      'The Focus and EcoSport GDI require power on Pin 61, ignition on Pin 16, and ground on Pin 32.',
+      'For the PowerShift TCM, power is applied to Pins 1 and 2, ignition to Pin 3, and grounds to Pins 4 and 5.',
+      'The Territory 1.5L EcoBoost uses Pin 8 for power, Pin 9 for ignition, and Pins 10 and 11 for ground.',
+      'Connecting the Ranger 2.5L NA requires power on Pin 1, ignition on Pin 2, and ground on Pins 3 and 4.',
+      'Older Escape, Focus, and Duratec models take power on Pin 15, ignition on Pin 6, and ground on Pin 61.',
+      'For the Explorer, power goes to Pin 103, ignition to Pin 105, and ground to Pin 116.',
+      'Finally, the Transit 2.2L TDCi needs power on Pin B20, ignition on Pin B22, and ground on Pins B23 and B24.',
+    ].join('\n'),
+  },
+  {
+    id: 'pb-toyota-oem-pinout-master',
+    kind: 'BENCH_PLAYBOOK',
+    title: 'Toyota OEM ECU Bench Test Pinouts (PH Market — Hilux, Fortuner, Innova, Hiace, Vios, Yaris, Wigo, Agya, Avanza, Rush, Corolla Altis, 6AT TCM)',
+    subtitle: 'Verified PH-Market Power (+B), Switched Ignition (IGSW), Ground (E1), CAN Bus & Sensor/Actuator Pinout Reference · 10 Toyota Platforms',
+    dtcCode: 'TOYOTA PINOUT 1GD 2GD 1KD 2KD 1TR 1NZ 2NR 1KR 2NR-VE 1ZR AC60',
+    ecuModel: 'Toyota Hilux Fortuner Innova Hiace Vios Yaris Wigo Agya Avanza Rush Corolla Altis Denso Aisin AC60E AC60F 6AT TCM',
+    actionTab: 'ECU_PINOUT',
+    targetPinId: 'ecu-pin-3',
+    body: [
+      '⚠️ WARNING: Pinout Verification & Polarity: Always cross-check the exact Denso/Fujitsu Ten part number on the ECU case and verify ground continuity with a multimeter before applying +12V bench power. Toyota connectors (A/B/C/D or E1–E6) vary slightly across model years and emissions tiers (Euro 2 vs. Euro 4).',
+      '1. Hilux / Fortuner / Innova (2.8L 1GD-FTV & 2.4L 2GD-FTV, Denso): Constant Power (+B / +B2): A1, A2 | Switched Ignition (IGSW): A28 | Ground (GND / E1 / ME01): A3, A4, B1 | CAN Bus: A41 (H) / A42 (L) | NE+ (CKP): B14 | G2+ (CMP): B15 | PCR1 (FRP): B32 | SCV+: B48.',
+      '2. Hilux / Fortuner / Hiace (3.0L 1KD-FTV & 2.5L 2KD-FTV, Denso): Constant Power (+B / +B2): E5-1, E5-2 | Switched Ignition (IGSW): E5-9 | Ground (GND / E1 / ME01): E5-3, E6-1 | CAN Bus: E5-23 (H) / E5-24 (L) | NE+ (CKP): E6-12 | G2+ (CMP): E6-13 | PCR1 (FRP): E6-25 | SCV+: E6-31.',
+      '3. Innova (2.0L 1TR-FE VVT-i Gasoline, Denso): Constant Power (+B): A1, A2 | Switched Ignition (IGSW): A18 | Ground (GND / E1): A3, B1 | CAN Bus: A33 (H) / A34 (L) | NE+ (CKP): B11 | G2+ (CMP): B12 | VTA1 (TPS): B21 | IGT1: B36.',
+      '4. Hiace Commuter / GL Grandia (2.8L 1GD-FTV, Denso): Constant Power (+B / +B2): A1, A2 | Switched Ignition (IGSW): A28 | Ground (GND / E1): A3, A4, B1 | CAN Bus: A41 (H) / A42 (L) | NE+ (CKP): B14 | G2+ (CMP): B15 | PCR1 (FRP): B32 | EGR PWM: B54.',
+      '5. Vios / Yaris (1.5L 1NZ-FE & 1.3L 2NZ-FE, Denso): Constant Power (+B / BATT): A1, A2 | Switched Ignition (IGSW): A15 | Ground (GND / E1): A3, B1 | CAN Bus: A27 (H) / A28 (L) | NE+ (CKP): B10 | G2+ (CMP): B11 | VTA1 (TPS): B19 | IGT1: B32.',
+      '6. Vios / Yaris (1.5L 2NR-FE & 1.3L 1NR-FE Dual VVT-i, Denso): Constant Power (+B / BATT): A1, A2 | Switched Ignition (IGSW): A21 | Ground (GND / E1): A3, A4, B1 | CAN Bus: A37 (H) / A38 (L) | NE+ (CKP): B12 | G2+ (CMP): B13 | VTA1 (TPS): B24 | IGT1: B40.',
+      '7. Wigo / Agya (1.0L 1KR-FE / 1KR-VE, Denso): Constant Power (+B / BATT): A1, A2 | Switched Ignition (IGSW): A12 | Ground (GND / E1): A3, B1 | CAN Bus: A22 (H) / A23 (L) | NE+ (CKP): B8 | G2+ (CMP): B9 | PIM (MAP): B16 | IGT1: B28.',
+      '8. Avanza / Rush (1.5L 2NR-VE & 1.3L 1NR-VE, Denso): Constant Power (+B / BATT): A1, A2 | Switched Ignition (IGSW): A19 | Ground (GND / E1): A3, B1 | CAN Bus: A31 (H) / A32 (L) | NE+ (CKP): B11 | G2+ (CMP): B12 | PIM (MAP): B20 | IGT1: B35.',
+      '9. Corolla Altis (1.6L 1ZR-FE & 1.8L 2ZR-FE Dual VVT-i, Denso): Constant Power (+B / +B2): A1, A2 | Switched Ignition (IGSW): A24 | Ground (GND / E1): A3, A4, B1 | CAN Bus: A39 (H) / A40 (L) | NE+ (CKP): B13 | G2+ (CMP): B14 | VG (MAF): B22 | IGT1: B42.',
+      '10. Fortuner / Hilux 6AT TCM (Aisin AC60E / AC60F): Constant Power (+B): Pin 1, Pin 2 | Switched Ignition (IG): Pin 11 | Ground (GND / E1): Pin 15, Pin 16 | CAN Bus: Pin 21 (H) / Pin 22 (L) | NT (Input Spd): Pin 5 | SP2 (Output Spd): Pin 6 | SL1: Pin 12.',
+    ].join('\n'),
+  },
+];
+
+function buildBaseDocuments(): IndexedKnowledgeDoc[] {
+  const docs: IndexedKnowledgeDoc[] = [...BENCH_PLAYBOOKS];
+
+  // 1. Index all OEM Repair Knowledge Base manuals
+  for (const art of REPAIR_KNOWLEDGE_BASE) {
+    const symptomsText = art.symptoms.join(' | ');
+    const causesText = art.rootCauses
+      .map((c) => `${c.cause} (${c.severity}): ${c.description}`)
+      .join(' | ');
+    const stepsText = art.repairSteps
+      .map((s) => `Step ${s.stepNum}: ${s.action} [${s.specification}]`)
+      .join('\n');
+
+    docs.push({
+      id: `manual_${art.id}`,
+      kind: 'OEM_MANUAL',
+      title: art.title,
+      subtitle: `${art.dtcCode} · ${art.vehicleModel}`,
+      dtcCode: art.dtcCode,
+      ecuModel: art.vehicleModel,
+      actionTab: 'REPAIR_GUIDE',
+      body: [
+        `Symptoms: ${symptomsText}`,
+        `Root Causes: ${causesText}`,
+        art.cpuArchitecture ? `Architecture: ${art.cpuArchitecture}` : '',
+        art.hardwareNote ? `Hardware Note: ${art.hardwareNote}` : '',
+        `Repair Procedure:\n${stepsText}`,
+      ]
+        .filter(Boolean)
+        .join('\n'),
+    });
+  }
+
+  // 2. Index all 11 ECU Brand Profiles, their pinouts, and PCB hotspots
+  for (const brand of ECU_BRAND_PROFILES) {
+    docs.push({
+      id: `ecu_profile_${brand.id}`,
+      kind: 'ECU_PINOUT',
+      title: `${brand.brandName} — ${brand.modelName}`,
+      subtitle: `${brand.cavityInfo} · ${brand.popularVehiclesInPH}`,
+      dtcCode: '',
+      ecuModel: `${brand.brandName} ${brand.modelName}`,
+      actionTab: 'ECU_PINOUT',
+      body: `${brand.description}\nPopular Vehicles: ${brand.popularVehiclesInPH}\nKey Bench Pins: ${brand.pinouts
+        .slice(0, 48)
+        .map((p) => `Pin ${p.pinCode || p.pinNumber} ${p.label} (${p.signalName}, ${p.nominalVoltage}V)`)
+        .join('; ')}`,
+    });
+
+    for (const pin of brand.pinouts) {
+      docs.push({
+        id: `pin_${brand.id}_${pin.plug}_${pin.pinCode || pin.pinNumber}`,
+        kind: 'ECU_PINOUT',
+        title: `${brand.brandName} ${brand.modelName.split('(')[0].trim()} — Pin ${pin.pinCode || pin.pinNumber} (${pin.label})`,
+        subtitle: `${pin.plug} · ${pin.signalName} · ${pin.wireColor} · ${pin.nominalVoltage}V`,
+        dtcCode: pin.pinCode || '',
+        ecuModel: `${brand.brandName} ${brand.modelName}`,
+        actionTab: 'ECU_PINOUT',
+        targetPinId: pin.associatedSimPinId,
+        body: [
+          `Pin ${pin.pinNumber}${pin.pinCode ? ` [Code: ${pin.pinCode}]` : ''} (${pin.label}) on ${brand.modelName}, Plug ${pin.plug}.`,
+          `Signal: ${pin.signalName} (${pin.category}), Wire Color: ${pin.wireColor}, Nominal Voltage: ${pin.nominalVoltage}V.`,
+          `Bench Role: ${pin.benchRole}`,
+          `Connection Instruction: ${pin.connectionInstruction}`,
+          `Electrical Spec: ${pin.electricalSpec}`,
+        ].join('\n'),
+      });
+    }
+
+    if (brand.pcbComponents) {
+      for (const comp of brand.pcbComponents) {
+        docs.push({
+          id: `pcb_${brand.id}_${comp.id}`,
+          kind: 'PCB_HOTSPOT',
+          title: `${brand.brandName} PCB Component: ${comp.name} (${comp.designation})`,
+          subtitle: `${brand.modelName.split('(')[0].trim()} · ${comp.spec}`,
+          dtcCode: '',
+          ecuModel: `${brand.brandName} ${brand.modelName}`,
+          actionTab: 'ECU_PINOUT',
+          targetPinId: comp.associatedSimPinId,
+          body: [
+            `PCB Hotspot ${comp.name} [${comp.designation}], Type: ${comp.type}.`,
+            `Specification: ${comp.spec}.`,
+            `Diagnostic Role: ${comp.diagnosticRole}`,
+            comp.associatedPins ? `Associated Connector Pins: ${comp.associatedPins}` : '',
+          ]
+            .filter(Boolean)
+            .join('\n'),
+        });
+      }
+    }
+  }
+
+  // 3. Index Verified Voice ECU Bench/Boot Guides & OCR_VERIFY Safety Gates
+  for (const guide of VERIFIED_VOICE_ECU_GUIDES) {
+    docs.push({
+      id: `voice_guide_${guide.id}`,
+      kind: 'BENCH_PLAYBOOK',
+      title: `${guide.brandLabel} ${guide.ecuName} [${guide.status}]`,
+      subtitle: `${guide.tableRef} · Models: ${guide.models.join(', ')}`,
+      dtcCode: guide.status,
+      ecuModel: `${guide.brandLabel} ${guide.ecuName} ${guide.models.join(' ')}`,
+      actionTab: guide.linkedProfileId ? 'ECU_PINOUT' : 'BENCH_LAB',
+      body: [
+        `Verification Status: ${guide.status} (${guide.tableRef})`,
+        `Key Bench Pins: ${guide.keyBenchPins}`,
+        `Power-Up / Boot Protocol: ${guide.bootOrPowerRule}`,
+        `Voice Guide Summary: ${guide.voicePrompt}`,
+        `DLC Protocol: ${guide.dlcProtocol}`,
+        guide.ocrVerifyGate ? `MANDATORY GATE: ${guide.ocrVerifyGate}` : '',
+      ]
+        .filter(Boolean)
+        .join('\n'),
+    });
+  }
+
+  for (const gate of OCR_VERIFY_RULES) {
+    docs.push({
+      id: `gate_rule_${gate.id}`,
+      kind: 'BENCH_PLAYBOOK',
+      title: gate.title,
+      subtitle: 'Mandatory Pre-Energize OCR_VERIFY / Hardware-Conflict Gate',
+      dtcCode: 'OCR_VERIFY',
+      ecuModel: gate.matchTerms.join(' '),
+      actionTab: 'BENCH_LAB',
+      body: `${gate.prompt}\nVoice Prompt: ${gate.spokenAlert}`,
+    });
+  }
+
+  // 4. Index Table 16 OBD-II / Legacy OEM DLC Pinouts
+  for (const dlc of TABLE16_DLC_INTERFACES) {
+    docs.push({
+      id: `table16_${dlc.id}`,
+      kind: 'ECU_PINOUT',
+      title: `Table 16 DLC Interface: ${dlc.brandLabel}`,
+      subtitle: dlc.connectorTypes,
+      dtcCode: 'DLC OBD2',
+      ecuModel: `${dlc.brandLabel} DLC OBD-II`,
+      actionTab: 'ECU_PINOUT',
+      body: [
+        `Connectors: ${dlc.connectorTypes}`,
+        `OBD-II 16-Pin Assignment: ${dlc.obd2Pins}`,
+        `Legacy OEM DLC: ${dlc.legacyDlcPins}`,
+        `Protocol Notes: ${dlc.protocolNotes}`,
+      ].join('\n'),
+    });
+  }
+
+  // 5. Index PART_METADATA_ONLY & MECHANICAL_NO_ECU records (zero fabricated pin numbers)
+  for (const restricted of RESTRICTED_MODEL_DATABASE) {
+    docs.push({
+      id: `restricted_${restricted.id}`,
+      kind: 'OEM_MANUAL',
+      title: `${restricted.brandLabel} ${restricted.modelName} [${restricted.status}]`,
+      subtitle: restricted.oemControllerNote,
+      dtcCode: restricted.status,
+      ecuModel: `${restricted.brandLabel} ${restricted.modelName}`,
+      actionTab: 'BENCH_LAB',
+      body: [
+        `Ingestion Rule: ${restricted.status} — Pin-by-pin wiring table NOT available in verified record. NEVER fabricate pin numbers.`,
+        `OEM Controller / Platform Note: ${restricted.oemControllerNote}`,
+        `DLC Protocol: ${restricted.dlcProtocol}`,
+        `Policy Note: ${restricted.restrictionReason}`,
+      ].join('\n'),
+    });
+  }
+
+  // 6. Index Brand-by-Brand OEM Bench Test Scenarios (PH Market & Bench Simulations)
+  for (const sc of BENCH_TEST_SCENARIOS) {
+    docs.push({
+      id: `bench_scenario_${sc.id}`,
+      kind: 'BENCH_PLAYBOOK',
+      title: `${sc.brandLabel} Scenario #${sc.scenarioNumber} (${sc.dtcCode}) — ${sc.faultDescription}`,
+      subtitle: `${sc.targetModuleAndModels} · ${sc.market}`,
+      dtcCode: sc.dtcCode,
+      ecuModel: `${sc.brandLabel} ${sc.targetModuleAndModels}`,
+      actionTab: 'BENCH_LAB',
+      targetPinId: sc.recommendedPinId,
+      body: [
+        `Target Module / Models: ${sc.targetModuleAndModels}`,
+        `DTC Code: ${sc.dtcCode} | Fault: ${sc.faultDescription}`,
+        `Bench Simulation Setup: ${sc.benchSimulationSetup}`,
+        `Expected ECU / Lab Behavior: ${sc.expectedEcuBehavior}`,
+      ].join('\n'),
+    });
+  }
+
+  // 7. Index OEM ECU & TCM PCB Hardware Layouts, IC Specifications & Component Values (Toyota & Ford 20 Platforms)
+  for (const pcb of OEM_PCB_HARDWARE_SPECS) {
+    docs.push({
+      id: `pcb_spec_${pcb.id}`,
+      kind: 'OEM_MANUAL',
+      title: `${pcb.platformName} PCB Specifications (${pcb.boardPartNumbers.join(', ')})`,
+      subtitle: `${pcb.engineOrTransmission} · MCU: ${pcb.mcuArchitecture}`,
+      dtcCode: pcb.brandKey === 'toyota' ? 'TOYOTA-PCB-SPECS' : 'FORD-PCB-SPECS',
+      ecuModel: `${pcb.platformName} ${pcb.boardPartNumbers.join(' ')}`,
+      actionTab: 'REPAIR_GUIDE',
+      body: [
+        `Platform: ${pcb.platformName} (${pcb.engineOrTransmission})`,
+        `Board Part Numbers: ${pcb.boardPartNumbers.join(', ')}`,
+        `Main MCU Architecture: ${pcb.mcuArchitecture}`,
+        `Memory & EEPROM: ${pcb.memoryAndEeprom}`,
+        `Power & Driver LSIs: ${pcb.powerAndDriverLsi}`,
+        `Network / CAN: ${pcb.canOrInterface}`,
+        `Bulk Filter Capacitors: ${pcb.bulkCapacitors}`,
+        `Passives & Protection: ${pcb.passiveAndProtection}`,
+        `Clock Crystal: ${pcb.crystalFrequency}`,
+        `Bench Diagnostic Checks: ${pcb.benchCheckNotes}`,
+        `Voice Summary: ${pcb.voiceSummary}`,
+      ].join('\n'),
+    });
+  }
+
+  // 8. Index all 2,080 Philippine Automotive Trouble Scenarios (Batch 1: PH-001–PH-520, Batch 2: PH-521–PH-1040, Batch 3: PH-1041–PH-1560, Batch 4: PH-1561–PH-2080)
+  for (const ph of PH_BENCH_TROUBLE_SCENARIOS) {
+    docs.push({
+      id: `ph_520_${ph.phId}`,
+      kind: 'PH_SCENARIO',
+      title: `${ph.phId} (${ph.relatedDtcs.join(', ') || 'NO-DTC'}) — ${ph.title.replace(`${ph.phId}: `, '')}`,
+      subtitle: `Batch ${ph.batch} · Domain ${ph.domainNumber}: ${ph.domainName} · p.${ph.sourcePage} [CROSS_REFERENCED]`,
+      dtcCode: `${ph.phId} ${ph.relatedDtcs.join(' ')}`.trim(),
+      ecuModel: ph.phContext,
+      actionTab: 'BENCH_LAB',
+      targetPinId: ph.focusPinId,
+      body: [
+        `Scenario ID: ${ph.phId} | Primary DTC: ${ph.relatedDtcs.join(', ') || 'NO-DTC'} | Provenance: CROSS_REFERENCED (PH Diagnostic Reference, p.${ph.sourcePage})`,
+        `Vehicle & Operating Context: ${ph.phContext}`,
+        `Key Symptoms: ${ph.symptoms}`,
+        `Diagnostic Steps & Specs: ${ph.diagnosticSteps}`,
+        `16-Pin Bench Simulation Mapping (${ph.emulationFidelity}): ${ph.emulationNote} | Focus Pin: ${ph.focusPinLabel}`,
+      ].join('\n'),
+    });
+  }
+
+  return docs;
+}
+
+const BASE_DOCS = buildBaseDocuments();
+
+export class OfflineDiagnosticChatbot {
+  private miniSearch: MiniSearch<IndexedKnowledgeDoc>;
+  private docsMap: Map<string, IndexedKnowledgeDoc>;
+
+  constructor(
+    savedLogs: SavedDiagnosticLog[] = [],
+    savedSessions: SavedBenchSession[] = []
+  ) {
+    this.docsMap = new Map<string, IndexedKnowledgeDoc>();
+    this.miniSearch = new MiniSearch<IndexedKnowledgeDoc>({
+      fields: ['title', 'subtitle', 'dtcCode', 'ecuModel', 'body'],
+      storeFields: ['id', 'kind', 'title', 'subtitle', 'dtcCode', 'ecuModel', 'body', 'actionTab', 'targetPinId'],
+      searchOptions: {
+        boost: { dtcCode: 4, title: 3, ecuModel: 2.5, subtitle: 2 },
+        fuzzy: 0.2,
+        prefix: true,
+      },
+    });
+
+    const allDocs: IndexedKnowledgeDoc[] = [...BASE_DOCS];
+
+    for (const log of savedLogs) {
+      allDocs.push({
+        id: `dblog_${log.id}`,
+        kind: 'SAVED_DB_LOG',
+        title: log.title,
+        subtitle: `Saved Diagnostic Log · ${log.dtcCode || log.sourceType} · ${log.ecuModel || 'User Note'}`,
+        dtcCode: log.dtcCode || '',
+        ecuModel: log.ecuModel || '',
+        body: log.summary,
+      });
+    }
+
+    for (const sess of savedSessions) {
+      allDocs.push({
+        id: `dbsess_${sess.id}`,
+        kind: 'SAVED_BENCH',
+        title: `Saved Bench Workspace: ${sess.title}`,
+        subtitle: `${sess.ecuProfileLabel} · ${sess.activeDtcs?.length ? `DTCs: ${sess.activeDtcs.join(', ')}` : 'Nominal'}`,
+        dtcCode: (sess.activeDtcs || []).join(' '),
+        ecuModel: sess.ecuProfileLabel,
+        body: [
+          sess.notes || 'Saved custom bench wiring and fault configuration.',
+          `PSU: ${sess.powerSupply?.voltageSetting ?? 12.6}V, Draw: ${sess.supplyCurrentDrawAmps ?? 0}A`,
+          `Faults: ${(sess.faults || []).map((f) => `${f.pinId} ${f.faultType} (${f.description})`).join('; ') || 'None'}`,
+        ].join('\n'),
+      });
+    }
+
+    for (const d of allDocs) {
+      this.docsMap.set(d.id, d);
+    }
+    this.miniSearch.addAll(allDocs);
+  }
+
+  get indexedCount(): number {
+    return this.docsMap.size;
+  }
+
+  ask(rawQuery: string, liveCtx?: LiveBenchContext): OfflineAssistantReply {
+    const q = rawQuery.trim();
+    const lower = q.toLowerCase();
+
+    const wantsLiveBenchDiagnosis =
+      lower.includes('current bench') ||
+      lower.includes('my bench') ||
+      lower.includes('diagnose') ||
+      lower.includes('what is wrong') ||
+      lower.includes("what's wrong") ||
+      lower.includes('active fault') ||
+      lower.includes('active dtc') ||
+      lower.includes('why is') ||
+      lower.includes('troubleshoot now') ||
+      lower.includes('status');
+
+    // Run MiniSearch BM25+ full-text + fuzzy retrieval
+    const effectiveQuery =
+      liveCtx && wantsLiveBenchDiagnosis && liveCtx.activeDTCs.length > 0
+        ? `${q} ${liveCtx.activeDTCs.map((d) => d.code).join(' ')}`
+        : q;
+
+    const rawResults = effectiveQuery
+      ? this.miniSearch.search(effectiveQuery, { combineWith: 'OR' }).slice(0, 6)
+      : [];
+
+    // Guarantee exact PH-xxx / PH-xxxx lookup ranks #1 if technician references PH-001..PH-2080
+    const explicitPhMatch = q.match(/\b(PH-\d{3,4})\b/i);
+    const exactPhDocId = explicitPhMatch ? `ph_520_${explicitPhMatch[1].toUpperCase()}` : null;
+    const mergedHits = exactPhDocId && this.docsMap.has(exactPhDocId)
+      ? [
+          { id: exactPhDocId, score: 999 },
+          ...rawResults.filter((r) => r.id !== exactPhDocId),
+        ].slice(0, 5)
+      : rawResults.slice(0, 5);
+
+    const searchResults = mergedHits;
+
+    const citations: AssistantCitation[] = searchResults.map((hit) => {
+      const full = this.docsMap.get(hit.id);
+      const bodyStr = full?.body || '';
+      const firstLines = bodyStr.split('\n').slice(0, 3).join(' ');
+      return {
+        id: hit.id,
+        kind: (full?.kind || 'OEM_MANUAL') as KnowledgeSourceKind,
+        title: full?.title || String((hit as { title?: unknown }).title || ''),
+        subtitle: full?.subtitle || String((hit as { subtitle?: unknown }).subtitle || ''),
+        snippet: firstLines.length > 220 ? `${firstLines.slice(0, 217)}...` : firstLines,
+        score: Math.round(hit.score * 10) / 10,
+        actionTab: full?.actionTab,
+        targetPinId: full?.targetPinId,
+      };
+    });
+
+    const sections: string[] = [];
+
+    // 0. Mandatory Hardware-Conflict OCR_VERIFY & Anti-Fabrication Guardrails
+    const safetyGates = matchSafetyGatesForQuery(q);
+    if (safetyGates.length > 0) {
+      sections.push(
+        [
+          'MANDATORY OCR_VERIFY / HARDWARE-CONFLICT GATING:',
+          ...safetyGates.map((g) => `• ${g.title}: ${g.prompt}`),
+        ].join('\n')
+      );
+    }
+
+    const restrictedMatches = matchRestrictedModelsForQuery(q);
+    if (restrictedMatches.length > 0) {
+      sections.push(
+        [
+          'DATABASE POLICY GUARDRAIL (NO FABRICATED PIN NUMBERS):',
+          ...restrictedMatches.slice(0, 3).map(
+            (r) =>
+              `• ${r.brandLabel} ${r.modelName} [${r.status}]: ${r.oemControllerNote} | DLC: ${r.dlcProtocol} — ${r.restrictionReason}`
+          ),
+        ].join('\n')
+      );
+    }
+
+    // 1. Live MNA Bench Telemetry Diagnosis (if relevant or if faults exist)
+    if (liveCtx && (wantsLiveBenchDiagnosis || (liveCtx.activeDTCs.length > 0 && lower.includes('help')))) {
+      sections.push(this.buildLiveBenchDiagnosis(liveCtx));
+    }
+
+    // 2. Selected Pin Inspection context if user asks about selected/current pin
+    if (
+      liveCtx &&
+      (lower.includes('selected pin') || lower.includes('this pin') || lower.includes('current pin')) &&
+      liveCtx.selectedPinId
+    ) {
+      const pin = liveCtx.pins.find((p) => p.id === liveCtx.selectedPinId);
+      if (pin) {
+        const v = liveCtx.nodeVoltages[pin.id];
+        const pinFault = liveCtx.faults.find((f) => f.pinId === pin.id);
+        sections.push(
+          [
+            `LIVE PIN TELEMETRY — ${pin.label} (Pin #${pin.pinNumber}: ${pin.name}):`,
+            `• Measured MNA Voltage: ${v !== undefined ? `${v.toFixed(2)}V` : 'Floating'} (Nominal: ${pin.nominalVoltage.toFixed(2)}V)`,
+            `• Internal Resistance: ${pin.internalResistance}Ω | Role: ${pin.description}`,
+            pinFault
+              ? `• ACTIVE FAULT ON THIS PIN: ${pinFault.faultType} — ${pinFault.description}. Clear or repair this in the Fault Injection Matrix.`
+              : `• No injected fault directly assigned to ${pin.label}.`,
+          ].join('\n')
+        );
+      }
+    }
+
+    // 3. Top Knowledge Base Matches from MiniSearch
+    if (searchResults.length > 0) {
+      const topDoc = this.docsMap.get(searchResults[0].id);
+      if (topDoc) {
+        sections.push(
+          [
+            `MATCHED PROJECT KNOWLEDGE (${topDoc.kind.replace(/_/g, ' ')}):`,
+            `**${topDoc.title}**`,
+            topDoc.subtitle ? `Context: ${topDoc.subtitle}` : '',
+            '',
+            topDoc.body,
+          ]
+            .filter((line) => line !== undefined)
+            .join('\n')
+        );
+      }
+
+      if (searchResults.length > 1) {
+        const secondary = searchResults
+          .slice(1, 3)
+          .map((r) => {
+            const docItem = this.docsMap.get(r.id);
+            if (!docItem) return null;
+            const summaryLine = docItem.body.split('\n')[0] || '';
+            return `• **${docItem.title}** (${docItem.subtitle}): ${summaryLine}`;
+          })
+          .filter(Boolean);
+        if (secondary.length > 0) {
+          sections.push(`RELATED DATABASE REFERENCES:\n${secondary.join('\n')}`);
+        }
+      }
+    } else if (sections.length === 0) {
+      sections.push(
+        [
+          `No exact keyword match found for "${q}" in the offline knowledge index (${this.indexedCount} records).`,
+          'Try asking with a specific ECU model (e.g. "Hitachi MEC11", "Marelli 5NF", "Toyota 1KD", "Bosch ME7.5", "Ford SID208"), a component ("R701 shunt", "TLE9135PD", "D301 diode"), a DTC ("P0122", "P0093", "U0001"), or ask "Diagnose my current bench".',
+        ].join('\n\n')
+      );
+    }
+
+    const suggestedPrompts = this.buildSuggestedPrompts(liveCtx, citations);
+
+    return {
+      answer: sections.join('\n\n---\n\n'),
+      citations,
+      suggestedPrompts,
+      indexedCount: this.indexedCount,
+    };
+  }
+
+  private buildLiveBenchDiagnosis(ctx: LiveBenchContext): string {
+    const lines: string[] = ['LIVE BENCH MNA SOLVER DIAGNOSIS:'];
+    const cutWires = ctx.wires.filter((w) => w.isCut);
+
+    if (!ctx.powerSupply.isOutputEnabled) {
+      lines.push(
+        `• Power Supply Output is OFF (${ctx.powerSupply.voltageSetting.toFixed(1)}V preset). Enable PSU Output to energize KL30/KL15 rails for live voltage & DTC evaluation.`
+      );
+    } else if (ctx.isSupplyCurrentTripped) {
+      lines.push(
+        `• CRITICAL: Bench Power Supply OCP TRIPPED at ${ctx.supplyCurrentDrawAmps.toFixed(2)}A (limit ${ctx.powerSupply.currentLimit.toFixed(1)}A)! Check for SHORT_TO_GND faults or direct +12V-to-GND jumpers.`
+      );
+    } else {
+      lines.push(
+        `• Power Supply: ${ctx.powerSupply.voltageSetting.toFixed(1)}V ON, Draw: ${ctx.supplyCurrentDrawAmps.toFixed(2)}A (Nominal).`
+      );
+    }
+
+    if (ctx.multimeterWarning) {
+      lines.push(`• DMM Safety Alert: ${ctx.multimeterWarning}`);
+    } else {
+      lines.push(
+        `• DMM Reading: ${ctx.multimeterDisplay} ${ctx.multimeterUnit} (Red: ${ctx.multimeter.redProbe.attachedLabel}, Black: ${ctx.multimeter.blackProbe.attachedLabel}).`
+      );
+    }
+
+    if (cutWires.length > 0) {
+      lines.push(
+        `• Open Harness Leads Detected (${cutWires.length}): ${cutWires.map((w) => w.label).join(', ')}. Click the cut wire on the Wiring Canvas to reconnect it.`
+      );
+    }
+
+    if (ctx.faults.length > 0) {
+      lines.push(
+        `• Injected Faults (${ctx.faults.length}): ${ctx.faults.map((f) => `${f.pinId} -> ${f.faultType} (${f.description})`).join('; ')}.`
+      );
+    }
+
+    if (ctx.activeDTCs.length === 0) {
+      lines.push('• OBD-II Monitor: 0 Active DTCs. All monitored sensor/CAN thresholds are nominal.');
+    } else {
+      lines.push(
+        `• Active OBD-II DTCs (${ctx.activeDTCs.length}): ${ctx.activeDTCs
+          .map((d) => `${d.code} [${d.severity}] - ${d.description}`)
+          .join('; ')}.`
+      );
+    }
+
+    return lines.join('\n');
+  }
+
+  private buildSuggestedPrompts(
+    ctx: LiveBenchContext | undefined,
+    citations: AssistantCitation[]
+  ): string[] {
+    const suggestions: string[] = [];
+
+    if (ctx && ctx.activeDTCs.length > 0) {
+      suggestions.push(`How do I fix ${ctx.activeDTCs[0].code}?`);
+    } else {
+      suggestions.push('Diagnose my current bench');
+    }
+
+    if (citations.some((c) => c.id.includes('mec11') || c.id.includes('mec22'))) {
+      suggestions.push('Hitachi MEC22 R701 shunt test');
+      suggestions.push('Why leave Pins 86 and 94 disconnected?');
+    } else {
+      suggestions.push('Hitachi MEC11 K-Line wakeup pins');
+      suggestions.push('Marelli IAW 5NF water temp jumper');
+    }
+
+    suggestions.push('CAN Bus 60 Ohm termination test');
+    return suggestions.slice(0, 4);
+  }
+}

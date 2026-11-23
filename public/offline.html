@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#071426" />
+    <title>Offline Mode — Virtual ECU Lab Pro</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background-color: #071426;
+        background-image: radial-gradient(circle at 50% 0%, #102644 0%, #071426 70%);
+        color: #e2e8f0;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      }
+      .bezel {
+        width: 100%;
+        max-width: 560px;
+        background: #0d1522;
+        border: 1px solid #28364d;
+        border-radius: 4px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+        overflow: hidden;
+      }
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 18px;
+        background: #121c2d;
+        border-bottom: 1px solid #243248;
+      }
+      .logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 3px;
+        border: 1px solid #384a66;
+        background: #071426;
+        object-fit: contain;
+      }
+      .title-wrap h1 {
+        margin: 0;
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #f8fafc;
+      }
+      .title-wrap p {
+        margin: 2px 0 0;
+        font-size: 11px;
+        color: #94a3b8;
+      }
+      .badge {
+        margin-left: auto;
+        padding: 3px 8px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #fbbf24;
+        background: rgba(245, 158, 11, 0.15);
+        border: 1px solid rgba(245, 158, 11, 0.5);
+        border-radius: 2px;
+      }
+      .body {
+        padding: 20px 18px;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+      .status-box {
+        padding: 12px;
+        background: #09101a;
+        border: 1px solid #1e2c40;
+        border-radius: 3px;
+        margin-bottom: 16px;
+      }
+      .status-box h2 {
+        margin: 0 0 6px;
+        font-size: 12px;
+        text-transform: uppercase;
+        color: #38bdf8;
+      }
+      ul {
+        margin: 8px 0 0;
+        padding-left: 18px;
+        color: #cbd5e1;
+      }
+      li {
+        margin-bottom: 4px;
+      }
+      .security-note {
+        padding: 10px 12px;
+        background: rgba(245, 158, 11, 0.08);
+        border-left: 3px solid #f59e0b;
+        color: #fde68a;
+        font-size: 11px;
+        margin-bottom: 18px;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .btn {
+        flex: 1;
+        min-width: 180px;
+        padding: 10px 14px;
+        font-family: inherit;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        border-radius: 3px;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+      }
+      .btn-primary {
+        background: #f59e0b;
+        color: #071426;
+        border: 1px solid #fbbf24;
+      }
+      .btn-secondary {
+        background: #162235;
+        color: #e2e8f0;
+        border: 1px solid #334560;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="bezel" role="main">
+      <header class="header">
+        <img src="/pwa-192x192.png" alt="Virtual ECU Lab Pro" class="logo" />
+        <div class="title-wrap">
+          <h1>Virtual ECU Lab Pro</h1>
+          <p>Automotive Electronics &amp; ECU Bench Workstation</p>
+        </div>
+        <span class="badge">Offline Shell</span>
+      </header>
+      <div class="body">
+        <p>
+          Workstation network link is currently unavailable. Your browser could not reach the remote diagnostic server for this uncached route.
+        </p>
+        <div class="status-box">
+          <h2>Available in Cached Workbench Shell</h2>
+          <ul>
+            <li>Modified Nodal Analysis (MNA) ECU Bench Circuit Solver &amp; Multimeter</li>
+            <li>Dual-Trace Pin Waveform Oscilloscope &amp; 3D Bench Twin</li>
+            <li>Local ECU Connector Pinout Reference &amp; Physical Fault Isolation</li>
+            <li>100% Local Offline Diagnostic Assistant &amp; IndexedDB Session Queue</li>
+          </ul>
+        </div>
+        <div class="security-note">
+          <strong>Security Policy:</strong> Firebase Authentication tokens, License activation/validation, Admin controls, and live Gemini AI endpoints are strictly online-only and are never cached or bypassed offline.
+        </div>
+        <div class="actions">
+          <a href="/" class="btn btn-primary">Launch Cached Workbench</a>
+          <button type="button" class="btn btn-secondary" onclick="window.location.reload()">
+            Retry Network Connection
+          </button>
+        </div>
+      </div>
+    </main>
+    <script>
+      window.addEventListener('online', function () {
+        window.location.href = '/';
+      });
+    </script>
+  </body>
+</html>

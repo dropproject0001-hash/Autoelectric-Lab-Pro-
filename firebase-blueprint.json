@@ -1,0 +1,1073 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Authenticated technician or trainee profile in Virtual ECU Lab.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Firebase Authentication UID."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "minLength": 3,
+          "maxLength": 254,
+          "description": "Verified Google account email."
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 120,
+          "description": "Technician display name."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": ["uid", "email", "createdAt", "updatedAt"]
+    },
+    "BenchSession": {
+      "title": "BenchSession",
+      "description": "Lightweight Virtual ECU Lab bench session header; harness wires, injected faults, and sensor/actuator component states are stored in dedicated subcollections so every document is individually validated.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 1000
+        },
+        "ecuProfileLabel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "powerSupply": {
+          "type": "object",
+          "description": "Bench power supply configuration (voltageSetting, currentLimit, isOutputEnabled, preset)."
+        },
+        "activeDtcs": {
+          "type": "array",
+          "description": "Bounded summary list of MNA-solved OBD-II DTC strings (max 20)."
+        },
+        "supplyCurrentDrawAmps": {
+          "type": "number",
+          "description": "MNA-solved total bench supply current draw in Amperes."
+        },
+        "wireCount": {
+          "type": "integer",
+          "description": "Count of BenchSessionWire documents in /wires subcollection (0..50)."
+        },
+        "faultCount": {
+          "type": "integer",
+          "description": "Count of BenchSessionFault documents in /faults subcollection (0..20)."
+        },
+        "componentStateCount": {
+          "type": "integer",
+          "description": "Count of BenchSessionComponentState documents in /componentStates subcollection (0..40)."
+        },
+        "schemaVersion": {
+          "type": "integer",
+          "description": "Subcollection storage schema version (2)."
+        },
+        "selectedBrandKey": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 64,
+          "description": "Optional selected vehicle make identifier."
+        },
+        "selectedModelName": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 120,
+          "description": "Optional selected vehicle model name."
+        },
+        "selectedEcuProfileId": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 64,
+          "description": "Optional ECU hardware profile ID."
+        },
+        "rpmEmulator": {
+          "type": "object",
+          "description": "Optional CKP/CMP emulator state (isActive, rpm, soundEnabled, camPhaseOffsetDeg, ckpSignalLost)."
+        },
+        "gaugeMonitor": {
+          "type": "object",
+          "description": "Optional synchronized Live Gauge Console configuration and Peak-Hold history."
+        },
+        "multimeter": {
+          "type": "object",
+          "description": "Optional digital multimeter mode and probe placement state."
+        },
+        "workflowCheckedIds": {
+          "type": "array",
+          "description": "Checked Diagnostic Workflow step IDs for this bench session (max 20)."
+        },
+        "preBenchGateLocked": {
+          "type": "boolean",
+          "description": "Whether the mandatory Pre-Bench PSU Safety Gate is armed."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "title",
+        "ecuProfileLabel",
+        "powerSupply",
+        "activeDtcs",
+        "supplyCurrentDrawAmps",
+        "wireCount",
+        "faultCount",
+        "componentStateCount",
+        "schemaVersion",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "BenchSessionWire": {
+      "title": "BenchSessionWire",
+      "description": "Individual harness wire connection document under a BenchSession.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "sourcePinId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "targetPinId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "color": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "label": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 120
+        },
+        "isCut": {
+          "type": "boolean"
+        },
+        "resistance": {
+          "type": "number",
+          "description": "Wire series resistance in Ohms (0..1,000,000)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "sessionId",
+        "sourcePinId",
+        "targetPinId",
+        "color",
+        "label",
+        "isCut",
+        "resistance",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "BenchSessionFault": {
+      "title": "BenchSessionFault",
+      "description": "Individual injected electrical fault document under a BenchSession.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "pinId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "faultType": {
+          "type": "string",
+          "enum": [
+            "NONE",
+            "OPEN_CIRCUIT",
+            "SHORT_TO_GND",
+            "SHORT_TO_VBAT",
+            "HIGH_RESISTANCE_50R",
+            "HIGH_RESISTANCE_250R",
+            "HIGH_RESISTANCE_1K"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 240
+        },
+        "timestamp": {
+          "type": "number"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "sessionId",
+        "pinId",
+        "faultType",
+        "description",
+        "timestamp",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "BenchSessionComponentState": {
+      "title": "BenchSessionComponentState",
+      "description": "Individual bench sensor/actuator parameter state document under a BenchSession.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "componentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "state": {
+          "type": "object",
+          "description": "Bounded key-value map of component state (throttle, pressureKpa, tempC, calibrationPreset, etc., max 24 entries)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "sessionId",
+        "componentId",
+        "state",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "DiagnosticLog": {
+      "title": "DiagnosticLog",
+      "description": "Saved diagnostic case note or Google Search Grounding TSB/pinout bookmark; grounded source links live in the /sources subcollection.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "dtcCode": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 32
+        },
+        "ecuModel": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 120
+        },
+        "sourceType": {
+          "type": "string",
+          "enum": ["GROUNDED_TSB", "BENCH_SNAPSHOT", "PINOUT_NOTE"]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 12000
+        },
+        "sourceCount": {
+          "type": "integer",
+          "description": "Count of DiagnosticLogSource documents in /sources subcollection (0..20)."
+        },
+        "schemaVersion": {
+          "type": "integer",
+          "description": "Subcollection storage schema version (2)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "title",
+        "sourceType",
+        "summary",
+        "sourceCount",
+        "schemaVersion",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "DiagnosticLogSource": {
+      "title": "DiagnosticLogSource",
+      "description": "Individual verified Google Search grounding source citation under a DiagnosticLog.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "logId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 200
+        },
+        "uri": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 1000
+        },
+        "domain": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 120
+        },
+        "orderIndex": {
+          "type": "integer"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "logId",
+        "title",
+        "uri",
+        "domain",
+        "orderIndex",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "PcbScan": {
+      "title": "PcbScan",
+      "description": "Saved mapped ECU PCB scan header; components, copper trace nets, and fault hotspots are stored in individual validated subcollection documents.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "boardType": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "analysisSummary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "componentCount": {
+          "type": "integer",
+          "description": "Count of PcbScanComponent documents in /components subcollection (0..200)."
+        },
+        "netCount": {
+          "type": "integer",
+          "description": "Count of PcbScanNet documents in /nets subcollection (0..100)."
+        },
+        "hotspotCount": {
+          "type": "integer",
+          "description": "Count of PcbScanHotspot documents in /hotspots subcollection (0..100)."
+        },
+        "schemaVersion": {
+          "type": "integer",
+          "description": "Subcollection storage schema version (2)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "title",
+        "boardType",
+        "analysisSummary",
+        "model",
+        "componentCount",
+        "netCount",
+        "hotspotCount",
+        "schemaVersion",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "PcbScanComponent": {
+      "title": "PcbScanComponent",
+      "description": "Individual normalized PCB component bounding box, marking, and pinout spec document under a PcbScan.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "scanId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "refDes": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "marking": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 64
+        },
+        "decodedValue": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 80
+        },
+        "packageType": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 64
+        },
+        "bbox": {
+          "type": "object",
+          "description": "Normalized 0..1000 bounding box { ymin, xmin, ymax, xmax }."
+        },
+        "confidenceScore": {
+          "type": "number"
+        },
+        "verificationStatus": {
+          "type": "string",
+          "enum": ["VERIFIED", "CROSS_REFERENCED", "UNVERIFIED", "UNKNOWN"]
+        },
+        "circuitFunction": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 240
+        },
+        "terminalIds": {
+          "type": "array",
+          "description": "Bounded list of terminal IDs on this component (max 24)."
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 400
+        },
+        "operatingVoltageRange": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 64
+        },
+        "maxCurrentRating": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 64
+        },
+        "datasheetSummary": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 400
+        },
+        "pinSpecs": {
+          "type": "array",
+          "description": "Bounded IC/package pinout list (max 24)."
+        },
+        "source": {
+          "type": "string",
+          "enum": ["AI", "LOCAL_CV", "MANUAL"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "scanId",
+        "refDes",
+        "category",
+        "marking",
+        "decodedValue",
+        "packageType",
+        "bbox",
+        "confidenceScore",
+        "verificationStatus",
+        "circuitFunction",
+        "terminalIds",
+        "notes",
+        "operatingVoltageRange",
+        "maxCurrentRating",
+        "datasheetSummary",
+        "pinSpecs",
+        "source",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "PcbScanNet": {
+      "title": "PcbScanNet",
+      "description": "Individual normalized copper trace net document under a PcbScan.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "scanId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "signalType": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 48
+        },
+        "connectedComponentRefs": {
+          "type": "array",
+          "description": "Connected component RefDes strings (max 32)."
+        },
+        "connectedTerminalIds": {
+          "type": "array",
+          "description": "Connected terminal ID strings (max 32)."
+        },
+        "tracePoints": {
+          "type": "array",
+          "description": "Normalized 0..1000 trace polyline points (max 40)."
+        },
+        "confidenceScore": {
+          "type": "number"
+        },
+        "verificationStatus": {
+          "type": "string",
+          "enum": ["VERIFIED", "CROSS_REFERENCED", "UNVERIFIED", "UNKNOWN"]
+        },
+        "isComplete": {
+          "type": "boolean"
+        },
+        "incompleteNotes": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 240
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "scanId",
+        "name",
+        "signalType",
+        "connectedComponentRefs",
+        "connectedTerminalIds",
+        "tracePoints",
+        "confidenceScore",
+        "verificationStatus",
+        "isComplete",
+        "incompleteNotes",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "PcbScanHotspot": {
+      "title": "PcbScanHotspot",
+      "description": "Individual normalized PCB defect or thermal hotspot document under a PcbScan.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "scanId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "hotspotId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["CRITICAL", "WARNING", "INFO"]
+        },
+        "bbox": {
+          "type": "object",
+          "description": "Normalized 0..1000 bounding box { ymin, xmin, ymax, xmax }."
+        },
+        "suspectComponentRef": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 32
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 300
+        },
+        "source": {
+          "type": "string",
+          "enum": ["AI", "LOCAL_CV"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "scanId",
+        "hotspotId",
+        "label",
+        "severity",
+        "bbox",
+        "suspectComponentRef",
+        "notes",
+        "source",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "BenchPreferences": {
+      "title": "BenchPreferences",
+      "description": "Per-user synced Diagnostic Workflow progress and Pre-Bench PSU Safety Gate preferences; SpeechRecognition Voice Macros are stored in the /voiceMacros subcollection.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "workflowCheckedIds": {
+          "type": "array",
+          "description": "Checked Diagnostic Workflow checklist step IDs (max 20)."
+        },
+        "preBenchGateLocked": {
+          "type": "boolean",
+          "description": "Whether Pre-Bench PSU Safety Gate requires mandatory workflow completion before energizing."
+        },
+        "autoVerifyWorkflow": {
+          "type": "boolean",
+          "description": "Whether passing MNA telemetry automatically checks off diagnostic workflow steps."
+        },
+        "voiceMacroCount": {
+          "type": "integer",
+          "description": "Count of VoiceMacroDoc documents in /voiceMacros subcollection (0..50)."
+        },
+        "schemaVersion": {
+          "type": "integer",
+          "description": "Subcollection storage schema version (2)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "workflowCheckedIds",
+        "preBenchGateLocked",
+        "autoVerifyWorkflow",
+        "voiceMacroCount",
+        "schemaVersion",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "VoiceMacroDoc": {
+      "title": "VoiceMacroDoc",
+      "description": "Individual custom or preset SpeechRecognition voice macro document under BenchPreferences.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "prefId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "triggerPhrase": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "steps": {
+          "type": "array",
+          "description": "Bounded ordered bench command steps (1..20 strings)."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 240
+        },
+        "isPreset": {
+          "type": "boolean"
+        },
+        "macroCreatedAtMs": {
+          "type": "number"
+        },
+        "macroUpdatedAtMs": {
+          "type": "number"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "ownerId",
+        "prefId",
+        "name",
+        "triggerPhrase",
+        "steps",
+        "isPreset",
+        "macroCreatedAtMs",
+        "macroUpdatedAtMs",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "Private technician profile keyed by Firebase Auth UID."
+    },
+    "/users/{userId}/benchSessions/{sessionId}": {
+      "schema": {
+        "$ref": "#/entities/BenchSession"
+      },
+      "description": "Lightweight saved ECU bench workspace headers belonging to the authenticated user."
+    },
+    "/users/{userId}/benchSessions/{sessionId}/wires/{wireId}": {
+      "schema": {
+        "$ref": "#/entities/BenchSessionWire"
+      },
+      "description": "Individual harness wire connection documents for a saved bench session."
+    },
+    "/users/{userId}/benchSessions/{sessionId}/faults/{faultId}": {
+      "schema": {
+        "$ref": "#/entities/BenchSessionFault"
+      },
+      "description": "Individual injected fault documents for a saved bench session."
+    },
+    "/users/{userId}/benchSessions/{sessionId}/componentStates/{componentId}": {
+      "schema": {
+        "$ref": "#/entities/BenchSessionComponentState"
+      },
+      "description": "Individual bench component parameter state documents for a saved bench session."
+    },
+    "/users/{userId}/diagnosticLogs/{logId}": {
+      "schema": {
+        "$ref": "#/entities/DiagnosticLog"
+      },
+      "description": "Saved diagnostic logs and grounded TSB/pinout bookmarks belonging to the authenticated user."
+    },
+    "/users/{userId}/diagnosticLogs/{logId}/sources/{sourceId}": {
+      "schema": {
+        "$ref": "#/entities/DiagnosticLogSource"
+      },
+      "description": "Individual grounded web search source citations for a diagnostic log."
+    },
+    "/users/{userId}/pcbScans/{scanId}": {
+      "schema": {
+        "$ref": "#/entities/PcbScan"
+      },
+      "description": "Saved mapped ECU PCB scan headers belonging to the authenticated user."
+    },
+    "/users/{userId}/pcbScans/{scanId}/components/{componentId}": {
+      "schema": {
+        "$ref": "#/entities/PcbScanComponent"
+      },
+      "description": "Individual normalized PCB component bounding box and pinout documents under a PCB scan."
+    },
+    "/users/{userId}/pcbScans/{scanId}/nets/{netId}": {
+      "schema": {
+        "$ref": "#/entities/PcbScanNet"
+      },
+      "description": "Individual normalized copper trace net documents under a PCB scan."
+    },
+    "/users/{userId}/pcbScans/{scanId}/hotspots/{hotspotId}": {
+      "schema": {
+        "$ref": "#/entities/PcbScanHotspot"
+      },
+      "description": "Individual normalized PCB fault/thermal hotspot documents under a PCB scan."
+    },
+    "/users/{userId}/benchPreferences/{prefId}": {
+      "schema": {
+        "$ref": "#/entities/BenchPreferences"
+      },
+      "description": "Synced per-user Diagnostic Workflow state and Pre-Bench safety gate settings."
+    },
+    "/users/{userId}/benchPreferences/{prefId}/voiceMacros/{macroId}": {
+      "schema": {
+        "$ref": "#/entities/VoiceMacroDoc"
+      },
+      "description": "Individual synced custom and preset Voice Macro documents under BenchPreferences."
+    }
+  }
+}

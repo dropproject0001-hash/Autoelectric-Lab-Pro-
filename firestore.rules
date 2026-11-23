@@ -1,0 +1,859 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global safety net: default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Global Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Parent Master Gate Helpers (Pre-batch for get/delete, Post-batch for batched create/update)
+    function ownsSessionExisting(userId, sessionId) {
+      return exists(/databases/$(database)/documents/users/$(userId)/benchSessions/$(sessionId)) &&
+        get(/databases/$(database)/documents/users/$(userId)/benchSessions/$(sessionId)).data.ownerId == request.auth.uid;
+    }
+
+    function ownsSessionAfter(userId, sessionId) {
+      return existsAfter(/databases/$(database)/documents/users/$(userId)/benchSessions/$(sessionId)) &&
+        getAfter(/databases/$(database)/documents/users/$(userId)/benchSessions/$(sessionId)).data.ownerId == request.auth.uid;
+    }
+
+    function ownsLogExisting(userId, logId) {
+      return exists(/databases/$(database)/documents/users/$(userId)/diagnosticLogs/$(logId)) &&
+        get(/databases/$(database)/documents/users/$(userId)/diagnosticLogs/$(logId)).data.ownerId == request.auth.uid;
+    }
+
+    function ownsLogAfter(userId, logId) {
+      return existsAfter(/databases/$(database)/documents/users/$(userId)/diagnosticLogs/$(logId)) &&
+        getAfter(/databases/$(database)/documents/users/$(userId)/diagnosticLogs/$(logId)).data.ownerId == request.auth.uid;
+    }
+
+    function ownsPcbScanExisting(userId, scanId) {
+      return exists(/databases/$(database)/documents/users/$(userId)/pcbScans/$(scanId)) &&
+        get(/databases/$(database)/documents/users/$(userId)/pcbScans/$(scanId)).data.ownerId == request.auth.uid;
+    }
+
+    function ownsPcbScanAfter(userId, scanId) {
+      return existsAfter(/databases/$(database)/documents/users/$(userId)/pcbScans/$(scanId)) &&
+        getAfter(/databases/$(database)/documents/users/$(userId)/pcbScans/$(scanId)).data.ownerId == request.auth.uid;
+    }
+
+    function ownsPrefsExisting(userId, prefId) {
+      return prefId == 'preferences' &&
+        exists(/databases/$(database)/documents/users/$(userId)/benchPreferences/$(prefId)) &&
+        get(/databases/$(database)/documents/users/$(userId)/benchPreferences/$(prefId)).data.ownerId == request.auth.uid;
+    }
+
+    function ownsPrefsAfter(userId, prefId) {
+      return prefId == 'preferences' &&
+        existsAfter(/databases/$(database)/documents/users/$(userId)/benchPreferences/$(prefId)) &&
+        getAfter(/databases/$(database)/documents/users/$(userId)/benchPreferences/$(prefId)).data.ownerId == request.auth.uid;
+    }
+
+    // Validation Helpers
+    function isValidUserProfile(data, userId) {
+      return data.keys().hasAll(['uid', 'email', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['uid', 'email', 'displayName', 'createdAt', 'updatedAt']) &&
+        isValidId(data.uid) &&
+        data.uid == userId &&
+        data.uid == request.auth.uid &&
+        data.email is string && data.email.size() >= 3 && data.email.size() <= 254 &&
+        (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 120)) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidProbe(probe) {
+      return probe is map &&
+        probe.keys().hasAll(['attachedToPinId', 'attachedLabel']) &&
+        probe.keys().hasOnly(['attachedToPinId', 'attachedLabel']) &&
+        (probe.attachedToPinId == null || (probe.attachedToPinId is string && probe.attachedToPinId.size() <= 64)) &&
+        probe.attachedLabel is string && probe.attachedLabel.size() <= 120;
+    }
+
+    function isValidGaugeMonitor(gm) {
+      return gm is map &&
+        gm.keys().hasAll([
+          'transportMode', 'intakeTempCelsius', 'mapCalibrationPreset',
+          'engineDisplacementLiters', 'volumetricEfficiency', 'selectedGear',
+          'finalDriveRatio', 'tireCircumferenceMm', 'speedKmhOverride',
+          'showPeakHold', 'peakHold'
+        ]) &&
+        gm.keys().hasOnly([
+          'transportMode', 'intakeTempCelsius', 'mapCalibrationPreset',
+          'engineDisplacementLiters', 'volumetricEfficiency', 'selectedGear',
+          'finalDriveRatio', 'tireCircumferenceMm', 'speedKmhOverride',
+          'showPeakHold', 'peakHold'
+        ]) &&
+        gm.transportMode in ['LIVE', 'PAUSED', 'STOPPED'] &&
+        gm.intakeTempCelsius is number && gm.intakeTempCelsius >= -40 && gm.intakeTempCelsius <= 120 &&
+        gm.mapCalibrationPreset in ['BAR_1_NA', 'BAR_2_BOOST', 'BAR_3_BOOST'] &&
+        gm.engineDisplacementLiters is number && gm.engineDisplacementLiters >= 0.6 && gm.engineDisplacementLiters <= 8.0 &&
+        gm.volumetricEfficiency is number && gm.volumetricEfficiency >= 0.4 && gm.volumetricEfficiency <= 1.15 &&
+        gm.selectedGear in ['N', '1', '2', '3', '4', '5', '6'] &&
+        gm.finalDriveRatio is number && gm.finalDriveRatio >= 2.5 && gm.finalDriveRatio <= 6.0 &&
+        gm.tireCircumferenceMm is number && gm.tireCircumferenceMm >= 1400 && gm.tireCircumferenceMm <= 2800 &&
+        (gm.speedKmhOverride == null || (gm.speedKmhOverride is number && gm.speedKmhOverride >= 0 && gm.speedKmhOverride <= 260)) &&
+        gm.showPeakHold is bool &&
+        gm.peakHold is map &&
+        gm.peakHold.keys().hasAll([
+          'maxRpm', 'maxSpeedKmh', 'maxBoostBar', 'maxMafGps',
+          'maxCoolantC', 'minSupplyV', 'maxSupplyV'
+        ]) &&
+        gm.peakHold.keys().hasOnly([
+          'maxRpm', 'maxSpeedKmh', 'maxBoostBar', 'maxMafGps',
+          'maxCoolantC', 'minSupplyV', 'maxSupplyV'
+        ]) &&
+        (gm.peakHold.maxRpm == null || (gm.peakHold.maxRpm is number && gm.peakHold.maxRpm >= 0 && gm.peakHold.maxRpm <= 12000)) &&
+        (gm.peakHold.maxSpeedKmh == null || (gm.peakHold.maxSpeedKmh is number && gm.peakHold.maxSpeedKmh >= 0 && gm.peakHold.maxSpeedKmh <= 400)) &&
+        (gm.peakHold.maxBoostBar == null || (gm.peakHold.maxBoostBar is number && gm.peakHold.maxBoostBar >= -1.2 && gm.peakHold.maxBoostBar <= 5.0)) &&
+        (gm.peakHold.maxMafGps == null || (gm.peakHold.maxMafGps is number && gm.peakHold.maxMafGps >= 0 && gm.peakHold.maxMafGps <= 1500)) &&
+        (gm.peakHold.maxCoolantC == null || (gm.peakHold.maxCoolantC is number && gm.peakHold.maxCoolantC >= -50 && gm.peakHold.maxCoolantC <= 200)) &&
+        (gm.peakHold.minSupplyV == null || (gm.peakHold.minSupplyV is number && gm.peakHold.minSupplyV >= 0 && gm.peakHold.minSupplyV <= 40)) &&
+        (gm.peakHold.maxSupplyV == null || (gm.peakHold.maxSupplyV is number && gm.peakHold.maxSupplyV >= 0 && gm.peakHold.maxSupplyV <= 40));
+    }
+
+    function isValidBenchSession(data, userId, sessionId) {
+      return data.keys().hasAll([
+          'id', 'ownerId', 'title', 'ecuProfileLabel',
+          'powerSupply', 'activeDtcs', 'supplyCurrentDrawAmps',
+          'wireCount', 'faultCount', 'componentStateCount', 'schemaVersion',
+          'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'ownerId', 'title', 'notes', 'ecuProfileLabel',
+          'powerSupply', 'activeDtcs', 'supplyCurrentDrawAmps',
+          'wireCount', 'faultCount', 'componentStateCount', 'schemaVersion',
+          'selectedBrandKey', 'selectedModelName', 'selectedEcuProfileId',
+          'rpmEmulator', 'gaugeMonitor', 'multimeter',
+          'workflowCheckedIds', 'preBenchGateLocked',
+          'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.id) && data.id == sessionId &&
+        isValidId(data.ownerId) && data.ownerId == userId && data.ownerId == request.auth.uid &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 120 &&
+        (!('notes' in data) || (data.notes is string && data.notes.size() <= 1000)) &&
+        data.ecuProfileLabel is string && data.ecuProfileLabel.size() >= 1 && data.ecuProfileLabel.size() <= 120 &&
+        data.powerSupply is map &&
+        data.powerSupply.keys().hasAll(['voltageSetting', 'currentLimit', 'isOutputEnabled', 'preset']) &&
+        data.powerSupply.keys().hasOnly(['voltageSetting', 'currentLimit', 'isOutputEnabled', 'preset']) &&
+        data.powerSupply.voltageSetting is number && data.powerSupply.voltageSetting >= 0 && data.powerSupply.voltageSetting <= 60 &&
+        data.powerSupply.currentLimit is number && data.powerSupply.currentLimit >= 0 && data.powerSupply.currentLimit <= 50 &&
+        data.powerSupply.isOutputEnabled is bool &&
+        data.powerSupply.preset is string && data.powerSupply.preset.size() >= 1 && data.powerSupply.preset.size() <= 32 &&
+        data.activeDtcs is list && data.activeDtcs.size() <= 20 &&
+        (data.activeDtcs.size() == 0 || (data.activeDtcs[0] is string && data.activeDtcs[0].size() <= 32)) &&
+        data.supplyCurrentDrawAmps is number && data.supplyCurrentDrawAmps >= 0 && data.supplyCurrentDrawAmps <= 200 &&
+        data.wireCount is int && data.wireCount >= 0 && data.wireCount <= 50 &&
+        data.faultCount is int && data.faultCount >= 0 && data.faultCount <= 20 &&
+        data.componentStateCount is int && data.componentStateCount >= 0 && data.componentStateCount <= 40 &&
+        data.schemaVersion == 2 &&
+        (!('selectedBrandKey' in data) || (data.selectedBrandKey is string && data.selectedBrandKey.size() <= 64)) &&
+        (!('selectedModelName' in data) || (data.selectedModelName is string && data.selectedModelName.size() <= 120)) &&
+        (!('selectedEcuProfileId' in data) || data.selectedEcuProfileId == null || (data.selectedEcuProfileId is string && data.selectedEcuProfileId.size() <= 64)) &&
+        (!('rpmEmulator' in data) || (
+          data.rpmEmulator is map &&
+          data.rpmEmulator.keys().hasAll(['isActive', 'rpm', 'soundEnabled']) &&
+          data.rpmEmulator.keys().hasOnly(['isActive', 'rpm', 'soundEnabled', 'camPhaseOffsetDeg', 'ckpSignalLost']) &&
+          data.rpmEmulator.isActive is bool &&
+          data.rpmEmulator.rpm is number && data.rpmEmulator.rpm >= 0 && data.rpmEmulator.rpm <= 15000 &&
+          data.rpmEmulator.soundEnabled is bool &&
+          (!('camPhaseOffsetDeg' in data.rpmEmulator) || (data.rpmEmulator.camPhaseOffsetDeg is number && data.rpmEmulator.camPhaseOffsetDeg >= -360 && data.rpmEmulator.camPhaseOffsetDeg <= 360)) &&
+          (!('ckpSignalLost' in data.rpmEmulator) || data.rpmEmulator.ckpSignalLost is bool)
+        )) &&
+        (!('gaugeMonitor' in data) || isValidGaugeMonitor(data.gaugeMonitor)) &&
+        (!('multimeter' in data) || (
+          data.multimeter is map &&
+          data.multimeter.keys().hasAll(['mode', 'redProbe', 'blackProbe', 'isPowered', 'rangeAuto', 'holdValue']) &&
+          data.multimeter.keys().hasOnly(['mode', 'redProbe', 'blackProbe', 'isPowered', 'rangeAuto', 'holdValue']) &&
+          data.multimeter.mode is string && data.multimeter.mode.size() <= 24 &&
+          isValidProbe(data.multimeter.redProbe) &&
+          isValidProbe(data.multimeter.blackProbe) &&
+          data.multimeter.isPowered is bool &&
+          data.multimeter.rangeAuto is bool &&
+          data.multimeter.holdValue is bool
+        )) &&
+        (!('workflowCheckedIds' in data) || (
+          data.workflowCheckedIds is list &&
+          data.workflowCheckedIds.size() <= 20 &&
+          (data.workflowCheckedIds.size() == 0 || (data.workflowCheckedIds[0] is string && data.workflowCheckedIds[0].size() <= 64))
+        )) &&
+        (!('preBenchGateLocked' in data) || data.preBenchGateLocked is bool) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidBenchWireDoc(data, userId, sessionId, wireId) {
+      return data.keys().hasAll([
+          'id', 'ownerId', 'sessionId', 'sourcePinId', 'targetPinId',
+          'color', 'label', 'isCut', 'resistance', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'ownerId', 'sessionId', 'sourcePinId', 'targetPinId',
+          'color', 'label', 'isCut', 'resistance', 'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.id) && data.id == wireId &&
+        isValidId(data.ownerId) && data.ownerId == userId && data.ownerId == request.auth.uid &&
+        isValidId(data.sessionId) && data.sessionId == sessionId &&
+        data.sourcePinId is string && data.sourcePinId.size() >= 1 && data.sourcePinId.size() <= 64 &&
+        data.targetPinId is string && data.targetPinId.size() >= 1 && data.targetPinId.size() <= 64 &&
+        data.color is string && data.color.size() >= 1 && data.color.size() <= 32 &&
+        data.label is string && data.label.size() <= 120 &&
+        data.isCut is bool &&
+        data.resistance is number && data.resistance >= 0 && data.resistance <= 1000000 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidBenchFaultDoc(data, userId, sessionId, faultId) {
+      return data.keys().hasAll([
+          'id', 'ownerId', 'sessionId', 'pinId', 'faultType',
+          'description', 'timestamp', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'ownerId', 'sessionId', 'pinId', 'faultType',
+          'description', 'timestamp', 'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.id) && data.id == faultId &&
+        isValidId(data.ownerId) && data.ownerId == userId && data.ownerId == request.auth.uid &&
+        isValidId(data.sessionId) && data.sessionId == sessionId &&
+        data.pinId is string && data.pinId.size() >= 1 && data.pinId.size() <= 64 &&
+        data.faultType in [
+          'NONE', 'OPEN_CIRCUIT', 'SHORT_TO_GND', 'SHORT_TO_VBAT',
+          'HIGH_RESISTANCE_50R', 'HIGH_RESISTANCE_250R', 'HIGH_RESISTANCE_1K'
+        ] &&
+        data.description is string && data.description.size() <= 240 &&
+        data.timestamp is number && data.timestamp >= 0 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidBenchComponentStateDoc(data, userId, sessionId, componentId) {
+      return data.keys().hasAll([
+          'id', 'ownerId', 'sessionId', 'componentId', 'state', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'ownerId', 'sessionId', 'componentId', 'state', 'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.id) && data.id == componentId &&
+        isValidId(data.ownerId) && data.ownerId == userId && data.ownerId == request.auth.uid &&
+        isValidId(data.sessionId) && data.sessionId == sessionId &&
+        data.componentId is string && data.componentId.size() >= 1 && data.componentId.size() <= 64 &&
+        data.state is map && data.state.size() <= 24 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidDiagnosticLog(data, userId, logId) {
+      return data.keys().hasAll([
+          'id', 'ownerId', 'title', 'sourceType', 'summary',
+          'sourceCount', 'schemaVersion', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'ownerId', 'title', 'dtcCode', 'ecuModel', 'sourceType', 'summary',
+          'sourceCount', 'schemaVersion', 'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.id) && data.id == logId &&
+        isValidId(data.ownerId) && data.ownerId == userId && data.ownerId == request.auth.uid &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 160 &&
+        (!('dtcCode' in data) || (data.dtcCode is string && data.dtcCode.size() <= 32)) &&
+        (!('ecuModel' in data) || (data.ecuModel is string && data.ecuModel.size() <= 120)) &&
+        data.sourceType in ['GROUNDED_TSB', 'BENCH_SNAPSHOT', 'PINOUT_NOTE'] &&
+        data.summary is string && data.summary.size() >= 1 && data.summary.size() <= 12000 &&
+        data.sourceCount is int && data.sourceCount >= 0 && data.sourceCount <= 20 &&
+        data.schemaVersion == 2 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidDiagnosticLogSourceDoc(data, userId, logId, sourceId) {
+      return data.keys().hasAll([
+          'id', 'ownerId', 'logId', 'title', 'uri', 'domain', 'orderIndex', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'ownerId', 'logId', 'title', 'uri', 'domain', 'orderIndex', 'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.id) && data.id == sourceId &&
+        isValidId(data.ownerId) && data.ownerId == userId && data.ownerId == request.auth.uid &&
+        isValidId(data.logId) && data.logId == logId &&
+        data.title is string && data.title.size() <= 200 &&
+        data.uri is string && data.uri.size() <= 1000 &&
+        data.domain is string && data.domain.size() <= 120 &&
+        data.orderIndex is int && data.orderIndex >= 0 && data.orderIndex <= 100 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidPcbBbox(bbox) {
+      return bbox is map &&
+        bbox.keys().hasAll(['ymin', 'xmin', 'ymax', 'xmax']) &&
+        bbox.keys().hasOnly(['ymin', 'xmin', 'ymax', 'xmax']) &&
+        bbox.ymin is number && bbox.ymin >= 0 && bbox.ymin <= 1000 &&
+        bbox.xmin is number && bbox.xmin >= 0 && bbox.xmin <= 1000 &&
+        bbox.ymax is number && bbox.ymax >= 0 && bbox.ymax <= 1000 &&
+        bbox.xmax is number && bbox.xmax >= 0 && bbox.xmax <= 1000;
+    }
+
+    function isValidPcbPinSpec(p) {
+      return p is map &&
+        p.keys().hasAll(['pinNumber', 'pinName', 'category', 'nominalVoltage', 'connectedNetId', 'notes']) &&
+        p.keys().hasOnly(['pinNumber', 'pinName', 'category', 'nominalVoltage', 'connectedNetId', 'notes']) &&
+        p.pinNumber is number && p.pinNumber >= 0 && p.pinNumber <= 1024 &&
+        p.pinName is string && p.pinName.size() <= 40 &&
+        p.category in ['power', 'ground', 'signal_in', 'signal_out', 'driver_out', 'bus'] &&
+        p.nominalVoltage is number && p.nominalVoltage >= -100 && p.nominalVoltage <= 1000 &&
+        p.connectedNetId is string && p.connectedNetId.size() <= 64 &&
+        p.notes is string && p.notes.size() <= 200;
+    }
+
+    function isValidTracePoint(pt) {
+      return pt is map &&
+        pt.keys().hasAll(['x', 'y']) &&
+        pt.keys().hasOnly(['x', 'y']) &&
+        pt.x is number && pt.x >= 0 && pt.x <= 1000 &&
+        pt.y is number && pt.y >= 0 && pt.y <= 1000;
+    }
+
+    function isValidPcbScan(data, userId, scanId) {
+      return data.keys().hasAll([
+          'id', 'ownerId', 'title', 'boardType', 'analysisSummary', 'model',
+          'componentCount', 'netCount', 'hotspotCount', 'schemaVersion',
+          'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'ownerId', 'title', 'boardType', 'analysisSummary', 'model',
+          'componentCount', 'netCount', 'hotspotCount', 'schemaVersion',
+          'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.id) && data.id == scanId &&
+        isValidId(data.ownerId) && data.ownerId == userId && data.ownerId == request.auth.uid &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 160 &&
+        data.boardType is string && data.boardType.size() >= 1 && data.boardType.size() <= 120 &&
+        data.analysisSummary is string && data.analysisSummary.size() >= 1 && data.analysisSummary.size() <= 4000 &&
+        data.model is string && data.model.size() >= 1 && data.model.size() <= 80 &&
+        data.componentCount is int && data.componentCount >= 0 && data.componentCount <= 200 &&
+        data.netCount is int && data.netCount >= 0 && data.netCount <= 100 &&
+        data.hotspotCount is int && data.hotspotCount >= 0 && data.hotspotCount <= 100 &&
+        data.schemaVersion == 2 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidPcbComponentDoc(data, userId, scanId, componentId) {
+      return data.keys().hasAll([
+          'id', 'ownerId', 'scanId', 'refDes', 'category', 'marking', 'decodedValue',
+          'packageType', 'bbox', 'confidenceScore', 'verificationStatus',
+          'circuitFunction', 'terminalIds', 'notes', 'operatingVoltageRange',
+          'maxCurrentRating', 'datasheetSummary', 'pinSpecs', 'source',
+          'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'ownerId', 'scanId', 'refDes', 'category', 'marking', 'decodedValue',
+          'packageType', 'bbox', 'confidenceScore', 'verificationStatus',
+          'circuitFunction', 'terminalIds', 'notes', 'operatingVoltageRange',
+          'maxCurrentRating', 'datasheetSummary', 'pinSpecs', 'source',
+          'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.id) && data.id == componentId &&
+        isValidId(data.ownerId) && data.ownerId == userId && data.ownerId == request.auth.uid &&
+        isValidId(data.scanId) && data.scanId == scanId &&
+        data.refDes is string && data.refDes.size() >= 1 && data.refDes.size() <= 32 &&
+        data.category is string && data.category.size() >= 1 && data.category.size() <= 64 &&
+        data.marking is string && data.marking.size() <= 64 &&
+        data.decodedValue is string && data.decodedValue.size() <= 80 &&
+        data.packageType is string && data.packageType.size() <= 64 &&
+        isValidPcbBbox(data.bbox) &&
+        data.confidenceScore is number && data.confidenceScore >= 0 && data.confidenceScore <= 1 &&
+        data.verificationStatus in ['VERIFIED', 'CROSS_REFERENCED', 'UNVERIFIED', 'UNKNOWN'] &&
+        data.circuitFunction is string && data.circuitFunction.size() <= 240 &&
+        data.terminalIds is list && data.terminalIds.size() <= 24 &&
+        (data.terminalIds.size() == 0 || (data.terminalIds[0] is string && data.terminalIds[0].size() <= 32)) &&
+        data.notes is string && data.notes.size() <= 400 &&
+        data.operatingVoltageRange is string && data.operatingVoltageRange.size() <= 64 &&
+        data.maxCurrentRating is string && data.maxCurrentRating.size() <= 64 &&
+        data.datasheetSummary is string && data.datasheetSummary.size() <= 400 &&
+        data.pinSpecs is list && data.pinSpecs.size() <= 24 &&
+        (data.pinSpecs.size() == 0 || isValidPcbPinSpec(data.pinSpecs[0])) &&
+        data.source in ['AI', 'LOCAL_CV', 'MANUAL'] &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidPcbNetDoc(data, userId, scanId, netId) {
+      return data.keys().hasAll([
+          'id', 'ownerId', 'scanId', 'name', 'signalType',
+          'connectedComponentRefs', 'connectedTerminalIds', 'tracePoints',
+          'confidenceScore', 'verificationStatus', 'isComplete', 'incompleteNotes',
+          'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'ownerId', 'scanId', 'name', 'signalType',
+          'connectedComponentRefs', 'connectedTerminalIds', 'tracePoints',
+          'confidenceScore', 'verificationStatus', 'isComplete', 'incompleteNotes',
+          'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.id) && data.id == netId &&
+        isValidId(data.ownerId) && data.ownerId == userId && data.ownerId == request.auth.uid &&
+        isValidId(data.scanId) && data.scanId == scanId &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 64 &&
+        data.signalType is string && data.signalType.size() >= 1 && data.signalType.size() <= 48 &&
+        data.connectedComponentRefs is list && data.connectedComponentRefs.size() <= 32 &&
+        (data.connectedComponentRefs.size() == 0 || (data.connectedComponentRefs[0] is string && data.connectedComponentRefs[0].size() <= 32)) &&
+        data.connectedTerminalIds is list && data.connectedTerminalIds.size() <= 32 &&
+        (data.connectedTerminalIds.size() == 0 || (data.connectedTerminalIds[0] is string && data.connectedTerminalIds[0].size() <= 32)) &&
+        data.tracePoints is list && data.tracePoints.size() <= 40 &&
+        (data.tracePoints.size() == 0 || isValidTracePoint(data.tracePoints[0])) &&
+        data.confidenceScore is number && data.confidenceScore >= 0 && data.confidenceScore <= 1 &&
+        data.verificationStatus in ['VERIFIED', 'CROSS_REFERENCED', 'UNVERIFIED', 'UNKNOWN'] &&
+        data.isComplete is bool &&
+        data.incompleteNotes is string && data.incompleteNotes.size() <= 240 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidPcbHotspotDoc(data, userId, scanId, docId) {
+      return data.keys().hasAll([
+          'id', 'ownerId', 'scanId', 'hotspotId', 'label', 'severity',
+          'bbox', 'suspectComponentRef', 'notes', 'source',
+          'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'ownerId', 'scanId', 'hotspotId', 'label', 'severity',
+          'bbox', 'suspectComponentRef', 'notes', 'source',
+          'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.id) && data.id == docId &&
+        isValidId(data.ownerId) && data.ownerId == userId && data.ownerId == request.auth.uid &&
+        isValidId(data.scanId) && data.scanId == scanId &&
+        data.hotspotId is string && data.hotspotId.size() >= 1 && data.hotspotId.size() <= 64 &&
+        data.label is string && data.label.size() >= 1 && data.label.size() <= 120 &&
+        data.severity in ['CRITICAL', 'WARNING', 'INFO'] &&
+        isValidPcbBbox(data.bbox) &&
+        data.suspectComponentRef is string && data.suspectComponentRef.size() <= 32 &&
+        data.notes is string && data.notes.size() <= 300 &&
+        data.source in ['AI', 'LOCAL_CV'] &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidBenchPreferences(data, userId, prefId) {
+      return prefId == 'preferences' &&
+        data.keys().hasAll([
+          'id', 'ownerId', 'workflowCheckedIds', 'preBenchGateLocked',
+          'autoVerifyWorkflow', 'voiceMacroCount', 'schemaVersion',
+          'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'ownerId', 'workflowCheckedIds', 'preBenchGateLocked',
+          'autoVerifyWorkflow', 'voiceMacroCount', 'schemaVersion',
+          'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.id) && data.id == prefId &&
+        isValidId(data.ownerId) && data.ownerId == userId && data.ownerId == request.auth.uid &&
+        data.workflowCheckedIds is list && data.workflowCheckedIds.size() <= 20 &&
+        (data.workflowCheckedIds.size() == 0 || (data.workflowCheckedIds[0] is string && data.workflowCheckedIds[0].size() <= 64)) &&
+        data.preBenchGateLocked is bool &&
+        data.autoVerifyWorkflow is bool &&
+        data.voiceMacroCount is int && data.voiceMacroCount >= 0 && data.voiceMacroCount <= 50 &&
+        data.schemaVersion == 2 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidVoiceMacroDoc(data, userId, prefId, macroId) {
+      return prefId == 'preferences' &&
+        data.keys().hasAll([
+          'id', 'ownerId', 'prefId', 'name', 'triggerPhrase', 'steps',
+          'isPreset', 'macroCreatedAtMs', 'macroUpdatedAtMs', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'ownerId', 'prefId', 'name', 'triggerPhrase', 'steps', 'description',
+          'isPreset', 'macroCreatedAtMs', 'macroUpdatedAtMs', 'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.id) && data.id == macroId &&
+        isValidId(data.ownerId) && data.ownerId == userId && data.ownerId == request.auth.uid &&
+        isValidId(data.prefId) && data.prefId == prefId &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 120 &&
+        data.triggerPhrase is string && data.triggerPhrase.size() >= 1 && data.triggerPhrase.size() <= 120 &&
+        data.steps is list && data.steps.size() >= 1 && data.steps.size() <= 20 &&
+        data.steps[0] is string && data.steps[0].size() >= 1 && data.steps[0].size() <= 240 &&
+        (!('description' in data) || (data.description is string && data.description.size() <= 240)) &&
+        data.isPreset is bool &&
+        data.macroCreatedAtMs is number && data.macroCreatedAtMs >= 0 &&
+        data.macroUpdatedAtMs is number && data.macroUpdatedAtMs >= 0 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    // Users private profile (PII isolated strictly to verified owner)
+    match /users/{userId} {
+      allow get: if isValidId(userId) && isVerified() && isOwner(userId);
+      allow list: if false;
+      allow create: if isValidId(userId) &&
+        isVerified() &&
+        isOwner(userId) &&
+        isValidUserProfile(incoming(), userId) &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+      allow update: if isValidId(userId) &&
+        isVerified() &&
+        isOwner(userId) &&
+        isValidUserProfile(incoming(), userId) &&
+        incoming().uid == existing().uid &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['email', 'displayName', 'updatedAt']);
+      allow delete: if false;
+
+      // Saved Bench Sessions (Header + Individual Validated Subcollections)
+      match /benchSessions/{sessionId} {
+        allow get: if isValidId(userId) && isValidId(sessionId) && isVerified() && isOwner(userId);
+        allow list: if isVerified() && isOwner(userId) && resource.data.ownerId == request.auth.uid;
+        allow create: if isValidId(userId) && isValidId(sessionId) &&
+          isVerified() &&
+          isOwner(userId) &&
+          isValidBenchSession(incoming(), userId, sessionId) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time;
+        allow update: if isValidId(userId) && isValidId(sessionId) &&
+          isVerified() &&
+          isOwner(userId) &&
+          isValidBenchSession(incoming(), userId, sessionId) &&
+          incoming().id == existing().id &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'title', 'notes', 'ecuProfileLabel', 'powerSupply',
+            'activeDtcs', 'supplyCurrentDrawAmps',
+            'wireCount', 'faultCount', 'componentStateCount', 'schemaVersion',
+            'selectedBrandKey', 'selectedModelName', 'selectedEcuProfileId',
+            'rpmEmulator', 'gaugeMonitor', 'multimeter',
+            'workflowCheckedIds', 'preBenchGateLocked', 'updatedAt',
+            // Permitted solely for legacy v1 field deletion (isValidBenchSession forbids retaining them)
+            'wires', 'faults', 'componentStates'
+          ]);
+        allow delete: if isValidId(userId) && isValidId(sessionId) && isVerified() && isOwner(userId);
+
+        match /wires/{wireId} {
+          allow get: if isValidId(userId) && isValidId(sessionId) && isValidId(wireId) &&
+            isVerified() && isOwner(userId) && ownsSessionExisting(userId, sessionId);
+          allow list: if isVerified() && isOwner(userId) && resource.data.ownerId == request.auth.uid;
+          allow create: if isValidId(userId) && isValidId(sessionId) && isValidId(wireId) &&
+            isVerified() && isOwner(userId) &&
+            isValidBenchWireDoc(incoming(), userId, sessionId, wireId) &&
+            incoming().createdAt == request.time &&
+            incoming().updatedAt == request.time &&
+            ownsSessionAfter(userId, sessionId);
+          allow update: if isValidId(userId) && isValidId(sessionId) && isValidId(wireId) &&
+            isVerified() && isOwner(userId) &&
+            isValidBenchWireDoc(incoming(), userId, sessionId, wireId) &&
+            incoming().id == existing().id &&
+            incoming().ownerId == existing().ownerId &&
+            incoming().sessionId == existing().sessionId &&
+            incoming().createdAt == existing().createdAt &&
+            incoming().updatedAt == request.time &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'sourcePinId', 'targetPinId', 'color', 'label', 'isCut', 'resistance', 'updatedAt'
+            ]) &&
+            ownsSessionAfter(userId, sessionId);
+          allow delete: if isValidId(userId) && isValidId(sessionId) && isValidId(wireId) &&
+            isVerified() && isOwner(userId) && ownsSessionExisting(userId, sessionId);
+        }
+
+        match /faults/{faultId} {
+          allow get: if isValidId(userId) && isValidId(sessionId) && isValidId(faultId) &&
+            isVerified() && isOwner(userId) && ownsSessionExisting(userId, sessionId);
+          allow list: if isVerified() && isOwner(userId) && resource.data.ownerId == request.auth.uid;
+          allow create: if isValidId(userId) && isValidId(sessionId) && isValidId(faultId) &&
+            isVerified() && isOwner(userId) &&
+            isValidBenchFaultDoc(incoming(), userId, sessionId, faultId) &&
+            incoming().createdAt == request.time &&
+            incoming().updatedAt == request.time &&
+            ownsSessionAfter(userId, sessionId);
+          allow update: if isValidId(userId) && isValidId(sessionId) && isValidId(faultId) &&
+            isVerified() && isOwner(userId) &&
+            isValidBenchFaultDoc(incoming(), userId, sessionId, faultId) &&
+            incoming().id == existing().id &&
+            incoming().ownerId == existing().ownerId &&
+            incoming().sessionId == existing().sessionId &&
+            incoming().createdAt == existing().createdAt &&
+            incoming().updatedAt == request.time &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'pinId', 'faultType', 'description', 'timestamp', 'updatedAt'
+            ]) &&
+            ownsSessionAfter(userId, sessionId);
+          allow delete: if isValidId(userId) && isValidId(sessionId) && isValidId(faultId) &&
+            isVerified() && isOwner(userId) && ownsSessionExisting(userId, sessionId);
+        }
+
+        match /componentStates/{componentId} {
+          allow get: if isValidId(userId) && isValidId(sessionId) && isValidId(componentId) &&
+            isVerified() && isOwner(userId) && ownsSessionExisting(userId, sessionId);
+          allow list: if isVerified() && isOwner(userId) && resource.data.ownerId == request.auth.uid;
+          allow create: if isValidId(userId) && isValidId(sessionId) && isValidId(componentId) &&
+            isVerified() && isOwner(userId) &&
+            isValidBenchComponentStateDoc(incoming(), userId, sessionId, componentId) &&
+            incoming().createdAt == request.time &&
+            incoming().updatedAt == request.time &&
+            ownsSessionAfter(userId, sessionId);
+          allow update: if isValidId(userId) && isValidId(sessionId) && isValidId(componentId) &&
+            isVerified() && isOwner(userId) &&
+            isValidBenchComponentStateDoc(incoming(), userId, sessionId, componentId) &&
+            incoming().id == existing().id &&
+            incoming().ownerId == existing().ownerId &&
+            incoming().sessionId == existing().sessionId &&
+            incoming().componentId == existing().componentId &&
+            incoming().createdAt == existing().createdAt &&
+            incoming().updatedAt == request.time &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['state', 'updatedAt']) &&
+            ownsSessionAfter(userId, sessionId);
+          allow delete: if isValidId(userId) && isValidId(sessionId) && isValidId(componentId) &&
+            isVerified() && isOwner(userId) && ownsSessionExisting(userId, sessionId);
+        }
+      }
+
+      // Saved Diagnostic Logs & Grounded TSB Bookmarks
+      match /diagnosticLogs/{logId} {
+        allow get: if isValidId(userId) && isValidId(logId) && isVerified() && isOwner(userId);
+        allow list: if isVerified() && isOwner(userId) && resource.data.ownerId == request.auth.uid;
+        allow create: if isValidId(userId) && isValidId(logId) &&
+          isVerified() &&
+          isOwner(userId) &&
+          isValidDiagnosticLog(incoming(), userId, logId) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time;
+        allow update: if isValidId(userId) && isValidId(logId) &&
+          isVerified() &&
+          isOwner(userId) &&
+          isValidDiagnosticLog(incoming(), userId, logId) &&
+          incoming().id == existing().id &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'title', 'dtcCode', 'ecuModel', 'summary', 'sourceCount', 'schemaVersion', 'updatedAt',
+            // Permitted solely for legacy v1 field deletion (isValidDiagnosticLog forbids retaining it)
+            'sources'
+          ]);
+        allow delete: if isValidId(userId) && isValidId(logId) && isVerified() && isOwner(userId);
+
+        match /sources/{sourceId} {
+          allow get: if isValidId(userId) && isValidId(logId) && isValidId(sourceId) &&
+            isVerified() && isOwner(userId) && ownsLogExisting(userId, logId);
+          allow list: if isVerified() && isOwner(userId) && resource.data.ownerId == request.auth.uid;
+          allow create: if isValidId(userId) && isValidId(logId) && isValidId(sourceId) &&
+            isVerified() && isOwner(userId) &&
+            isValidDiagnosticLogSourceDoc(incoming(), userId, logId, sourceId) &&
+            incoming().createdAt == request.time &&
+            incoming().updatedAt == request.time &&
+            ownsLogAfter(userId, logId);
+          allow update: if isValidId(userId) && isValidId(logId) && isValidId(sourceId) &&
+            isVerified() && isOwner(userId) &&
+            isValidDiagnosticLogSourceDoc(incoming(), userId, logId, sourceId) &&
+            incoming().id == existing().id &&
+            incoming().ownerId == existing().ownerId &&
+            incoming().logId == existing().logId &&
+            incoming().createdAt == existing().createdAt &&
+            incoming().updatedAt == request.time &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'title', 'uri', 'domain', 'orderIndex', 'updatedAt'
+            ]) &&
+            ownsLogAfter(userId, logId);
+          allow delete: if isValidId(userId) && isValidId(logId) && isValidId(sourceId) &&
+            isVerified() && isOwner(userId) && ownsLogExisting(userId, logId);
+        }
+      }
+
+      // Saved Mapped PCB Scans (Header + Individual Validated Component / Net / Hotspot Subcollections)
+      match /pcbScans/{scanId} {
+        allow get: if isValidId(userId) && isValidId(scanId) && isVerified() && isOwner(userId);
+        allow list: if isVerified() && isOwner(userId) && resource.data.ownerId == request.auth.uid;
+        allow create: if isValidId(userId) && isValidId(scanId) &&
+          isVerified() &&
+          isOwner(userId) &&
+          isValidPcbScan(incoming(), userId, scanId) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time;
+        allow update: if isValidId(userId) && isValidId(scanId) &&
+          isVerified() &&
+          isOwner(userId) &&
+          isValidPcbScan(incoming(), userId, scanId) &&
+          incoming().id == existing().id &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'title', 'boardType', 'analysisSummary', 'model',
+            'componentCount', 'netCount', 'hotspotCount', 'schemaVersion', 'updatedAt',
+            // Permitted solely for legacy v1 field deletion (isValidPcbScan forbids retaining them)
+            'components', 'nets', 'hotspots'
+          ]);
+        allow delete: if isValidId(userId) && isValidId(scanId) && isVerified() && isOwner(userId);
+
+        match /components/{componentId} {
+          allow get: if isValidId(userId) && isValidId(scanId) && isValidId(componentId) &&
+            isVerified() && isOwner(userId) && ownsPcbScanExisting(userId, scanId);
+          allow list: if isVerified() && isOwner(userId) && resource.data.ownerId == request.auth.uid;
+          allow create: if isValidId(userId) && isValidId(scanId) && isValidId(componentId) &&
+            isVerified() && isOwner(userId) &&
+            isValidPcbComponentDoc(incoming(), userId, scanId, componentId) &&
+            incoming().createdAt == request.time &&
+            incoming().updatedAt == request.time &&
+            ownsPcbScanAfter(userId, scanId);
+          allow update: if isValidId(userId) && isValidId(scanId) && isValidId(componentId) &&
+            isVerified() && isOwner(userId) &&
+            isValidPcbComponentDoc(incoming(), userId, scanId, componentId) &&
+            incoming().id == existing().id &&
+            incoming().ownerId == existing().ownerId &&
+            incoming().scanId == existing().scanId &&
+            incoming().createdAt == existing().createdAt &&
+            incoming().updatedAt == request.time &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'refDes', 'category', 'marking', 'decodedValue', 'packageType',
+              'bbox', 'confidenceScore', 'verificationStatus', 'circuitFunction',
+              'terminalIds', 'notes', 'operatingVoltageRange', 'maxCurrentRating',
+              'datasheetSummary', 'pinSpecs', 'source', 'updatedAt'
+            ]) &&
+            ownsPcbScanAfter(userId, scanId);
+          allow delete: if isValidId(userId) && isValidId(scanId) && isValidId(componentId) &&
+            isVerified() && isOwner(userId) && ownsPcbScanExisting(userId, scanId);
+        }
+
+        match /nets/{netId} {
+          allow get: if isValidId(userId) && isValidId(scanId) && isValidId(netId) &&
+            isVerified() && isOwner(userId) && ownsPcbScanExisting(userId, scanId);
+          allow list: if isVerified() && isOwner(userId) && resource.data.ownerId == request.auth.uid;
+          allow create: if isValidId(userId) && isValidId(scanId) && isValidId(netId) &&
+            isVerified() && isOwner(userId) &&
+            isValidPcbNetDoc(incoming(), userId, scanId, netId) &&
+            incoming().createdAt == request.time &&
+            incoming().updatedAt == request.time &&
+            ownsPcbScanAfter(userId, scanId);
+          allow update: if isValidId(userId) && isValidId(scanId) && isValidId(netId) &&
+            isVerified() && isOwner(userId) &&
+            isValidPcbNetDoc(incoming(), userId, scanId, netId) &&
+            incoming().id == existing().id &&
+            incoming().ownerId == existing().ownerId &&
+            incoming().scanId == existing().scanId &&
+            incoming().createdAt == existing().createdAt &&
+            incoming().updatedAt == request.time &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'name', 'signalType', 'connectedComponentRefs', 'connectedTerminalIds',
+              'tracePoints', 'confidenceScore', 'verificationStatus',
+              'isComplete', 'incompleteNotes', 'updatedAt'
+            ]) &&
+            ownsPcbScanAfter(userId, scanId);
+          allow delete: if isValidId(userId) && isValidId(scanId) && isValidId(netId) &&
+            isVerified() && isOwner(userId) && ownsPcbScanExisting(userId, scanId);
+        }
+
+        match /hotspots/{hotspotId} {
+          allow get: if isValidId(userId) && isValidId(scanId) && isValidId(hotspotId) &&
+            isVerified() && isOwner(userId) && ownsPcbScanExisting(userId, scanId);
+          allow list: if isVerified() && isOwner(userId) && resource.data.ownerId == request.auth.uid;
+          allow create: if isValidId(userId) && isValidId(scanId) && isValidId(hotspotId) &&
+            isVerified() && isOwner(userId) &&
+            isValidPcbHotspotDoc(incoming(), userId, scanId, hotspotId) &&
+            incoming().createdAt == request.time &&
+            incoming().updatedAt == request.time &&
+            ownsPcbScanAfter(userId, scanId);
+          allow update: if isValidId(userId) && isValidId(scanId) && isValidId(hotspotId) &&
+            isVerified() && isOwner(userId) &&
+            isValidPcbHotspotDoc(incoming(), userId, scanId, hotspotId) &&
+            incoming().id == existing().id &&
+            incoming().ownerId == existing().ownerId &&
+            incoming().scanId == existing().scanId &&
+            incoming().createdAt == existing().createdAt &&
+            incoming().updatedAt == request.time &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'hotspotId', 'label', 'severity', 'bbox',
+              'suspectComponentRef', 'notes', 'source', 'updatedAt'
+            ]) &&
+            ownsPcbScanAfter(userId, scanId);
+          allow delete: if isValidId(userId) && isValidId(scanId) && isValidId(hotspotId) &&
+            isVerified() && isOwner(userId) && ownsPcbScanExisting(userId, scanId);
+        }
+      }
+
+      // Per-User Diagnostic Workflow Preferences & Synced Voice Macros Subcollection
+      match /benchPreferences/{prefId} {
+        allow get: if isValidId(userId) && isValidId(prefId) && prefId == 'preferences' && isVerified() && isOwner(userId);
+        allow list: if isVerified() && isOwner(userId) && resource.data.ownerId == request.auth.uid;
+        allow create: if isValidId(userId) && isValidId(prefId) &&
+          isVerified() &&
+          isOwner(userId) &&
+          isValidBenchPreferences(incoming(), userId, prefId) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time;
+        allow update: if isValidId(userId) && isValidId(prefId) &&
+          isVerified() &&
+          isOwner(userId) &&
+          isValidBenchPreferences(incoming(), userId, prefId) &&
+          incoming().id == existing().id &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'workflowCheckedIds', 'preBenchGateLocked', 'autoVerifyWorkflow',
+            'voiceMacroCount', 'schemaVersion', 'updatedAt',
+            // Permitted solely for legacy v1 field deletion (isValidBenchPreferences forbids retaining it)
+            'voiceMacros'
+          ]);
+        allow delete: if isValidId(userId) && isValidId(prefId) && prefId == 'preferences' && isVerified() && isOwner(userId);
+
+        match /voiceMacros/{macroId} {
+          allow get: if isValidId(userId) && isValidId(prefId) && isValidId(macroId) &&
+            isVerified() && isOwner(userId) && ownsPrefsExisting(userId, prefId);
+          allow list: if isVerified() && isOwner(userId) && prefId == 'preferences' && resource.data.ownerId == request.auth.uid;
+          allow create: if isValidId(userId) && isValidId(prefId) && isValidId(macroId) &&
+            isVerified() && isOwner(userId) &&
+            isValidVoiceMacroDoc(incoming(), userId, prefId, macroId) &&
+            incoming().createdAt == request.time &&
+            incoming().updatedAt == request.time &&
+            ownsPrefsAfter(userId, prefId);
+          allow update: if isValidId(userId) && isValidId(prefId) && isValidId(macroId) &&
+            isVerified() && isOwner(userId) &&
+            isValidVoiceMacroDoc(incoming(), userId, prefId, macroId) &&
+            incoming().id == existing().id &&
+            incoming().ownerId == existing().ownerId &&
+            incoming().prefId == existing().prefId &&
+            incoming().createdAt == existing().createdAt &&
+            incoming().updatedAt == request.time &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'name', 'triggerPhrase', 'steps', 'description', 'isPreset',
+              'macroCreatedAtMs', 'macroUpdatedAtMs', 'updatedAt'
+            ]) &&
+            ownsPrefsAfter(userId, prefId);
+          allow delete: if isValidId(userId) && isValidId(prefId) && isValidId(macroId) &&
+            isVerified() && isOwner(userId) && ownsPrefsExisting(userId, prefId);
+        }
+      }
+    }
+  }
+}
