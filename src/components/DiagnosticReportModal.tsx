@@ -73,6 +73,7 @@ export const DiagnosticReportModal: React.FC<DiagnosticReportModalProps> = ({
   const [showDmm, setShowDmm] = useState(true);
   const [showFaults, setShowFaults] = useState(true);
   const [isUniversityPdfOpen, setIsUniversityPdfOpen] = useState(false);
+  const [isSigningClientPdf, setIsSigningClientPdf] = useState(false);
   const { canUseExports, openAccessModal } = useTrialAccess();
 
   if (!isOpen) return null;
@@ -82,8 +83,6 @@ export const DiagnosticReportModal: React.FC<DiagnosticReportModalProps> = ({
   const kl31V = nodeVoltages['ecu-pin-1'] ?? 0;
   const selectedPin = pins.find((p) => p.id === selectedPinId);
   const timestamp = new Date().toISOString();
-
-  const [isSigningClientPdf, setIsSigningClientPdf] = useState(false);
 
   const handlePrint = () => {
     if (!canUseExports) {

@@ -73,12 +73,11 @@ import {
 } from './simulation/telemetry/telemetryTypes';
 import { useBenchContext } from './hooks/useBenchContext';
 import {
-  AiWorkbenchControlBar,
+  UnifiedAiAssistantDrawer,
   loadPersistedBilingualLang,
-} from './components/ai/AiWorkbenchControlBar';
-import { AiDiagnosticAssistantPanel } from './components/ai/AiDiagnosticAssistantPanel';
+  type UnifiedAiSubTab,
+} from './components/ai/UnifiedAiAssistantDrawer';
 import { FloatingHelpDrawer } from './components/help/FloatingHelpDrawer';
-import { HandsFreeVoiceCoach } from './components/ai/HandsFreeVoiceCoach';
 import { CurriculumSelectorDrawer } from './components/academy/CurriculumSelectorDrawer';
 import { InstructorVerifierView } from './components/academy/InstructorVerifierView';
 import { SubscriptionPricingModal } from './components/billing/SubscriptionPricingModal';
@@ -895,29 +894,53 @@ function AuthorizedBenchLabWorkspace() {
     [powerSupply, pins, wires, faults, circuitSolution, multimeter, selectedPinId]
   );
 
-  // Bilingual AI Workbench (EN/TL) + Live Bench Context + Floating Help Drawer
+  // Bilingual AI Workbench (EN/TL) + Live Bench Context + Unified AI Drawer + Help Drawer
   const [bilingualLang, setBilingualLang] = useState<BilingualLang>(() =>
     loadPersistedBilingualLang()
   );
-  const [showAiDiagnosticPanel, setShowAiDiagnosticPanel] = useState(false);
+  const [showUnifiedAiDrawer, setShowUnifiedAiDrawer] = useState(false);
+  const [unifiedAiSubTab, setUnifiedAiSubTab] = useState<UnifiedAiSubTab>('VOICE');
+  const [showHelpDrawer, setShowHelpDrawer] = useState(false);
   const [aiVoiceTranscript, setAiVoiceTranscript] = useState<string | null>(null);
-  const [showHandsFreeCoach, setShowHandsFreeCoach] = useState(false);
+  const [handsFreeIncomingCommand, setHandsFreeIncomingCommand] = useState<string | null>(null);
   const [showAcademyCurriculum, setShowAcademyCurriculum] = useState(false);
   const [showInstructorVerifier, setShowInstructorVerifier] = useState(false);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [showAdminBillingModal, setShowAdminBillingModal] = useState(false);
   const [activeAcademyModuleId, setActiveAcademyModuleId] = useState<string | null>(null);
+  const [academyLaunchRequest, setAcademyLaunchRequest] = useState<{
+    moduleId: string;
+    nonce: number;
+  } | null>(null);
+
+  const handleHandsFreeModalAction = useCallback(
+    (modal: 'ACADEMY_LAB' | 'REPORT_STUDIO' | 'DIAGNOSTIC_ASSISTANT' | 'SAVED_SESSIONS') => {
+      if (modal === 'ACADEMY_LAB') {
+        setShowAcademyCurriculum(true);
+      } else if (modal === 'REPORT_STUDIO') {
+        setShowDocsModal(true);
+      } else if (modal === 'DIAGNOSTIC_ASSISTANT') {
+        setUnifiedAiSubTab('DIAGNOSTIC');
+        setShowUnifiedAiDrawer(true);
+      } else if (modal === 'SAVED_SESSIONS') {
+        setShowCloudModal(true);
+      }
+    },
+    []
+  );
+
+  const handleTopBarVoiceTranscript = useCallback((transcript: string) => {
+    setUnifiedAiSubTab('VOICE');
+    setShowUnifiedAiDrawer(true);
+    setHandsFreeIncomingCommand(transcript);
+  }, []);
 
   const handleStartAcademyExercise = useCallback(
     (mod: LabModule) => {
       setActiveAcademyModuleId(mod.id);
       setActiveTab('BENCH_LAB');
       setShowDiagnosticGuide(true);
-      setPowerSupply((prev) => ({
-        ...prev,
-        isOutputEnabled: mod.psuOverride.isOutputEnabled,
-        voltageSetting: mod.psuOverride.voltageSetting || prev.voltageSetting,
-      }));
+      setAcademyLaunchRequest({ moduleId: mod.id, nonce: Date.now() });
     },
     []
   );
@@ -950,7 +973,8 @@ function AuthorizedBenchLabWorkspace() {
     if (prefillQuery && prefillQuery.trim()) {
       setAiVoiceTranscript(prefillQuery.trim());
     }
-    setShowAiDiagnosticPanel(true);
+    setUnifiedAiSubTab('DIAGNOSTIC');
+    setShowUnifiedAiDrawer(true);
   }, []);
 
   // Fault management handlers
@@ -1451,19 +1475,13 @@ function AuthorizedBenchLabWorkspace() {
         isLookupDrawerOpen={showLookupDrawer}
         onOpenBatchPinTest={handleOpenBatchPinTest}
         batchSelectedPinCount={batchSelectedPinIds.length}
-      />
-
-      <AiWorkbenchControlBar
-        lang={bilingualLang}
-        onChangeLang={setBilingualLang}
-        telemetry={liveAiBenchContext.telemetry}
-        isAssistantOpen={showAiDiagnosticPanel}
-        onOpenAssistant={handleOpenAiDiagnosticPanel}
-        onOpenHandsFreeCoach={() => setShowHandsFreeCoach(true)}
+        bilingualLang={bilingualLang}
+        onChangeBilingualLang={setBilingualLang}
         onOpenAcademyCurriculum={() => setShowAcademyCurriculum(true)}
         onOpenSubscriptionModal={() => setShowSubscriptionModal(true)}
         onOpenAdminBillingModal={() => setShowAdminBillingModal(true)}
         isAdminUnlocked={isAdminUnlocked}
+        onOpenHelpDrawer={() => setShowHelpDrawer(true)}
       />
 
       <CircuitAudioAlertBar
@@ -1553,6 +1571,13 @@ function AuthorizedBenchLabWorkspace() {
         isLookupDrawerOpen={showLookupDrawer}
         onOpenLookupDrawer={() => setShowLookupDrawer(true)}
         onCloseLookupDrawer={() => setShowLookupDrawer(false)}
+        academyLaunchRequest={academyLaunchRequest}
+        onActiveUniversityModuleChange={setActiveAcademyModuleId}
+        isAiCoachOpen={showUnifiedAiDrawer}
+        onOpenAiCoach={() => {
+          setUnifiedAiSubTab('VOICE');
+          setShowUnifiedAiDrawer((prev) => !prev);
+        }}
         simulationSpeed={simulationSpeed}
         powerSupply={powerSupply}
         onChangePowerSupply={handlePowerSupplyChange}
@@ -1976,20 +2001,11 @@ function AuthorizedBenchLabWorkspace() {
           </Suspense>
         </AppErrorBoundary>
       )}
-      {/* Bilingual AI Diagnostic Assistant Panel (3 Repair Step Cards + Live Bench Telemetry) */}
-      <AiDiagnosticAssistantPanel
-        isOpen={showAiDiagnosticPanel}
-        onClose={() => setShowAiDiagnosticPanel(false)}
-        lang={bilingualLang}
-        telemetry={liveAiBenchContext.telemetry}
-        benchSummaryText={liveAiBenchContext.summaryText}
-        quickFillPrompt={liveAiBenchContext.quickFillPrompt}
-        incomingVoiceTranscript={aiVoiceTranscript}
-        onConsumedVoiceTranscript={() => setAiVoiceTranscript(null)}
-      />
-
-      {/* Persistent Bottom-Right Floating Help Drawer (5 Interactive Bilingual Quick Guides) */}
+      {/* Controlled Help Drawer (opened from NavigationDrawer -> Gabay at Tulong) */}
       <FloatingHelpDrawer
+        isOpen={showHelpDrawer}
+        onClose={() => setShowHelpDrawer(false)}
+        hideFab={true}
         lang={bilingualLang}
         onAskAssistant={handleOpenAiDiagnosticPanel}
       />
@@ -2025,12 +2041,28 @@ function AuthorizedBenchLabWorkspace() {
         onClose={() => setShowAdminBillingModal(false)}
       />
 
-      {/* Hands-Free Local AI Voice Interactive Engine & Natural Taglish Coach */}
-      <HandsFreeVoiceCoach
-        isOpen={showHandsFreeCoach}
-        onClose={() => setShowHandsFreeCoach(false)}
-        activeModuleId={activeAcademyModuleId}
+      {/* Unified AI Assistant Drawer (Tab 1: Hands-Free Natural Taglish Voice Coach · Tab 2: Diagnostic Assistant) */}
+      <UnifiedAiAssistantDrawer
+        isOpen={showUnifiedAiDrawer}
+        onClose={() => setShowUnifiedAiDrawer(false)}
+        activeSubTab={unifiedAiSubTab}
+        onChangeSubTab={setUnifiedAiSubTab}
+        lang={bilingualLang}
+        onChangeLang={setBilingualLang}
         telemetry={liveAiBenchContext.telemetry}
+        benchSummaryText={liveAiBenchContext.summaryText}
+        quickFillPrompt={liveAiBenchContext.quickFillPrompt}
+        activeModuleId={activeAcademyModuleId}
+        activeTab={activeTab}
+        pins={pins}
+        nodeVoltages={circuitSolution.nodeVoltages}
+        incomingVoiceCommand={handsFreeIncomingCommand}
+        onConsumedIncomingVoiceCommand={() => setHandsFreeIncomingCommand(null)}
+        incomingDiagnosticTranscript={aiVoiceTranscript}
+        onConsumedDiagnosticTranscript={() => setAiVoiceTranscript(null)}
+        onNavigateTab={setActiveTab}
+        onOpenModal={handleHandsFreeModalAction}
+        onVoiceTranscript={handleTopBarVoiceTranscript}
       />
     </div>
   );

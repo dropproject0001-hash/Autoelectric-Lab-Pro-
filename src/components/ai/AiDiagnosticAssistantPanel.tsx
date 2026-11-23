@@ -24,6 +24,7 @@ import { queryAiDiagnosticRouter } from '../../services/ai/aiRouter';
 interface AiDiagnosticAssistantPanelProps {
   isOpen: boolean;
   onClose: () => void;
+  embedded?: boolean;
   lang: BilingualLang;
   telemetry: BenchTelemetry;
   benchSummaryText: string;
@@ -61,6 +62,7 @@ function getCardStyles(card: DiagnosticStepCard): {
 export const AiDiagnosticAssistantPanel: React.FC<AiDiagnosticAssistantPanelProps> = ({
   isOpen,
   onClose,
+  embedded = false,
   lang,
   telemetry,
   benchSummaryText,
@@ -117,63 +119,63 @@ export const AiDiagnosticAssistantPanel: React.FC<AiDiagnosticAssistantPanelProp
   return (
     <div
       data-testid="ai-diagnostic-assistant-panel"
-      className="fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-[#070E1B] border-l border-slate-700/90 shadow-2xl flex flex-col text-slate-100"
-      role="dialog"
-      aria-modal="false"
-      aria-label={
-        lang === 'TL'
-          ? 'AutoElectric Lab Pro AI Diagnostic Assistant'
-          : 'AutoElectric Lab Pro AI Diagnostic Assistant'
+      className={
+        embedded
+          ? 'flex flex-col flex-1 min-h-0 overflow-hidden text-slate-100'
+          : 'fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-[#070E1B] border-l border-slate-700/90 shadow-2xl flex flex-col text-slate-100'
       }
+      role={embedded ? 'region' : 'dialog'}
+      aria-modal="false"
+      aria-label="AutoElectric Lab Pro AI Diagnostic Assistant"
     >
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800 bg-[#0B1528] shrink-0">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-[3px] border border-cyan-500/50 bg-cyan-950/60 flex items-center justify-center shrink-0">
-            <Bot className="w-4 h-4 text-cyan-300" />
+      {/* Header (omitted when hosted inside UnifiedAiAssistantDrawer) */}
+      {!embedded && (
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800 bg-[#0B1528] shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-[3px] border border-cyan-500/50 bg-cyan-950/60 flex items-center justify-center shrink-0">
+              <Bot className="w-4 h-4 text-cyan-300" />
+            </div>
+            <div className="min-w-0">
+              <h2 className="font-hud text-sm font-bold tracking-wide text-slate-100 truncate">
+                {lang === 'TL'
+                  ? 'AI Bench Diagnostic Assistant (TL/EN)'
+                  : 'AI Bench Diagnostic Assistant (EN/TL)'}
+              </h2>
+              <p className="font-mono text-[10px] text-slate-400 truncate">
+                Zero-Fabrication · 70% Score Gate · Live Bench Context
+              </p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <h2 className="font-hud text-sm font-bold tracking-wide text-slate-100 truncate">
-              {lang === 'TL'
-                ? 'AI Bench Diagnostic Assistant (TL/EN)'
-                : 'AI Bench Diagnostic Assistant (EN/TL)'}
-            </h2>
-            <p className="font-mono text-[10px] text-slate-400 truncate">
-              {lang === 'TL'
-                ? 'Zero-Fabrication · 70% Score Gate · Live Bench Context'
-                : 'Zero-Fabrication · 70% Score Gate · Live Bench Context'}
-            </p>
-          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 rounded-[3px] border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300 cursor-pointer"
+            aria-label="Close AI Diagnostic Assistant"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="p-1.5 rounded-[3px] border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300 cursor-pointer"
-          aria-label="Close AI Diagnostic Assistant"
-        >
-          <X className="w-4 h-4" />
-        </button>
-      </div>
+      )}
 
       {/* Live Simulated Bench Context Strip */}
-      <div className="px-4 py-2 border-b border-slate-800/80 bg-slate-950/80 shrink-0 space-y-1">
-        <div className="flex items-center justify-between gap-2">
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-cyan-300">
-            {lang === 'TL'
-              ? 'Simulated Bench Telemetry (Live Injected)'
-              : 'Simulated Bench Telemetry (Live Injected)'}
-          </span>
-          {telemetry.isOcpTripped && (
-            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[2px] border border-rose-500/70 bg-rose-950/80 font-mono text-[10px] font-bold text-rose-200">
-              <AlertTriangle className="w-3 h-3" />
-              OCP TRIPPED
+      {!embedded && (
+        <div className="px-4 py-2 border-b border-slate-800/80 bg-slate-950/80 shrink-0 space-y-1">
+          <div className="flex items-center justify-between gap-2">
+            <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-cyan-300">
+              Simulated Bench Telemetry (Live Injected)
             </span>
-          )}
+            {telemetry.isOcpTripped && (
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[2px] border border-rose-500/70 bg-rose-950/80 font-mono text-[10px] font-bold text-rose-200">
+                <AlertTriangle className="w-3 h-3" />
+                OCP TRIPPED
+              </span>
+            )}
+          </div>
+          <p className="font-mono text-[11px] text-slate-300 break-words">
+            {benchSummaryText}
+          </p>
         </div>
-        <p className="font-mono text-[11px] text-slate-300 break-words">
-          {benchSummaryText}
-        </p>
-      </div>
+      )}
 
       {/* Compact Diagnostic Input Form */}
       <form

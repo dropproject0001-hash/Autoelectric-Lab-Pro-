@@ -6,8 +6,6 @@ import {
   Cloud,
   Cpu,
   FileText,
-  LogIn,
-  LogOut,
   Menu,
   RefreshCw,
   ScanLine,
@@ -18,6 +16,7 @@ import {
 import type { CircuitSolution } from '../utils/circuitSolver';
 import type { PowerSupplyState } from '../types/ecu';
 import type { PwaStateAndActions } from '../hooks/usePWA';
+import type { BilingualLang } from '../types/aiAssistant';
 import type { WorkspaceTab } from './workspace/workspaceTypes';
 import { APP_ICON_SRC } from '../constants/branding';
 import { CredentialsModal } from './CredentialsModal';
@@ -65,6 +64,13 @@ export interface LabTopNavProps {
   isLookupDrawerOpen?: boolean;
   onOpenBatchPinTest?: () => void;
   batchSelectedPinCount?: number;
+  bilingualLang?: BilingualLang;
+  onChangeBilingualLang?: (lang: BilingualLang) => void;
+  onOpenAcademyCurriculum?: () => void;
+  onOpenSubscriptionModal?: () => void;
+  onOpenAdminBillingModal?: () => void;
+  isAdminUnlocked?: boolean;
+  onOpenHelpDrawer?: () => void;
 }
 
 interface NavigationItem extends DrawerNavTabItem {
@@ -132,6 +138,13 @@ export const LabTopNav: React.FC<LabTopNavProps> = ({
   isLookupDrawerOpen = false,
   onOpenBatchPinTest,
   batchSelectedPinCount,
+  bilingualLang,
+  onChangeBilingualLang,
+  onOpenAcademyCurriculum,
+  onOpenSubscriptionModal,
+  onOpenAdminBillingModal,
+  isAdminUnlocked,
+  onOpenHelpDrawer,
 }) => {
   const navigationRef = useRef<HTMLElement>(null);
   const activeButtonRef = useRef<HTMLButtonElement>(null);
@@ -141,10 +154,7 @@ export const LabTopNav: React.FC<LabTopNavProps> = ({
   const [isCredentialsModalOpen, setIsCredentialsModalOpen] = useState(false);
   const {
     user: googleUser,
-    isSigningIn,
     syncStatus,
-    signInWithGoogle,
-    signOutUser,
     retryCloudSync,
   } = useAuth();
 
@@ -253,15 +263,15 @@ export const LabTopNav: React.FC<LabTopNavProps> = ({
           <button
             type="button"
             onClick={() => onSelectTab('BENCH_LAB')}
-            className="flex min-w-0 items-center gap-2.5 text-left cursor-pointer"
+            className="flex min-w-0 items-center gap-2 text-left cursor-pointer"
           >
             <BrandAppIcon />
             <div className="min-w-0 leading-none">
-              <div className="flex items-baseline gap-1.5 whitespace-nowrap">
-                <span className="font-body text-[15px] sm:text-[18px] lg:text-[19px] font-bold italic tracking-tight brand-wordmark-silver">
+              <div className="flex items-baseline gap-1 min-w-0">
+                <span className="font-body text-[14px] sm:text-[18px] lg:text-[19px] font-bold italic tracking-tight brand-wordmark-silver truncate">
                   AutoElectric Lab
                 </span>
-                <span className="font-body text-[15px] sm:text-[18px] lg:text-[19px] font-bold italic tracking-tight brand-wordmark-amber">
+                <span className="font-body text-[14px] sm:text-[18px] lg:text-[19px] font-bold italic tracking-tight brand-wordmark-amber shrink-0">
                   Pro
                 </span>
               </div>
@@ -411,33 +421,7 @@ export const LabTopNav: React.FC<LabTopNavProps> = ({
             </div>
           </div>
 
-          {googleUser ? (
-            <button
-              type="button"
-              onClick={() => void signOutUser()}
-              title={`Signed in as ${googleUser.email || 'Google Account'} — Click to sign out`}
-              aria-label="Sign out of Google account"
-              className={`flex h-10 lg:h-9 items-center gap-1.5 rounded-lg border border-[#20D889]/45 bg-[#0A1220]/95 px-2.5 lg:px-3 font-mono text-[10.5px] lg:text-[11px] font-semibold text-[#EAF3FF] hover:border-[#FF4D62]/60 hover:text-[#FFC2CA] transition cursor-pointer ${FOCUS_STYLES}`}
-            >
-              <span className="hidden xl:inline max-w-[120px] truncate text-[#8DF0C1]">
-                {googleUser.displayName?.split(' ')[0] || googleUser.email?.split('@')[0] || 'Account'}
-              </span>
-              <LogOut className="h-3.5 w-3.5 shrink-0 text-[#91A4BD]" aria-hidden="true" />
-              <span className="hidden sm:inline lg:hidden xl:inline">Sign Out</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              disabled={isSigningIn}
-              onClick={() => void signInWithGoogle()}
-              title="Sign in with Google for Firestore Cloud Sync across devices"
-              aria-label="Sign in with Google"
-              className={`flex h-10 lg:h-9 items-center gap-1.5 rounded-lg border border-[#19C8F5]/55 bg-[#0E192A] px-2.5 lg:px-3 font-mono text-[10.5px] lg:text-[11px] font-bold text-[#19C8F5] hover:bg-[#14253D] hover:text-white disabled:opacity-60 transition cursor-pointer ${FOCUS_STYLES}`}
-            >
-              <LogIn className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-              <span>{isSigningIn ? 'Signing in...' : 'Google Sign-In'}</span>
-            </button>
-          )}
+          {/* Google Sign-In / Sign-Out intentionally lives inside NavigationDrawer so Row 1 remains crisp and non-overlapping on mobile viewports. */}
 
           <button
             type="button"
@@ -536,6 +520,13 @@ export const LabTopNav: React.FC<LabTopNavProps> = ({
         onOpenBatchPinTest={onOpenBatchPinTest}
         batchSelectedPinCount={batchSelectedPinCount}
         onOpenCredentials={() => setIsCredentialsModalOpen(true)}
+        bilingualLang={bilingualLang}
+        onChangeBilingualLang={onChangeBilingualLang}
+        onOpenAcademyCurriculum={onOpenAcademyCurriculum}
+        onOpenSubscriptionModal={onOpenSubscriptionModal}
+        onOpenAdminBillingModal={onOpenAdminBillingModal}
+        isAdminUnlocked={isAdminUnlocked}
+        onOpenHelpDrawer={onOpenHelpDrawer}
       />
 
       {/* Official Credentials & Governance Modal */}

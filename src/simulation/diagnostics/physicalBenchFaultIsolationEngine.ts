@@ -67,7 +67,7 @@ export interface PhysicalMeasurementDiagnosisResult {
 export const STANDARD_ECU_BENCH_PIN_SPECS: BenchPinSpecification[] = [
   {
     pinId: 'KL30',
-    pinLabel: 'Pin 1 / KL30 — Permanent Battery Supply (+BATT)',
+    pinLabel: 'KL30 — Permanent Battery Supply (+BATT) [Trainer Pin 3 / OEM per FSM]',
     circuitRole: 'Primary unswitched ECU power rail via main fuse',
     unit: 'V',
     expectedByCondition: {
@@ -96,7 +96,7 @@ export const STANDARD_ECU_BENCH_PIN_SPECS: BenchPinSpecification[] = [
   },
   {
     pinId: 'KL15',
-    pinLabel: 'Pin 2 / KL15 — Switched Ignition Wake-Up',
+    pinLabel: 'KL15 — Switched Ignition Wake-Up (+IGN) [Trainer Pin 4 / OEM per FSM]',
     circuitRole: 'Ignition switch wake-up input to ECU power management ASIC',
     unit: 'V',
     expectedByCondition: {
@@ -125,7 +125,7 @@ export const STANDARD_ECU_BENCH_PIN_SPECS: BenchPinSpecification[] = [
   },
   {
     pinId: 'KL31',
-    pinLabel: 'Pin 3 / KL31 — Power & Logic Ground Return',
+    pinLabel: 'KL31 — Power & Logic Ground Return (GND) [Trainer Pin 1 / OEM per FSM]',
     circuitRole: 'Main ECU chassis/bench ground return (measured relative to negative supply terminal)',
     unit: 'V',
     expectedByCondition: {
@@ -154,7 +154,7 @@ export const STANDARD_ECU_BENCH_PIN_SPECS: BenchPinSpecification[] = [
   },
   {
     pinId: 'VREF_5V',
-    pinLabel: 'Pin 14 / VREF_5V — Regulated 5.00V Sensor Reference Bus',
+    pinLabel: 'VREF_5V — Regulated 5.00V Sensor Reference Bus [Trainer Pin 5 / OEM per FSM]',
     circuitRole: 'Internal LDO/tracker 5V regulated supply feeding ratiometric sensors (MAP, TPS, Rail Pressure)',
     unit: 'V',
     expectedByCondition: {
@@ -183,7 +183,7 @@ export const STANDARD_ECU_BENCH_PIN_SPECS: BenchPinSpecification[] = [
   },
   {
     pinId: 'TPS_SIG',
-    pinLabel: 'Pin 21 / TPS_SIG — Throttle Position Sensor Signal',
+    pinLabel: 'TPS_SIG — Throttle Position Sensor Signal [Trainer Pin 7 / OEM per FSM]',
     circuitRole: 'Ratiometric 0.5V–4.5V analog feedback with open-circuit pull-down/pull-up supervision',
     unit: 'V',
     expectedByCondition: {
@@ -212,7 +212,7 @@ export const STANDARD_ECU_BENCH_PIN_SPECS: BenchPinSpecification[] = [
   },
   {
     pinId: 'ECT_SIG',
-    pinLabel: 'Pin 24 / ECT_SIG — Engine Coolant Temp NTC Divider',
+    pinLabel: 'ECT_SIG — Engine Coolant Temp NTC Divider [Trainer Pin 9 / OEM per FSM]',
     circuitRole: '5V internal pull-up resistor (~2.49 kΩ) feeding external NTC thermistor to sensor ground',
     unit: 'V',
     expectedByCondition: {
@@ -241,7 +241,7 @@ export const STANDARD_ECU_BENCH_PIN_SPECS: BenchPinSpecification[] = [
   },
   {
     pinId: 'CAN_H',
-    pinLabel: 'Pin 6 / CAN_H — High-Speed CAN Bus Dominant High',
+    pinLabel: 'CAN_H — High-Speed CAN Bus Dominant High [Trainer Pin 13 / OBD-II DLC Pin 6]',
     circuitRole: 'ISO 11898-2 High-Speed CAN differential transceiver high line',
     unit: 'V',
     expectedByCondition: {
@@ -270,7 +270,7 @@ export const STANDARD_ECU_BENCH_PIN_SPECS: BenchPinSpecification[] = [
   },
   {
     pinId: 'CAN_L',
-    pinLabel: 'Pin 14-CAN / CAN_L — High-Speed CAN Bus Dominant Low',
+    pinLabel: 'CAN_L — High-Speed CAN Bus Dominant Low [Trainer Pin 14 / OBD-II DLC Pin 14]',
     circuitRole: 'ISO 11898-2 High-Speed CAN differential transceiver low line',
     unit: 'V',
     expectedByCondition: {
@@ -328,7 +328,7 @@ export const STANDARD_ECU_BENCH_PIN_SPECS: BenchPinSpecification[] = [
   },
   {
     pinId: 'INJ_1_LSD',
-    pinLabel: 'Pin 45 / INJ_1 — Injector 1 Low-Side MOSFET Drain',
+    pinLabel: 'INJ_1 — Injector 1 Low-Side MOSFET Drain [Trainer Pin 10 / OEM per FSM]',
     circuitRole: 'Low-side clamped inductive driver fed by +12V main relay through injector winding (~12 Ω)',
     unit: 'V',
     expectedByCondition: {

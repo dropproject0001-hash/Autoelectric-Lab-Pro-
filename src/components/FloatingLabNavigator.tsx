@@ -5,6 +5,7 @@ import {
   Bot,
   ChevronDown,
   ChevronUp,
+  Headphones,
   History,
   Layers,
   Mic,
@@ -132,6 +133,9 @@ export interface FloatingLabNavigatorProps {
   onVerifyScenarioStep?: () => ScenarioVoiceCallbackResult | void;
   onCompleteScenarioStep?: (stepNumber?: number) => ScenarioVoiceCallbackResult | void;
   onProbeScenarioFocusPin?: () => ScenarioVoiceCallbackResult | void;
+  /** Unified AI Coach drawer toggle & open state. */
+  isAiCoachOpen?: boolean;
+  onOpenAiCoach?: () => void;
 }
 
 export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
@@ -190,6 +194,8 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
   onVerifyScenarioStep,
   onCompleteScenarioStep,
   onProbeScenarioFocusPin,
+  isAiCoachOpen = false,
+  onOpenAiCoach,
 }) => {
   const [internalVoiceNavEnabled, setInternalVoiceNavEnabled] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -1176,18 +1182,16 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
         <div className="flex items-center gap-1.5 flex-wrap lg:flex-nowrap shrink-0">
           <button
             type="button"
-            role="switch"
             data-testid="floating-voice-fab"
-            aria-checked={voiceNavEnabled}
-            onClick={handleToggleVoiceNav}
+            aria-pressed={onOpenAiCoach ? isAiCoachOpen : voiceNavEnabled}
+            onClick={onOpenAiCoach ?? handleToggleVoiceNav}
             className={`hw-btn min-h-[36px] lg:min-h-[30px] flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider whitespace-nowrap cursor-pointer ${
-              voiceNavEnabled ? 'hw-btn-green' : 'text-[#d4e3f6]'
+              (onOpenAiCoach ? isAiCoachOpen : voiceNavEnabled) ? 'hw-btn-green' : 'text-[#d4e3f6]'
             }`}
-            title="Turn Offline AI Voice Navigator ON or OFF"
+            title="Open Unified AI Coach (Natural Taglish Voice Coach & Diagnostic Assistant)"
           >
-            {voiceNavEnabled ? <Volume2 className="w-3.5 h-3.5 shrink-0" /> : <VolumeX className="w-3.5 h-3.5 shrink-0" />}
-            <span className="sm:hidden">{voiceNavEnabled ? 'ON' : 'Voice'}</span>
-            <span className="hidden sm:inline">{voiceNavEnabled ? 'AI Voice ON' : 'AI Voice'}</span>
+            <Headphones className="w-3.5 h-3.5 shrink-0 text-[#19c8f5]" />
+            <span>AI Coach</span>
           </button>
 
           {onToggleVoiceLog && (
@@ -1204,22 +1208,6 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
               <span>Log</span>
             </button>
           )}
-
-          <button
-            type="button"
-            onClick={handleStartListening}
-            aria-pressed={voiceState.isListening}
-            aria-label={voiceState.isListening ? 'Stop voice recognition' : 'Speak hardware command'}
-            className={`hw-btn min-h-[36px] lg:min-h-[30px] flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase whitespace-nowrap cursor-pointer ${
-              voiceState.isListening
-                ? 'bg-[#2a1019] border-[#ff4d62] text-[#ff8594] animate-pulse'
-                : 'hw-btn-amber'
-            }`}
-            title='Speak hardware command (e.g. "Connect pin 5 to ground")'
-          >
-            {voiceState.isListening ? <MicOff className="w-3.5 h-3.5 shrink-0" /> : <Mic className="w-3.5 h-3.5 shrink-0" />}
-            <span>{voiceState.isListening ? 'Stop' : 'Mic'}</span>
-          </button>
         </div>
       </div>
     </div>

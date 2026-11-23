@@ -84,13 +84,13 @@ export const INTERACTIVE_QUICK_GUIDES: readonly InteractiveQuickGuide[] = [
     stepsTL: [
       'Siguraduhing naka-OFF ang Bench Power Supply bago magdagdag o magbago ng jumper wire sa Wiring Canvas.',
       'I-verify muna ang eksaktong ECU part number at pinout — huwag manghula ng wire color.',
-      'Bago i-ON ang PSU, sukatin sa DMM OHMS mode ang KL30 (Pin 2) papuntang KL31 (Pin 1) upang makumpirmang walang dead short.',
+      'Bago i-ON ang PSU, sukatin sa DMM RESISTANCE (Ω / OHMS) mode ang KL30 (Pin 3) papuntang KL31 (Pin 1) upang makumpirmang walang dead short.',
       'Itakda ang Current Limit sa 1.5A – 2.0A sa unang power-up bago i-enable ang Output.',
     ],
     stepsEN: [
       'Keep Bench Power Supply OFF while adding or modifying any jumper wires on the Wiring Canvas.',
       'Confirm exact ECU part number and connector orientation — never guess pinouts or wire colors.',
-      'Before enabling PSU Output, run a DMM OHMS short-to-ground check across KL30 (Pin 2) and KL31 (Pin 1).',
+      'Before enabling PSU Output, run a DMM RESISTANCE (Ω / OHMS) short-to-ground check across KL30 (Pin 3) and KL31 (Pin 1).',
       'Set Current Limit conservatively (1.5A – 2.0A) on initial bring-up before turning Output ON.',
     ],
     assistantFollowUpTL: 'Paano magkabit ng KL30, KL15, KL31 at 5V VREF nang ligtas?',
@@ -109,13 +109,13 @@ export const INTERACTIVE_QUICK_GUIDES: readonly InteractiveQuickGuide[] = [
     stepsTL: [
       'I-OFF agad ang Bench Power Supply Output.',
       'Buksan ang Fault Injection Matrix at Wiring Canvas para alisin ang anumang SHORT_TO_GND fault o maling +12V-to-GND jumper.',
-      'Sukatin sa DMM OHMS mode ang Pin 2 (KL30) vs Pin 1 (KL31) para kumpirmahing nawala na ang short.',
+      'Sukatin sa DMM RESISTANCE (Ω / OHMS) mode ang Pin 3 (KL30) vs Pin 1 (KL31) para kumpirmahing nawala na ang short.',
       'I-reset at ibalik ang PSU Output sa 12.6V / 2.0A limit at i-verify na normal ang idle current draw.',
     ],
     stepsEN: [
       'Switch Bench Power Supply Output OFF immediately.',
       'Inspect the Fault Injection Matrix and Wiring Canvas to clear any SHORT_TO_GND fault or misrouted +12V-to-GND wire.',
-      'Verify Pin 2 (KL30) to Pin 1 (KL31) resistance in DMM OHMS mode to confirm the short is cleared.',
+      'Verify Pin 3 (KL30) to Pin 1 (KL31) resistance in DMM RESISTANCE (Ω / OHMS) mode to confirm the short is cleared.',
       'Re-enable PSU Output at 12.6V with a 2.0A limit and confirm normal idle current draw.',
     ],
     assistantFollowUpTL: 'Nag-OCP Trip ang Power Supply ko, ano ang step-by-step check?',
@@ -145,6 +145,9 @@ export const INTERACTIVE_QUICK_GUIDES: readonly InteractiveQuickGuide[] = [
 interface FloatingHelpDrawerProps {
   lang: BilingualLang;
   onAskAssistant?: (prompt: string) => void;
+  isOpen?: boolean;
+  onClose?: () => void;
+  hideFab?: boolean;
 }
 
 function getGuideIcon(id: string): React.ReactNode {
@@ -165,25 +168,39 @@ function getGuideIcon(id: string): React.ReactNode {
 export const FloatingHelpDrawer: React.FC<FloatingHelpDrawerProps> = ({
   lang,
   onAskAssistant,
+  isOpen: controlledOpen,
+  onClose,
+  hideFab = false,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
   const [expandedId, setExpandedId] = useState<string>(INTERACTIVE_QUICK_GUIDES[2].id);
+
+  const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpenState = (next: boolean) => {
+    if (controlledOpen === undefined) {
+      setInternalOpen(next);
+    }
+    if (!next) {
+      onClose?.();
+    }
+  };
 
   return (
     <>
-      {/* Persistent Bottom-Right Floating Action Button */}
-      <button
-        type="button"
-        data-testid="floating-help-fab"
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 rounded-full border border-cyan-400/70 bg-[#0B172A]/95 hover:bg-cyan-950 px-3.5 py-2.5 text-cyan-100 shadow-lg shadow-cyan-950/60 transition-transform hover:scale-[1.02] cursor-pointer"
-        aria-label={lang === 'TL' ? 'Gabay at Tulong' : 'Help & Guide'}
-      >
-        <HelpCircle className="w-4 h-4 text-cyan-300 shrink-0" />
-        <span className="font-mono text-xs font-semibold">
-          {lang === 'TL' ? 'Gabay at Tulong' : 'Help & Guide'}
-        </span>
-      </button>
+      {!hideFab && (
+        <button
+          type="button"
+          data-testid="floating-help-fab"
+          onClick={() => setOpenState(true)}
+          className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 rounded-full border border-cyan-400/70 bg-[#0B172A]/95 hover:bg-cyan-950 px-3.5 py-2.5 text-cyan-100 shadow-lg shadow-cyan-950/60 transition-transform hover:scale-[1.02] cursor-pointer"
+          aria-label={lang === 'TL' ? 'Gabay at Tulong' : 'Help & Guide'}
+        >
+          <HelpCircle className="w-4 h-4 text-cyan-300 shrink-0" />
+          <span className="font-mono text-xs font-semibold">
+            {lang === 'TL' ? 'Gabay at Tulong' : 'Help & Guide'}
+          </span>
+        </button>
+      )}
 
       {/* Sliding Help Drawer */}
       {isOpen && (
@@ -212,7 +229,7 @@ export const FloatingHelpDrawer: React.FC<FloatingHelpDrawerProps> = ({
             </div>
             <button
               type="button"
-              onClick={() => setIsOpen(false)}
+              onClick={() => setOpenState(false)}
               className="p-1.5 rounded-[3px] border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300 cursor-pointer"
               aria-label="Close Help Drawer"
             >
@@ -277,7 +294,7 @@ export const FloatingHelpDrawer: React.FC<FloatingHelpDrawerProps> = ({
                         <button
                           type="button"
                           onClick={() => {
-                            setIsOpen(false);
+                            setOpenState(false);
                             onAskAssistant(followUp);
                           }}
                           className="w-full mt-1 px-2.5 py-1.5 rounded-[3px] border border-cyan-500/50 bg-cyan-950/50 hover:bg-cyan-900/60 text-cyan-200 font-mono text-[11px] font-semibold cursor-pointer"

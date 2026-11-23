@@ -106,7 +106,7 @@ export const ECU_BRAND_PROFILES: EcuBrandProfile[] = [
       '⚠️ WARNING: Pinout Verification & Polarity: Always cross-check the exact Denso/Fujitsu Ten part number on the ECU case and verify ground continuity with a multimeter before applying +12V bench power. Toyota connectors (A/B/C/D or E1–E6) vary slightly across model years and emissions tiers (Euro 2 vs. Euro 4). Covers all 10 PH-Market Toyota OEM ECM & 6AT TCM bench pinout sets.',
     imageSrc: '/assets/images/ecu_connector_socket.jpg',
     pcbImageSrc:
-      '/assets/aistudio/Screenshot_20261112_145941_com_facebook_katana_ImmersiveActivity_0131e03d.jpg',
+      '/assets/images/Screenshot_20261112_145941_com_facebook_katana_ImmersiveActivity_0131e03d.jpg',
     pcbComponents: [
       {
         id: 'pcb-toyota-cpu1',
@@ -2985,8 +2985,8 @@ export const ECU_BRAND_PROFILES: EcuBrandProfile[] = [
       'Sentra N16 (2000–2013 QG16DE), Navara D40 (YD25DDTi — Verify 2007–2009 vs 2010+), X-Trail / Teana (QR25DE)',
     description:
       'Sentra N16 (QG16DE) operates strictly on ISO-9141 K-Line (Pin 85/88 -> OBD-II Pin 7). Pins 86 & 94 are internal TCU-only lines (leave disconnected on bench). Note: PH Navara/Terra/Urvan YD25DDTi diesels use DENSO SH7058/SH7059 ECUs, not Bosch EDC16C42.',
-    imageSrc: '/assets/aistudio/IMG_20261031_102222_185ec4db.jpg',
-    pcbImageSrc: '/assets/aistudio/IMG_20261031_100429_ce48661e.jpg',
+    imageSrc: '/assets/images/IMG_20261031_102222_185ec4db.jpg',
+    pcbImageSrc: '/assets/images/IMG_20261031_100429_ce48661e.jpg',
     pcbComponents: [
       {
         id: 'pcb-shunt-r701-r703',
@@ -3939,9 +3939,9 @@ export const ECU_BRAND_PROFILES: EcuBrandProfile[] = [
     description:
       'Hybrid ceramic/SMD ECU prone to thermal bond fractures. Drivers: VB025 (Coils), MC33186DH (Throttle), ST L9135PD (Injectors), UE06AB6 (5V Reg), TLE6230GP (Fans), ST95160 EEPROM. Note: Some Fiat manuals invert Connector A vs B labels.',
     imageSrc:
-      '/assets/aistudio/Screenshot_20261112_170409_com_facebook_katana_FbMainTabActivity_af47a1b8.jpg',
+      '/assets/images/Screenshot_20261112_170409_com_facebook_katana_FbMainTabActivity_af47a1b8.jpg',
     pcbImageSrc:
-      '/assets/aistudio/Screenshot_20261112_170409_com_facebook_katana_FbMainTabActivity_af47a1b8.jpg',
+      '/assets/images/Screenshot_20261112_170409_com_facebook_katana_FbMainTabActivity_af47a1b8.jpg',
     pcbComponents: [
       {
         id: 'pcb-iaw-vb025-cyl14',

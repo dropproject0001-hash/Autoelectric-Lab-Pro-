@@ -550,6 +550,12 @@ class OfflineVoiceAssistantService {
     this.emitState();
   }
 
+  public setRecognitionLang(lang: 'TL' | 'EN') {
+    if (this.recognition) {
+      this.recognition.lang = lang === 'TL' ? 'tl-PH' : 'en-US';
+    }
+  }
+
   /**
    * Cleans technical markdown / bullet symbols for clear, natural speech synthesis.
    */
@@ -561,6 +567,7 @@ class OfflineVoiceAssistantService {
       .replace(/\*\*([^*]+)\*\*/g, '$1')
       .replace(/\*([^*]+)\*/g, '$1')
       .replace(/^#+\s+/gm, '')
+      .replace(/\|/g, ' ')
       .replace(/•\s+/g, '. ')
       .replace(/-\s+/g, '. ')
       .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')

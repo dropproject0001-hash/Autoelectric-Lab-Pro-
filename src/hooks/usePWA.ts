@@ -137,13 +137,12 @@ export function evaluateSwRequestSecurityPolicy(params: {
   if (
     pathname.endsWith('.zip') ||
     pathname.endsWith('.map') ||
-    (pathname.startsWith('/assets/aistudio/') &&
-      pathname !== '/assets/aistudio/file_0000000098d48211abb177ce752b7b0e_62980da7.png')
+    pathname.startsWith('/assets/aistudio/')
   ) {
     return {
       allowCache: false,
       strategy: 'NETWORK_ONLY',
-      reason: 'Large archives and user-uploaded diagnostic image dumps are excluded from SW cache.',
+      reason: 'Large archives and temporary aistudio dumps are excluded from SW cache.',
     };
   }
 

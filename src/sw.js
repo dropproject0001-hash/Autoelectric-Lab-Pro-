@@ -23,7 +23,7 @@ const ALLOWED_CACHES = new Set([
 
 const MAX_CACHEABLE_BYTES = 2.5 * 1024 * 1024; // 2.5 MB per static asset limit
 const BRAND_ICON_PATH =
-  '/assets/aistudio/file_0000000098d48211abb177ce752b7b0e_62980da7.png';
+  '/assets/images/file_0000000098d48211abb177ce752b7b0e_62980da7.png';
 
 // Optional Workbox manifest injection reference (populated if bundled with injectManifest)
 const INJECTED_MANIFEST = Array.isArray(self.__WB_MANIFEST)
@@ -59,8 +59,7 @@ function getPrecacheUrls() {
     if (
       normalized.endsWith('.zip') ||
       normalized.endsWith('.map') ||
-      (normalized.startsWith('/assets/aistudio/') &&
-        normalized !== BRAND_ICON_PATH)
+      normalized.startsWith('/assets/aistudio/')
     ) {
       continue;
     }
@@ -132,10 +131,7 @@ function isSecuritySensitiveOrExcludedRequest(request, url) {
   if (pathname.endsWith('.zip') || pathname.endsWith('.map')) {
     return true;
   }
-  if (
-    pathname.startsWith('/assets/aistudio/') &&
-    pathname !== BRAND_ICON_PATH
-  ) {
+  if (pathname.startsWith('/assets/aistudio/')) {
     return true;
   }
 

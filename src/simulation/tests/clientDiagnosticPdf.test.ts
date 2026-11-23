@@ -173,7 +173,27 @@ async function main() {
     assert.ok(src.includes('studio-signed-pdf-seal'), 'Must display cryptographic SHA-256 verification seal');
   });
 
-  console.log(`\n[Client Diagnostic Signed A4 PDF Suite] PASSED ${passed}/4 assertions.\n`);
+  await runTest('5. DiagnosticReportModal and GoogleDocsModal call all React hooks before any early return', () => {
+    for (const relPath of [
+      'src/components/DiagnosticReportModal.tsx',
+      'src/components/GoogleDocsModal.tsx',
+    ]) {
+      const src = fs.readFileSync(path.resolve(process.cwd(), relPath), 'utf8');
+      const guardIdx = src.indexOf('if (!isOpen');
+      assert.ok(guardIdx > 0, `${relPath} must guard !isOpen`);
+      const afterGuard = src.slice(guardIdx);
+      const hookAfterGuardMatch = afterGuard.match(
+        /\n\s*(?:const\s+[^=]+=\s*)?use(?:State|Effect|Memo|Callback|Ref|Context|Reducer|Id|TrialAccess|Auth)\s*\(/
+      );
+      assert.equal(
+        hookAfterGuardMatch,
+        null,
+        `${relPath} calls a React hook after early return: ${hookAfterGuardMatch?.[0] ?? ''}`
+      );
+    }
+  });
+
+  console.log(`\n[Client Diagnostic Signed A4 PDF Suite] PASSED ${passed}/5 assertions.\n`);
 }
 
 main().catch((err) => {

@@ -87,6 +87,8 @@ interface AiWorkbenchControlBarProps {
   telemetry: BenchTelemetry;
   isAssistantOpen: boolean;
   onOpenAssistant: (prefillQuery?: string) => void;
+  onVoiceTranscript?: (transcript: string) => void;
+  isHandsFreeOpen?: boolean;
   onOpenHandsFreeCoach?: () => void;
   onOpenAcademyCurriculum?: () => void;
   onOpenSubscriptionModal?: () => void;
@@ -116,6 +118,8 @@ export const AiWorkbenchControlBar: React.FC<AiWorkbenchControlBarProps> = ({
   telemetry,
   isAssistantOpen,
   onOpenAssistant,
+  onVoiceTranscript,
+  isHandsFreeOpen = false,
   onOpenHandsFreeCoach,
   onOpenAcademyCurriculum,
   onOpenSubscriptionModal,
@@ -201,7 +205,11 @@ export const AiWorkbenchControlBar: React.FC<AiWorkbenchControlBarProps> = ({
       recognition.onresult = (event) => {
         const transcript = event.results?.[0]?.[0]?.transcript?.trim();
         if (transcript) {
-          onOpenAssistant(transcript);
+          if (onVoiceTranscript) {
+            onVoiceTranscript(transcript);
+          } else {
+            onOpenAssistant(transcript);
+          }
         }
       };
 
@@ -215,7 +223,7 @@ export const AiWorkbenchControlBar: React.FC<AiWorkbenchControlBarProps> = ({
           : 'Could not start Voice Mic.'
       );
     }
-  }, [isListening, lang, onOpenAssistant]);
+  }, [isListening, lang, onOpenAssistant, onVoiceTranscript]);
 
   const activeTierMeta =
     AI_TIER_CASCADE.find((t) => t.id === routerSnapshot.activeTier) ||
@@ -302,8 +310,12 @@ export const AiWorkbenchControlBar: React.FC<AiWorkbenchControlBarProps> = ({
           <button
             type="button"
             onClick={onOpenHandsFreeCoach}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[3px] border border-emerald-500/60 bg-emerald-950/50 text-emerald-200 hover:bg-emerald-900/60 font-mono text-[11px] font-medium transition-colors cursor-pointer"
-            title="Hands-Free Local AI Voice Coach (Natural Taglish)"
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[3px] border font-mono text-[11px] font-medium transition-colors cursor-pointer ${
+              isHandsFreeOpen
+                ? 'border-emerald-400 bg-emerald-500/25 text-emerald-100'
+                : 'border-emerald-500/60 bg-emerald-950/50 text-emerald-200 hover:bg-emerald-900/60'
+            }`}
+            title="Hands-Free Local AI Voice Coach (Natural Taglish — Full System DB)"
           >
             <Headphones className="w-3.5 h-3.5 text-emerald-400" />
             <span>{lang === 'TL' ? 'Hands-Free Coach' : 'Hands-Free Coach'}</span>

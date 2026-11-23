@@ -116,11 +116,11 @@ export const REPAIR_KNOWLEDGE_BASE: RepairArticle[] = [
     category: 'NISSAN_HITACHI',
     images: [
       {
-        url: '/assets/aistudio/IMG_20261031_102222_185ec4db.jpg',
+        url: '/assets/images/IMG_20261031_102222_185ec4db.jpg',
         caption: 'Physical 121-Pin Receptacle: Dual-Chamber Grey Connector (Chamber A: 81 Pins with Green Power Terminal Retainers; Chamber B: 40 Pins including K-Line Pin 88)'
       },
       {
-        url: '/assets/aistudio/IMG_20261031_100429_ce48661e.jpg',
+        url: '/assets/images/IMG_20261031_100429_ce48661e.jpg',
         caption: 'MEC22-251 Internal Multilayer PCB: R701-R703 (0.028Ω Current Sense Shunts), R704 (82Ω Pulldown), C844-C879 Filter Bank, Clamping Diodes D301-D302, & Solder Array'
       }
     ],
@@ -219,11 +219,11 @@ export const REPAIR_KNOWLEDGE_BASE: RepairArticle[] = [
     category: 'MAGNETI_MARELLI',
     images: [
       {
-        url: '/assets/aistudio/Screenshot_20261112_170414_com_facebook_katana_FbMainTabActivity_75282c2f.jpg',
+        url: '/assets/images/Screenshot_20261112_170414_com_facebook_katana_FbMainTabActivity_75282c2f.jpg',
         caption: 'Diagnostic 1: Jumper from Pin 10 of Injector Driver IC (TLE9135PD) to Connector A Pin 35/36 restoring water temp sensor ground return'
       },
       {
-        url: '/assets/aistudio/Screenshot_20261112_170409_com_facebook_katana_FbMainTabActivity_af47a1b8.jpg',
+        url: '/assets/images/Screenshot_20261112_170409_com_facebook_katana_FbMainTabActivity_af47a1b8.jpg',
         caption: 'Component Topology Map of Magneti Marelli IAW 5NF: TLE9135PD (Magenta Arrow) & Connector A 64-pin layout'
       }
     ],
@@ -257,7 +257,7 @@ export const REPAIR_KNOWLEDGE_BASE: RepairArticle[] = [
     category: 'MAGNETI_MARELLI',
     images: [
       {
-        url: '/assets/aistudio/Screenshot_20261112_170414_com_facebook_katana_FbMainTabActivity_75282c2f.jpg',
+        url: '/assets/images/Screenshot_20261112_170414_com_facebook_katana_FbMainTabActivity_75282c2f.jpg',
         caption: 'Diagnostic 2: Sonda não trabalha - Bridge sensor ground directly to Pin 35 / Pin 36 vias along the red arrow pathway'
       }
     ],
@@ -288,7 +288,7 @@ export const REPAIR_KNOWLEDGE_BASE: RepairArticle[] = [
     category: 'MAGNETI_MARELLI',
     images: [
       {
-        url: '/assets/aistudio/Screenshot_20261112_170418_com_facebook_katana_FbMainTabActivity_29a7e205.jpg',
+        url: '/assets/images/Screenshot_20261112_170418_com_facebook_katana_FbMainTabActivity_29a7e205.jpg',
         caption: 'Diagnostic 3: Electronic Throttle Driver MC33186DH and 1-Ohm (1R) current sense resistors verification'
       }
     ],
@@ -320,7 +320,7 @@ export const REPAIR_KNOWLEDGE_BASE: RepairArticle[] = [
     category: 'MAGNETI_MARELLI',
     images: [
       {
-        url: '/assets/aistudio/Screenshot_20261112_170418_com_facebook_katana_FbMainTabActivity_29a7e205.jpg',
+        url: '/assets/images/Screenshot_20261112_170418_com_facebook_katana_FbMainTabActivity_29a7e205.jpg',
         caption: 'Diagnostic 4: Micro-jumper across broken edge trace to restore 5V to UE06AB6 regulator and fuel pump relay circuit'
       }
     ],
@@ -353,15 +353,15 @@ export const REPAIR_KNOWLEDGE_BASE: RepairArticle[] = [
     category: 'TOYOTA_DENSO',
     images: [
       {
-        url: '/assets/aistudio/Screenshot_20261112_145941_com_facebook_katana_ImmersiveActivity_0131e03d.jpg',
+        url: '/assets/images/Screenshot_20261112_145941_com_facebook_katana_ImmersiveActivity_0131e03d.jpg',
         caption: 'Dual-CPU Denso Architecture: CPU #1 (Denso/Toshiba Flash MCU) and CPU #2 (Sub-Processor) with 175822-887* board'
       },
       {
-        url: '/assets/aistudio/Screenshot_20261112_145945_com_facebook_katana_ImmersiveActivity_0f70fb91.jpg',
+        url: '/assets/images/Screenshot_20261112_145945_com_facebook_katana_ImmersiveActivity_0f70fb91.jpg',
         caption: 'Fast-Flashing Engine Light Source: CPU #2 Clock Crystal Oscillator (X-Tal) and dual 22pF load capacitors'
       },
       {
-        url: '/assets/aistudio/Screenshot_20261112_145932_com_facebook_katana_ImmersiveActivity_9d5c7a34.jpg',
+        url: '/assets/images/Screenshot_20261112_145932_com_facebook_katana_ImmersiveActivity_9d5c7a34.jpg',
         caption: 'Diagnostic Trouble Code P0093: 4 Classic Symptoms & ECU Damage Causes in Toyota 1KD/2KD Repair Manual'
       }
     ],

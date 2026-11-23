@@ -2146,12 +2146,12 @@ async function main() {
 
       // Verify Google Sign-In + Firestore cloud sync wiring + offline fallback in active shell components
       const landingSrc = fs.readFileSync(path.resolve('src/components/IntroductionPinLandingPage.tsx'), 'utf8');
-      const topNavSrc = fs.readFileSync(path.resolve('src/components/LabTopNav.tsx'), 'utf8');
+      const navDrawerSrc = fs.readFileSync(path.resolve('src/components/NavigationDrawer.tsx'), 'utf8');
       const appSrc = fs.readFileSync(path.resolve('src/App.tsx'), 'utf8');
       const cloudModalSrc = fs.readFileSync(path.resolve('src/components/BenchCloudModal.tsx'), 'utf8');
 
       assert.equal(landingSrc.includes('signInWithGoogle'), true);
-      assert.equal(topNavSrc.includes('signInWithGoogle'), true);
+      assert.equal(navDrawerSrc.includes('signInWithGoogle'), true);
       assert.equal(appSrc.includes('activeStorageUid'), true);
       assert.equal(cloudModalSrc.includes('activeStorageUid'), true);
       assert.equal(appSrc.includes('LOCAL_WORKSTATION_UID'), true);

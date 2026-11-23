@@ -2,9 +2,11 @@ import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import {
+  BookOpen,
   Bot,
   CheckCircle2,
   ChevronRight,
+  Cloud,
   Cpu,
   Database,
   Download,
@@ -12,12 +14,15 @@ import {
   FileText,
   Gauge,
   Globe,
+  GraduationCap,
   HardDrive,
   HelpCircle,
   KeyRound,
   Layers,
   ListChecks,
   Lock,
+  LogIn,
+  LogOut,
   RefreshCw,
   RotateCcw,
   Save,
@@ -30,8 +35,12 @@ import {
 } from 'lucide-react';
 
 import { APP_ICON_SRC, APP_LOGO_SRC } from '../constants/branding';
+import { useAuth } from '../context/AuthContext';
 import { formatTrialCountdown, useTrialAccess } from '../context/TrialAccessContext';
 import type { PwaStateAndActions } from '../hooks/usePWA';
+import type { BilingualLang } from '../types/aiAssistant';
+import { persistBilingualLang } from './ai/AiWorkbenchControlBar';
+import { LicenseStatusBadge } from './billing/LicenseStatusBadge';
 import type { WorkspaceTab } from './workspace/workspaceTypes';
 import type { LabTab } from './LabTopNav';
 import type { LabDrawerIconName } from './icons/LabDrawerIcons';
@@ -99,6 +108,13 @@ export interface NavigationDrawerProps {
   onOpenBatchPinTest?: () => void;
   batchSelectedPinCount?: number;
   onOpenCredentials?: () => void;
+  bilingualLang?: BilingualLang;
+  onChangeBilingualLang?: (lang: BilingualLang) => void;
+  onOpenAcademyCurriculum?: () => void;
+  onOpenSubscriptionModal?: () => void;
+  onOpenAdminBillingModal?: () => void;
+  isAdminUnlocked?: boolean;
+  onOpenHelpDrawer?: () => void;
 }
 
 const ICON_TONE_CLASSES: Record<NonNullable<DrawerActionItem['tone']>, string> = {
@@ -205,6 +221,13 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
   onOpenBatchPinTest,
   batchSelectedPinCount,
   onOpenCredentials,
+  bilingualLang = 'TL',
+  onChangeBilingualLang,
+  onOpenAcademyCurriculum,
+  onOpenSubscriptionModal,
+  onOpenAdminBillingModal,
+  isAdminUnlocked = false,
+  onOpenHelpDrawer,
 }) => {
   const titleId = useId();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -212,6 +235,14 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
   const [bannerFailed, setBannerFailed] = useState(false);
   const [emblemFailed, setEmblemFailed] = useState(false);
   const { accessMode, remainingSeconds, lockBenchSession } = useTrialAccess();
+  const {
+    user: googleUser,
+    isSigningIn,
+    syncStatus,
+    signInWithGoogle,
+    signOutUser,
+    retryCloudSync,
+  } = useAuth();
 
   const diagnosticTools = useMemo<readonly DrawerActionItem[]>(
     () => [
@@ -227,6 +258,20 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
               tone: 'sky' as const,
               isActive: isLookupDrawerOpen,
               onClick: onOpenLookupDrawer,
+            },
+          ]
+        : []),
+      ...(onOpenAcademyCurriculum
+        ? [
+            {
+              id: 'academy-lab-curriculum',
+              label: 'Academy Lab',
+              description: 'University 3-Tier Curriculum Matrix & SHA-256 Exam PDF',
+              icon: GraduationCap,
+              metaText: '3 Tiers',
+              tone: 'sky' as const,
+              showChevron: true,
+              onClick: onOpenAcademyCurriculum,
             },
           ]
         : []),
@@ -306,6 +351,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
     [
       batchSelectedPinCount,
       isLookupDrawerOpen,
+      onOpenAcademyCurriculum,
       onOpenBatchPinTest,
       onOpenGeminiStudio,
       onOpenGroundedSearch,
@@ -461,6 +507,33 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
             },
           ]
         : []),
+      ...(onOpenAdminBillingModal && isAdminUnlocked
+        ? [
+            {
+              id: 'admin-pin-qr-manager',
+              label: 'Admin PIN / QR',
+              description: 'Master Admin Offline PIN Generator & E-Wallet QR Uploader',
+              icon: KeyRound,
+              metaText: 'Admin',
+              tone: 'amber' as const,
+              showChevron: true,
+              onClick: onOpenAdminBillingModal,
+            },
+          ]
+        : []),
+      ...(onOpenHelpDrawer
+        ? [
+            {
+              id: 'help-quick-guides',
+              label: bilingualLang === 'TL' ? 'Gabay at Tulong' : 'Help & Quick Guides',
+              description: '5 interactive beginner-safe ECU bench guides (Taglish & English)',
+              icon: BookOpen,
+              tone: 'sky' as const,
+              showChevron: true,
+              onClick: onOpenHelpDrawer,
+            },
+          ]
+        : []),
       {
         id: 'guide',
         label: 'Slide Walkthrough',
@@ -481,12 +554,19 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
     ],
     [
       activeAudioAlertCount,
+      accessMode,
+      bilingualLang,
+      isAdminUnlocked,
+      lockBenchSession,
+      onOpenAdminBillingModal,
+      onOpenHelpDrawer,
       onOpenIntroModal,
       onOpenLicenseModal,
       onOpenPwaGuideModal,
       onResetLab,
       onToggleAudioAlertsPanel,
       pwa,
+      remainingSeconds,
     ],
   );
 
@@ -887,6 +967,136 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
                       );
                     })}
                   </div>
+                </motion.div>
+
+                {/* Language & License / Account Controls */}
+                {(onChangeBilingualLang || onOpenSubscriptionModal) && (
+                  <motion.div
+                    variants={drawerItemVariants}
+                    className="mb-2 hw-lcd-well rounded-lg px-3 py-2.5 space-y-2 will-change-transform"
+                  >
+                    {onChangeBilingualLang && (
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="flex items-center gap-2 text-[12px] font-semibold text-[#EAF3FF]">
+                          <Globe className="w-4 h-4 text-[#19C8F5]" aria-hidden="true" />
+                          <span>{bilingualLang === 'TL' ? 'Wika ng Coach' : 'Coach Language'}</span>
+                        </span>
+                        <div className="inline-flex rounded-md border border-[#203653] bg-[#0A1220] p-0.5">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              persistBilingualLang('TL');
+                              onChangeBilingualLang('TL');
+                            }}
+                            aria-pressed={bilingualLang === 'TL'}
+                            className={`px-2 py-0.5 rounded font-mono text-[10.5px] font-bold cursor-pointer ${
+                              bilingualLang === 'TL'
+                                ? 'bg-cyan-500/25 text-cyan-200 border border-cyan-400/50'
+                                : 'text-[#91A4BD] hover:text-white'
+                            }`}
+                          >
+                            TL
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              persistBilingualLang('EN');
+                              onChangeBilingualLang('EN');
+                            }}
+                            aria-pressed={bilingualLang === 'EN'}
+                            className={`px-2 py-0.5 rounded font-mono text-[10.5px] font-bold cursor-pointer ${
+                              bilingualLang === 'EN'
+                                ? 'bg-cyan-500/25 text-cyan-200 border border-cyan-400/50'
+                                : 'text-[#91A4BD] hover:text-white'
+                            }`}
+                          >
+                            EN
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {onOpenSubscriptionModal && (
+                      <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#203653]/70">
+                        <span className="font-mono text-[10.5px] text-[#91A4BD]">
+                          {bilingualLang === 'TL' ? 'Lisensya' : 'License'}
+                        </span>
+                        <LicenseStatusBadge
+                          lang={bilingualLang}
+                          onClick={() => {
+                            onClose(false);
+                            onOpenSubscriptionModal();
+                          }}
+                        />
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+
+                {/* Google Account & Firestore Cloud Sync Card */}
+                <motion.div
+                  variants={drawerItemVariants}
+                  className="mb-2 hw-lcd-well rounded-lg px-3 py-2.5 space-y-2 will-change-transform"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-2 text-[12px] font-semibold text-[#EAF3FF] min-w-0">
+                      <Cloud
+                        className={`w-4 h-4 shrink-0 ${
+                          googleUser
+                            ? syncStatus.pendingCount > 0
+                              ? 'text-[#FFB020]'
+                              : 'text-[#20D889]'
+                            : 'text-[#91A4BD]'
+                        }`}
+                        aria-hidden="true"
+                      />
+                      <span className="truncate">
+                        {googleUser
+                          ? googleUser.displayName || googleUser.email || 'Cloud Account'
+                          : 'Google Cloud Sync'}
+                      </span>
+                    </span>
+                    {googleUser && (
+                      <button
+                        type="button"
+                        onClick={() => void retryCloudSync()}
+                        className="inline-flex items-center gap-1 font-mono text-[10px] font-semibold text-[#19C8F5] hover:text-white cursor-pointer shrink-0"
+                        title="Retry or verify Firestore Cloud Sync"
+                      >
+                        <RefreshCw
+                          className={`w-3 h-3 ${
+                            syncStatus.state === 'SYNCING' ? 'animate-spin' : ''
+                          }`}
+                        />
+                        <span>
+                          {syncStatus.pendingCount > 0
+                            ? `Sync (${syncStatus.pendingCount})`
+                            : 'Synced'}
+                        </span>
+                      </button>
+                    )}
+                  </div>
+
+                  {googleUser ? (
+                    <button
+                      type="button"
+                      onClick={() => void signOutUser()}
+                      className={`w-full inline-flex items-center justify-center gap-1.5 min-h-[34px] rounded-md border border-[#FF4D62]/45 bg-[#200C13]/75 hover:bg-[#31111C] font-mono text-[11px] font-semibold text-[#FFC2CA] cursor-pointer ${FOCUS_RING}`}
+                    >
+                      <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
+                      <span>Sign Out</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={isSigningIn}
+                      onClick={() => void signInWithGoogle()}
+                      className={`w-full inline-flex items-center justify-center gap-1.5 min-h-[34px] rounded-md border border-[#19C8F5]/55 bg-[#0E192A] hover:bg-[#14253D] font-mono text-[11px] font-bold text-[#19C8F5] disabled:opacity-60 cursor-pointer ${FOCUS_RING}`}
+                    >
+                      <LogIn className="w-3.5 h-3.5" aria-hidden="true" />
+                      <span>{isSigningIn ? 'Signing in...' : 'Google Sign-In'}</span>
+                    </button>
+                  )}
                 </motion.div>
 
                 {configurationTools.length > 0 && (

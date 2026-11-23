@@ -150,9 +150,9 @@ export const CURATED_VERIFIED_BENCH_ENTRIES: CuratedOfflineKnowledgeEntry[] = [
     rootCauseEN:
       'Over-Current Protection (OCP) trips when total current draw exceeds the preset current limit due to a KL30/KL15 short-to-ground, reversed jumper wire, or shorted power driver / TVS diode.',
     verificationStepTL:
-      'I-OFF muna ang PSU Output, suriin ang Wiring Canvas at Fault Matrix para sa SHORT_TO_GND, pagkatapos sukatin sa DMM OHMS mode ang KL30 (Pin 2) papuntang KL31 (Pin 1) bago ibalik ang power.',
+      'I-OFF muna ang PSU Output, suriin ang Wiring Canvas at Fault Matrix para sa SHORT_TO_GND, pagkatapos sukatin sa DMM RESISTANCE (Ω / OHMS) mode ang KL30 (Pin 3) papuntang KL31 (Pin 1) bago ibalik ang power.',
     verificationStepEN:
-      'Switch PSU Output OFF immediately, inspect Wiring Canvas and Fault Matrix for SHORT_TO_GND faults, then verify KL30 (Pin 2) to KL31 (Pin 1) resistance in DMM OHMS mode before re-enabling power.',
+      'Switch PSU Output OFF immediately, inspect Wiring Canvas and Fault Matrix for SHORT_TO_GND faults, then verify KL30 (Pin 3) to KL31 (Pin 1) resistance in DMM RESISTANCE (Ω / OHMS) mode before re-enabling power.',
     verificationBulletsTL: [
       'Panatilihing mababa ang bench current limit (~1.0A – 2.0A) sa initial ECU power-up.',
       'Huwag kailanman pagdidikitin ang +12V rail (KL30/KL15) at 5V sensor rail (VREF_5V).',
@@ -176,9 +176,9 @@ export const CURATED_VERIFIED_BENCH_ENTRIES: CuratedOfflineKnowledgeEntry[] = [
     rootCauseEN:
       'P0117 (< 0.15V) indicates a short-to-ground on ECT_SIG (Pin 9); P0118 (> 4.85V) indicates an open thermistor circuit or disconnected harness pulling Pin 9 up to 5.00V.',
     verificationStepTL:
-      'I-probe ang Pin 9 (ECT_SIG) gamit ang DMM V_DC mode. Ang warm bench reading (85°C) ay nasa ~0.50V – 1.95V; kung 5.00V ay open wire, kung 0.00V ay short to ground.',
+      'I-probe ang Pin 9 (ECT_SIG) gamit ang DMM V_DC mode. Ang warm bench reading (85°C) ay nasa ~0.55V (saklaw na 0.50V – 1.95V mula mainit hanggang malamig); kung 5.00V ay open wire, kung 0.00V ay short to ground.',
     verificationStepEN:
-      'Probe Pin 9 (ECT_SIG) in DMM V_DC mode. Warm bench reading (~85°C) sits around ~0.50V – 1.95V; 5.00V confirms open circuit, 0.00V confirms short to ground.',
+      'Probe Pin 9 (ECT_SIG) in DMM V_DC mode. Default warm bench reading (85°C) sits at ~0.55V (0.50V – 1.95V warm-to-cool range); 5.00V confirms open circuit, 0.00V confirms short to ground.',
     verificationBulletsTL: [
       'I-check ang wire connection mula comp-ect hanggang ecu-pin-9 sa Wiring Canvas.',
       'I-verify na hindi putol ang Sensor Ground (SGND Pin 6).',

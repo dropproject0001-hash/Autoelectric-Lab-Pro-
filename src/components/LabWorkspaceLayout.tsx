@@ -188,6 +188,10 @@ export interface LabNavigationProps {
   isLookupDrawerOpen?: boolean;
   onOpenLookupDrawer?: () => void;
   onCloseLookupDrawer?: () => void;
+  academyLaunchRequest?: { moduleId: string; nonce: number } | null;
+  onActiveUniversityModuleChange?: (moduleId: string | null) => void;
+  isAiCoachOpen?: boolean;
+  onOpenAiCoach?: () => void;
 }
 export interface LabSimulationProps {
   simulationSpeed: number;
@@ -935,10 +939,25 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
         "comp-inj",
         overrideMap.get("comp-inj") ?? { isFiring: true },
       );
+      onUpdateComponentState(
+        "comp-tps",
+        overrideMap.get("comp-tps") ?? { throttleAnglePercent: 20 },
+      );
+      onUpdateComponentState(
+        "comp-map",
+        overrideMap.get("comp-map") ?? { pressureKpa: 42 },
+      );
+      onUpdateComponentState(
+        "comp-ect",
+        overrideMap.get("comp-ect") ?? { tempCelsius: 85 },
+      );
       for (const entry of scenario.componentOverrides ?? []) {
         if (
           entry.componentId !== "comp-relay" &&
-          entry.componentId !== "comp-inj"
+          entry.componentId !== "comp-inj" &&
+          entry.componentId !== "comp-tps" &&
+          entry.componentId !== "comp-map" &&
+          entry.componentId !== "comp-ect"
         ) {
           onUpdateComponentState(entry.componentId, entry.state);
         }
@@ -1015,6 +1034,26 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
     [handleApplyTroubleScenario, onNavigateTab],
   );
 
+  const lastHandledAcademyNonceRef = useRef<number>(0);
+  const { academyLaunchRequest, onActiveUniversityModuleChange } = props;
+
+  useEffect(() => {
+    if (
+      !academyLaunchRequest ||
+      academyLaunchRequest.nonce === lastHandledAcademyNonceRef.current
+    ) {
+      return;
+    }
+    const targetModule = getUniversityLabModuleById(academyLaunchRequest.moduleId);
+    if (!targetModule) return;
+    lastHandledAcademyNonceRef.current = academyLaunchRequest.nonce;
+    handleStartUniversityModule(targetModule);
+  }, [academyLaunchRequest, handleStartUniversityModule]);
+
+  useEffect(() => {
+    onActiveUniversityModuleChange?.(activeUniversityModuleId);
+  }, [activeUniversityModuleId, onActiveUniversityModuleChange]);
+
   const handleCaptureUniversityStep = useCallback(
     (step: LabGuidanceStep, evaluation: LabStepLiveEvaluation) => {
       if (!activeUniversityModuleId) return;
@@ -1079,6 +1118,9 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
     }
     onUpdateComponentState("comp-relay", { isLatched: true });
     onUpdateComponentState("comp-inj", { isFiring: true });
+    onUpdateComponentState("comp-tps", { throttleAnglePercent: 20 });
+    onUpdateComponentState("comp-map", { pressureKpa: 42 });
+    onUpdateComponentState("comp-ect", { tempCelsius: 85 });
     onChangePowerSupply((previous) => ({
       ...previous,
       isOutputEnabled: true,
@@ -2409,6 +2451,8 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
           onVerifyScenarioStep={handleVoiceVerifyScenarioStep}
           onCompleteScenarioStep={handleVoiceCompleteScenarioStep}
           onProbeScenarioFocusPin={handleVoiceProbeScenarioFocusPin}
+          isAiCoachOpen={props.isAiCoachOpen}
+          onOpenAiCoach={props.onOpenAiCoach}
         />
       </ModuleErrorBoundary>
       <VoiceCommandLogSidebar

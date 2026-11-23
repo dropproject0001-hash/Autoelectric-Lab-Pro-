@@ -2185,28 +2185,39 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
 
   app.post(
     '/api/admin/generate-license',
-    smallJsonParser,
     requireBillingMasterAdmin,
+    smallJsonParser,
     (req, res) => {
-      const allowedDurations = new Set<number>([30, 90, 180, 365, 36500]);
-      const rawDays = Number(req.body?.durationDays);
-      if (!Number.isFinite(rawDays) || !allowedDurations.has(rawDays)) {
-        return res.status(400).json({
-          error: 'durationDays must be one of 30, 90, 180, 365, or 36500 (Lifetime).',
-          code: 'INVALID_DURATION_DAYS',
+      try {
+        const allowedDurations = new Set<number>([30, 90, 180, 365, 36500]);
+        const rawDays = Number(req.body?.durationDays);
+        if (!Number.isFinite(rawDays) || !allowedDurations.has(rawDays)) {
+          return res.status(400).json({
+            error: 'durationDays must be one of 30, 90, 180, 365, or 36500 (Lifetime).',
+            code: 'INVALID_DURATION_DAYS',
+          });
+        }
+        const technicianNote =
+          typeof req.body?.technicianNote === 'string' ? req.body.technicianNote : '';
+        const record = generateSignedOfflineLicense({
+          durationDays: rawDays as SubscriptionDurationDays,
+          technicianNote,
+        });
+        return res.json({
+          status: 'SUCCESS',
+          record,
+          publicKeyJwk: getPublicVerificationKeyJwk(),
+        });
+      } catch (err: unknown) {
+        console.error(
+          '[AdminBilling] Offline license generation failed:',
+          err instanceof Error ? err.message : 'Unknown error'
+        );
+        return res.status(500).json({
+          error: 'Failed to generate offline license record.',
+          code: 'OFFLINE_LICENSE_GENERATION_FAILED',
         });
       }
-      const technicianNote =
-        typeof req.body?.technicianNote === 'string' ? req.body.technicianNote : '';
-      const record = generateSignedOfflineLicense({
-        durationDays: rawDays as SubscriptionDurationDays,
-        technicianNote,
-      });
-      return res.json({
-        status: 'SUCCESS',
-        record,
-        publicKeyJwk: getPublicVerificationKeyJwk(),
-      });
     }
   );
 

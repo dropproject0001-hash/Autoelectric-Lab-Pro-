@@ -15,12 +15,15 @@ Thumbs.db
 .env*
 !.env.example
 
-# Residual documents, backups & raw media dumps
+# Residual documents, archives, backups & raw media dumps
 *.pdf
+*.zip
 *.bak
 *.tmp
 temp/
 uploads/
+.aistudio/
+public/assets/aistudio/
 
 # Local runtime secrets & license HMAC stores (never commit)
 .data/

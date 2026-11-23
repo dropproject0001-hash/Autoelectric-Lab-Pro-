@@ -186,13 +186,13 @@ async function main() {
       assert.ok(guide.stepsTL.length >= 3 && guide.stepsEN.length >= 3);
     }
 
-    const controlBarSrc = fs.readFileSync(
-      path.join(root, 'src/components/ai/AiWorkbenchControlBar.tsx'),
+    const unifiedDrawerSrc = fs.readFileSync(
+      path.join(root, 'src/components/ai/UnifiedAiAssistantDrawer.tsx'),
       'utf8'
     );
-    assert.ok(controlBarSrc.includes('tl-PH') && controlBarSrc.includes('en-US'), 'Web Speech API locales tl-PH & en-US required');
-    assert.ok(controlBarSrc.includes('localStorage'), 'Language toggle must persist to localStorage');
-    assert.ok(controlBarSrc.includes('subscribeAiRouterStatus'), 'Control bar must subscribe to live AI Router tier updates');
+    assert.ok(unifiedDrawerSrc.includes('tl-PH') && unifiedDrawerSrc.includes('en-US'), 'Web Speech API locales tl-PH & en-US required');
+    assert.ok(unifiedDrawerSrc.includes('persistBilingualLang'), 'Language toggle must persist to localStorage');
+    assert.ok(unifiedDrawerSrc.includes('subscribeAiRouterStatus'), 'Unified drawer must subscribe to live AI Router tier updates');
   });
 
   // 4. Micro-Task 2 Proof: Tagalog + English Stopword Filter
@@ -463,12 +463,19 @@ async function main() {
   });
 
   // 9. App.tsx Integration Proof
-  await runTest('App.tsx cleanly mounts AiWorkbenchControlBar, AiDiagnosticAssistantPanel, FloatingHelpDrawer, and useBenchContext', () => {
+  await runTest('App.tsx cleanly mounts UnifiedAiAssistantDrawer, controlled FloatingHelpDrawer, NavigationDrawer auth/academy controls, and useBenchContext', () => {
     const appSrc = fs.readFileSync(path.join(root, 'src/App.tsx'), 'utf8');
-    assert.ok(appSrc.includes('AiWorkbenchControlBar'));
-    assert.ok(appSrc.includes('AiDiagnosticAssistantPanel'));
+    assert.ok(appSrc.includes('UnifiedAiAssistantDrawer'));
     assert.ok(appSrc.includes('FloatingHelpDrawer'));
+    assert.ok(appSrc.includes('hideFab={true}'));
     assert.ok(appSrc.includes('useBenchContext'));
+    assert.equal(appSrc.includes('<AiWorkbenchControlBar'), false, 'Redundant AiWorkbenchControlBar ribbon must be removed from App.tsx');
+
+    const navDrawerSrc = fs.readFileSync(path.join(root, 'src/components/NavigationDrawer.tsx'), 'utf8');
+    assert.ok(navDrawerSrc.includes('signInWithGoogle'), 'NavigationDrawer must host Google Sign-In');
+    assert.ok(navDrawerSrc.includes('LicenseStatusBadge'), 'NavigationDrawer must host LicenseStatusBadge');
+    assert.ok(navDrawerSrc.includes('onOpenAcademyCurriculum'), 'NavigationDrawer must host Academy Lab trigger');
+    assert.ok(navDrawerSrc.includes('onOpenHelpDrawer'), 'NavigationDrawer must host Gabay at Tulong trigger');
   });
 
   console.log(`\nSummary: ${passed} passed, ${failed} failed`);
