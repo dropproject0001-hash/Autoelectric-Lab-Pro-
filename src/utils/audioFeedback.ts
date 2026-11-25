@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 let audioCtx: AudioContext | null = null;
 let beepOscillator: OscillatorNode | null = null;
 let gainNode: GainNode | null = null;

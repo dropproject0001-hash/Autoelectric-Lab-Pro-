@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   X,
@@ -13,6 +18,7 @@ import {
   Wrench,
   HardDrive,
 } from 'lucide-react';
+import { toSafeExternalHttpUrl } from '../utils/safeExternalUrl';
 import {
   LOCAL_WORKSTATION_UID,
   SavedBenchSession,
@@ -760,18 +766,31 @@ export const BenchCloudModal: React.FC<BenchCloudModalProps> = ({
 
                           {log.sources && log.sources.length > 0 && (
                             <div className="flex flex-wrap gap-1.5 pt-1">
-                              {log.sources.map((src, idx) => (
-                                <a
-                                  key={idx}
-                                  href={src.uri}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="hw-btn text-[10px] px-2 py-0.5 rounded-[2px] hover:border-amber-500/60 text-amber-300 flex items-center gap-1 transition"
-                                >
-                                  <ExternalLink className="w-2.5 h-2.5" />
-                                  <span className="truncate max-w-[160px]">{src.title}</span>
-                                </a>
-                              ))}
+                              {log.sources.map((src, idx) => {
+                                const safeHref = toSafeExternalHttpUrl(src.uri);
+                                if (!safeHref) {
+                                  return (
+                                    <span
+                                      key={idx}
+                                      className="hw-btn text-[10px] px-2 py-0.5 rounded-[2px] text-slate-400 flex items-center gap-1"
+                                    >
+                                      <span className="truncate max-w-[160px]">{src.title}</span>
+                                    </span>
+                                  );
+                                }
+                                return (
+                                  <a
+                                    key={idx}
+                                    href={safeHref}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="hw-btn text-[10px] px-2 py-0.5 rounded-[2px] hover:border-amber-500/60 text-amber-300 flex items-center gap-1 transition"
+                                  >
+                                    <ExternalLink className="w-2.5 h-2.5" />
+                                    <span className="truncate max-w-[160px]">{src.title}</span>
+                                  </a>
+                                );
+                              })}
                             </div>
                           )}
                         </div>

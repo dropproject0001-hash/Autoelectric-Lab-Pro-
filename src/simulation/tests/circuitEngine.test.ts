@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 /**
  * Automated Verification Test Suite for AutoTech Virtual Lab Pro
  * Tests MNA Circuit Simulation Engine, Automotive Component Models,

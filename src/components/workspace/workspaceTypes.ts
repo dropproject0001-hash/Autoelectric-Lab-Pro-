@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import { DriveBenchSnapshot, DriveFileItem, DriveMimeFilter } from '../../services/googleDriveService';
 import { GmailMessageDetail, GmailMessageSummary } from '../../services/gmailService';
 

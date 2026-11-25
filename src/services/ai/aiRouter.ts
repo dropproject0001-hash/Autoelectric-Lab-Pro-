@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import type {
   AiDiagnosticResult,
   AiRouterStatusSnapshot,
@@ -14,6 +19,12 @@ import {
   type StructuredAiHttpError,
 } from '../geminiIntelligenceService';
 import { saveVerifiedKnowledgeEntry } from './localKnowledgeDB';
+import {
+  isLiveTelemetryQuery,
+  lookupVoiceInteractionCache,
+  resetVoiceInteractionCacheMemorySync,
+  saveVoiceInteractionCache,
+} from './voiceInteractionCache';
 import {
   buildThreeRepairStepCards,
   formatBenchSnapshotSummary,
@@ -306,6 +317,7 @@ export function resetAiRouterStateForTests(): void {
   tierCooldownUntilMs.clear();
   modelPoolRequestTimestamps.clear();
   modelPoolCooldownUntilMs.clear();
+  resetVoiceInteractionCacheMemorySync();
   emitStatus({
     activeTier: 'CARBON',
     phase: 'IDLE',
@@ -511,6 +523,7 @@ export async function queryAiDiagnosticRouter(params: {
   telemetry?: BenchTelemetry;
   timeoutMs?: number;
   forceOffline?: boolean;
+  bypassInteractionCache?: boolean;
 }): Promise<AiDiagnosticResult> {
   const {
     query,
@@ -518,12 +531,61 @@ export async function queryAiDiagnosticRouter(params: {
     telemetry,
     timeoutMs = DEFAULT_TIER_TIMEOUT_MS,
     forceOffline = false,
+    bypassInteractionCache = false,
   } = params;
 
   const trimmedQuery = query.trim();
   const benchContextText = formatBenchSnapshotSummary(telemetry, lang);
   const extractedTokens = stripBilingualStopwords(trimmedQuery);
   const attemptTrail: AiTierAttemptLog[] = [];
+
+  const liveTelemetryQuery = isLiveTelemetryQuery(trimmedQuery);
+
+  // Check IndexedDB Voice/Diagnostic Interaction Cache BEFORE invoking online APIs
+  // (strictly bypasses live bench telemetry questions so real-time voltages are never stale)
+  if (
+    !bypassInteractionCache &&
+    !forceOffline &&
+    extractedTokens.length > 0 &&
+    !liveTelemetryQuery
+  ) {
+    const cachedHit = await lookupVoiceInteractionCache({
+      query: trimmedQuery,
+      lang,
+      channel: 'DIAGNOSTIC_ROUTER',
+    });
+
+    if (cachedHit?.diagnosticResult) {
+      const hitNow = Date.now();
+      const cacheTrail: AiTierAttemptLog[] = [
+        {
+          tier: cachedHit.diagnosticResult.tierUsed,
+          outcome: 'VOICE_CACHE_HIT',
+          reason: 'Served immediately from AutoLabPro_VoiceInteractionCache (0 online API calls)',
+        },
+      ];
+
+      emitStatus({
+        activeTier: cachedHit.diagnosticResult.tierUsed,
+        phase: 'ACTIVE',
+        lastUpdatedAt: hitNow,
+        isOfflineFallback: false,
+        attemptTrail: cacheTrail,
+      });
+
+      return {
+        ...cachedHit.diagnosticResult,
+        id: `cache-hit-${hitNow}`,
+        sourceProvenance: 'LOCAL_VERIFIED_CACHE',
+        cachedLocally: true,
+        servedFromInteractionCache: true,
+        cacheHitCount: cachedHit.hitCount,
+        attemptTrail: cacheTrail,
+        benchSnapshotSummary: benchContextText,
+        createdAt: hitNow,
+      };
+    }
+  }
 
   const onlineTiers = AI_TIER_CASCADE.filter((t) => t.isOnline);
   const shouldAttemptOnline = !forceOffline && isBrowserOnline() && extractedTokens.length > 0;
@@ -673,7 +735,7 @@ export async function queryAiDiagnosticRouter(params: {
             ? `Boss, batay sa verified online analysis (${effectiveTier.label}${rerouteNoteTL}): ${parsed.rootCause}`
             : `Based on verified online analysis (${effectiveTier.label}${rerouteNoteEN}): ${parsed.rootCause}`;
 
-        return {
+        const resultPayload: AiDiagnosticResult = {
           id: `online-${effectiveTier.id.toLowerCase()}-${successNow}`,
           lang,
           tierUsed: effectiveTier.id,
@@ -697,6 +759,26 @@ export async function queryAiDiagnosticRouter(params: {
           benchSnapshotSummary: benchContextText,
           createdAt: successNow,
         };
+
+        if (!liveTelemetryQuery) {
+          await saveVoiceInteractionCache({
+            channel: 'DIAGNOSTIC_ROUTER',
+            lang,
+            query: trimmedQuery,
+            intent: 'DIAGNOSTIC_QUERY',
+            spokenText: conversationalSummary,
+            displayText: conversationalSummary,
+            whyTip: parsed.safetyWarning,
+            matchedSource: `${effectiveTier.label} Verified Diagnostic`,
+            detailsBullets: [parsed.rootCause, parsed.verificationAction].filter(Boolean),
+            diagnosticResult: resultPayload,
+            sourceOrigin: 'VERIFIED_ONLINE_AI',
+            confidence: resultPayload.confidence,
+            nowMs: successNow,
+          });
+        }
+
+        return resultPayload;
       } catch (error) {
         const failNow = Date.now();
         const classified = classifyTransportError(error);

@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -27,6 +32,12 @@ import {
 } from '../../server/services/quotaManager';
 import { ThinkingLevel } from '@google/genai';
 import { validateImagePayload } from '../../server/services/imagePayloadValidator';
+import { isAllowedLiveVoiceOrigin } from '../../server/services/geminiLiveVoiceServer';
+import { toSafeExternalHttpUrl } from '../../utils/safeExternalUrl';
+import {
+  getSavedOfflineLeaseToken,
+  saveOfflineLeaseToken,
+} from '../../services/licenseClientService';
 import {
   cacheLocalDocument,
   enqueueOfflineMutation,
@@ -74,16 +85,22 @@ import {
 import {
   BENCH_PREFERENCES_DOC_ID,
   buildBenchSessionUpdatePayload,
+  buildConflictCopyFaultSequence,
   buildConflictCopySessionPayload,
+  cancelScheduledBenchSyncRetries,
+  countLocalWorkstationFaultSequences,
   deleteFaultSequence,
   extractRemoteUpdatedAtMs,
   flushQueuedBenchSync,
   formatConflictCopyTitle,
+  formatFaultSequenceConflictCopyTitle,
   hasRemoteSessionConflict,
   LOCAL_WORKSTATION_UID,
   migrateLegacyLocalFaultSequencesToStore,
+  promoteLocalWorkstationFaultSequencesToUser,
   saveFaultSequence,
   SCHEMA_VERSION_SUBCOLLECTIONS,
+  setBenchSyncExecutorForTests,
   subscribeBenchSessions,
   subscribeDiagnosticLogs,
   subscribeFaultSequences,
@@ -94,6 +111,18 @@ import {
   syncUserProfile,
   toSafeFirestoreDocId,
 } from '../../services/benchStorageService';
+import { describeFooterSyncIndicator } from '../../components/LabStatusFooter';
+import {
+  buildFirebaseAuthorizedDomainsConsoleUrl,
+  formatFirebaseAuthError,
+  formatFirebaseAuthErrorDetails,
+} from '../../context/AuthContext';
+import {
+  createQuotaManagerFromEnv,
+  getSanitizedQuotaStatus,
+  isServerQuotaRuntime,
+  loadApiKeysFromEnv,
+} from '../../services/ai/QuotaManager';
 import {
   BUILT_IN_FAULT_SEQUENCES,
   CUSTOM_FAULT_SEQUENCES_STORAGE_KEY,
@@ -107,6 +136,7 @@ import {
 } from '../../utils/cloudSyncErrorUtils';
 import {
   resolveFirebaseClientConfig,
+  resolvedFirebaseConfig,
   sanitizeFirestoreDatabaseId,
 } from '../../lib/firebase';
 import React from 'react';
@@ -1933,11 +1963,26 @@ async function main() {
       };
       assert.equal(firebaserc.projects?.default, appletConfig.projectId);
       assert.equal(firebaseJson.firestore?.database, appletConfig.firestoreDatabaseId);
+      assert.equal(
+        resolvedFirebaseConfig.projectId,
+        appletConfig.projectId,
+        'Client resolvedFirebaseConfig.projectId must load directly from firebase-applet-config.json'
+      );
+      assert.equal(
+        resolvedFirebaseConfig.firestoreDatabaseId,
+        appletConfig.firestoreDatabaseId,
+        'Client resolvedFirebaseConfig.firestoreDatabaseId must load directly from firebase-applet-config.json, never stale VITE_FIREBASE_DATABASE_ID'
+      );
     }
 
     const firebaseSrc = fs.readFileSync(path.resolve('src/lib/firebase.ts'), 'utf8');
     assert.equal(firebaseSrc.includes('getDocFromServer'), true);
     assert.equal(firebaseSrc.includes('resolvedFirebaseConfig.firestoreDatabaseId'), true);
+    assert.equal(
+      firebaseSrc.includes("typeof meta.glob === 'function'"),
+      false,
+      'firebase.ts must not hide firebase-applet-config.json behind dead typeof import.meta.glob === function guard'
+    );
 
     // Provisioned firebase-applet-config.json must override stale/corrupt VITE_FIREBASE_* env vars
     assert.equal(sanitizeFirestoreDatabaseId('/users/GpbGdGCaYgY0dsKSCWvretSIgSN2'), '(default)');
@@ -2656,6 +2701,507 @@ async function main() {
 
     resetFaultSequenceStoreForTests();
     await resetOfflineQueueForTests();
+  });
+
+  await runTest('Fault Builder [Conflict Copy] OCC respects 100-char firestore.rules title cap, promotes local_workstation drills idempotently, and cleans up _deleted tombstones on flush', async () => {
+    await resetOfflineQueueForTests();
+    resetFaultSequenceStoreForTests();
+
+    const samplePreset = BUILT_IN_FAULT_SEQUENCES[2] ?? BUILT_IN_FAULT_SEQUENCES[0];
+
+    // 1. Conflict Copy title formatting clamps strictly to <= 100 chars and does not double suffix
+    const longTitle = 'Extremely Long Multi-Stage Bosch EDC17 Intermittent Sensor + Corrosion Buildup Sequence Name Over 100 Chars';
+    const conflictTitle = formatFaultSequenceConflictCopyTitle(longTitle);
+    assert.ok(conflictTitle.length <= 100, `Conflict title exceeded 100 chars (${conflictTitle.length})`);
+    assert.equal(conflictTitle.endsWith(' [Conflict Copy]'), true);
+    assert.equal(formatFaultSequenceConflictCopyTitle(conflictTitle), conflictTitle);
+
+    const conflictSeq = buildConflictCopyFaultSequence('uid_tech_occ', 'fseq_conflict_1', {
+      ...samplePreset,
+      id: 'fseq_orig_1',
+      title: longTitle,
+      isBuiltInPreset: false,
+    });
+    assert.equal(conflictSeq.id, 'fseq_conflict_1');
+    assert.equal(conflictSeq.ownerId, 'uid_tech_occ');
+    assert.equal(conflictSeq.schemaVersion, SCHEMA_VERSION_SUBCOLLECTIONS);
+    assert.ok(conflictSeq.title.length <= 100);
+    assert.equal(hasRemoteSessionConflict(1_000_000, 1_005_000), true);
+    assert.equal(hasRemoteSessionConflict(1_005_000, 1_005_000), false);
+
+    // 2. Non-destructive concurrent/idempotent promotion from local_workstation -> authenticated UID
+    const localSaved = await saveFaultSequence(LOCAL_WORKSTATION_UID, {
+      ...samplePreset,
+      id: 'local_drill_promote',
+      title: 'Offline Bench Injector Drill',
+      isBuiltInPreset: false,
+    });
+    assert.equal(await countLocalWorkstationFaultSequences(), 1);
+
+    const authUid = 'uid_promoted_user';
+    const [p1, p2] = await Promise.all([
+      promoteLocalWorkstationFaultSequencesToUser(authUid),
+      promoteLocalWorkstationFaultSequencesToUser(authUid),
+    ]);
+    assert.equal(p1 + p2, 1, 'Concurrent login promotions must promote exactly once');
+    assert.equal(await promoteLocalWorkstationFaultSequencesToUser(authUid), 0, 'Repeat promotion must be idempotent');
+
+    const localRemaining = await getLocalCachedDocuments<Record<string, unknown>>(
+      LOCAL_WORKSTATION_UID,
+      'faultSequences'
+    );
+    const userPromotedDocs = await getLocalCachedDocuments<Record<string, unknown>>(
+      authUid,
+      'faultSequences'
+    );
+    assert.equal(localRemaining.some((d) => d.docId === localSaved.id), true, 'Local workstation drill must be preserved');
+    assert.equal(userPromotedDocs.some((d) => d.docId === localSaved.id), true, 'User library must receive promoted drill');
+
+    // 3. markMutationSynced with _deleted tombstone deletes STORE_CACHE record rather than leaving stale tombstones
+    await deleteFaultSequence(authUid, localSaved.id);
+    const stampedDelete = reserveMutationStamp(authUid, 'faultSequences', localSaved.id);
+    await enqueueOfflineMutation({
+      uid: authUid,
+      collection: 'faultSequences',
+      docId: localSaved.id,
+      payload: { _deleted: true, id: localSaved.id },
+      version: stampedDelete.version,
+      updatedAtMs: stampedDelete.updatedAtMs,
+    });
+    await flushOfflineMutations(authUid, async () => undefined);
+    const userDocsAfterFlush = await getLocalCachedDocuments<Record<string, unknown>>(
+      authUid,
+      'faultSequences'
+    );
+    assert.equal(userDocsAfterFlush.some((d) => d.docId === localSaved.id), false);
+
+    resetFaultSequenceStoreForTests();
+    await resetOfflineQueueForTests();
+  });
+
+  await runTest('Google Auth diagnostics include preview hostname and NavigationDrawer surfaces authError alongside verified rules parity', async () => {
+    const unauthorizedMsg = formatFirebaseAuthError(
+      { code: 'auth/unauthorized-domain' },
+      'ais-pre-example.asia-southeast1.run.app'
+    );
+    assert.ok(unauthorizedMsg.includes('ais-pre-example.asia-southeast1.run.app'));
+    assert.ok(formatFirebaseAuthError({ code: 'auth/operation-not-allowed' }).includes('Google Sign-In provider'));
+    assert.ok(formatFirebaseAuthError({ code: 'auth/cancelled-popup-request' }).includes('superseded'));
+    assert.ok(formatFirebaseAuthError({ code: 'auth/popup-blocked' }).includes('popups'));
+
+    const navDrawerSource = fs.readFileSync(
+      path.join(process.cwd(), 'src/components/NavigationDrawer.tsx'),
+      'utf8'
+    );
+    assert.ok(navDrawerSource.includes('authError'), 'NavigationDrawer must read authError from useAuth');
+    assert.ok(navDrawerSource.includes('role="alert"'), 'NavigationDrawer must render visible role="alert" for auth/sync errors');
+
+    const rulesSource = fs.readFileSync(path.join(process.cwd(), 'firestore.rules'), 'utf8');
+    const blueprintRaw = JSON.parse(
+      fs.readFileSync(path.join(process.cwd(), 'firebase-blueprint.json'), 'utf8')
+    ) as { firestore: Record<string, unknown> };
+    assert.ok(rulesSource.includes('match /faultSequences/{sequenceId}'));
+    assert.ok(rulesSource.includes('data.title.size() <= 100'));
+    assert.ok('/users/{userId}/faultSequences/{sequenceId}' in blueprintRaw.firestore);
+    assert.ok('/users/{userId}/faultSequences/{sequenceId}/stages/{stageId}' in blueprintRaw.firestore);
+    assert.ok('/users/{userId}/faultSequences/{sequenceId}/items/{itemId}' in blueprintRaw.firestore);
+  });
+
+  await runTest('src/services/ai/QuotaManager.ts loads .env.example multi-key rotation, skips placeholders, switches before limits, and never leaks raw secrets', () => {
+    assert.equal(isServerQuotaRuntime(), true);
+
+    const envKeys = loadApiKeysFromEnv(
+      {
+        GEMINI_API_KEY: 'MY_GEMINI_API_KEY',
+        GEMINI_API_KEY_2: 'test-key-alpha-1111',
+        GEMINI_API_KEY_3: 'test-key-beta-2222',
+        GEMINI_API_KEYS: 'YOUR_API_KEY, test-key-gamma-3333 , test-key-alpha-1111',
+        GEMINI_KEY_RPM_LIMIT: '5',
+        OPENAI_API_KEY: 'sk-test-vision-9999',
+        OPENAI_MODEL: 'gpt-4o-mini',
+      },
+      { includeOpenAiVisionKey: true }
+    );
+
+    // MY_GEMINI_API_KEY and YOUR_API_KEY must be ignored, duplicate test-key-alpha-1111 deduplicated
+    assert.equal(envKeys.length, 4);
+    assert.deepEqual(
+      envKeys.map((k) => k.apiKey),
+      ['test-key-alpha-1111', 'test-key-beta-2222', 'test-key-gamma-3333', 'sk-test-vision-9999']
+    );
+    assert.equal(envKeys[3].provider, 'openai');
+
+    const qm = createQuotaManagerFromEnv({
+      GEMINI_API_KEY: 'rot-key-one-aaaa',
+      GEMINI_API_KEY_2: 'rot-key-two-bbbb',
+      GEMINI_API_KEY_3: 'rot-key-three-cccc',
+      GEMINI_KEY_RPM_LIMIT: '5',
+      GEMINI_QUOTA_SWITCH_RATIO: '0.8',
+    });
+
+    const t0 = 1_760_000_000_000;
+    const plan1 = qm.acquirePlan('gemini-4-hydrogen', ['gemini-3.1-flash-lite'], t0);
+    assert.ok(plan1.selected);
+    const firstKeyId = plan1.selected.keyId;
+
+    // Record 4 requests (80% of RPM limit 5) to trigger proactive rotation to the next key
+    for (let i = 0; i < 4; i += 1) {
+      qm.recordAttemptStart({
+        keyId: firstKeyId,
+        endpointId: 'gemini-4-hydrogen',
+        nowMs: t0 + i * 100,
+      });
+    }
+    const plan2 = qm.acquirePlan('gemini-4-hydrogen', ['gemini-3.1-flash-lite'], t0 + 500);
+    assert.ok(plan2.selected);
+    assert.notEqual(
+      plan2.selected.keyId,
+      firstKeyId,
+      'QuotaManager must proactively rotate to next available key when approaching 80% threshold'
+    );
+
+    // 401 failure on the rotated key isolates only that key and routes to the 3rd key
+    const secondKeyId = plan2.selected.keyId;
+    qm.recordFailure(
+      { keyId: secondKeyId, endpointId: 'gemini-4-hydrogen' },
+      { category: 'UNAUTHENTICATED', statusCode: 401 },
+      t0 + 600
+    );
+    const plan3 = qm.acquirePlan('gemini-4-hydrogen', ['gemini-3.1-flash-lite'], t0 + 700);
+    assert.ok(plan3.selected);
+    assert.notEqual(plan3.selected.keyId, secondKeyId);
+
+    // Snapshots must never contain raw API key strings
+    const snapJson = JSON.stringify(
+      qm.getSnapshot(['gemini-4-hydrogen', 'gemini-3.1-flash-lite'], t0 + 800)
+    );
+    assert.equal(snapJson.includes('rot-key-one-aaaa'), false);
+    assert.equal(snapJson.includes('rot-key-two-bbbb'), false);
+    assert.equal(snapJson.includes('rot-key-three-cccc'), false);
+
+    const sharedStatus = getSanitizedQuotaStatus(t0 + 800);
+    assert.equal(typeof sharedStatus.switchThresholdRatio, 'number');
+  });
+
+  await runTest('Firebase auth/unauthorized-domain recovery emits exact hostname + validated Console URL and wires PIN autofill + Copy Domain UI', () => {
+    assert.equal(
+      buildFirebaseAuthorizedDomainsConsoleUrl('gen-lang-client-0979131562'),
+      'https://console.firebase.google.com/project/gen-lang-client-0979131562/authentication/settings'
+    );
+    assert.equal(
+      buildFirebaseAuthorizedDomainsConsoleUrl('bad/project?evil=1'),
+      null,
+      'Invalid Firebase project IDs must be rejected before constructing external Console URLs'
+    );
+
+    const details = formatFirebaseAuthErrorDetails(
+      { code: 'auth/unauthorized-domain' },
+      'ais-dev-35pdrdt3cnp7dfv62o3vcs-490665088557.asia-southeast1.run.app',
+      'gen-lang-client-0979131562'
+    );
+    assert.equal(details.code, 'auth/unauthorized-domain');
+    assert.equal(
+      details.hostname,
+      'ais-dev-35pdrdt3cnp7dfv62o3vcs-490665088557.asia-southeast1.run.app'
+    );
+    assert.equal(
+      details.consoleAuthorizedDomainsUrl,
+      'https://console.firebase.google.com/project/gen-lang-client-0979131562/authentication/settings'
+    );
+    assert.ok(details.message.includes('ais-dev-35pdrdt3cnp7dfv62o3vcs-490665088557.asia-southeast1.run.app'));
+
+    const landingSrc = fs.readFileSync(
+      path.join(process.cwd(), 'src/components/IntroductionPinLandingPage.tsx'),
+      'utf8'
+    );
+    assert.ok(landingSrc.includes('data-testid="unauthorized-domain-recovery"'));
+    assert.ok(landingSrc.includes('data-testid="copy-unauthorized-domain-btn"'));
+    assert.ok(landingSrc.includes('rel="noopener noreferrer"'));
+    assert.ok(landingSrc.includes('autoComplete="one-time-code"'));
+
+    const navDrawerSrc = fs.readFileSync(
+      path.join(process.cwd(), 'src/components/NavigationDrawer.tsx'),
+      'utf8'
+    );
+    assert.ok(navDrawerSrc.includes('authErrorDetails'));
+    assert.ok(navDrawerSrc.includes('Copy Domain'));
+    assert.ok(navDrawerSrc.includes('rel="noopener noreferrer"'));
+  });
+
+  await runTest('All primary TypeScript source files under src/ include the compact SPDX MIT license header', () => {
+    const missing: string[] = [];
+    const walk = (dir: string) => {
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          walk(full);
+        } else if (entry.isFile() && /\.(ts|tsx)$/.test(entry.name)) {
+          const head = fs.readFileSync(full, 'utf8').split(/\r?\n/).slice(0, 12).join('\n');
+          if (
+            !head.includes('SPDX-License-Identifier: MIT') ||
+            !head.includes('2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations')
+          ) {
+            missing.push(path.relative(process.cwd(), full));
+          }
+        }
+      }
+    };
+    walk(path.join(process.cwd(), 'src'));
+    assert.deepEqual(
+      missing,
+      [],
+      `Expected SPDX MIT header in all src/**/*.ts(x) files, missing in: ${missing.join(', ')}`
+    );
+  });
+
+  await runTest('Full audit safeguards: strict external http(s) URLs, Live Voice WS Origin check, in-memory lease tokens, rate limits, and sanitized upstream errors', () => {
+    // 1. Strict external http(s) URL sanitizer blocks javascript:/data:/vbscript:/malformed links
+    assert.equal(
+      toSafeExternalHttpUrl('https://docs.example.com/manual?page=12#pinout'),
+      'https://docs.example.com/manual?page=12#pinout'
+    );
+    assert.equal(
+      toSafeExternalHttpUrl('http://localhost:3000/bench'),
+      'http://localhost:3000/bench'
+    );
+    assert.equal(toSafeExternalHttpUrl('javascript:alert(document.cookie)'), null);
+    assert.equal(toSafeExternalHttpUrl('JAVASCRIPT:void(0)'), null);
+    assert.equal(toSafeExternalHttpUrl('data:text/html,<script>alert(1)</script>'), null);
+    assert.equal(toSafeExternalHttpUrl('vbscript:msgbox(1)'), null);
+    assert.equal(toSafeExternalHttpUrl('http:javascript:alert(1)'), null);
+    assert.equal(toSafeExternalHttpUrl('https://example.com/\x00evil'), null);
+    assert.equal(toSafeExternalHttpUrl(`https://example.com/${'a'.repeat(5000)}`), null);
+    assert.equal(toSafeExternalHttpUrl(''), null);
+    assert.equal(toSafeExternalHttpUrl(undefined), null);
+
+    // 2. Live Voice WebSocket Origin validator allows same-host & proxy-forwarded origins and rejects cross-site origins
+    assert.equal(
+      isAllowedLiveVoiceOrigin(
+        'https://ais-dev-35pdrdt3cnp7dfv62o3vcs-490665088557.asia-southeast1.run.app',
+        '127.0.0.1:3000',
+        'ais-dev-35pdrdt3cnp7dfv62o3vcs-490665088557.asia-southeast1.run.app'
+      ),
+      true
+    );
+    assert.equal(
+      isAllowedLiveVoiceOrigin('http://localhost:3000', '127.0.0.1:3000'),
+      true
+    );
+    assert.equal(
+      isAllowedLiveVoiceOrigin(undefined, '127.0.0.1:3000'),
+      true
+    );
+    assert.equal(
+      isAllowedLiveVoiceOrigin(
+        'https://attacker.example',
+        '127.0.0.1:3000',
+        'ais-dev-35pdrdt3cnp7dfv62o3vcs-490665088557.asia-southeast1.run.app'
+      ),
+      false
+    );
+    assert.equal(isAllowedLiveVoiceOrigin('null', 'localhost:3000'), false);
+    assert.equal(isAllowedLiveVoiceOrigin('file:///tmp/evil.html', 'localhost:3000'), false);
+
+    // 3. Offline lease token stays in memory and never writes to localStorage
+    let localStorageSetCalled = false;
+    let localStorageRemovedKey: string | null = null;
+    const prevWindow = (globalThis as Record<string, unknown>).window;
+    (globalThis as Record<string, unknown>).window = {
+      localStorage: {
+        setItem: () => {
+          localStorageSetCalled = true;
+        },
+        removeItem: (k: string) => {
+          localStorageRemovedKey = k;
+        },
+        getItem: () => null,
+      },
+    };
+    try {
+      saveOfflineLeaseToken('lease_payload.lease_sig');
+      assert.equal(getSavedOfflineLeaseToken(), 'lease_payload.lease_sig');
+      assert.equal(localStorageSetCalled, false, 'Offline lease token must never be written to localStorage');
+      assert.equal(localStorageRemovedKey, 'vecl_offline_lease_token_v1');
+      saveOfflineLeaseToken(null);
+      assert.equal(getSavedOfflineLeaseToken(), null);
+    } finally {
+      if (prevWindow === undefined) {
+        delete (globalThis as Record<string, unknown>).window;
+      } else {
+        (globalThis as Record<string, unknown>).window = prevWindow;
+      }
+    }
+
+    // 4. Server route rate-limiting & sanitized error wiring checks
+    const apiAppSrc = fs.readFileSync(path.join(process.cwd(), 'src/server/createApiApp.ts'), 'utf8');
+    assert.ok(apiAppSrc.includes('TRIAL_STATUS_RATE_LIMITED'));
+    assert.ok(apiAppSrc.includes('admin-setup:'));
+    assert.ok(apiAppSrc.includes('safePath'));
+
+    const openAiSrc = fs.readFileSync(
+      path.join(process.cwd(), 'src/server/services/openAIImageAnalysisProvider.ts'),
+      'utf8'
+    );
+    assert.ok(openAiSrc.includes('OpenAI vision upstream returned HTTP ${res.status}.'));
+    assert.equal(openAiSrc.includes('${res.status}): ${errText'), false);
+  });
+
+  await runTest('Fault Builder IndexedDB optimistic sync re-queues background Firestore failures, auto-retries with backoff, flushes concurrent edits, and drives non-intrusive LabStatusFooter indicator', async () => {
+    await resetOfflineQueueForTests();
+    resetFaultSequenceStoreForTests();
+    cancelScheduledBenchSyncRetries();
+
+    const samplePreset = BUILT_IN_FAULT_SEQUENCES[0];
+    const uid = 'uid_fault_retry_audit';
+
+    try {
+      // 1. Simulate transient background Firestore failure on 1st attempt -> re-queued in IndexedDB -> auto-retried & recovered on 2nd attempt
+      let attemptCount = 0;
+      const syncedTitles: string[] = [];
+      setBenchSyncExecutorForTests(async (record) => {
+        attemptCount += 1;
+        if (attemptCount === 1) {
+          throw new Error('FirebaseError: [code=unavailable]: Service unavailable');
+        }
+        syncedTitles.push(String((record.payload as { title?: string }).title || ''));
+      }, 35);
+
+      const saved = await saveFaultSequence(uid, {
+        ...samplePreset,
+        id: 'fseq_retry_test_01',
+        title: 'CAN Bus Intermittent Drop',
+        isBuiltInPreset: false,
+      });
+
+      // Optimistic local save completes immediately as QUEUED_OFFLINE
+      assert.equal(saved.queuedOffline, true);
+      assert.equal(saved.sequence.syncState, 'QUEUED_OFFLINE');
+
+      // Wait briefly for first background flush failure to settle (before 35ms auto-retry)
+      await new Promise((r) => setTimeout(r, 15));
+      assert.equal(attemptCount, 1);
+
+      const pendingAfterFirstFail = await getPendingMutations(uid);
+      assert.equal(pendingAfterFirstFail.length, 1);
+      assert.equal(pendingAfterFirstFail[0].attempts, 1);
+      assert.ok(pendingAfterFirstFail[0].nextRetryAtMs > Date.now() - 100);
+
+      const snapAfterTransientFail = getSyncStatusSnapshot();
+      assert.equal(snapAfterTransientFail.state, 'OFFLINE_QUEUED');
+      assert.equal(snapAfterTransientFail.pendingCount, 1);
+      assert.equal(snapAfterTransientFail.failedCount, 1);
+      assert.equal(snapAfterTransientFail.pendingCollections.includes('faultSequences'), true);
+
+      const requeuedFooter = describeFooterSyncIndicator(snapAfterTransientFail);
+      assert.equal(requeuedFooter.visible, true);
+      assert.equal(requeuedFooter.tone, 'REQUEUED');
+      assert.equal(requeuedFooter.label, 'Re-queued (1)');
+      assert.ok(requeuedFooter.tooltip.includes('Fault Builder'));
+      assert.ok(requeuedFooter.tooltip.includes('IndexedDB'));
+
+      // Wait for automatic backoff retry timer to fire and recover cleanly
+      await new Promise((r) => setTimeout(r, 90));
+      assert.equal(attemptCount, 2, 'Auto-retry timer must automatically retry failed Fault Builder sync');
+      assert.deepEqual(syncedTitles, ['CAN Bus Intermittent Drop']);
+
+      const snapAfterAutoRecovery = getSyncStatusSnapshot();
+      assert.equal(snapAfterAutoRecovery.state, 'IDLE');
+      assert.equal(snapAfterAutoRecovery.pendingCount, 0);
+      assert.equal(snapAfterAutoRecovery.failedCount, 0);
+      assert.equal(describeFooterSyncIndicator(snapAfterAutoRecovery).visible, false);
+
+      // 2. Concurrent rapid second optimistic edit during an in-flight flush must trigger automatic follow-up flush (never stranded)
+      const uploadedOrder: string[] = [];
+      const firstFlightGate: { release: (() => void) | null } = { release: null };
+      setBenchSyncExecutorForTests(async (record) => {
+        const title = String((record.payload as { title?: string }).title || '');
+        if (title === 'Rapid Edit V1') {
+          await new Promise<void>((resolve) => {
+            firstFlightGate.release = resolve;
+          });
+        }
+        uploadedOrder.push(title);
+      }, 5000);
+
+      await saveFaultSequence(uid, {
+        ...samplePreset,
+        id: 'fseq_rapid_edit',
+        title: 'Rapid Edit V1',
+        isBuiltInPreset: false,
+      });
+      await new Promise((r) => setTimeout(r, 10));
+      // Enqueue V2 while V1 is still in-flight
+      await saveFaultSequence(uid, {
+        ...samplePreset,
+        id: 'fseq_rapid_edit',
+        title: 'Rapid Edit V2',
+        isBuiltInPreset: false,
+      });
+      // Release V1; follow-up flush must automatically pick up V2
+      firstFlightGate.release?.();
+      await new Promise((r) => setTimeout(r, 40));
+
+      assert.deepEqual(uploadedOrder, ['Rapid Edit V1', 'Rapid Edit V2']);
+      assert.equal((await getPendingMutations(uid)).length, 0);
+
+      // 3. Non-transient Firestore failure preserves lastError even when a sibling item succeeds in the same batch,
+      //    and LabStatusFooter renders sanitized non-intrusive Sync Retry indicator (no raw JSON dump)
+      setBenchSyncExecutorForTests(async (record) => {
+        if (record.docId === 'fseq_perm_fail') {
+          throw new Error(
+            JSON.stringify({
+              error: 'Missing or insufficient permissions.',
+              operationType: 'write',
+              path: `users/${uid}/faultSequences/fseq_perm_fail`,
+              authInfo: { userId: uid },
+            })
+          );
+        }
+      }, 60_000);
+
+      await enqueueOfflineMutation({
+        uid,
+        collection: 'faultSequences',
+        docId: 'fseq_perm_fail',
+        payload: { ...samplePreset, id: 'fseq_perm_fail', title: 'Perm Fail Drill' },
+      });
+      await enqueueOfflineMutation({
+        uid,
+        collection: 'faultSequences',
+        docId: 'fseq_sibling_ok',
+        payload: { ...samplePreset, id: 'fseq_sibling_ok', title: 'Sibling Success Drill' },
+      });
+
+      const mixedBatch = await flushQueuedBenchSync(uid, true);
+      assert.equal(mixedBatch.failed, 1);
+      assert.equal(mixedBatch.synced, 1);
+      assert.equal(mixedBatch.remaining, 1);
+
+      const errorSnap = getSyncStatusSnapshot();
+      assert.equal(errorSnap.state, 'ERROR');
+      assert.equal(errorSnap.pendingCount, 1);
+      assert.equal(errorSnap.failedCount, 1);
+      assert.ok(errorSnap.lastError?.includes('Missing or insufficient permissions.'));
+
+      const errorFooter = describeFooterSyncIndicator(errorSnap);
+      assert.equal(errorFooter.visible, true);
+      assert.equal(errorFooter.tone, 'ERROR');
+      assert.equal(errorFooter.label, 'Sync Retry (1)');
+      assert.equal(errorFooter.tooltip.includes('{"error"'), false, 'Footer tooltip must never expose raw JSON');
+      assert.ok(errorFooter.tooltip.includes('Missing or insufficient permissions.'));
+
+      // Verify LabStatusFooter markup includes accessible non-intrusive status semantics
+      const footerSrc = fs.readFileSync(path.join(process.cwd(), 'src/components/LabStatusFooter.tsx'), 'utf8');
+      assert.ok(footerSrc.includes('data-testid="footer-sync-status-btn"'));
+      assert.ok(footerSrc.includes('role="status"'));
+      assert.ok(footerSrc.includes('aria-live="polite"'));
+      assert.ok(footerSrc.includes('describeFooterSyncIndicator'));
+    } finally {
+      setBenchSyncExecutorForTests(null);
+      cancelScheduledBenchSyncRetries();
+      resetFaultSequenceStoreForTests();
+      await resetOfflineQueueForTests();
+    }
   });
 
   console.log(`\nSecurity & Offline Test Summary: ${passed} passed, ${failed} failed.`);

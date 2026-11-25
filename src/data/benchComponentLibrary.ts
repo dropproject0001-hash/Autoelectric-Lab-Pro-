@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import { BenchComponent, BenchComponentType } from '../types/ecu';
 
 export type LibraryComponentCategory = 'ALL' | 'LEDS' | 'RESISTORS' | 'DIODES' | 'SWITCHES' | 'PASSIVES';

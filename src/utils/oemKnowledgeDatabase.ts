@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 /**
  * Canonical OEM Vehicle, ECU Verification Gating, Boot-Mode, & Table 16 DLC Database.
  *

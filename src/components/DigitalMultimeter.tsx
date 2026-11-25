@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import React, { useEffect, useRef, useState } from 'react';
 import { MultimeterState, MultimeterMode, EcuPin, BenchComponent } from '../types/ecu';
 import { Volume2, VolumeX, AlertTriangle, ArrowLeftRight, X, Disc, PauseCircle } from 'lucide-react';

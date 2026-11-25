@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import type { InjectedFault } from '../../types/ecu';
 import {
   BAROMETRIC_PRESSURE_KPA,

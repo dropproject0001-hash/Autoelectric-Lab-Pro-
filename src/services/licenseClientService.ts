@@ -1,5 +1,7 @@
-
-
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
 
 export type LicenseDurationPlan =
   | 'TRIAL_1D'
@@ -50,7 +52,21 @@ export interface UserLicenseStatusResponse {
 }
 
 const DEVICE_ID_STORAGE_KEY = 'vecl_workstation_device_id_v1';
-const LEASE_TOKEN_STORAGE_KEY = 'vecl_offline_lease_token_v1';
+const LEGACY_LEASE_TOKEN_STORAGE_KEY = 'vecl_offline_lease_token_v1';
+
+// Keep signed license lease tokens strictly in JS memory (never localStorage/sessionStorage)
+let inMemoryOfflineLeaseToken: string | null = null;
+
+function generateCryptographicDeviceSuffix(): string {
+  if (typeof globalThis !== 'undefined' && globalThis.crypto?.getRandomValues) {
+    const bytes = new Uint8Array(16);
+    globalThis.crypto.getRandomValues(bytes);
+    return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+  }
+  return Array.from({ length: 16 }, () =>
+    Math.floor(Math.random() * 36).toString(36)
+  ).join('');
+}
 
 export function getOrCreateWorkstationDeviceId(): string {
   if (typeof window === 'undefined') return 'srv_workstation_node';
@@ -59,10 +75,7 @@ export function getOrCreateWorkstationDeviceId(): string {
     if (existing && existing.trim().length >= 8) {
       return existing.trim();
     }
-    const randomPart = Array.from({ length: 12 }, () =>
-      Math.floor(Math.random() * 36).toString(36)
-    ).join('');
-    const created = `vecl_dev_${randomPart}`;
+    const created = `vecl_dev_${generateCryptographicDeviceSuffix()}`;
     window.localStorage.setItem(DEVICE_ID_STORAGE_KEY, created);
     return created;
   } catch {
@@ -77,25 +90,18 @@ export function getDefaultWorkstationLabel(): string {
 }
 
 export function saveOfflineLeaseToken(token: string | null): void {
+  inMemoryOfflineLeaseToken = token && token.trim() ? token.trim() : null;
   if (typeof window === 'undefined') return;
   try {
-    if (token) {
-      window.localStorage.setItem(LEASE_TOKEN_STORAGE_KEY, token);
-    } else {
-      window.localStorage.removeItem(LEASE_TOKEN_STORAGE_KEY);
-    }
+    // Purge any legacy persisted lease token from localStorage
+    window.localStorage.removeItem(LEGACY_LEASE_TOKEN_STORAGE_KEY);
   } catch {
-    // Ignore storage quota errors
+    // Ignore storage access errors
   }
 }
 
 export function getSavedOfflineLeaseToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    return window.localStorage.getItem(LEASE_TOKEN_STORAGE_KEY);
-  } catch {
-    return null;
-  }
+  return inMemoryOfflineLeaseToken;
 }
 
 async function buildAuthHeaders(_forceRefresh = false): Promise<Record<string, string>> {

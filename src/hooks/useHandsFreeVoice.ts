@@ -1,13 +1,33 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { LabTab } from '../components/LabTopNav';
 import { getAllVerifiedKnowledgeEntries } from '../services/ai/localKnowledgeDB';
 import {
+  classifyVoiceIntent,
   createInitialVoiceSessionMemory,
   processVoiceCoachTurn,
   type VoiceActionTarget,
   type VoiceCoachTurnResult,
   type VoiceSessionMemory,
 } from '../services/ai/localVoiceBrain';
+import {
+  VOICE_CACHE_MIN_CONFIDENCE,
+  clearVoiceInteractionCache,
+  getVoiceInteractionCacheStats,
+  isLiveTelemetryQuery,
+  listRecentVoiceInteractions,
+  lookupVoiceInteractionCache,
+  lookupVoiceInteractionMemorySync,
+  recordVoiceHistoryReplay,
+  saveVoiceInteractionCache,
+  subscribeVoiceInteractionCache,
+  type VoiceInteractionCacheEntry,
+  type VoiceInteractionCacheStats,
+} from '../services/ai/voiceInteractionCache';
 import type { VoiceModalAction } from '../services/ai/systemVoiceKnowledgeBase';
 import type {
   BenchTelemetry,
@@ -15,6 +35,13 @@ import type {
   VerifiedKnowledgeRecord,
 } from '../types/aiAssistant';
 import type { EcuPin } from '../types/ecu';
+
+export interface VoiceTurnCacheMetadata {
+  servedFromCache: boolean;
+  cacheHitCount: number;
+  bypassedForLiveTelemetry: boolean;
+  cachedAtMs?: number;
+}
 
 export type HandsFreeVoiceStatus =
   | 'STANDBY'
@@ -141,6 +168,12 @@ export function useHandsFreeVoice(params: {
   const [lastTranscript, setLastTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
   const [lastTurn, setLastTurn] = useState<VoiceCoachTurnResult | null>(null);
+  const [lastTurnCacheMeta, setLastTurnCacheMeta] =
+    useState<VoiceTurnCacheMetadata | null>(null);
+  const [recentHistory, setRecentHistory] = useState<VoiceInteractionCacheEntry[]>([]);
+  const [cacheStats, setCacheStats] = useState<VoiceInteractionCacheStats>(() =>
+    getVoiceInteractionCacheStats()
+  );
   const [errorNotice, setErrorNotice] = useState<string | null>(null);
 
   const isHandsFreeRef = useRef(false);
@@ -221,6 +254,28 @@ export function useHandsFreeVoice(params: {
       });
     return () => {
       active = false;
+    };
+  }, []);
+
+  // Hydrate voice interaction IndexedDB history & subscribe to updates across channels
+  useEffect(() => {
+    let active = true;
+    const refreshHistory = () => {
+      void listRecentVoiceInteractions({ channel: 'VOICE_COACH', limit: 24 })
+        .then((rows) => {
+          if (!active) return;
+          setRecentHistory(rows);
+          setCacheStats(getVoiceInteractionCacheStats());
+        })
+        .catch(() => {
+          // Non-blocking fallback
+        });
+    };
+    refreshHistory();
+    const unsub = subscribeVoiceInteractionCache(refreshHistory);
+    return () => {
+      active = false;
+      unsub();
     };
   }, []);
 
@@ -370,12 +425,87 @@ export function useHandsFreeVoice(params: {
       setInterimTranscript('');
       setStatus('CHINE_CHECK_SA_DB');
 
+      const currentLang = langRef.current;
+      const classified = classifyVoiceIntent(cleaned, pinsRef.current);
+      const isLiveBypass = isLiveTelemetryQuery(cleaned, classified.intent);
+
+      // Fast-path: serve cached general diagnostic / guide interactions from hydrated IndexedDB cache
+      if (!isLiveBypass) {
+        const cachedEntry = lookupVoiceInteractionMemorySync({
+          query: cleaned,
+          lang: currentLang,
+          channel: 'VOICE_COACH',
+          intent: classified.intent,
+        });
+
+        if (cachedEntry) {
+          const prevMem = memoryRef.current;
+          const updatedMemory: VoiceSessionMemory = {
+            ...prevMem,
+            lastIntent:
+              cachedEntry.intent === 'DIAGNOSTIC_QUERY'
+                ? 'DTC_OR_COMPONENT_LOOKUP'
+                : cachedEntry.intent,
+            lastFiveResponses: [
+              ...prevMem.lastFiveResponses.slice(-4),
+              cachedEntry.spokenText,
+            ],
+            activeTab: activeTabRef.current,
+            lang: currentLang,
+          };
+
+          const cachedTurn: VoiceCoachTurnResult = {
+            intent:
+              cachedEntry.intent === 'DIAGNOSTIC_QUERY'
+                ? 'DTC_OR_COMPONENT_LOOKUP'
+                : cachedEntry.intent,
+            confidence: cachedEntry.confidence,
+            spokenText: cachedEntry.spokenText,
+            displayText: cachedEntry.displayText,
+            whyTip: cachedEntry.whyTip,
+            nextStepIndex: prevMem.currentStepIndex,
+            matchedSource: cachedEntry.matchedSource,
+            usedClarificationFallback: false,
+            updatedMemory,
+            navigationAction: null,
+            suggestedAction: cachedEntry.suggestedAction ?? null,
+            detailsBullets: cachedEntry.detailsBullets,
+            followUpChips: cachedEntry.followUpChips,
+          };
+
+          memoryRef.current = updatedMemory;
+          setMemory(updatedMemory);
+          setLastTurn(cachedTurn);
+          setLastTurnCacheMeta({
+            servedFromCache: true,
+            cacheHitCount: cachedEntry.hitCount + 1,
+            bypassedForLiveTelemetry: false,
+            cachedAtMs: cachedEntry.lastAccessedAtMs,
+          });
+
+          // Persist hitCount & LRU recency asynchronously without blocking speech
+          void lookupVoiceInteractionCache({
+            query: cleaned,
+            lang: currentLang,
+            channel: 'VOICE_COACH',
+            intent: classified.intent,
+          }).catch(() => {});
+
+          if (speakReply) {
+            speakWithEchoShield(cachedTurn.spokenText);
+          } else {
+            setStatus(isHandsFreeRef.current ? 'NAKIKINIG' : 'STANDBY');
+          }
+          return;
+        }
+      }
+
       const result = processVoiceCoachTurn({
         transcript: cleaned,
         memory: memoryRef.current,
         telemetry: telemetryRef.current,
         activeTab: activeTabRef.current,
-        lang: langRef.current,
+        lang: currentLang,
         pins: pinsRef.current,
         nodeVoltages: nodeVoltagesRef.current,
         cachedKnowledge: cachedKnowledgeRef.current,
@@ -384,6 +514,35 @@ export function useHandsFreeVoice(params: {
       memoryRef.current = result.updatedMemory;
       setMemory(result.updatedMemory);
       setLastTurn(result);
+
+      const bypassedLive = isLiveBypass || isLiveTelemetryQuery(cleaned, result.intent);
+      setLastTurnCacheMeta({
+        servedFromCache: false,
+        cacheHitCount: 0,
+        bypassedForLiveTelemetry: bypassedLive,
+      });
+
+      if (
+        !bypassedLive &&
+        !result.usedClarificationFallback &&
+        result.confidence >= VOICE_CACHE_MIN_CONFIDENCE
+      ) {
+        void saveVoiceInteractionCache({
+          channel: 'VOICE_COACH',
+          lang: currentLang,
+          query: cleaned,
+          intent: result.intent,
+          spokenText: result.spokenText,
+          displayText: result.displayText,
+          whyTip: result.whyTip,
+          matchedSource: result.matchedSource,
+          detailsBullets: result.detailsBullets,
+          followUpChips: result.followUpChips,
+          suggestedAction: result.suggestedAction ?? null,
+          sourceOrigin: 'LOCAL_VOICE_BRAIN',
+          confidence: result.confidence,
+        }).catch(() => {});
+      }
 
       // Execute voice-commanded tab/modal navigation immediately
       if (result.navigationAction) {
@@ -398,6 +557,71 @@ export function useHandsFreeVoice(params: {
     },
     [executeAction, speakWithEchoShield]
   );
+
+  const replayHistoryEntry = useCallback(
+    (entry: VoiceInteractionCacheEntry, speakReply = true) => {
+      const prevMem = memoryRef.current;
+      const resolvedIntent =
+        entry.intent === 'DIAGNOSTIC_QUERY'
+          ? 'DTC_OR_COMPONENT_LOOKUP'
+          : entry.intent;
+      const updatedMemory: VoiceSessionMemory = {
+        ...prevMem,
+        lastIntent: resolvedIntent,
+        lastFiveResponses: [...prevMem.lastFiveResponses.slice(-4), entry.spokenText],
+        activeTab: activeTabRef.current,
+        lang: entry.lang,
+      };
+
+      const replayedTurn: VoiceCoachTurnResult = {
+        intent: resolvedIntent,
+        confidence: entry.confidence,
+        spokenText: entry.spokenText,
+        displayText: entry.displayText,
+        whyTip: entry.whyTip,
+        nextStepIndex: prevMem.currentStepIndex,
+        matchedSource: entry.matchedSource,
+        usedClarificationFallback: false,
+        updatedMemory,
+        navigationAction: null,
+        suggestedAction: entry.suggestedAction ?? null,
+        detailsBullets: entry.detailsBullets,
+        followUpChips: entry.followUpChips,
+      };
+
+      setLastTranscript(entry.query);
+      setInterimTranscript('');
+      memoryRef.current = updatedMemory;
+      setMemory(updatedMemory);
+      setLastTurn(replayedTurn);
+      setLastTurnCacheMeta({
+        servedFromCache: true,
+        cacheHitCount: entry.hitCount + 1,
+        bypassedForLiveTelemetry: false,
+        cachedAtMs: entry.lastAccessedAtMs,
+      });
+
+      void recordVoiceHistoryReplay(entry.id).catch(() => {});
+
+      if (speakReply) {
+        speakWithEchoShield(entry.spokenText);
+      } else {
+        setStatus(isHandsFreeRef.current ? 'NAKIKINIG' : 'STANDBY');
+      }
+    },
+    [speakWithEchoShield]
+  );
+
+  const clearHistory = useCallback(async () => {
+    await clearVoiceInteractionCache();
+    setRecentHistory([]);
+    setCacheStats(getVoiceInteractionCacheStats());
+    setLastTurnCacheMeta((prev) =>
+      prev?.servedFromCache
+        ? { ...prev, servedFromCache: false, cacheHitCount: 0 }
+        : prev
+    );
+  }, []);
 
   const startListeningLoop = useCallback(() => {
     if (!isHandsFreeRef.current || isSpeakingRef.current) return;
@@ -552,11 +776,16 @@ export function useHandsFreeVoice(params: {
     lastTranscript,
     interimTranscript,
     lastTurn,
+    lastTurnCacheMeta,
+    recentHistory,
+    cacheStats,
     errorNotice,
     startHandsFree,
     stopHandsFree,
     bargeInInterrupt,
     executeAction,
+    replayHistoryEntry,
+    clearHistory,
     triggerQuickCommand: (phrase: string) => handleUserCommand(phrase, true),
   };
 }

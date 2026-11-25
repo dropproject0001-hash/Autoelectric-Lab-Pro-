@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import React, { useEffect, useState } from 'react';
 import { Clock, CloudOff, RefreshCw } from 'lucide-react';
 import { formatTrialCountdown, useTrialAccess } from '../context/TrialAccessContext';
@@ -12,7 +17,65 @@ import {
   getSyncStatusSnapshot,
   subscribeSyncStatus,
 } from '../services/benchStorageService';
+import { formatCloudSyncError } from '../utils/cloudSyncErrorUtils';
 import { LabDrawerIcon } from './icons/LabDrawerIcons';
+
+export interface FooterSyncIndicatorDescriptor {
+  visible: boolean;
+  tone: 'SYNCING' | 'ERROR' | 'REQUEUED' | 'QUEUED';
+  label: string;
+  tooltip: string;
+  ariaLabel: string;
+}
+
+export function describeFooterSyncIndicator(
+  syncStatus: CloudSyncStatusSnapshot
+): FooterSyncIndicatorDescriptor {
+  const pending = syncStatus.pendingCount;
+  const failed = syncStatus.failedCount ?? 0;
+  const visible = pending > 0 || syncStatus.state === 'ERROR' || syncStatus.state === 'SYNCING';
+
+  const hasFaultBuilderPending = Boolean(
+    syncStatus.pendingCollections?.includes('faultSequences')
+  );
+  const scopeLabel = hasFaultBuilderPending ? 'Fault Builder & bench writes' : 'Bench writes';
+
+  const sanitizedErr = syncStatus.lastError
+    ? formatCloudSyncError(new Error(syncStatus.lastError), { isPinOnlyLocalMode: false }) ||
+      syncStatus.lastError.replace(/^\{.*\}$/, 'Cloud sync deferred while offline')
+    : null;
+
+  if (syncStatus.state === 'SYNCING') {
+    const label = `Syncing (${pending})`;
+    const tooltip = `${scopeLabel} syncing from IndexedDB to cloud (${pending} pending).`;
+    return { visible, tone: 'SYNCING', label, tooltip, ariaLabel: tooltip };
+  }
+
+  if (syncStatus.state === 'ERROR') {
+    const label = pending > 0 ? `Sync Retry (${pending})` : 'Sync Error';
+    const detail = sanitizedErr ? ` Last issue: ${sanitizedErr}.` : '';
+    const tooltip =
+      pending > 0
+        ? `${scopeLabel} saved safely in IndexedDB and re-queued for retry (${pending} pending).${detail} Click to retry now.`
+        : `Cloud sync encountered an error.${detail} Click to retry.`;
+    return { visible, tone: 'ERROR', label, tooltip, ariaLabel: tooltip };
+  }
+
+  if (failed > 0 && pending > 0) {
+    const label = `Re-queued (${pending})`;
+    const retryNote =
+      typeof syncStatus.nextRetryAtMs === 'number'
+        ? ' Auto-retry scheduled.'
+        : ' Will retry automatically when online.';
+    const detail = sanitizedErr ? ` (${sanitizedErr})` : '';
+    const tooltip = `${scopeLabel} saved locally in IndexedDB after background sync interruption and re-queued (${pending} pending).${retryNote}${detail} Click to retry now.`;
+    return { visible, tone: 'REQUEUED', label, tooltip, ariaLabel: tooltip };
+  }
+
+  const label = `Sync (${pending})`;
+  const tooltip = `${scopeLabel} saved locally in IndexedDB (${pending} pending cloud upload). Click to sync now.`;
+  return { visible, tone: 'QUEUED', label, tooltip, ariaLabel: tooltip };
+}
 
 interface LabStatusFooterProps {
   activeTab: LabTab;
@@ -68,8 +131,8 @@ export const LabStatusFooter: React.FC<LabStatusFooterProps> = ({
   const isMnaGuideActive = showDiagnosticGuide && diagnosticPanelMode === 'MNA_GUIDE';
   const hasFaults = circuitSolution.activeDTCs.length > 0;
 
-  const showSyncBadge =
-    syncStatus.pendingCount > 0 || syncStatus.state === 'ERROR' || syncStatus.state === 'SYNCING';
+  const syncIndicator = describeFooterSyncIndicator(syncStatus);
+  const showSyncBadge = syncIndicator.visible;
 
   const isCriticalLowTime =
     isLowTimeWarning && remainingSeconds !== null && remainingSeconds > 0 && remainingSeconds <= 300;
@@ -118,18 +181,22 @@ export const LabStatusFooter: React.FC<LabStatusFooterProps> = ({
         {showSyncBadge && (
           <button
             type="button"
+            data-testid="footer-sync-status-btn"
+            role="status"
+            aria-live="polite"
+            aria-label={syncIndicator.ariaLabel}
             onClick={onRetryCloudSync}
             disabled={syncStatus.state === 'SYNCING'}
             className={`hw-btn text-[10px] flex items-center gap-1.5 px-2 py-0.5 rounded-md whitespace-nowrap tabular-nums cursor-pointer ${
-              syncStatus.state === 'ERROR'
+              syncIndicator.tone === 'ERROR'
                 ? 'bg-rose-950/75 border-[#ff4d62]/70 text-rose-200'
-                : syncStatus.state === 'SYNCING'
+                : syncIndicator.tone === 'SYNCING'
                   ? 'hw-btn-green'
                   : 'hw-btn-amber'
             }`}
-            title={syncStatus.lastError || 'Queued bench writes pending cloud sync'}
+            title={syncIndicator.tooltip}
           >
-            {syncStatus.state === 'SYNCING' ? (
+            {syncIndicator.tone === 'SYNCING' ? (
               <span className="relative inline-flex h-3 w-3 items-center justify-center">
                 <span
                   aria-hidden="true"
@@ -138,15 +205,9 @@ export const LabStatusFooter: React.FC<LabStatusFooterProps> = ({
                 <RefreshCw className="relative w-3 h-3 animate-spin" aria-hidden="true" />
               </span>
             ) : (
-              <CloudOff className="w-3 h-3" aria-hidden="true" />
+              <CloudOff className="w-3 h-3 shrink-0" aria-hidden="true" />
             )}
-            <span>
-              {syncStatus.state === 'SYNCING'
-                ? `Syncing (${syncStatus.pendingCount})`
-                : syncStatus.state === 'ERROR'
-                  ? 'Sync Error'
-                  : `Sync (${syncStatus.pendingCount})`}
-            </span>
+            <span>{syncIndicator.label}</span>
           </button>
         )}
       </div>

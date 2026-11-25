@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import pcbLdoStageImg from '../assets/images/pcb_ldo_stage_1794671232433.jpg';
 import pcbCanStageImg from '../assets/images/pcb_can_stage_1794671234715.jpg';
 import pcbInjectorStageImg from '../assets/images/pcb_injector_stage_1794671235614.jpg';

@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import type http from 'node:http';
 import type { Duplex } from 'node:stream';
 import { WebSocketServer, WebSocket, type RawData } from 'ws';
@@ -16,7 +21,107 @@ import {
 const LIVE_VOICE_WS_PATH = '/api/autoelectric/live-voice-ws';
 const LIVE_VOICE_MODEL = 'gemini-3.8-live';
 const MAX_WS_PAYLOAD_BYTES = 128 * 1024;
+const MAX_CONCURRENT_WS_GLOBAL = 24;
+const MAX_CONCURRENT_WS_PER_IP = 4;
 const ALLOWED_VOICES = new Set(['Zephyr', 'Kore', 'Puck', 'Charon', 'Fenrir']);
+
+function normalizeHostValue(raw: string | undefined): string {
+  if (!raw) return '';
+  const first = raw.split(',')[0]?.trim().toLowerCase() ?? '';
+  return first.replace(/\.$/, '');
+}
+
+function stripDefaultPort(hostWithOptionalPort: string, protocol: 'http:' | 'https:'): string {
+  if (protocol === 'https:' && hostWithOptionalPort.endsWith(':443')) {
+    return hostWithOptionalPort.slice(0, -4);
+  }
+  if (protocol === 'http:' && hostWithOptionalPort.endsWith(':80')) {
+    return hostWithOptionalPort.slice(0, -3);
+  }
+  return hostWithOptionalPort;
+}
+
+function isLoopbackHost(hostname: string): boolean {
+  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]';
+}
+
+/**
+ * Validates browser WebSocket Origin headers against the incoming request Host / X-Forwarded-Host
+ * to prevent cross-site WebSocket hijacking while remaining compatible with reverse proxies and
+ * local development loopback aliases.
+ */
+export function isAllowedLiveVoiceOrigin(
+  originHeader: string | string[] | undefined,
+  hostHeader: string | string[] | undefined,
+  forwardedHostHeader?: string | string[] | undefined
+): boolean {
+  const rawOrigin = Array.isArray(originHeader) ? originHeader[0] : originHeader;
+  // Non-browser clients (CLI, server probes) omit Origin and still require Bearer/PIN handshake.
+  if (!rawOrigin || !rawOrigin.trim()) {
+    return true;
+  }
+
+  let parsedOrigin: URL;
+  try {
+    parsedOrigin = new URL(rawOrigin.trim());
+  } catch {
+    return false;
+  }
+
+  if (parsedOrigin.protocol !== 'https:' && parsedOrigin.protocol !== 'http:') {
+    return false;
+  }
+
+  const originHost = stripDefaultPort(parsedOrigin.host.toLowerCase(), parsedOrigin.protocol);
+  const originHostname = parsedOrigin.hostname.toLowerCase();
+
+  const candidateHosts = [
+    normalizeHostValue(Array.isArray(forwardedHostHeader) ? forwardedHostHeader[0] : forwardedHostHeader),
+    normalizeHostValue(Array.isArray(hostHeader) ? hostHeader[0] : hostHeader),
+  ].filter(Boolean);
+
+  if (candidateHosts.length === 0) {
+    return false;
+  }
+
+  for (const candidate of candidateHosts) {
+    const normalizedCandidate = stripDefaultPort(candidate, parsedOrigin.protocol);
+    if (originHost === normalizedCandidate) {
+      return true;
+    }
+    const candidateHostname = normalizedCandidate.replace(/:\d+$/, '');
+    if (isLoopbackHost(originHostname) && isLoopbackHost(candidateHostname)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function getUpgradeClientIp(request: http.IncomingMessage): string {
+  const xff = request.headers['x-forwarded-for'];
+  const raw = Array.isArray(xff) ? xff[0] : xff;
+  if (raw && raw.trim()) {
+    return raw.split(',')[0].trim().slice(0, 64);
+  }
+  return (request.socket.remoteAddress || 'unknown').slice(0, 64);
+}
+
+function rejectUpgrade(socket: Duplex, statusCode: number, statusText: string, body: string): void {
+  try {
+    socket.write(
+      `HTTP/1.1 ${statusCode} ${statusText}\r\n` +
+        'Connection: close\r\n' +
+        'Content-Type: text/plain; charset=utf-8\r\n' +
+        `Content-Length: ${Buffer.byteLength(body)}\r\n\r\n` +
+        body
+    );
+  } catch {
+    // Ignore write failure on already-closed socket
+  } finally {
+    socket.destroy();
+  }
+}
 
 interface LiveClientInitMessage {
   type: 'init';
@@ -70,6 +175,19 @@ export function attachGeminiLiveVoiceWebSocket(httpServer: http.Server): Attache
     maxPayload: MAX_WS_PAYLOAD_BYTES,
   });
 
+  let activeTotal = 0;
+  const activeByIp = new Map<string, number>();
+
+  const releaseConnectionSlot = (clientIp: string) => {
+    activeTotal = Math.max(0, activeTotal - 1);
+    const current = activeByIp.get(clientIp) || 0;
+    if (current <= 1) {
+      activeByIp.delete(clientIp);
+    } else {
+      activeByIp.set(clientIp, current - 1);
+    }
+  };
+
   const handleUpgrade = (request: http.IncomingMessage, socket: Duplex, head: Buffer) => {
     let pathname = '';
     try {
@@ -83,14 +201,50 @@ export function attachGeminiLiveVoiceWebSocket(httpServer: http.Server): Attache
       return;
     }
 
+    if (
+      !isAllowedLiveVoiceOrigin(
+        request.headers.origin,
+        request.headers.host,
+        request.headers['x-forwarded-host']
+      )
+    ) {
+      rejectUpgrade(socket, 403, 'Forbidden', 'Cross-origin WebSocket upgrade rejected.');
+      return;
+    }
+
+    if (activeTotal >= MAX_CONCURRENT_WS_GLOBAL) {
+      rejectUpgrade(
+        socket,
+        503,
+        'Service Unavailable',
+        'Live voice capacity reached. Please retry shortly.'
+      );
+      return;
+    }
+
+    const clientIp = getUpgradeClientIp(request);
+    const currentForIp = activeByIp.get(clientIp) || 0;
+    if (currentForIp >= MAX_CONCURRENT_WS_PER_IP) {
+      rejectUpgrade(
+        socket,
+        429,
+        'Too Many Requests',
+        'Too many concurrent live voice connections from this network.'
+      );
+      return;
+    }
+
+    activeTotal += 1;
+    activeByIp.set(clientIp, currentForIp + 1);
+
     wss.handleUpgrade(request, socket, head, (ws) => {
-      wss.emit('connection', ws, request);
+      wss.emit('connection', ws, request, clientIp);
     });
   };
 
   httpServer.on('upgrade', handleUpgrade);
 
-  wss.on('connection', (ws: WebSocket) => {
+  wss.on('connection', (ws: WebSocket, _request: http.IncomingMessage, clientIp = 'unknown') => {
     let liveSession: Awaited<ReturnType<GoogleGenAI['live']['connect']>> | null = null;
     let initialized = false;
     let initializing = false;
@@ -99,6 +253,7 @@ export function attachGeminiLiveVoiceWebSocket(httpServer: http.Server): Attache
     const cleanupSession = (reason?: string) => {
       if (closed) return;
       closed = true;
+      releaseConnectionSlot(clientIp);
       if (liveSession) {
         try {
           liveSession.close();

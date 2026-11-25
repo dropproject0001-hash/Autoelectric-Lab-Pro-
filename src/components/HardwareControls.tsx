@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import React, { useCallback, useId, useRef, useState } from 'react';
 
 export type HardwareAccent = 'amber' | 'green' | 'steel' | 'red';

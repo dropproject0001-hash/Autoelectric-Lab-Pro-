@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 /**
  * MatrixSolver: High-performance linear equation solver for Modified Nodal Analysis (MNA).
  * Solves [A][x] = [b] using Gaussian Elimination with Partial Pivoting.

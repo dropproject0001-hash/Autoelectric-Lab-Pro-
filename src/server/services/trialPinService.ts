@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -408,6 +413,16 @@ function checkRateBucket(
   }
   list.push(nowMs);
   buckets.set(key, list);
+  if (buckets.size > 128) {
+    for (const [k, times] of buckets.entries()) {
+      const active = times.filter((t) => t > windowStart);
+      if (active.length === 0) {
+        buckets.delete(k);
+      } else if (active.length !== times.length) {
+        buckets.set(k, active);
+      }
+    }
+  }
   return { allowed: true };
 }
 

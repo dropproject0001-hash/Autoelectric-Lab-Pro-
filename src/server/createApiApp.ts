@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import express from 'express';
 import { ThinkingLevel } from '@google/genai';
 import {
@@ -562,7 +567,19 @@ export function createAutoelectricApiApp(): express.Express {
     });
   };
 
+  const trialStatusIpBuckets = new Map<string, number[]>();
+
   app.get('/api/autoelectric/trial/status', (req, res) => {
+    const ipKey = `trial-status:${req.ip || req.socket.remoteAddress || 'unknown'}`;
+    const rateCheck = checkBucket(trialStatusIpBuckets, ipKey, 30, Date.now());
+    if (!rateCheck.allowed) {
+      res.setHeader('Retry-After', String(rateCheck.retryAfterSec));
+      return res.status(429).json({
+        error: `Too many trial status requests. Retry in ${rateCheck.retryAfterSec}s.`,
+        code: 'TRIAL_STATUS_RATE_LIMITED',
+      });
+    }
+
     const deviceId =
       typeof req.query.deviceId === 'string'
         ? req.query.deviceId
@@ -671,6 +688,15 @@ export function createAutoelectricApiApp(): express.Express {
   });
 
   app.post('/api/autoelectric/trial/admin/setup', smallJsonParser, (req, res) => {
+    const rateKey = `admin-setup:${req.ip || 'unknown'}`;
+    const rate = checkAdminPinRateLimit(rateKey);
+    if (!rate.allowed) {
+      res.setHeader('Retry-After', String(rate.retryAfterSec || 60));
+      return res.status(429).json({
+        error: `Too many Admin PIN setup attempts. Retry in ${rate.retryAfterSec}s.`,
+        code: 'ADMIN_RATE_LIMITED',
+      });
+    }
     try {
       const { masterPin } = req.body || {};
       if (!masterPin || typeof masterPin !== 'string') {
@@ -2472,8 +2498,9 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
   });
 
   app.use('/api', (req, res) => {
+    const safePath = String(req.path || '').replace(/[\u0000-\u001F\u007F]/g, '').slice(0, 120);
     res.status(404).json({
-      error: `API endpoint not found: ${req.method} ${req.originalUrl}`,
+      error: `API endpoint not found: ${req.method} /api${safePath}`,
       code: 'API_ROUTE_NOT_FOUND',
     });
   });

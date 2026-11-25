@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 export type BilingualLang = 'TL' | 'EN';
 
 export type AiTierId =
@@ -27,7 +32,8 @@ export interface AiTierAttemptLog {
     | 'NETWORK_ERROR'
     | 'SKIPPED_OFFLINE'
     | 'SKIPPED_COOLDOWN'
-    | 'PRE_QUOTA_REROUTED';
+    | 'PRE_QUOTA_REROUTED'
+    | 'VOICE_CACHE_HIT';
   statusCode?: number;
   reason?: string;
 }
@@ -129,6 +135,8 @@ export interface AiDiagnosticResult {
   extractedTokens: string[];
   attemptTrail: AiTierAttemptLog[];
   cachedLocally: boolean;
+  servedFromInteractionCache?: boolean;
+  cacheHitCount?: number;
   benchSnapshotSummary: string;
   createdAt: number;
 }

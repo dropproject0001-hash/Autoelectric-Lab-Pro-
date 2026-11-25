@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 /**
  * SignalGenerator: Generates time-domain automotive waveforms driven by simulation parameters.
  * Eliminates artificial Math.random noise with reproducible physical signal synthesis.

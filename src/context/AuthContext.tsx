@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import {
   onAuthStateChanged,
@@ -11,21 +16,33 @@ import {
   firebaseAuth,
   googleAuthProvider,
   isFirebaseConfigured,
+  resolvedFirebaseConfig,
 } from '../lib/firebase';
 import {
+  cancelScheduledBenchSyncRetries,
   CloudSyncStatusSnapshot,
   flushQueuedBenchSync,
   getSyncStatusSnapshot,
   handleFirestoreError,
   OperationType,
+  promoteLocalWorkstationFaultSequencesToUser,
   subscribeSyncStatus,
 } from '../services/benchStorageService';
+
+export interface AuthErrorDetails {
+  code: string;
+  message: string;
+  hostname?: string;
+  consoleAuthorizedDomainsUrl?: string | null;
+}
 
 interface AuthContextValue {
   user: User | null;
   authReady: boolean;
   isSigningIn: boolean;
   authError: string | null;
+  authErrorDetails: AuthErrorDetails | null;
+  clearAuthError: () => void;
   workspaceToken: string | null;
   needsWorkspaceAuth: boolean;
   syncStatus: CloudSyncStatusSnapshot;
@@ -40,6 +57,8 @@ const AuthContext = createContext<AuthContextValue>({
   authReady: true,
   isSigningIn: false,
   authError: null,
+  authErrorDetails: null,
+  clearAuthError: () => {},
   workspaceToken: null,
   needsWorkspaceAuth: false,
   syncStatus: getSyncStatusSnapshot(),
@@ -91,24 +110,91 @@ async function ensureUserProfileDocument(user: User): Promise<void> {
   }
 }
 
-function formatFirebaseAuthError(err: unknown): string {
+const SAFE_FIREBASE_PROJECT_ID_REGEX = /^[a-z0-9-]+$/;
+
+export function buildFirebaseAuthorizedDomainsConsoleUrl(
+  projectIdOverride?: string
+): string | null {
+  const candidate = (projectIdOverride ?? resolvedFirebaseConfig.projectId ?? '').trim();
+  if (!candidate || !SAFE_FIREBASE_PROJECT_ID_REGEX.test(candidate)) {
+    return null;
+  }
+  return `https://console.firebase.google.com/project/${candidate}/authentication/settings`;
+}
+
+export function formatFirebaseAuthErrorDetails(
+  err: unknown,
+  hostnameOverride?: string,
+  projectIdOverride?: string
+): AuthErrorDetails {
   const code =
     typeof err === 'object' && err !== null && 'code' in err
       ? String((err as { code?: unknown }).code || '')
       : '';
+  const hostname =
+    hostnameOverride ||
+    (typeof window !== 'undefined' && window.location?.hostname
+      ? window.location.hostname
+      : 'this host');
+
   if (code === 'auth/popup-closed-by-user') {
-    return 'Google Sign-In popup was closed before completing authentication.';
+    return {
+      code,
+      message: 'Google Sign-In popup was closed before completing authentication.',
+    };
+  }
+  if (code === 'auth/cancelled-popup-request') {
+    return {
+      code,
+      message: 'A newer Google Sign-In popup superseded the previous request. Please try again.',
+    };
   }
   if (code === 'auth/popup-blocked') {
-    return 'Browser blocked the Google Sign-In popup. Allow popups for this site and try again.';
+    return {
+      code,
+      message: 'Browser blocked the Google Sign-In popup. Allow popups for this site and try again.',
+    };
   }
   if (code === 'auth/network-request-failed') {
-    return 'Network unavailable for Google Sign-In. Offline IndexedDB bench mode remains active.';
+    return {
+      code,
+      message: 'Network unavailable for Google Sign-In. Offline IndexedDB bench mode remains active.',
+    };
   }
   if (code === 'auth/unauthorized-domain') {
-    return 'This preview domain is not yet authorized in Firebase Authentication.';
+    return {
+      code,
+      hostname,
+      consoleAuthorizedDomainsUrl: buildFirebaseAuthorizedDomainsConsoleUrl(projectIdOverride),
+      message: `Domain "${hostname}" is not yet authorized in Firebase Authentication. Add it under Firebase Console → Authentication → Settings → Authorized domains.`,
+    };
   }
-  return err instanceof Error ? err.message : 'Google Sign-In failed.';
+  if (code === 'auth/operation-not-allowed') {
+    return {
+      code,
+      message: 'Google Sign-In provider is not enabled in Firebase Authentication for this project.',
+    };
+  }
+  if (code === 'auth/account-exists-with-different-credential') {
+    return {
+      code,
+      message: 'An account already exists with this email under a different sign-in provider.',
+    };
+  }
+  if (code === 'auth/invalid-api-key' || code === 'auth/app-not-authorized') {
+    return {
+      code,
+      message: 'Firebase client API key or OAuth origin was rejected. Verify firebase-applet-config.json and authorized origins.',
+    };
+  }
+  return {
+    code: code || 'auth/unknown',
+    message: err instanceof Error ? err.message : 'Google Sign-In failed.',
+  };
+}
+
+export function formatFirebaseAuthError(err: unknown, hostnameOverride?: string): string {
+  return formatFirebaseAuthErrorDetails(err, hostnameOverride).message;
 }
 
 /**
@@ -120,12 +206,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [authReady, setAuthReady] = useState<boolean>(() => !firebaseAuth);
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [authErrorDetails, setAuthErrorDetails] = useState<AuthErrorDetails | null>(null);
   const [workspaceToken, setWorkspaceToken] = useState<string | null>(null);
   const [syncStatus, setSyncStatus] = useState<CloudSyncStatusSnapshot>(() => getSyncStatusSnapshot());
 
   useEffect(() => {
     const unsubSync = subscribeSyncStatus(setSyncStatus);
     return () => unsubSync();
+  }, []);
+
+  const syncSignedInUserBench = useCallback(async (signedInUser: User): Promise<void> => {
+    if (!signedInUser.emailVerified) {
+      const msg =
+        'Signed in, but this Google account email is not verified. Firestore cloud sync requires a verified email; local IndexedDB storage remains active.';
+      setAuthError(msg);
+      setAuthErrorDetails({ code: 'auth/email-not-verified', message: msg });
+      return;
+    }
+    setAuthError(null);
+    setAuthErrorDetails(null);
+    await ensureUserProfileDocument(signedInUser);
+    await promoteLocalWorkstationFaultSequencesToUser(signedInUser.uid).catch(() => 0);
+    await flushQueuedBenchSync(signedInUser.uid).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -138,15 +240,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(nextUser);
       setAuthReady(true);
       if (nextUser) {
-        setAuthError(null);
-        void ensureUserProfileDocument(nextUser).then(() => {
-          void flushQueuedBenchSync(nextUser.uid).catch(() => {});
-        });
+        void syncSignedInUserBench(nextUser);
       }
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [syncSignedInUserBench]);
 
   useEffect(() => {
     if (!user?.uid || typeof window === 'undefined') return;
@@ -159,29 +258,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = useCallback(async (): Promise<string | null> => {
     if (!isFirebaseConfigured || !firebaseAuth) {
-      setAuthError('Cloud sign-in is not configured in this environment. Offline local bench mode is active.');
+      const msg =
+        'Cloud sign-in is not configured in this environment. Offline local bench mode is active.';
+      setAuthError(msg);
+      setAuthErrorDetails({ code: 'auth/not-configured', message: msg });
       return null;
     }
     setIsSigningIn(true);
     setAuthError(null);
+    setAuthErrorDetails(null);
     try {
       const credential = await signInWithPopup(firebaseAuth, googleAuthProvider);
       const signedInUser = credential.user;
       setUser(signedInUser);
-      await ensureUserProfileDocument(signedInUser);
-      void flushQueuedBenchSync(signedInUser.uid).catch(() => {});
+      await syncSignedInUserBench(signedInUser);
       const idToken = await signedInUser.getIdToken();
       return idToken;
     } catch (err: unknown) {
-      setAuthError(formatFirebaseAuthError(err));
+      const details = formatFirebaseAuthErrorDetails(err);
+      setAuthError(details.message);
+      setAuthErrorDetails(details);
       return null;
     } finally {
       setIsSigningIn(false);
     }
-  }, []);
+  }, [syncSignedInUserBench]);
 
   const signOutUser = useCallback(async () => {
+    cancelScheduledBenchSyncRetries(user?.uid);
     setAuthError(null);
+    setAuthErrorDetails(null);
     setWorkspaceToken(null);
     if (!firebaseAuth) {
       setUser(null);
@@ -191,8 +297,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await signOut(firebaseAuth);
       setUser(null);
     } catch (err: unknown) {
-      setAuthError(formatFirebaseAuthError(err));
+      const details = formatFirebaseAuthErrorDetails(err);
+      setAuthError(details.message);
+      setAuthErrorDetails(details);
     }
+  }, [user?.uid]);
+
+  const clearAuthError = useCallback(() => {
+    setAuthError(null);
+    setAuthErrorDetails(null);
   }, []);
 
   const invalidateWorkspaceToken = useCallback(() => {
@@ -211,6 +324,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         authReady,
         isSigningIn,
         authError,
+        authErrorDetails,
+        clearAuthError,
         workspaceToken,
         needsWorkspaceAuth: false,
         syncStatus,

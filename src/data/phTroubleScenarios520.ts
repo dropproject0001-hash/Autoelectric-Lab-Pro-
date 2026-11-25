@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import rawPhScenarios from './phTroubleScenarios520.json';
 import rawPhScenariosBatch2 from './phTroubleScenariosBatch2_520.json';
 import rawPhScenariosBatch3 from './phTroubleScenariosBatch3_520.json';

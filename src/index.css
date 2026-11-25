@@ -447,6 +447,39 @@ body {
   animation: transcriptEntryFadeIn 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Crisp 180ms Staggered Technical Cascade for Unified AI Assistant Drawer Panels */
+@keyframes aiDrawerCascadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ai-drawer-cascade-item {
+  animation: aiDrawerCascadeIn 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
+.ai-drawer-stagger-0 {
+  animation-delay: 0ms;
+}
+
+.ai-drawer-stagger-1 {
+  animation-delay: 40ms;
+}
+
+.ai-drawer-stagger-2 {
+  animation-delay: 80ms;
+}
+
+.ai-drawer-stagger-3 {
+  animation-delay: 120ms;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -460,8 +493,12 @@ body {
   .animate-dmm-hold-glow,
   .animate-probe-tap,
   .animate-probe-trail,
-  .animate-transcript-entry-in {
+  .animate-transcript-entry-in,
+  .ai-drawer-cascade-item {
     animation: none;
+    animation-delay: 0ms;
+    opacity: 1;
+    transform: none;
   }
   .gauge-peak-marker {
     transition: none;

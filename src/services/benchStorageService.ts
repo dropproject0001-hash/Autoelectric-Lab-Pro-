@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import {
   collection,
   doc,
@@ -16,12 +21,14 @@ import {
 import { auth, db } from '../lib/firebase';
 import {
   SavePersistenceResult,
+  FlushExecutorOutcome,
   OfflineMutationCollection,
   OfflineMutationRecord,
   cacheLocalDocument,
   enqueueOfflineMutation,
   flushOfflineMutations,
   getLocalCachedDocuments,
+  getPendingMutations,
   isTransientOfflineError,
   markMutationSynced,
   refreshPendingCount,
@@ -3627,7 +3634,9 @@ export function subscribeUserBenchPreferences(
   };
 }
 
-async function replayFirestoreMutation(record: OfflineMutationRecord): Promise<void> {
+async function replayFirestoreMutation(
+  record: OfflineMutationRecord
+): Promise<void | FlushExecutorOutcome> {
   const { uid, collection: colName, docId, payload } = record;
   if (!db || isLocalWorkstationUid(uid)) return;
   if (colName === 'users') {
@@ -3851,6 +3860,7 @@ async function replayFirestoreMutation(record: OfflineMutationRecord): Promise<v
   if (colName === 'faultSequences') {
     if (rawPayload._deleted === true) {
       await deleteFaultSequenceFromFirestore(uid, docId);
+      markSequenceRecentlyDeleted(uid, docId);
       return;
     }
     const sanitized = sanitizeFaultSequence(rawPayload);
@@ -3860,8 +3870,115 @@ async function replayFirestoreMutation(record: OfflineMutationRecord): Promise<v
       id: docId,
       isBuiltInPreset: false,
     });
-    await writeFaultSequenceBundleToFirestore(uid, docId, normalizedSeq);
+    const baseUpdatedAtMs =
+      record.baseUpdatedAtMs ??
+      (typeof rawPayload.baseUpdatedAtMs === 'number' ? rawPayload.baseUpdatedAtMs : undefined);
+    const outcome = await writeFaultSequenceBundleToFirestore(
+      uid,
+      docId,
+      normalizedSeq,
+      baseUpdatedAtMs
+    );
+    if (outcome.conflictForked && outcome.conflictSequence) {
+      const conflictCopy = outcome.conflictSequence;
+      await cacheLocalDocument({
+        uid,
+        collection: 'faultSequences',
+        docId: outcome.targetSequenceId,
+        data: {
+          ...conflictCopy,
+          ownerId: uid,
+          schemaVersion: SCHEMA_VERSION_SUBCOLLECTIONS,
+          cloudUpdatedAtMs: Date.now(),
+        },
+        syncState: 'SYNCED_CLOUD',
+        updatedAtMs: conflictCopy.updatedAt,
+      });
+      await removeLocalCachedDocument(uid, 'faultSequences', docId);
+      emitFaultSequenceConflict({
+        originalId: docId,
+        originalTitle: normalizedSeq.title,
+        conflictId: outcome.targetSequenceId,
+        conflictTitle: conflictCopy.title,
+      });
+      return { skipCachePayloadUpdate: true };
+    }
+    return;
   }
+}
+
+export interface FaultSequenceConflictEvent {
+  originalId: string;
+  originalTitle: string;
+  conflictId: string;
+  conflictTitle: string;
+}
+
+const faultSequenceConflictListeners = new Set<(event: FaultSequenceConflictEvent) => void>();
+
+export function subscribeFaultSequenceConflicts(
+  listener: (event: FaultSequenceConflictEvent) => void
+): () => void {
+  faultSequenceConflictListeners.add(listener);
+  return () => {
+    faultSequenceConflictListeners.delete(listener);
+  };
+}
+
+function emitFaultSequenceConflict(event: FaultSequenceConflictEvent): void {
+  faultSequenceConflictListeners.forEach((listener) => {
+    try {
+      listener(event);
+    } catch {
+      // Non-fatal listener failure
+    }
+  });
+}
+
+const recentlyDeletedSequenceIds = new Map<string, number>();
+
+function markSequenceRecentlyDeleted(uid: string, seqId: string): void {
+  recentlyDeletedSequenceIds.set(`${uid}:${seqId}`, Date.now() + 10_000);
+}
+
+function isSequenceRecentlyDeleted(uid: string, seqId: string): boolean {
+  const key = `${uid}:${seqId}`;
+  const expiresAt = recentlyDeletedSequenceIds.get(key);
+  if (!expiresAt) return false;
+  if (Date.now() > expiresAt) {
+    recentlyDeletedSequenceIds.delete(key);
+    return false;
+  }
+  return true;
+}
+
+export function formatFaultSequenceConflictCopyTitle(rawTitle: string): string {
+  const base = String(rawTitle || '').trim() || 'Custom Fault Sequence';
+  if (base.endsWith(CONFLICT_COPY_TITLE_SUFFIX)) {
+    return base.slice(0, 100);
+  }
+  const maxBaseLen = 100 - CONFLICT_COPY_TITLE_SUFFIX.length;
+  return `${base.slice(0, maxBaseLen).trimEnd()}${CONFLICT_COPY_TITLE_SUFFIX}`;
+}
+
+export function buildConflictCopyFaultSequence(
+  uid: string,
+  conflictSequenceId: string,
+  seq: CustomFaultSequence
+): CustomFaultSequence & { ownerId: string; schemaVersion: number } {
+  const now = Date.now();
+  return {
+    ...sanitizeFaultSequenceForFirestore({
+      ...seq,
+      id: conflictSequenceId,
+      title: formatFaultSequenceConflictCopyTitle(seq.title),
+      isBuiltInPreset: false,
+      createdAt: now,
+      updatedAt: now,
+    }),
+    ownerId: uid,
+    schemaVersion: SCHEMA_VERSION_SUBCOLLECTIONS,
+  };
 }
 
 function clampSeqNum(val: unknown, fallback: number, min: number, max: number): number {
@@ -3923,6 +4040,9 @@ function sanitizeFaultSequenceForFirestore(sequence: CustomFaultSequence): Custo
     blindChallengeHint: String(source.blindChallengeHint || '').slice(0, 260),
     steps,
     isBuiltInPreset: false,
+    ...(typeof source.cloudUpdatedAtMs === 'number' && source.cloudUpdatedAtMs > 0
+      ? { cloudUpdatedAtMs: source.cloudUpdatedAtMs }
+      : {}),
     createdAt: Math.max(0, Number(source.createdAt) || now),
     updatedAt: Math.max(0, Number(source.updatedAt) || now),
   };
@@ -3931,11 +4051,40 @@ function sanitizeFaultSequenceForFirestore(sequence: CustomFaultSequence): Custo
 async function writeFaultSequenceBundleToFirestore(
   uid: string,
   seqId: string,
-  seq: CustomFaultSequence
-): Promise<void> {
+  seq: CustomFaultSequence,
+  baseUpdatedAtMs?: number
+): Promise<{
+  targetSequenceId: string;
+  conflictForked: boolean;
+  conflictSequence?: CustomFaultSequence;
+}> {
   const seqRef = doc(db, 'users', uid, 'faultSequences', seqId);
-  const [headerSnap, stagesSnap, itemsSnap] = await Promise.all([
-    getDoc(seqRef),
+  const headerSnap = await getDoc(seqRef);
+
+  if (headerSnap.exists()) {
+    const remoteUpdatedAtMs = extractRemoteUpdatedAtMs(
+      headerSnap.data() as Record<string, unknown>
+    );
+    if (hasRemoteSessionConflict(baseUpdatedAtMs, remoteUpdatedAtMs)) {
+      const conflictSeqId = makeSafeId('fseq_conflict');
+      const conflictSeq = sanitizeFaultSequenceForFirestore({
+        ...seq,
+        id: conflictSeqId,
+        title: formatFaultSequenceConflictCopyTitle(seq.title),
+        cloudUpdatedAtMs: undefined,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+      await writeFaultSequenceBundleToFirestore(uid, conflictSeqId, conflictSeq);
+      return {
+        targetSequenceId: conflictSeqId,
+        conflictForked: true,
+        conflictSequence: conflictSeq,
+      };
+    }
+  }
+
+  const [stagesSnap, itemsSnap] = await Promise.all([
     getDocs(
       query(
         collection(db, 'users', uid, 'faultSequences', seqId, 'stages'),
@@ -4070,6 +4219,7 @@ async function writeFaultSequenceBundleToFirestore(
   }
 
   await commitWriteOpsInChunks(ops);
+  return { targetSequenceId: seqId, conflictForked: false };
 }
 
 async function deleteFaultSequenceFromFirestore(uid: string, seqId: string): Promise<void> {
@@ -4096,8 +4246,9 @@ async function deleteFaultSequenceFromFirestore(uid: string, seqId: string): Pro
 }
 
 /**
- * Persists a custom Fault Builder sequence into IndexedDB immediately and queues/writes
- * an atomic subcollection batch to Firestore (/users/{uid}/faultSequences/{sequenceId}).
+ * Optimistically saves a custom Fault Builder sequence into local IndexedDB FIRST (<10ms)
+ * as the primary source of truth, then dispatches non-blocking background Firestore cloud sync
+ * (with non-destructive [Conflict Copy] OCC protection) when signed in and online.
  */
 export async function saveFaultSequence(
   uid: string,
@@ -4106,7 +4257,6 @@ export async function saveFaultSequence(
   const isPresetSource = Boolean(sequence.isBuiltInPreset);
   const rawTargetId = isPresetSource ? makeSafeId('fseq') : sequence.id || makeSafeId('fseq');
   const seqId = toSafeFirestoreDocId(rawTargetId, 'fseq', 0);
-  const path = `users/${uid}/faultSequences/${seqId}`;
   const normalized = sanitizeFaultSequenceForFirestore({
     ...sequence,
     id: seqId,
@@ -4119,20 +4269,19 @@ export async function saveFaultSequence(
     updatedAt: Date.now(),
   });
 
-  const payload = {
-    ...normalized,
-    ownerId: uid,
-    schemaVersion: SCHEMA_VERSION_SUBCOLLECTIONS,
-  };
-
   const stamp = reserveMutationStamp(uid, 'faultSequences', seqId);
 
   if (isLocalWorkstationUid(uid)) {
+    const localPayload = {
+      ...normalized,
+      ownerId: uid,
+      schemaVersion: SCHEMA_VERSION_SUBCOLLECTIONS,
+    };
     await cacheLocalDocument({
       uid,
       collection: 'faultSequences',
       docId: seqId,
-      data: payload,
+      data: localPayload,
       syncState: 'SYNCED_CLOUD',
       version: stamp.version,
       updatedAtMs: stamp.updatedAtMs,
@@ -4147,70 +4296,72 @@ export async function saveFaultSequence(
     };
   }
 
-  if (!db || !auth?.currentUser || (typeof navigator !== 'undefined' && navigator.onLine === false)) {
-    await enqueueOfflineMutation({
-      uid,
-      collection: 'faultSequences',
-      docId: seqId,
-      payload,
-      lastError: 'Offline or unauthenticated — fault sequence queued for automatic cloud sync',
-      version: stamp.version,
-      updatedAtMs: stamp.updatedAtMs,
-    });
-    notifyLocalCollectionChange('faultSequences');
-    return {
-      id: seqId,
-      syncedToCloud: false,
-      queuedOffline: true,
-      syncState: 'QUEUED_OFFLINE',
-      sequence: { ...normalized, syncState: 'QUEUED_OFFLINE' },
-    };
+  let baseUpdatedAtMs = normalized.cloudUpdatedAtMs;
+  if (baseUpdatedAtMs === undefined && !isPresetSource) {
+    const cachedDocs = await getLocalCachedDocuments<Record<string, unknown>>(uid, 'faultSequences');
+    const existingCache = cachedDocs.find((d) => d.docId === seqId);
+    if (existingCache?.data && typeof existingCache.data.cloudUpdatedAtMs === 'number') {
+      baseUpdatedAtMs = existingCache.data.cloudUpdatedAtMs;
+    } else if (existingCache?.syncState === 'SYNCED_CLOUD' && existingCache.updatedAtMs > 0) {
+      baseUpdatedAtMs = existingCache.updatedAtMs;
+    }
   }
 
-  try {
-    await writeFaultSequenceBundleToFirestore(uid, seqId, normalized);
-    await markMutationSynced(uid, 'faultSequences', seqId, payload, {
-      expectedVersion: stamp.version,
-      expectedUpdatedAtMs: stamp.updatedAtMs,
+  const payload = {
+    ...normalized,
+    ...(baseUpdatedAtMs !== undefined ? { cloudUpdatedAtMs: baseUpdatedAtMs, baseUpdatedAtMs } : {}),
+    ownerId: uid,
+    schemaVersion: SCHEMA_VERSION_SUBCOLLECTIONS,
+  };
+
+  const canSyncInBackground = Boolean(
+    (benchSyncExecutorOverrideForTests !== null ||
+      (db && auth?.currentUser && auth.currentUser.emailVerified !== false)) &&
+      (typeof navigator === 'undefined' || navigator.onLine !== false)
+  );
+
+  await enqueueOfflineMutation({
+    uid,
+    collection: 'faultSequences',
+    docId: seqId,
+    payload,
+    ...(canSyncInBackground
+      ? {}
+      : { lastError: 'Offline or unauthenticated — fault sequence queued for automatic cloud sync' }),
+    version: stamp.version,
+    updatedAtMs: stamp.updatedAtMs,
+    ...(baseUpdatedAtMs !== undefined ? { baseUpdatedAtMs } : {}),
+  });
+  notifyLocalCollectionChange('faultSequences');
+
+  if (canSyncInBackground) {
+    void flushQueuedBenchSync(uid).catch(() => {
+      // Background sync failure keeps item safely queued in IndexedDB with retry backoff
     });
-    notifyLocalCollectionChange('faultSequences');
-    return {
-      id: seqId,
-      syncedToCloud: true,
-      queuedOffline: false,
-      syncState: 'SYNCED_CLOUD',
-      sequence: { ...normalized, syncState: 'SYNCED_CLOUD' },
-    };
-  } catch (error) {
-    if (isTransientOfflineError(error)) {
-      await enqueueOfflineMutation({
-        uid,
-        collection: 'faultSequences',
-        docId: seqId,
-        payload,
-        lastError: error instanceof Error ? error.message : String(error),
-        version: stamp.version,
-        updatedAtMs: stamp.updatedAtMs,
-      });
-      notifyLocalCollectionChange('faultSequences');
-      return {
-        id: seqId,
-        syncedToCloud: false,
-        queuedOffline: true,
-        syncState: 'QUEUED_OFFLINE',
-        sequence: { ...normalized, syncState: 'QUEUED_OFFLINE' },
-      };
-    }
-    handleFirestoreError(error, OperationType.WRITE, path);
   }
+
+  return {
+    id: seqId,
+    syncedToCloud: false,
+    queuedOffline: true,
+    syncState: 'QUEUED_OFFLINE',
+    sequence: {
+      ...normalized,
+      ...(baseUpdatedAtMs !== undefined ? { cloudUpdatedAtMs: baseUpdatedAtMs } : {}),
+      syncState: 'QUEUED_OFFLINE',
+    },
+  };
 }
 
+/**
+ * Optimistically tombstones/deletes a custom Fault Builder sequence in local IndexedDB FIRST,
+ * then deletes from Firestore asynchronously in the background when signed in and online.
+ */
 export async function deleteFaultSequence(
   uid: string,
   sequenceId: string
 ): Promise<{ syncedToCloud: boolean; queuedOffline: boolean }> {
   const seqId = toSafeFirestoreDocId(sequenceId, 'fseq', 0);
-  const path = `users/${uid}/faultSequences/${seqId}`;
   const stamp = reserveMutationStamp(uid, 'faultSequences', seqId);
 
   if (isLocalWorkstationUid(uid)) {
@@ -4219,41 +4370,32 @@ export async function deleteFaultSequence(
     return { syncedToCloud: false, queuedOffline: false };
   }
 
-  if (!db || !auth?.currentUser || (typeof navigator !== 'undefined' && navigator.onLine === false)) {
-    await enqueueOfflineMutation({
-      uid,
-      collection: 'faultSequences',
-      docId: seqId,
-      payload: { _deleted: true, id: seqId },
-      lastError: 'Offline — sequence deletion queued for cloud sync',
-      version: stamp.version,
-      updatedAtMs: stamp.updatedAtMs,
+  const canSyncInBackground = Boolean(
+    (benchSyncExecutorOverrideForTests !== null ||
+      (db && auth?.currentUser && auth.currentUser.emailVerified !== false)) &&
+      (typeof navigator === 'undefined' || navigator.onLine !== false)
+  );
+
+  await enqueueOfflineMutation({
+    uid,
+    collection: 'faultSequences',
+    docId: seqId,
+    payload: { _deleted: true, id: seqId },
+    ...(canSyncInBackground
+      ? {}
+      : { lastError: 'Offline — sequence deletion queued for cloud sync' }),
+    version: stamp.version,
+    updatedAtMs: stamp.updatedAtMs,
+  });
+  notifyLocalCollectionChange('faultSequences');
+
+  if (canSyncInBackground) {
+    void flushQueuedBenchSync(uid).catch(() => {
+      // Background delete failure stays queued as tombstone for retry
     });
-    notifyLocalCollectionChange('faultSequences');
-    return { syncedToCloud: false, queuedOffline: true };
   }
 
-  try {
-    await deleteFaultSequenceFromFirestore(uid, seqId);
-    await removeLocalCachedDocument(uid, 'faultSequences', seqId);
-    notifyLocalCollectionChange('faultSequences');
-    return { syncedToCloud: true, queuedOffline: false };
-  } catch (error) {
-    if (isTransientOfflineError(error)) {
-      await enqueueOfflineMutation({
-        uid,
-        collection: 'faultSequences',
-        docId: seqId,
-        payload: { _deleted: true, id: seqId },
-        lastError: error instanceof Error ? error.message : String(error),
-        version: stamp.version,
-        updatedAtMs: stamp.updatedAtMs,
-      });
-      notifyLocalCollectionChange('faultSequences');
-      return { syncedToCloud: false, queuedOffline: true };
-    }
-    handleFirestoreError(error, OperationType.DELETE, path);
-  }
+  return { syncedToCloud: false, queuedOffline: true };
 }
 
 const migratedFaultSequenceUids = new Set<string>();
@@ -4280,6 +4422,71 @@ export async function migrateLegacyLocalFaultSequencesToStore(uid: string): Prom
 
   clearLegacyLocalFaultSequences();
   return migratedCount;
+}
+
+/**
+ * Counts custom Fault Builder sequences stored on the offline local_workstation profile.
+ */
+export async function countLocalWorkstationFaultSequences(): Promise<number> {
+  const cached = await getLocalCachedDocuments<Record<string, unknown>>(
+    LOCAL_WORKSTATION_UID,
+    'faultSequences'
+  );
+  const cachedCount = cached.filter((d) => d.data && d.data._deleted !== true).length;
+  const legacyCount = readLegacyLocalFaultSequences().length;
+  return cachedCount + legacyCount;
+}
+
+const promotionInFlightByUid = new Map<string, Promise<number>>();
+
+/**
+ * Non-destructively promotes offline local_workstation Fault Builder sequences into an
+ * authenticated Google user's IndexedDB cache + cloud sync queue upon login (idempotent by ID).
+ */
+export async function promoteLocalWorkstationFaultSequencesToUser(
+  uid: string
+): Promise<number> {
+  if (!uid || isLocalWorkstationUid(uid)) return 0;
+
+  const existingPromise = promotionInFlightByUid.get(uid);
+  if (existingPromise) {
+    await existingPromise;
+    return 0;
+  }
+
+  const run = (async () => {
+    await migrateLegacyLocalFaultSequencesToStore(LOCAL_WORKSTATION_UID);
+
+    const [localDocs, userDocs] = await Promise.all([
+      getLocalCachedDocuments<Record<string, unknown>>(LOCAL_WORKSTATION_UID, 'faultSequences'),
+      getLocalCachedDocuments<Record<string, unknown>>(uid, 'faultSequences'),
+    ]);
+
+    const existingUserIds = new Set(userDocs.map((d) => d.docId));
+    let promoted = 0;
+
+    for (const docItem of localDocs) {
+      if (!docItem.data || docItem.data._deleted === true) continue;
+      if (existingUserIds.has(docItem.docId)) continue;
+      const parsed = sanitizeFaultSequence(docItem.data);
+      if (!parsed) continue;
+      await saveFaultSequence(uid, {
+        ...parsed,
+        id: docItem.docId,
+        isBuiltInPreset: false,
+      });
+      promoted += 1;
+    }
+
+    return promoted;
+  })();
+
+  promotionInFlightByUid.set(uid, run);
+  try {
+    return await run;
+  } finally {
+    promotionInFlightByUid.delete(uid);
+  }
 }
 
 export function subscribeFaultSequences(
@@ -4310,7 +4517,7 @@ export function subscribeFaultSequences(
         id: d.docId,
         isBuiltInPreset: false,
         syncState:
-          d.syncState === 'QUEUED_OFFLINE'
+          d.syncState === 'QUEUED_OFFLINE' || d.syncState === 'ERROR'
             ? 'QUEUED_OFFLINE'
             : localFallbackTone,
       });
@@ -4352,7 +4559,7 @@ export function subscribeFaultSequences(
       if (latestHeaderDocs && latestHeaderDocs.length > 0) {
         const hydratedCloud = await Promise.all(
           latestHeaderDocs.map(async (hdr) => {
-            if (deletedIds.has(hdr.id)) return null;
+            if (deletedIds.has(hdr.id) || isSequenceRecentlyDeleted(uid, hdr.id)) return null;
             const d = hdr.data;
             const [stagesSnap, itemsSnap] = await Promise.all([
               getDocs(
@@ -4415,6 +4622,9 @@ export function subscribeFaultSequences(
 
             if (steps.length === 0) return null;
 
+            const cloudUpdatedAtMs =
+              extractRemoteUpdatedAtMs(d) ?? (Number(d.sequenceUpdatedAtMs) || Date.now());
+
             const reconstructed = sanitizeFaultSequence({
               id: hdr.id,
               title: String(d.title || 'Untitled Fault Sequence'),
@@ -4425,8 +4635,9 @@ export function subscribeFaultSequences(
               steps,
               isBuiltInPreset: false,
               syncState: 'SYNCED_CLOUD',
+              cloudUpdatedAtMs,
               createdAt: Number(d.sequenceCreatedAtMs) || Date.now(),
-              updatedAt: Number(d.sequenceUpdatedAtMs) || Date.now(),
+              updatedAt: Number(d.sequenceUpdatedAtMs) || cloudUpdatedAtMs,
             });
             return reconstructed;
           })
@@ -4435,21 +4646,31 @@ export function subscribeFaultSequences(
         for (const seq of hydratedCloud) {
           if (!seq) continue;
           byId.set(seq.id, seq);
-          await cacheLocalDocument({
-            uid,
-            collection: 'faultSequences',
-            docId: seq.id,
-            data: seq as unknown as Record<string, unknown>,
-            syncState: 'SYNCED_CLOUD',
-            updatedAtMs: seq.updatedAt,
-          });
+          const hasQueuedLocalEdit = cachedList.some(
+            (localSeq) => localSeq.id === seq.id && localSeq.syncState === 'QUEUED_OFFLINE'
+          );
+          if (!hasQueuedLocalEdit) {
+            await cacheLocalDocument({
+              uid,
+              collection: 'faultSequences',
+              docId: seq.id,
+              data: {
+                ...seq,
+                ownerId: uid,
+                schemaVersion: SCHEMA_VERSION_SUBCOLLECTIONS,
+              } as unknown as Record<string, unknown>,
+              syncState: 'SYNCED_CLOUD',
+              updatedAtMs: Math.max(seq.updatedAt, seq.cloudUpdatedAtMs ?? 0),
+            });
+          }
         }
       }
 
       // Overlay any locally cached / offline-queued sequences (queued edits always take precedence)
       for (const localSeq of cachedList) {
+        if (isSequenceRecentlyDeleted(uid, localSeq.id)) continue;
         const existing = byId.get(localSeq.id);
-        if (!existing || localSeq.syncState === 'QUEUED_OFFLINE' || localSeq.updatedAt > existing.updatedAt) {
+        if (!existing || localSeq.syncState === 'QUEUED_OFFLINE') {
           byId.set(localSeq.id, localSeq);
         }
       }
@@ -4502,15 +4723,146 @@ export function subscribeFaultSequences(
   };
 }
 
+const MAX_AUTO_RETRY_ATTEMPTS = 5;
+const inFlightFlushUids = new Set<string>();
+const followUpFlushForceByUid = new Map<string, boolean>();
+const scheduledRetryTimersByUid = new Map<string, ReturnType<typeof setTimeout>>();
+
+type BenchSyncExecutor = (
+  record: OfflineMutationRecord
+) => Promise<void | FlushExecutorOutcome>;
+
+let benchSyncExecutorOverrideForTests: BenchSyncExecutor | null = null;
+let autoRetryDelayOverrideMsForTests: number | null = null;
+
+export function setBenchSyncExecutorForTests(
+  executor: BenchSyncExecutor | null,
+  autoRetryDelayMs?: number | null
+): void {
+  benchSyncExecutorOverrideForTests = executor;
+  autoRetryDelayOverrideMsForTests = autoRetryDelayMs ?? null;
+  if (!executor) {
+    cancelScheduledBenchSyncRetries();
+  }
+}
+
+export function cancelScheduledBenchSyncRetries(uid?: string): void {
+  if (uid) {
+    const existing = scheduledRetryTimersByUid.get(uid);
+    if (existing !== undefined) {
+      clearTimeout(existing);
+      scheduledRetryTimersByUid.delete(uid);
+    }
+    followUpFlushForceByUid.delete(uid);
+    return;
+  }
+  scheduledRetryTimersByUid.forEach((timer) => clearTimeout(timer));
+  scheduledRetryTimersByUid.clear();
+  followUpFlushForceByUid.clear();
+}
+
+async function scheduleAutoRetryIfPending(uid: string): Promise<void> {
+  if (!uid || isLocalWorkstationUid(uid)) return;
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+  if (benchSyncExecutorOverrideForTests === null && (!db || !auth?.currentUser)) return;
+
+  const pending = await getPendingMutations(uid);
+  const eligible = pending.filter((rec) => rec.attempts < MAX_AUTO_RETRY_ATTEMPTS);
+  if (eligible.length === 0) return;
+
+  const now = Date.now();
+  const earliestRetryAtMs = eligible.reduce(
+    (min, rec) => Math.min(min, rec.nextRetryAtMs),
+    Number.POSITIVE_INFINITY
+  );
+  const computedDelay =
+    autoRetryDelayOverrideMsForTests !== null
+      ? Math.max(10, autoRetryDelayOverrideMsForTests)
+      : Math.max(250, earliestRetryAtMs - now);
+
+  const prevTimer = scheduledRetryTimersByUid.get(uid);
+  if (prevTimer !== undefined) {
+    clearTimeout(prevTimer);
+  }
+
+  const timer = setTimeout(() => {
+    scheduledRetryTimersByUid.delete(uid);
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+    void flushQueuedBenchSync(uid, autoRetryDelayOverrideMsForTests !== null).catch(() => {
+      // Failed retry remains safely queued in IndexedDB
+    });
+  }, computedDelay);
+
+  if (typeof (timer as { unref?: () => void }).unref === 'function') {
+    (timer as { unref: () => void }).unref();
+  }
+  scheduledRetryTimersByUid.set(uid, timer);
+}
+
 export async function flushQueuedBenchSync(
   uid: string,
   forceRetry = false
 ): Promise<{ synced: number; failed: number; remaining: number }> {
   await refreshPendingCount(uid);
-  if (!db || isLocalWorkstationUid(uid)) {
+  const activeExecutor = benchSyncExecutorOverrideForTests ?? replayFirestoreMutation;
+  if (
+    isLocalWorkstationUid(uid) ||
+    (benchSyncExecutorOverrideForTests === null && !db)
+  ) {
     return { synced: 0, failed: 0, remaining: 0 };
   }
-  return flushOfflineMutations(uid, replayFirestoreMutation, { forceRetry });
+
+  // Clear any pending scheduled retry timer since a flush is starting now
+  const existingTimer = scheduledRetryTimersByUid.get(uid);
+  if (existingTimer !== undefined) {
+    clearTimeout(existingTimer);
+    scheduledRetryTimersByUid.delete(uid);
+  }
+
+  // If a flush is already in flight for this UID (e.g., rapid optimistic Fault Builder edit),
+  // register a follow-up flush so newly queued mutations are never stranded in IndexedDB.
+  if (inFlightFlushUids.has(uid)) {
+    const prevForce = followUpFlushForceByUid.get(uid) ?? false;
+    followUpFlushForceByUid.set(uid, prevForce || forceRetry);
+    return flushOfflineMutations(uid, activeExecutor, {
+      forceRetry,
+      onRecordSynced: (record) => {
+        notifyLocalCollectionChange(record.collection);
+      },
+      onRecordFailed: (record) => {
+        notifyLocalCollectionChange(record.collection);
+      },
+    });
+  }
+
+  inFlightFlushUids.add(uid);
+  let result: { synced: number; failed: number; remaining: number };
+  try {
+    result = await flushOfflineMutations(uid, activeExecutor, {
+      forceRetry,
+      onRecordSynced: (record) => {
+        notifyLocalCollectionChange(record.collection);
+      },
+      onRecordFailed: (record) => {
+        notifyLocalCollectionChange(record.collection);
+      },
+    });
+  } finally {
+    inFlightFlushUids.delete(uid);
+  }
+
+  if (followUpFlushForceByUid.has(uid)) {
+    const followUpForce = followUpFlushForceByUid.get(uid) ?? false;
+    followUpFlushForceByUid.delete(uid);
+    return flushQueuedBenchSync(uid, followUpForce);
+  }
+
+  if (result.remaining > 0) {
+    await scheduleAutoRetryIfPending(uid);
+  }
+
+  return result;
 }
+
 
 

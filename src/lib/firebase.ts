@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
 import {
   getAuth,
@@ -11,6 +16,8 @@ import {
   initializeFirestore,
   type Firestore,
 } from 'firebase/firestore';
+
+import firebaseAppletConfig from '../../firebase-applet-config.json';
 
 interface FirebaseAppletConfigShape {
   projectId?: string;
@@ -38,23 +45,6 @@ export interface FirebaseCurrentUserSnapshot {
 
 export interface FirebaseAuthHandle {
   currentUser: FirebaseCurrentUserSnapshot | null;
-}
-
-function loadOptionalAppletConfig(): FirebaseAppletConfigShape {
-  try {
-    const meta = import.meta as unknown as { glob?: unknown };
-    if (typeof meta.glob === 'function') {
-      const modules = import.meta.glob('../../firebase-applet-config.json', { eager: true }) as Record<
-        string,
-        { default?: FirebaseAppletConfigShape }
-      >;
-      const first = Object.values(modules)[0];
-      return first?.default ?? {};
-    }
-  } catch {
-    // Ignore when running outside Vite (e.g., Node tsx unit tests)
-  }
-  return {};
 }
 
 const clientEnv: Record<string, string | undefined> =
@@ -101,7 +91,8 @@ export function resolveFirebaseClientConfig(
   };
 }
 
-const fileConfig = loadOptionalAppletConfig();
+const fileConfig: FirebaseAppletConfigShape =
+  (firebaseAppletConfig as FirebaseAppletConfigShape) ?? {};
 
 export const resolvedFirebaseConfig = resolveFirebaseClientConfig(fileConfig, clientEnv);
 
@@ -113,24 +104,20 @@ let app: FirebaseApp | null = null;
 let firestoreInstance: Firestore | null = null;
 let authInstance: Auth | null = null;
 
-if (isFirebaseConfigured) {
+if (isFirebaseConfigured && typeof window !== 'undefined') {
   app = getApps().length ? getApps()[0] : initializeApp(resolvedFirebaseConfig);
-  if (typeof window !== 'undefined') {
-    try {
-      authInstance = getAuth(app);
-    } catch {
-      authInstance = null;
-    }
-    try {
-      firestoreInstance = initializeFirestore(
-        app,
-        { experimentalForceLongPolling: true },
-        resolvedFirebaseConfig.firestoreDatabaseId
-      );
-    } catch {
-      firestoreInstance = getFirestore(app, resolvedFirebaseConfig.firestoreDatabaseId);
-    }
-  } else {
+  try {
+    authInstance = getAuth(app);
+  } catch {
+    authInstance = null;
+  }
+  try {
+    firestoreInstance = initializeFirestore(
+      app,
+      { experimentalForceLongPolling: true },
+      resolvedFirebaseConfig.firestoreDatabaseId
+    );
+  } catch {
     firestoreInstance = getFirestore(app, resolvedFirebaseConfig.firestoreDatabaseId);
   }
 }

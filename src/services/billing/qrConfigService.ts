@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import { useEffect, useState } from 'react';
 
 export const BILLING_CONFIG_DB_NAME = 'AutoLabPro_BillingConfig';

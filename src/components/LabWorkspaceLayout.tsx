@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import React, {
   Component,
   Suspense,
@@ -29,6 +34,7 @@ import type {
 } from "../types/ecu";
 import type { CircuitSolution } from "../utils/circuitSolver";
 import type {
+  CloudSyncStatusSnapshot,
   SavedBenchSession,
   SavedDiagnosticLog,
 } from "../services/benchStorageService";
@@ -284,6 +290,11 @@ export interface LabCloudDataProps {
   savedFaultSequences?: CustomFaultSequence[];
   onSaveFaultSequence?: (sequence: CustomFaultSequence) => Promise<CustomFaultSequence>;
   onDeleteFaultSequence?: (sequenceId: string) => Promise<void>;
+  faultSyncStatus?: CloudSyncStatusSnapshot;
+  isCloudAuthenticated?: boolean;
+  localWorkstationSequenceCount?: number;
+  onSyncFaultSequences?: () => Promise<void>;
+  onPromoteLocalFaultSequences?: () => Promise<number>;
 }
 export interface LabWorkspaceLayoutProps
   extends
@@ -371,6 +382,8 @@ const OPTIONAL_CALLBACK_KEYS: readonly (keyof LabWorkspaceLayoutProps)[] = [
   "onReplaceFaults",
   "onSaveFaultSequence",
   "onDeleteFaultSequence",
+  "onSyncFaultSequences",
+  "onPromoteLocalFaultSequences",
 ];
 const PANEL_LABELS: Record<MobileBenchPane, string> = {
   INSTRUMENTS: "Instruments",
@@ -2919,6 +2932,11 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
             customSequences={props.savedFaultSequences}
             onSaveSequence={props.onSaveFaultSequence}
             onDeleteSequence={props.onDeleteFaultSequence}
+            cloudSyncStatus={props.faultSyncStatus}
+            isCloudAuthenticated={props.isCloudAuthenticated}
+            localWorkstationSequenceCount={props.localWorkstationSequenceCount}
+            onSyncNow={props.onSyncFaultSequences}
+            onPromoteLocalSequences={props.onPromoteLocalFaultSequences}
             onRunSequence={handleRunFaultSequence}
             onPauseToggle={() => setIsSequencePlaying((p) => !p)}
             onJumpToStage={handleJumpFaultSequenceStage}

@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { useMotionValueEvent, useReducedMotion, useSpring } from 'motion/react';
 

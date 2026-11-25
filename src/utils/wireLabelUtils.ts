@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import { DEFAULT_WIRES } from '../simulation/ecu/BenchCircuitSolver';
 import type { WireConnection } from '../types/ecu';
 

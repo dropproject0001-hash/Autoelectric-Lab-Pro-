@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import React from 'react';
 import { ShieldAlert, ShieldCheck, Info, ExternalLink } from 'lucide-react';
 import { AutomotiveRecordProvenance } from '../types/provenance';
@@ -5,6 +10,7 @@ import {
   getVerificationBadgeMeta,
   REGIONAL_MARKET_LABELS,
 } from '../utils/provenanceEngine';
+import { toSafeExternalHttpUrl } from '../utils/safeExternalUrl';
 
 interface ProvenanceBadgeBarProps {
   provenance: AutomotiveRecordProvenance;
@@ -63,19 +69,22 @@ export const ProvenanceBadgeBar: React.FC<ProvenanceBadgeBarProps> = ({
           </div>
           <div className="truncate">
             <strong className="text-slate-300">Reference:</strong>{' '}
-            {provenance.sourceUrlOrRef.startsWith('http') ? (
-              <a
-                href={provenance.sourceUrlOrRef}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-amber-300 hover:underline inline-flex items-center gap-0.5"
-              >
+            {(() => {
+              const safeRefUrl = toSafeExternalHttpUrl(provenance.sourceUrlOrRef);
+              return safeRefUrl ? (
+                <a
+                  href={safeRefUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-300 hover:underline inline-flex items-center gap-0.5"
+                >
+                  <span>{provenance.sourceUrlOrRef}</span>
+                  <ExternalLink className="w-2.5 h-2.5" />
+                </a>
+              ) : (
                 <span>{provenance.sourceUrlOrRef}</span>
-                <ExternalLink className="w-2.5 h-2.5" />
-              </a>
-            ) : (
-              <span>{provenance.sourceUrlOrRef}</span>
-            )}
+              );
+            })()}
           </div>
           {provenance.engineCode && (
             <div>

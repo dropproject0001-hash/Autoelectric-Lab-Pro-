@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { lazyWithRetry } from './utils/lazyWithRetry';
 import {
@@ -27,11 +32,15 @@ import {
   LOCAL_WORKSTATION_UID,
   SavedBenchSession,
   SavedDiagnosticLog,
+  countLocalWorkstationFaultSequences,
   deleteFaultSequence,
+  flushQueuedBenchSync,
+  promoteLocalWorkstationFaultSequencesToUser,
   saveFaultSequence,
   saveUserBenchPreferences,
   subscribeBenchSessions,
   subscribeDiagnosticLogs,
+  subscribeFaultSequenceConflicts,
   subscribeFaultSequences,
   subscribeUserBenchPreferences,
   updateBenchSessionWires,
@@ -164,7 +173,7 @@ function AuthorizedBenchLabWorkspace() {
   const [workspaceInitialTab, setWorkspaceInitialTab] = useState<WorkspaceTab>('DRIVE');
 
   // Firebase Google Auth & Firestore Cloud Sync State
-  const { user } = useAuth();
+  const { user, syncStatus, retryCloudSync } = useAuth();
   const activeStorageUid = user?.uid || LOCAL_WORKSTATION_UID;
 
   // Unified Trial PIN, Access Control & Admin Console Modal State
@@ -430,6 +439,41 @@ function AuthorizedBenchLabWorkspace() {
     },
     [activeStorageUid, reportCloudSyncError]
   );
+
+  const [localWorkstationSequenceCount, setLocalWorkstationSequenceCount] = useState(0);
+
+  useEffect(() => {
+    if (!user?.uid) {
+      setLocalWorkstationSequenceCount(0);
+      return;
+    }
+    let cancelled = false;
+    void countLocalWorkstationFaultSequences().then((count) => {
+      if (!cancelled) setLocalWorkstationSequenceCount(count);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.uid, savedFaultSequences]);
+
+  useEffect(() => {
+    return subscribeFaultSequenceConflicts((conflict) => {
+      setCloudSyncNotice(
+        `Offline edit conflict preserved: saved "${conflict.conflictTitle}" alongside newer cloud revision of "${conflict.originalTitle}".`
+      );
+    });
+  }, []);
+
+  const handlePromoteLocalFaultSequences = useCallback(async (): Promise<number> => {
+    if (!user?.uid) return 0;
+    const promoted = await promoteLocalWorkstationFaultSequencesToUser(user.uid);
+    const remaining = await countLocalWorkstationFaultSequences();
+    setLocalWorkstationSequenceCount(remaining);
+    if (promoted > 0) {
+      void flushQueuedBenchSync(user.uid).catch(() => {});
+    }
+    return promoted;
+  }, [user?.uid]);
 
   useEffect(() => {
     if (!cloudPrefsHydrated || applyingRemotePrefsRef.current) {
@@ -1679,6 +1723,11 @@ function AuthorizedBenchLabWorkspace() {
         savedFaultSequences={savedFaultSequences}
         onSaveFaultSequence={handleSaveFaultSequence}
         onDeleteFaultSequence={handleDeleteFaultSequence}
+        faultSyncStatus={syncStatus}
+        isCloudAuthenticated={Boolean(user)}
+        localWorkstationSequenceCount={localWorkstationSequenceCount}
+        onSyncFaultSequences={retryCloudSync}
+        onPromoteLocalFaultSequences={handlePromoteLocalFaultSequences}
         onOpenVoiceMacroLibrary={() => setShowVoiceMacroLibrary(true)}
         manualRangeLabel={manualRangeLabel}
         onSetManualRangeLabel={setManualRangeLabel}
@@ -1704,6 +1753,9 @@ function AuthorizedBenchLabWorkspace() {
         onQuickAttachBlackProbe={handleQuickAttachBlackProbe}
         onRetryCloudSync={() => {
           setCloudSyncNotice(null);
+          if (user?.uid) {
+            void retryCloudSync().catch(() => {});
+          }
         }}
       />
 

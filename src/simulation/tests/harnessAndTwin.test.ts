@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import assert from 'node:assert/strict';
 import {
   DEFAULT_BENCH_COMPONENTS,

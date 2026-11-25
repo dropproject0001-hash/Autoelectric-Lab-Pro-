@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import { useEffect, useRef, useState } from 'react';
 import { playProbeTapSound } from '../../utils/audioFeedback';
 

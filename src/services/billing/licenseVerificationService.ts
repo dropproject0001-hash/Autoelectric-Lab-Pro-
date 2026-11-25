@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import type { OfflineLicensePayload } from '../../server/services/offlineLicenseCrypto';
 
 export const LICENSE_VAULT_DB_NAME = 'AutoLabPro_LicenseVault';

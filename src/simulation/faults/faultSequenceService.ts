@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import type { EcuPin, FaultType, InjectedFault } from '../../types/ecu';
 
 export type CustomFaultMode =
@@ -60,6 +65,8 @@ export interface CustomFaultSequence {
   steps: FaultSequenceStep[];
   isBuiltInPreset?: boolean;
   syncState?: FaultSequenceSyncState;
+  /** Server-confirmed Firestore updatedAt timestamp (ms) used for cross-device OCC conflict detection. */
+  cloudUpdatedAtMs?: number;
   createdAt: number;
   updatedAt: number;
 }
@@ -521,6 +528,12 @@ export function sanitizeFaultSequence(raw: unknown): CustomFaultSequence | null 
       ? rawSync
       : undefined;
 
+  const rawCloudUpdatedAtMs = Number(obj.cloudUpdatedAtMs);
+  const cloudUpdatedAtMs =
+    Number.isFinite(rawCloudUpdatedAtMs) && rawCloudUpdatedAtMs > 0
+      ? rawCloudUpdatedAtMs
+      : undefined;
+
   return {
     id: String(obj.id || makeUid('fseq')).slice(0, 64),
     title: String(obj.title || 'Untitled Fault Sequence').slice(0, 100) || 'Untitled Fault Sequence',
@@ -531,6 +544,7 @@ export function sanitizeFaultSequence(raw: unknown): CustomFaultSequence | null 
     steps,
     isBuiltInPreset: Boolean(obj.isBuiltInPreset),
     ...(syncState ? { syncState } : {}),
+    ...(cloudUpdatedAtMs !== undefined ? { cloudUpdatedAtMs } : {}),
     createdAt: clampNumber(obj.createdAt, Date.now(), 0, Number.MAX_SAFE_INTEGER),
     updatedAt: clampNumber(obj.updatedAt, Date.now(), 0, Number.MAX_SAFE_INTEGER),
   };

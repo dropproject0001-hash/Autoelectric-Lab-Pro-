@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 export interface BenchPinoutInfo {
   pinNumber: number;
   pinCode?: string; // OEM cavity label e.g. 'A9', 'K28', 'B2'

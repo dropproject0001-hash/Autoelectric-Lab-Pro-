@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 export type PinCategory = 'power' | 'ground' | 'sensor_in' | 'actuator_out' | 'communication' | 'reference';
 
 export interface EcuPin {

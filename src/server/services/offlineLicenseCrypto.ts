@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import crypto from 'node:crypto';
 
 export type SubscriptionDurationDays = 30 | 90 | 180 | 365 | 36500;

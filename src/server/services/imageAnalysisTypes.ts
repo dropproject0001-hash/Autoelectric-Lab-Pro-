@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 export interface PcbNormalizedBox {
   ymin: number; // 0 - 1000 normalized top
   xmin: number; // 0 - 1000 normalized left

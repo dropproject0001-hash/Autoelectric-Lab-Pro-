@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import React, { useState } from 'react';
 import {
   Check,
@@ -28,6 +33,7 @@ import {
   WorkspaceBenchTelemetryInput,
 } from '../../services/googleSheetsSlidesTasksKeepService';
 import { PendingWorkspaceAction } from './workspaceTypes';
+import { toSafeExternalHttpUrl } from '../../utils/safeExternalUrl';
 
 // ============================================================================
 // 1. GOOGLE SHEETS TAB
@@ -229,15 +235,20 @@ export const GoogleSheetsTab: React.FC<GoogleSheetsTabProps> = ({
                     <span>Append Bench Snapshot to &ldquo;{selectedSheetTabTitle}&rdquo;</span>
                   </button>
                 )}
-                <a
-                  href={selectedSpreadsheet.spreadsheetUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hw-btn px-2.5 py-1 rounded-[2px] text-[11px] text-emerald-300 flex items-center gap-1"
-                >
-                  <span>Open in Sheets</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+                {(() => {
+                  const safeSheetUrl = toSafeExternalHttpUrl(selectedSpreadsheet.spreadsheetUrl);
+                  return safeSheetUrl ? (
+                    <a
+                      href={safeSheetUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hw-btn px-2.5 py-1 rounded-[2px] text-[11px] text-emerald-300 flex items-center gap-1"
+                    >
+                      <span>Open in Sheets</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  ) : null;
+                })()}
               </div>
             </div>
 
@@ -521,15 +532,20 @@ export const GoogleSlidesTab: React.FC<GoogleSlidesTabProps> = ({
                   <Plus className="w-3 h-3" />
                   <span>Append Live Diagnostic Slide</span>
                 </button>
-                <a
-                  href={selectedPresentation.webViewLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hw-btn px-2.5 py-1 rounded-[2px] text-[11px] text-amber-300 flex items-center gap-1"
-                >
-                  <span>Open in Slides</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+                {(() => {
+                  const safeSlideUrl = toSafeExternalHttpUrl(selectedPresentation.webViewLink);
+                  return safeSlideUrl ? (
+                    <a
+                      href={safeSlideUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hw-btn px-2.5 py-1 rounded-[2px] text-[11px] text-amber-300 flex items-center gap-1"
+                    >
+                      <span>Open in Slides</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  ) : null;
+                })()}
               </div>
             </div>
 

@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import { GearSelection } from './telemetryTypes';
 
 export const GEAR_RATIOS: Record<GearSelection, number> = {

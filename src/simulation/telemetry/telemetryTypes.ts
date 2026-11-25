@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 export type GaugeTransportMode = 'LIVE' | 'PAUSED' | 'STOPPED';
 
 export type MapCalibrationPreset = 'BAR_1_NA' | 'BAR_2_BOOST' | 'BAR_3_BOOST';

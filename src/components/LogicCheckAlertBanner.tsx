@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import React from 'react';
 import { AlertTriangle, ShieldAlert, X } from 'lucide-react';
 import type { LogicCheckAlert } from '../simulation/ecu/LogicCheckEngine';

@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import { AutomotiveRecordProvenance, RegionalMarket } from '../types/provenance';
 import { buildProvenanceRecord } from './provenanceEngine';
 import { RESTRICTED_MODEL_DATABASE, VERIFIED_VOICE_ECU_GUIDES } from './oemKnowledgeDatabase';

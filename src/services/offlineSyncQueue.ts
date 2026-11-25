@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 export type OfflineMutationCollection =
   | 'users'
   | 'benchSessions'
@@ -47,6 +52,9 @@ export type CloudSyncState = 'IDLE' | 'SYNCING' | 'OFFLINE_QUEUED' | 'ERROR';
 export interface CloudSyncStatusSnapshot {
   state: CloudSyncState;
   pendingCount: number;
+  failedCount: number;
+  nextRetryAtMs: number | null;
+  pendingCollections: OfflineMutationCollection[];
   lastSyncedAtMs: number | null;
   lastError: string | null;
 }
@@ -75,6 +83,9 @@ const latestStampByKey = new Map<string, MutationVersionStamp>();
 let currentSyncState: CloudSyncStatusSnapshot = {
   state: 'IDLE',
   pendingCount: 0,
+  failedCount: 0,
+  nextRetryAtMs: null,
+  pendingCollections: [],
   lastSyncedAtMs: null,
   lastError: null,
 };
@@ -101,7 +112,10 @@ function updateSyncSnapshot(partial: Partial<CloudSyncStatusSnapshot>): void {
 }
 
 export function getSyncStatusSnapshot(): CloudSyncStatusSnapshot {
-  return { ...currentSyncState };
+  return {
+    ...currentSyncState,
+    pendingCollections: [...currentSyncState.pendingCollections],
+  };
 }
 
 export function subscribeSyncStatus(
@@ -301,17 +315,62 @@ export function isTransientOfflineError(err: unknown): boolean {
   );
 }
 
+function summarizePendingQueue(records: OfflineMutationRecord[]): {
+  pendingCount: number;
+  failedCount: number;
+  nextRetryAtMs: number | null;
+  pendingCollections: OfflineMutationCollection[];
+  latestQueuedError: string | null;
+} {
+  let failedCount = 0;
+  let earliestRetry: number | null = null;
+  let latestQueuedError: string | null = null;
+  let latestErrorTs = -1;
+  const collections = new Set<OfflineMutationCollection>();
+
+  for (const rec of records) {
+    collections.add(rec.collection);
+    if (rec.attempts > 0) {
+      failedCount += 1;
+      if (
+        typeof rec.nextRetryAtMs === 'number' &&
+        (earliestRetry === null || rec.nextRetryAtMs < earliestRetry)
+      ) {
+        earliestRetry = rec.nextRetryAtMs;
+      }
+    }
+    if (rec.lastError && rec.updatedAtMs >= latestErrorTs) {
+      latestQueuedError = rec.lastError;
+      latestErrorTs = rec.updatedAtMs;
+    }
+  }
+
+  return {
+    pendingCount: records.length,
+    failedCount,
+    nextRetryAtMs: earliestRetry,
+    pendingCollections: Array.from(collections),
+    latestQueuedError,
+  };
+}
+
 export async function refreshPendingCount(uid?: string): Promise<number> {
   const all = await idbGetAll<OfflineMutationRecord>(STORE_QUEUE);
   const filtered = uid ? all.filter((m) => m.uid === uid) : all;
-  const count = filtered.length;
+  const summary = summarizePendingQueue(filtered);
+  const count = summary.pendingCount;
   updateSyncSnapshot({
     pendingCount: count,
+    failedCount: summary.failedCount,
+    nextRetryAtMs: summary.nextRetryAtMs,
+    pendingCollections: summary.pendingCollections,
     state:
       count > 0
         ? currentSyncState.state === 'SYNCING'
           ? 'SYNCING'
-          : 'OFFLINE_QUEUED'
+          : currentSyncState.state === 'ERROR'
+            ? 'ERROR'
+            : 'OFFLINE_QUEUED'
         : currentSyncState.lastError
           ? 'ERROR'
           : 'IDLE',
@@ -497,10 +556,14 @@ export async function markMutationSynced<T = Record<string, unknown>>(
     )
   ) {
     const all = await idbGetAll<OfflineMutationRecord>(STORE_QUEUE);
-    const remaining = all.filter((m) => m.uid === uid).length;
+    const remainingRecords = all.filter((m) => m.uid === uid);
+    const summary = summarizePendingQueue(remainingRecords);
     updateSyncSnapshot({
-      pendingCount: remaining,
-      state: remaining > 0 ? 'OFFLINE_QUEUED' : 'IDLE',
+      pendingCount: summary.pendingCount,
+      failedCount: summary.failedCount,
+      nextRetryAtMs: summary.nextRetryAtMs,
+      pendingCollections: summary.pendingCollections,
+      state: summary.pendingCount > 0 ? 'OFFLINE_QUEUED' : 'IDLE',
     });
     return false;
   }
@@ -514,32 +577,44 @@ export async function markMutationSynced<T = Record<string, unknown>>(
       options?.expectedUpdatedAtMs
     );
     if (!hasNewerCachedDoc) {
-      const syncedVersion =
-        options?.expectedVersion ?? currentQueued?.version ?? currentCached?.version ?? 1;
-      const syncedUpdatedAtMs =
-        options?.expectedUpdatedAtMs ??
-        currentQueued?.updatedAtMs ??
-        currentCached?.updatedAtMs ??
-        Date.now();
-      await cacheLocalDocument({
-        uid,
-        collection,
-        docId,
-        data: syncedData,
-        syncState: 'SYNCED_CLOUD',
-        version: syncedVersion,
-        updatedAtMs: syncedUpdatedAtMs,
-      });
+      const isDeletedTombstone =
+        typeof syncedData === 'object' &&
+        syncedData !== null &&
+        (syncedData as { _deleted?: unknown })._deleted === true;
+      if (isDeletedTombstone) {
+        await idbDelete(STORE_CACHE, idempotencyKey);
+      } else {
+        const syncedVersion =
+          options?.expectedVersion ?? currentQueued?.version ?? currentCached?.version ?? 1;
+        const syncedUpdatedAtMs =
+          options?.expectedUpdatedAtMs ??
+          currentQueued?.updatedAtMs ??
+          currentCached?.updatedAtMs ??
+          Date.now();
+        await cacheLocalDocument({
+          uid,
+          collection,
+          docId,
+          data: syncedData,
+          syncState: 'SYNCED_CLOUD',
+          version: syncedVersion,
+          updatedAtMs: syncedUpdatedAtMs,
+        });
+      }
     }
   }
 
   const all = await idbGetAll<OfflineMutationRecord>(STORE_QUEUE);
-  const remaining = all.filter((m) => m.uid === uid).length;
+  const remainingRecords = all.filter((m) => m.uid === uid);
+  const summary = summarizePendingQueue(remainingRecords);
   updateSyncSnapshot({
-    pendingCount: remaining,
+    pendingCount: summary.pendingCount,
+    failedCount: summary.failedCount,
+    nextRetryAtMs: summary.nextRetryAtMs,
+    pendingCollections: summary.pendingCollections,
     lastSyncedAtMs: Date.now(),
-    lastError: null,
-    state: remaining > 0 ? 'OFFLINE_QUEUED' : 'IDLE',
+    lastError: summary.failedCount > 0 ? summary.latestQueuedError : null,
+    state: summary.pendingCount > 0 ? 'OFFLINE_QUEUED' : 'IDLE',
   });
   return true;
 }
@@ -555,10 +630,18 @@ const activeFlushPromisesByUid = new Map<
   Promise<{ synced: number; failed: number; remaining: number }>
 >();
 
+export interface FlushExecutorOutcome {
+  skipCachePayloadUpdate?: boolean;
+}
+
 export async function flushOfflineMutations(
   uid: string,
-  executor: (record: OfflineMutationRecord) => Promise<void>,
-  options: { forceRetry?: boolean } = {}
+  executor: (record: OfflineMutationRecord) => Promise<void | FlushExecutorOutcome>,
+  options: {
+    forceRetry?: boolean;
+    onRecordSynced?: (record: OfflineMutationRecord) => void | Promise<void>;
+    onRecordFailed?: (record: OfflineMutationRecord, error: unknown) => void | Promise<void>;
+  } = {}
 ): Promise<{ synced: number; failed: number; remaining: number }> {
   const flushKey = uid || '__all__';
   const existingPromise = activeFlushPromisesByUid.get(flushKey);
@@ -572,31 +655,49 @@ export async function flushOfflineMutations(
     if (pending.length === 0) {
       updateSyncSnapshot({
         pendingCount: 0,
+        failedCount: 0,
+        nextRetryAtMs: null,
+        pendingCollections: [],
         state: 'IDLE',
         lastError: null,
       });
       return { synced: 0, failed: 0, remaining: 0 };
     }
 
+    const initialSummary = summarizePendingQueue(pending);
     updateSyncSnapshot({
       state: 'SYNCING',
-      pendingCount: pending.length,
+      pendingCount: initialSummary.pendingCount,
+      failedCount: initialSummary.failedCount,
+      nextRetryAtMs: initialSummary.nextRetryAtMs,
+      pendingCollections: initialSummary.pendingCollections,
     });
 
     let synced = 0;
     let failed = 0;
     let hasNonTransientFailure = false;
+    let lastBatchError: string | null = null;
 
     for (const record of pending) {
       if (!options.forceRetry && record.nextRetryAtMs > now) {
         continue;
       }
       try {
-        await executor(record);
-        await markMutationSynced(record.uid, record.collection, record.docId, record.payload, {
-          expectedVersion: record.version,
-          expectedUpdatedAtMs: record.updatedAtMs,
-        });
+        const outcome = await executor(record);
+        const skipCache = Boolean(outcome && outcome.skipCachePayloadUpdate);
+        await markMutationSynced(
+          record.uid,
+          record.collection,
+          record.docId,
+          skipCache ? undefined : record.payload,
+          {
+            expectedVersion: record.version,
+            expectedUpdatedAtMs: record.updatedAtMs,
+          }
+        );
+        if (options.onRecordSynced) {
+          await options.onRecordSynced(record);
+        }
         synced += 1;
       } catch (err) {
         failed += 1;
@@ -605,10 +706,12 @@ export async function flushOfflineMutations(
           hasNonTransientFailure = true;
         }
         const errMsg = err instanceof Error ? err.message : String(err);
+        lastBatchError = errMsg;
         const latestQueued = await idbGet<OfflineMutationRecord>(
           STORE_QUEUE,
           record.idempotencyKey
         );
+        let updatedRecord: OfflineMutationRecord = record;
         // Only write retry state if no newer version was enqueued while executor was in-flight
         if (
           !latestQueued ||
@@ -616,14 +719,17 @@ export async function flushOfflineMutations(
         ) {
           const attempts = record.attempts + 1;
           const backoff = RETRY_BACKOFF_MS[Math.min(attempts - 1, RETRY_BACKOFF_MS.length - 1)];
-          const updated: OfflineMutationRecord = {
+          updatedRecord = {
             ...record,
             attempts,
             updatedAtMs: record.updatedAtMs,
             nextRetryAtMs: Date.now() + backoff,
             lastError: errMsg,
           };
-          await idbPut(STORE_QUEUE, updated);
+          await idbPut(STORE_QUEUE, updatedRecord);
+        }
+        if (options.onRecordFailed) {
+          await options.onRecordFailed(updatedRecord, err);
         }
         updateSyncSnapshot({
           lastError: errMsg,
@@ -636,13 +742,22 @@ export async function flushOfflineMutations(
     }
 
     const remainingList = await getPendingMutations(uid);
+    const finalSummary = summarizePendingQueue(remainingList);
     const isBrowserOffline = typeof navigator !== 'undefined' && navigator.onLine === false;
+    const resolvedLastError =
+      lastBatchError ??
+      (finalSummary.failedCount > 0 ? finalSummary.latestQueuedError : null);
+
     updateSyncSnapshot({
-      pendingCount: remainingList.length,
+      pendingCount: finalSummary.pendingCount,
+      failedCount: finalSummary.failedCount,
+      nextRetryAtMs: finalSummary.nextRetryAtMs,
+      pendingCollections: finalSummary.pendingCollections,
+      lastError: remainingList.length === 0 && failed === 0 ? null : resolvedLastError,
       state:
         hasNonTransientFailure && !isBrowserOffline
           ? 'ERROR'
-          : remainingList.length > 0
+          : finalSummary.pendingCount > 0
             ? 'OFFLINE_QUEUED'
             : failed > 0
               ? 'ERROR'
@@ -652,7 +767,7 @@ export async function flushOfflineMutations(
     return {
       synced,
       failed,
-      remaining: remainingList.length,
+      remaining: finalSummary.pendingCount,
     };
   })();
 
@@ -673,6 +788,9 @@ export async function resetOfflineQueueForTests(): Promise<void> {
   currentSyncState = {
     state: 'IDLE',
     pendingCount: 0,
+    failedCount: 0,
+    nextRetryAtMs: null,
+    pendingCollections: [],
     lastSyncedAtMs: null,
     lastError: null,
   };

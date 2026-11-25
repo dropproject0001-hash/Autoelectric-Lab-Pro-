@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Activity,
@@ -5,14 +10,17 @@ import {
   ArrowLeft,
   ArrowRight,
   CheckCircle2,
+  Cloud,
   Copy,
   Download,
   Eye,
   EyeOff,
+  HardDrive,
   Layers,
   Pause,
   Play,
   Plus,
+  RefreshCw,
   RotateCcw,
   Save,
   SkipForward,
@@ -21,6 +29,7 @@ import {
   Wrench,
   X,
 } from 'lucide-react';
+import type { CloudSyncStatusSnapshot } from '../services/benchStorageService';
 import type {
   DiagnosticTroubleCode,
   EcuPin,
@@ -68,6 +77,11 @@ export interface FaultBuilderModalProps {
   customSequences?: CustomFaultSequence[];
   onSaveSequence?: (sequence: CustomFaultSequence) => Promise<CustomFaultSequence>;
   onDeleteSequence?: (sequenceId: string) => Promise<void>;
+  cloudSyncStatus?: CloudSyncStatusSnapshot;
+  isCloudAuthenticated?: boolean;
+  localWorkstationSequenceCount?: number;
+  onSyncNow?: () => Promise<void>;
+  onPromoteLocalSequences?: () => Promise<number>;
   onRunSequence: (sequence: CustomFaultSequence, blindMode?: boolean) => void;
   onPauseToggle: () => void;
   onJumpToStage: (stageIndex: number) => void;
@@ -175,6 +189,11 @@ export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
   customSequences,
   onSaveSequence,
   onDeleteSequence,
+  cloudSyncStatus,
+  isCloudAuthenticated = false,
+  localWorkstationSequenceCount = 0,
+  onSyncNow,
+  onPromoteLocalSequences,
   onRunSequence,
   onPauseToggle,
   onJumpToStage,
@@ -223,6 +242,27 @@ export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
     return () => window.removeEventListener('keydown', handleKey);
   }, [isOpen, onClose, customSequences]);
 
+  const [isPromotingLocal, setIsPromotingLocal] = useState(false);
+
+  useEffect(() => {
+    const matched = sequences.find((s) => s.id === draft.id);
+    if (!matched || matched.isBuiltInPreset) return;
+    if (
+      matched.syncState !== draft.syncState ||
+      matched.cloudUpdatedAtMs !== draft.cloudUpdatedAtMs
+    ) {
+      setDraft((prev) =>
+        prev.id === matched.id
+          ? {
+              ...prev,
+              syncState: matched.syncState,
+              cloudUpdatedAtMs: matched.cloudUpdatedAtMs,
+            }
+          : prev
+      );
+    }
+  }, [sequences, draft.id, draft.syncState, draft.cloudUpdatedAtMs]);
+
   useEffect(() => {
     if (selectedStageIdx >= draft.steps.length) {
       setSelectedStageIdx(Math.max(0, draft.steps.length - 1));
@@ -268,9 +308,11 @@ export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
         setDraft(saved);
         const syncDetail =
           saved.syncState === 'SYNCED_CLOUD'
-            ? 'to IndexedDB & synced to Firestore cloud.'
+            ? 'to IndexedDB & confirmed in Firestore cloud.'
             : saved.syncState === 'QUEUED_OFFLINE'
-              ? 'to IndexedDB offline cache (queued for automatic cloud sync).'
+              ? isCloudAuthenticated
+                ? 'to IndexedDB cache — syncing to Firestore cloud in background…'
+                : 'to IndexedDB offline cache (queued for automatic cloud sync).'
               : 'to durable local IndexedDB storage.';
         setStatusMessage({
           tone: 'SUCCESS',
@@ -350,7 +392,12 @@ export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
           setDraft(fallback);
           setSelectedStageIdx(0);
         }
-        setStatusMessage({ tone: 'INFO', text: 'Deleted custom sequence from IndexedDB & cloud library.' });
+        setStatusMessage({
+          tone: 'INFO',
+          text: isCloudAuthenticated
+            ? 'Removed sequence from IndexedDB cache (cloud delete queued in background).'
+            : 'Removed custom sequence from local IndexedDB storage.',
+        });
       } catch (err) {
         setStatusMessage({
           tone: 'ERROR',
@@ -603,6 +650,118 @@ export const FaultBuilderModal: React.FC<FaultBuilderModalProps> = ({
             aria-label="Saved fault sequences library"
             className="flex flex-col gap-3 border-b lg:border-b-0 lg:border-r border-[#203653] bg-[#080F1C] p-4 lg:overflow-y-auto"
           >
+            {/* IndexedDB-First + Firestore Background Sync Telemetry Bar */}
+            <div className="rounded-lg border border-[#203653] bg-[#0A1220] p-2.5 space-y-2">
+              <div className="flex items-center justify-between gap-2 font-mono text-[11px]">
+                <span className="flex items-center gap-1.5 text-[#d4e3f6] font-semibold">
+                  {isCloudAuthenticated ? (
+                    <Cloud
+                      className={`h-3.5 w-3.5 shrink-0 ${
+                        cloudSyncStatus?.state === 'ERROR'
+                          ? 'text-[#ff8a99]'
+                          : (cloudSyncStatus?.pendingCount ?? 0) > 0
+                            ? 'text-[#ffb020]'
+                            : 'text-[#20d889]'
+                      }`}
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <HardDrive className="h-3.5 w-3.5 shrink-0 text-[#19c8f5]" aria-hidden="true" />
+                  )}
+                  <span>
+                    {isCloudAuthenticated ? 'IndexedDB + Cloud Sync' : 'IndexedDB Local Primary'}
+                  </span>
+                </span>
+                {isCloudAuthenticated && onSyncNow && (
+                  <button
+                    type="button"
+                    disabled={cloudSyncStatus?.state === 'SYNCING'}
+                    onClick={() => {
+                      void onSyncNow()
+                        .then(() => {
+                          setStatusMessage({
+                            tone: 'INFO',
+                            text: 'Requested background Firestore sync flush for pending offline edits.',
+                          });
+                        })
+                        .catch((err) => {
+                          setStatusMessage({
+                            tone: 'ERROR',
+                            text:
+                              err instanceof Error
+                                ? err.message
+                                : 'Unable to complete cloud sync right now.',
+                          });
+                        });
+                    }}
+                    className="inline-flex items-center gap-1 rounded border border-[#203653] bg-[#060B14] px-2 py-0.5 text-[10.5px] font-semibold text-[#19c8f5] hover:border-[#19c8f5]/60 disabled:opacity-50 cursor-pointer"
+                  >
+                    <RefreshCw
+                      className={`h-3 w-3 ${
+                        cloudSyncStatus?.state === 'SYNCING' ? 'animate-spin' : ''
+                      }`}
+                      aria-hidden="true"
+                    />
+                    <span>
+                      {cloudSyncStatus?.state === 'SYNCING'
+                        ? 'Syncing…'
+                        : (cloudSyncStatus?.pendingCount ?? 0) > 0
+                          ? `Sync (${cloudSyncStatus?.pendingCount})`
+                          : 'Sync Now'}
+                    </span>
+                  </button>
+                )}
+              </div>
+
+              <div className="font-mono text-[10.5px] text-[#91a4bd] leading-snug">
+                {!isCloudAuthenticated
+                  ? 'Instant local IndexedDB persistence. Sign in with Google to mirror drills across devices.'
+                  : cloudSyncStatus?.state === 'ERROR' && cloudSyncStatus.lastError
+                    ? `Retry queued: ${cloudSyncStatus.lastError}`
+                    : (cloudSyncStatus?.pendingCount ?? 0) > 0
+                      ? `${cloudSyncStatus?.pendingCount} mutation(s) queued in IndexedDB for background upload.`
+                      : 'All custom sequences cached locally & mirrored to Firestore.'}
+              </div>
+
+              {isCloudAuthenticated && localWorkstationSequenceCount > 0 && onPromoteLocalSequences && (
+                <button
+                  type="button"
+                  disabled={isPromotingLocal}
+                  onClick={() => {
+                    setIsPromotingLocal(true);
+                    void onPromoteLocalSequences()
+                      .then((count) => {
+                        setStatusMessage({
+                          tone: 'SUCCESS',
+                          text:
+                            count > 0
+                              ? `Promoted ${count} offline local workstation drill(s) into IndexedDB & cloud sync queue.`
+                              : 'All local workstation drills are already present in your cloud library.',
+                        });
+                      })
+                      .catch((err) => {
+                        setStatusMessage({
+                          tone: 'ERROR',
+                          text:
+                            err instanceof Error
+                              ? err.message
+                              : 'Failed to import local workstation drills.',
+                        });
+                      })
+                      .finally(() => setIsPromotingLocal(false));
+                  }}
+                  className="w-full inline-flex items-center justify-center gap-1.5 rounded-md border border-[#19c8f5]/45 bg-[#0d2738] px-2.5 py-1.5 font-mono text-[11px] font-semibold text-[#19c8f5] hover:bg-[#13354b] disabled:opacity-50 cursor-pointer"
+                >
+                  <Upload className="h-3 w-3" aria-hidden="true" />
+                  <span>
+                    {isPromotingLocal
+                      ? 'Importing Local Drills…'
+                      : `Import Local Workstation Drills (${localWorkstationSequenceCount})`}
+                  </span>
+                </button>
+              )}
+            </div>
+
             <div className="flex items-center justify-between gap-2">
               <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#91a4bd]">
                 Saved Sequences ({sequences.length})

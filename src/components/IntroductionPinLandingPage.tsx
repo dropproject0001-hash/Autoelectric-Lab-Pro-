@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import {
@@ -8,6 +13,7 @@ import {
   Copy,
   Cpu,
   Delete,
+  ExternalLink,
   KeyRound,
   Laptop,
   Lock,
@@ -95,6 +101,8 @@ export const IntroductionPinLandingPage: React.FC = () => {
     signInWithGoogle,
     isSigningIn,
     authError,
+    authErrorDetails,
+    clearAuthError,
   } = useAuth();
   const {
     accessMode,
@@ -114,6 +122,19 @@ export const IntroductionPinLandingPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [copiedDomain, setCopiedDomain] = useState(false);
+
+  const handleCopyUnauthorizedDomain = useCallback(async (hostname: string) => {
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(hostname);
+      }
+      setCopiedDomain(true);
+      window.setTimeout(() => setCopiedDomain(false), 2200);
+    } catch {
+      setCopiedDomain(false);
+    }
+  }, []);
 
   // Technician 8-digit PIN state
   const [pinDigits, setPinDigits] = useState('');
@@ -617,10 +638,62 @@ export const IntroductionPinLandingPage: React.FC = () => {
             {(lockNotice || errorMsg || authError) && (
               <div
                 role="alert"
-                className="flex items-start gap-2.5 rounded-lg border border-[#FF4D62]/50 bg-[#2A0E15] px-3.5 py-2.5 text-xs text-[#FFC2CA]"
+                className="rounded-lg border border-[#FF4D62]/50 bg-[#2A0E15] px-3.5 py-2.5 text-xs text-[#FFC2CA] space-y-2.5"
               >
-                <AlertTriangle className="h-4 w-4 text-[#FF4D62] shrink-0 mt-0.5" aria-hidden="true" />
-                <span>{errorMsg || authError || lockNotice}</span>
+                <div className="flex items-start gap-2.5">
+                  <AlertTriangle
+                    className="h-4 w-4 text-[#FF4D62] shrink-0 mt-0.5"
+                    aria-hidden="true"
+                  />
+                  <span className="leading-relaxed">{errorMsg || authError || lockNotice}</span>
+                </div>
+
+                {!errorMsg &&
+                  authErrorDetails?.code === 'auth/unauthorized-domain' &&
+                  authErrorDetails.hostname && (
+                    <div
+                      data-testid="unauthorized-domain-recovery"
+                      className="pt-2 border-t border-[#FF4D62]/30 space-y-2"
+                    >
+                      <div className="font-mono text-[11px] text-[#FFE0E5] break-all tabular-nums">
+                        {authErrorDetails.hostname}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            void handleCopyUnauthorizedDomain(authErrorDetails.hostname!)
+                          }
+                          data-testid="copy-unauthorized-domain-btn"
+                          className="min-h-[40px] px-3 py-1.5 rounded-md border border-[#FF8A99]/55 bg-[#3D141F] hover:bg-[#4E1A28] font-mono text-[11px] font-semibold text-[#FFF0F2] inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap transition-colors"
+                        >
+                          <Copy className="w-3.5 h-3.5" aria-hidden="true" />
+                          <span>{copiedDomain ? 'Domain Copied' : 'Copy Domain'}</span>
+                        </button>
+
+                        {authErrorDetails.consoleAuthorizedDomainsUrl && (
+                          <a
+                            href={authErrorDetails.consoleAuthorizedDomainsUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-testid="open-firebase-auth-settings-link"
+                            className="min-h-[40px] px-3 py-1.5 rounded-md border border-[#19C8F5]/55 bg-[#0E192A] hover:bg-[#14253D] font-mono text-[11px] font-semibold text-[#19C8F5] inline-flex items-center gap-1.5 whitespace-nowrap transition-colors"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
+                            <span>Open Firebase Settings</span>
+                          </a>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={clearAuthError}
+                          className="min-h-[40px] px-2.5 py-1.5 font-mono text-[11px] text-[#FFC2CA]/85 hover:text-white underline cursor-pointer whitespace-nowrap"
+                        >
+                          Dismiss
+                        </button>
+                      </div>
+                    </div>
+                  )}
               </div>
             )}
 
@@ -771,7 +844,9 @@ export const IntroductionPinLandingPage: React.FC = () => {
                       <div className="space-y-2.5">
                         <input
                           type="password"
+                          name="vecl-admin-setup-pin"
                           inputMode="numeric"
+                          autoComplete="new-password"
                           value={masterPinInput}
                           onChange={(e) => setMasterPinInput(e.target.value.replace(/\D/g, '').slice(0, 12))}
                           placeholder="Choose Master Admin PIN (6–12 digits)"
@@ -779,7 +854,9 @@ export const IntroductionPinLandingPage: React.FC = () => {
                         />
                         <input
                           type="password"
+                          name="vecl-admin-setup-pin-confirm"
                           inputMode="numeric"
+                          autoComplete="new-password"
                           value={setupPinConfirm}
                           onChange={(e) => setSetupPinConfirm(e.target.value.replace(/\D/g, '').slice(0, 12))}
                           placeholder="Confirm Master Admin PIN"
@@ -806,7 +883,9 @@ export const IntroductionPinLandingPage: React.FC = () => {
                       </div>
                       <input
                         type="password"
+                        name="vecl-admin-master-pin"
                         inputMode="numeric"
+                        autoComplete="one-time-code"
                         value={masterPinInput}
                         onChange={(e) => setMasterPinInput(e.target.value)}
                         placeholder="Enter Master Admin PIN"

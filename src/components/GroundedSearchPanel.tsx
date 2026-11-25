@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   Search,
@@ -23,6 +28,7 @@ import { useTrialAccess } from '../context/TrialAccessContext';
 import { LOCAL_WORKSTATION_UID, saveDiagnosticLog } from '../services/benchStorageService';
 import { ProvenanceBadgeBar } from './ProvenanceBadgeBar';
 import { buildProvenanceRecord } from '../utils/provenanceEngine';
+import { toSafeExternalHttpUrl } from '../utils/safeExternalUrl';
 import {
   buildStartMyCarGroundedQuery,
   buildStartMyCarProvenance,
@@ -714,23 +720,39 @@ export const GroundedSearchPanel: React.FC<GroundedSearchPanelProps> = ({
                 <span>Verified OEM &amp; Automotive Technical Sources:</span>
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                {result.sources.map((source, idx) => (
-                  <a
-                    key={idx}
-                    href={source.uri}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-[#0e1116] hover:bg-[#151a22] p-2.5 rounded-[2px] border border-[#2b313c] hover:border-amber-500/60 transition flex flex-col justify-between gap-1 group"
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="font-sans font-semibold text-xs text-slate-200 group-hover:text-amber-300 line-clamp-1">
-                        {source.title}
-                      </span>
-                      <ExternalLink className="w-3 h-3 text-slate-500 group-hover:text-amber-400 shrink-0 mt-0.5" />
-                    </div>
-                    <span className="text-[10px] text-slate-400 font-mono truncate">{source.domain}</span>
-                  </a>
-                ))}
+                {result.sources.map((source, idx) => {
+                  const safeHref = toSafeExternalHttpUrl(source.uri);
+                  if (!safeHref) {
+                    return (
+                      <div
+                        key={idx}
+                        className="bg-[#0e1116] p-2.5 rounded-[2px] border border-[#2b313c] flex flex-col justify-between gap-1"
+                      >
+                        <span className="font-sans font-semibold text-xs text-slate-300 line-clamp-1">
+                          {source.title}
+                        </span>
+                        <span className="text-[10px] text-slate-500 font-mono truncate">{source.domain}</span>
+                      </div>
+                    );
+                  }
+                  return (
+                    <a
+                      key={idx}
+                      href={safeHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-[#0e1116] hover:bg-[#151a22] p-2.5 rounded-[2px] border border-[#2b313c] hover:border-amber-500/60 transition flex flex-col justify-between gap-1 group"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="font-sans font-semibold text-xs text-slate-200 group-hover:text-amber-300 line-clamp-1">
+                          {source.title}
+                        </span>
+                        <ExternalLink className="w-3 h-3 text-slate-500 group-hover:text-amber-400 shrink-0 mt-0.5" />
+                      </div>
+                      <span className="text-[10px] text-slate-400 font-mono truncate">{source.domain}</span>
+                    </a>
+                  );
+                })}
               </div>
             </div>
           )}

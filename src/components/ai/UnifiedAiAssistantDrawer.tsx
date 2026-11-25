@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   AlertTriangle,
@@ -434,36 +439,43 @@ export const UnifiedAiAssistantDrawer: React.FC<UnifiedAiAssistantDrawerProps> =
         </p>
       </div>
 
-      {/* Active Sub-Tab Content */}
-      {activeSubTab === 'VOICE' ? (
-        <HandsFreeVoiceCoach
-          isOpen={isOpen}
-          embedded={true}
-          onClose={onClose}
-          activeModuleId={activeModuleId}
-          activeTab={activeTab}
-          lang={lang}
-          telemetry={telemetry}
-          pins={pins}
-          nodeVoltages={nodeVoltages}
-          incomingCommand={incomingVoiceCommand}
-          onConsumedIncomingCommand={onConsumedIncomingVoiceCommand}
-          onNavigateTab={onNavigateTab}
-          onOpenModal={onOpenModal}
-        />
-      ) : (
-        <AiDiagnosticAssistantPanel
-          isOpen={isOpen}
-          embedded={true}
-          onClose={onClose}
-          lang={lang}
-          telemetry={telemetry}
-          benchSummaryText={benchSummaryText}
-          quickFillPrompt={quickFillPrompt}
-          incomingVoiceTranscript={incomingDiagnosticTranscript}
-          onConsumedVoiceTranscript={onConsumedDiagnosticTranscript}
-        />
-      )}
+      {/* Active Sub-Tab Content (Keyed for crisp 180ms staggered cascade on switch) */}
+      <div
+        key={activeSubTab}
+        data-testid="ai-drawer-panel-stage"
+        data-active-subtab={activeSubTab}
+        className="flex flex-col flex-1 min-h-0 overflow-hidden"
+      >
+        {activeSubTab === 'VOICE' ? (
+          <HandsFreeVoiceCoach
+            isOpen={isOpen}
+            embedded={true}
+            onClose={onClose}
+            activeModuleId={activeModuleId}
+            activeTab={activeTab}
+            lang={lang}
+            telemetry={telemetry}
+            pins={pins}
+            nodeVoltages={nodeVoltages}
+            incomingCommand={incomingVoiceCommand}
+            onConsumedIncomingCommand={onConsumedIncomingVoiceCommand}
+            onNavigateTab={onNavigateTab}
+            onOpenModal={onOpenModal}
+          />
+        ) : (
+          <AiDiagnosticAssistantPanel
+            isOpen={isOpen}
+            embedded={true}
+            onClose={onClose}
+            lang={lang}
+            telemetry={telemetry}
+            benchSummaryText={benchSummaryText}
+            quickFillPrompt={quickFillPrompt}
+            incomingVoiceTranscript={incomingDiagnosticTranscript}
+            onConsumedVoiceTranscript={onConsumedDiagnosticTranscript}
+          />
+        )}
+      </div>
     </aside>
   );
 };

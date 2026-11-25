@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
@@ -7,9 +12,11 @@ import {
   CheckCircle2,
   ChevronRight,
   Cloud,
+  Copy,
   Cpu,
   Database,
   Download,
+  ExternalLink,
   FileSpreadsheet,
   FileText,
   Gauge,
@@ -234,10 +241,14 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
   const shouldReduceMotion = useReducedMotion();
   const [bannerFailed, setBannerFailed] = useState(false);
   const [emblemFailed, setEmblemFailed] = useState(false);
+  const [copiedAuthDomain, setCopiedAuthDomain] = useState(false);
   const { accessMode, remainingSeconds, lockBenchSession } = useTrialAccess();
   const {
     user: googleUser,
     isSigningIn,
+    authError,
+    authErrorDetails,
+    clearAuthError,
     syncStatus,
     signInWithGoogle,
     signOutUser,
@@ -1060,7 +1071,13 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
                       <button
                         type="button"
                         onClick={() => void retryCloudSync()}
-                        className="inline-flex items-center gap-1 font-mono text-[10px] font-semibold text-[#19C8F5] hover:text-white cursor-pointer shrink-0"
+                        className={`inline-flex items-center gap-1 font-mono text-[10px] font-semibold cursor-pointer shrink-0 ${
+                          syncStatus.state === 'ERROR'
+                            ? 'text-[#FF8A99] hover:text-white'
+                            : syncStatus.pendingCount > 0
+                              ? 'text-[#FFB020] hover:text-white'
+                              : 'text-[#19C8F5] hover:text-white'
+                        }`}
                         title="Retry or verify Firestore Cloud Sync"
                       >
                         <RefreshCw
@@ -1069,13 +1086,78 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
                           }`}
                         />
                         <span>
-                          {syncStatus.pendingCount > 0
-                            ? `Sync (${syncStatus.pendingCount})`
-                            : 'Synced'}
+                          {syncStatus.state === 'ERROR'
+                            ? `Retry (${syncStatus.pendingCount})`
+                            : syncStatus.pendingCount > 0
+                              ? `Sync (${syncStatus.pendingCount})`
+                              : 'Synced'}
                         </span>
                       </button>
                     )}
                   </div>
+
+                  {authError && (
+                    <div
+                      role="alert"
+                      className="rounded-md border border-[#FF4D62]/50 bg-[#2A0E15] px-2.5 py-2 text-[11px] leading-snug text-[#FFC2CA] space-y-2"
+                    >
+                      <p>{authError}</p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {authErrorDetails?.code === 'auth/unauthorized-domain' &&
+                          authErrorDetails.hostname && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+                                  void navigator.clipboard.writeText(authErrorDetails.hostname!);
+                                  setCopiedAuthDomain(true);
+                                  window.setTimeout(() => setCopiedAuthDomain(false), 2000);
+                                }
+                              }}
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded border border-[#FF8A99]/50 bg-[#3D141F] hover:bg-[#4E1A28] font-mono text-[10px] font-semibold text-white cursor-pointer whitespace-nowrap"
+                            >
+                              <Copy className="w-3 h-3" aria-hidden="true" />
+                              <span>{copiedAuthDomain ? 'Copied' : 'Copy Domain'}</span>
+                            </button>
+                          )}
+                        {authErrorDetails?.code === 'auth/unauthorized-domain' &&
+                          authErrorDetails.consoleAuthorizedDomainsUrl && (
+                            <a
+                              href={authErrorDetails.consoleAuthorizedDomainsUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded border border-[#19C8F5]/50 bg-[#0E192A] hover:bg-[#14253D] font-mono text-[10px] font-semibold text-[#19C8F5] whitespace-nowrap"
+                            >
+                              <ExternalLink className="w-3 h-3" aria-hidden="true" />
+                              <span>Firebase Settings</span>
+                            </a>
+                          )}
+                        <button
+                          type="button"
+                          onClick={clearAuthError}
+                          className="font-mono text-[10px] underline text-[#FFC2CA] hover:text-white cursor-pointer"
+                        >
+                          Dismiss
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {googleUser && syncStatus.state === 'ERROR' && syncStatus.lastError && (
+                    <div
+                      role="alert"
+                      className="rounded-md border border-[#FFB020]/50 bg-[#241908] px-2.5 py-2 text-[11px] leading-snug text-[#FFE29E] flex items-center justify-between gap-2"
+                    >
+                      <span className="min-w-0 truncate">{syncStatus.lastError}</span>
+                      <button
+                        type="button"
+                        onClick={() => void retryCloudSync()}
+                        className="font-mono text-[10px] font-semibold text-[#FFB020] underline shrink-0 cursor-pointer"
+                      >
+                        Retry
+                      </button>
+                    </div>
+                  )}
 
                   {googleUser ? (
                     <button

@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import React from 'react';
 import { Pause, Play, RotateCcw, Square } from 'lucide-react';
 import type { GaugeTransportMode } from '../../simulation/telemetry/telemetryTypes';

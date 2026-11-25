@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import React, { useRef } from 'react';
 import {
   ChevronRight,
@@ -23,6 +28,7 @@ import {
   formatDriveFileSize,
 } from '../../services/googleDriveService';
 import { PendingWorkspaceAction, WorkspaceStatusBanner } from './workspaceTypes';
+import { toSafeExternalHttpUrl } from '../../utils/safeExternalUrl';
 
 interface GoogleDriveTabProps {
   driveFiles: DriveFileItem[];
@@ -310,17 +316,20 @@ export const GoogleDriveTab: React.FC<GoogleDriveTabProps> = ({
                     </button>
 
                     <div className="flex items-center gap-1 shrink-0">
-                      {file.webViewLink && (
-                        <a
-                          href={file.webViewLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hw-btn p-1 rounded-[2px] text-slate-400 hover:text-emerald-300 transition"
-                          title="Open in Google Drive"
-                        >
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                      )}
+                      {(() => {
+                        const safeLink = toSafeExternalHttpUrl(file.webViewLink);
+                        return safeLink ? (
+                          <a
+                            href={safeLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hw-btn p-1 rounded-[2px] text-slate-400 hover:text-emerald-300 transition"
+                            title="Open in Google Drive"
+                          >
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        ) : null;
+                      })()}
                       <button
                         type="button"
                         onClick={() =>
@@ -395,17 +404,20 @@ export const GoogleDriveTab: React.FC<GoogleDriveTabProps> = ({
                     <span>Download</span>
                   </button>
                 )}
-                {selectedDriveFile.webViewLink && (
-                  <a
-                    href={selectedDriveFile.webViewLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hw-btn hw-btn-green px-2.5 py-1.5 rounded-[2px] text-[11px] font-bold flex items-center gap-1 transition"
-                  >
-                    <span>Drive</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                )}
+                {(() => {
+                  const safeLink = toSafeExternalHttpUrl(selectedDriveFile.webViewLink);
+                  return safeLink ? (
+                    <a
+                      href={safeLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hw-btn hw-btn-green px-2.5 py-1.5 rounded-[2px] text-[11px] font-bold flex items-center gap-1 transition"
+                    >
+                      <span>Drive</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  ) : null;
+                })()}
               </div>
             </div>
 

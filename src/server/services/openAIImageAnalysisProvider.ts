@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
+ */
+
 import {
   ImageAnalysisProvider,
   ImageAnalysisProviderError,
@@ -90,8 +95,12 @@ Return ONLY valid JSON with keys: confidenceScore (number 0..1), analysisSummary
               'RATE_LIMITED'
             );
           }
+          console.error(
+            `[OpenAIVision] Upstream HTTP ${res.status}:`,
+            errBody.slice(0, 200)
+          );
           throw new ImageAnalysisProviderError(
-            `OpenAI vision returned HTTP ${res.status}: ${errBody.slice(0, 200)}`,
+            `OpenAI vision upstream returned HTTP ${res.status}.`,
             502,
             'openai',
             'UPSTREAM_ERROR'
