@@ -161,7 +161,7 @@ export class SignalGenerator {
     } = params;
 
     const safeRpm = Math.max(300, rpm);
-    const windowSec = Math.max(0.002, windowMs / 1000);
+    const windowSec = Math.max(0.00005, windowMs / 1000);
     const dt = windowSec / Math.max(1, sampleCount - 1);
     const isHardPinFault =
       faultType === 'SHORT_TO_GND' || faultType === 'SHORT_TO_VBAT' || faultType === 'OPEN_CIRCUIT';
@@ -202,7 +202,8 @@ export class SignalGenerator {
 
     for (let i = 0; i < sampleCount; i++) {
       const t = tStartSec + i * dt;
-      const timeMs = Number((i * dt * 1000).toFixed(2));
+      const timeDecimals = windowMs < 5 ? 4 : 2;
+      const timeMs = Number((i * dt * 1000).toFixed(timeDecimals));
       let voltage = mnaNodeVoltage;
       let secondaryVoltage: number | undefined;
 
@@ -636,7 +637,7 @@ export class SignalGenerator {
     } = params;
 
     const safeRpm = Math.max(300, rpm);
-    const windowSec = Math.max(0.002, windowMs / 1000);
+    const windowSec = Math.max(0.00005, windowMs / 1000);
     const dt = windowSec / Math.max(1, sampleCount - 1);
     const isHardPinFault =
       faultType === 'SHORT_TO_GND' ||

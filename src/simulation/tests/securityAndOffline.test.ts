@@ -35,6 +35,24 @@ import { validateImagePayload } from '../../server/services/imagePayloadValidato
 import { isAllowedLiveVoiceOrigin } from '../../server/services/geminiLiveVoiceServer';
 import { toSafeExternalHttpUrl } from '../../utils/safeExternalUrl';
 import {
+  DEFAULT_SCOPE_ZOOM,
+  clampScopeZoom,
+  formatScopeTimeAxisTick,
+  formatScopeTimeUnit,
+  formatZoomFactor,
+  getVisibleTimeWindowMs,
+  getVisibleVoltageDomain,
+  isScopeZoomed,
+  panScopeViewport,
+  setScopePanCenter,
+  stepScopeZoomX,
+  stepScopeZoomY,
+  zoomHorizontalAtAnchor,
+  zoomToSelectionRange,
+  zoomVerticalAtAnchor,
+} from '../../utils/oscilloscopeZoomUtils';
+import { SignalGenerator } from '../signals/SignalGenerator';
+import {
   getSavedOfflineLeaseToken,
   saveOfflineLeaseToken,
 } from '../../services/licenseClientService';
@@ -3201,6 +3219,116 @@ async function main() {
       cancelScheduledBenchSyncRetries();
       resetFaultSequenceStoreForTests();
       await resetOfflineQueueForTests();
+    }
+  });
+
+  // -------------------------------------------------------------------------
+  // Oscilloscope Diagnostic Lab-Bench Transient Zoom Engine Verification
+  // -------------------------------------------------------------------------
+  await runTest('Oscilloscope zoom engine clamps magnification, preserves cursor anchors, supports drag-box transient selection, and formats sub-millisecond scales', () => {
+    assert.equal(isScopeZoomed(DEFAULT_SCOPE_ZOOM), false);
+
+    // Clamping bounds (H: 1x-50x, V: 1x-10x, pan clamped within remaining window)
+    const clampedHigh = clampScopeZoom({ zoomX: 999, panX: 0.999, zoomY: 25, panY: 5 });
+    assert.equal(clampedHigh.zoomX, 50);
+    assert.equal(clampedHigh.zoomY, 10);
+    assert.ok(Math.abs(clampedHigh.panX - 0.98) < 1e-5, `panX max at 50x should be 0.98, got ${clampedHigh.panX}`);
+    assert.ok(Math.abs(clampedHigh.panY - 0.45) < 1e-5, `panY max at 10x should be 0.45, got ${clampedHigh.panY}`);
+    assert.equal(isScopeZoomed(clampedHigh), true);
+
+    const clampedReset = clampScopeZoom({ zoomX: 0.2, panX: 0.5, zoomY: 0.5, panY: -0.3 });
+    assert.deepEqual(clampedReset, DEFAULT_SCOPE_ZOOM);
+
+    // Cursor-anchored horizontal zoom keeps the signal feature under cursor fixed
+    const anchor = 0.25;
+    const zoomed4x = zoomHorizontalAtAnchor(DEFAULT_SCOPE_ZOOM, 4, anchor);
+    assert.equal(zoomed4x.zoomX, 4);
+    const globalAtAnchor = zoomed4x.panX + anchor * (1 / zoomed4x.zoomX);
+    assert.ok(Math.abs(globalAtAnchor - 0.25) < 1e-5, `Anchor feature drifted: ${globalAtAnchor}`);
+
+    // Drag-box region zoom around a narrow 0.4ms injector flyback spike in a 40ms window
+    const boxZoom = zoomToSelectionRange(DEFAULT_SCOPE_ZOOM, 0.2, 0.25); // 5% width -> 20x zoom
+    assert.equal(boxZoom.zoomX, 20);
+    assert.ok(Math.abs(boxZoom.panX - 0.2) < 1e-5);
+    const visBox = getVisibleTimeWindowMs(40, boxZoom, 10);
+    assert.ok(Math.abs(visBox.startMs - 8.0) < 1e-4);
+    assert.ok(Math.abs(visBox.endMs - 10.0) < 1e-4);
+    assert.ok(Math.abs(visBox.spanMs - 2.0) < 1e-4);
+    assert.ok(Math.abs(visBox.msPerDiv - 0.2) < 1e-4);
+    assert.equal(formatScopeTimeUnit(visBox.msPerDiv), '200 µs');
+    assert.equal(formatScopeTimeAxisTick(0.45, 0.5), '450µs');
+    assert.equal(formatZoomFactor(20), '20×');
+
+    // Micro-click below 2% width is ignored so clicks don't accidentally zoom
+    const ignored = zoomToSelectionRange(DEFAULT_SCOPE_ZOOM, 0.4, 0.405);
+    assert.deepEqual(ignored, DEFAULT_SCOPE_ZOOM);
+
+    // Lab 1-2-5 detents step cleanly up and down
+    const s1 = stepScopeZoomX(DEFAULT_SCOPE_ZOOM, 'in', 0.5);
+    assert.equal(s1.zoomX, 1.5);
+    const s2 = stepScopeZoomX(s1, 'in', 0.5);
+    assert.equal(s2.zoomX, 2);
+    const sBack = stepScopeZoomX(s2, 'out', 0.5);
+    assert.equal(sBack.zoomX, 1.5);
+
+    // Vertical zoom narrows visible voltage domain around midpoint and shifts with panY
+    const vZoom2x = zoomVerticalAtAnchor(DEFAULT_SCOPE_ZOOM, 2, 0.5);
+    const [vLo, vHi] = getVisibleVoltageDomain([0, 20], vZoom2x);
+    assert.equal(vLo, 5);
+    assert.equal(vHi, 15);
+    const panned = panScopeViewport(vZoom2x, 0, 0.5);
+    const [vLoPan, vHiPan] = getVisibleVoltageDomain([0, 20], panned);
+    assert.ok(vLoPan > vLo && vHiPan > vHi, 'Vertical pan should shift zoomed voltage domain');
+
+    const vStep = stepScopeZoomY(DEFAULT_SCOPE_ZOOM, 'in', 0.5);
+    assert.equal(vStep.zoomY, 1.5);
+
+    // Minimap pan center jump clamps cleanly
+    const centered = setScopePanCenter(boxZoom, 0.5);
+    assert.ok(Math.abs(centered.panX - 0.475) < 1e-5);
+
+    // SignalGenerator sub-millisecond transient sampling resolves 400µs injector flyback spike at 50x zoom
+    const flybackWindow = SignalGenerator.samplePinWaveformSeries({
+      pinId: 'ecu-pin-10',
+      pinLabel: 'INJ_1',
+      mnaNodeVoltage: 12.6,
+      faultType: 'NONE',
+      isPowerOn: true,
+      isEcuAwake: true,
+      hasCanFault: false,
+      hasInjectorFault: false,
+      isInjectorFiring: true,
+      rpm: 1200,
+      tStartSec: 0.0024, // right before 2.5ms flyback edge
+      windowMs: 0.6, // 600 µs zoomed window
+      sampleCount: 120,
+    });
+    assert.equal(flybackWindow.samples.length, 120);
+    const lastSampleMs = flybackWindow.samples[flybackWindow.samples.length - 1].timeMs;
+    assert.ok(
+      Math.abs(lastSampleMs - 0.6) < 0.02,
+      `Sub-millisecond window must not be clamped to 2ms (got ${lastSampleMs}ms)`
+    );
+    assert.ok(
+      flybackWindow.vMax > 50,
+      `Zoomed 600µs window must resolve 65V inductive flyback spike (got vMax=${flybackWindow.vMax})`
+    );
+
+    // Verify all three oscilloscope views mount OscilloscopeZoomControls
+    for (const file of [
+      'src/components/Oscilloscope.tsx',
+      'src/components/D3OscilloscopeView.tsx',
+      'src/components/PinWaveformOscilloscope.tsx',
+    ]) {
+      const src = fs.readFileSync(path.join(process.cwd(), file), 'utf8');
+      assert.ok(
+        src.includes('OscilloscopeZoomControls'),
+        `${file} must render OscilloscopeZoomControls`
+      );
+      assert.ok(
+        src.includes('zoomToSelectionRange'),
+        `${file} must support drag-box transient zoom`
+      );
     }
   });
 

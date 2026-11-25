@@ -3,7 +3,7 @@
  * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
  */
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Area,
   CartesianGrid,
@@ -34,7 +34,22 @@ import { EcuPin, InjectedFault } from '../types/ecu';
 import { SignalGenerator } from '../simulation/signals/SignalGenerator';
 import { BinaryStateMonitor } from './BinaryStateMonitor';
 import { RackCornerScrews, RotaryEncoderDial } from './HardwareControls';
+import { OscilloscopeZoomControls } from './OscilloscopeZoomControls';
 import { useTrialAccess } from '../context/TrialAccessContext';
+import {
+  DEFAULT_SCOPE_ZOOM,
+  ScopeDragInteractionMode,
+  ScopeZoomViewport,
+  formatScopeTimeAxisTick,
+  formatScopeTimeUnit,
+  getVisibleTimeWindowMs,
+  getVisibleVoltageDomain,
+  isScopeZoomed,
+  panScopeViewport,
+  stepScopeZoomX,
+  stepScopeZoomY,
+  zoomToSelectionRange,
+} from '../utils/oscilloscopeZoomUtils';
 
 export interface PinWaveformOscilloscopeProps {
   /** Ordered array of 16 ECU connector pins. */
@@ -145,11 +160,42 @@ export const PinWaveformOscilloscope: React.FC<PinWaveformOscilloscopeProps> = R
   const [showBinaryMonitor, setShowBinaryMonitor] = useState(false);
   const [cursorAMs, setCursorAMs] = useState<number>(10);
   const [cursorBMs, setCursorBMs] = useState<number>(30);
+  const [zoomViewport, setZoomViewport] = useState<ScopeZoomViewport>(DEFAULT_SCOPE_ZOOM);
+  const [interactionMode, setInteractionMode] = useState<ScopeDragInteractionMode>('ZOOM_BOX');
+  const [dragSelection, setDragSelection] = useState<{ startRatio: number; currentRatio: number } | null>(null);
+  const chartContainerRef = useRef<HTMLDivElement | null>(null);
+  const chartPointerRef = useRef<{
+    active: boolean;
+    pointerId: number;
+    mode: ScopeDragInteractionMode;
+    startClientX: number;
+    startClientY: number;
+    startRatioX: number;
+    startViewport: ScopeZoomViewport;
+  } | null>(null);
 
+  const visibleWindow = useMemo(
+    () => getVisibleTimeWindowMs(windowMs, zoomViewport, 10),
+    [windowMs, zoomViewport]
+  );
+
+  // Reset zoom cleanly when switching base capture timebase window
   useEffect(() => {
-    setCursorAMs((prev) => Math.max(0, Math.min(windowMs, prev)));
-    setCursorBMs((prev) => Math.max(0, Math.min(windowMs, prev > windowMs ? windowMs * 0.75 : prev)));
+    setZoomViewport(DEFAULT_SCOPE_ZOOM);
   }, [windowMs]);
+
+  // Keep A/B cursors within the currently visible zoomed time window
+  useEffect(() => {
+    const start = visibleWindow.startMs;
+    const end = visibleWindow.endMs;
+    const span = visibleWindow.spanMs;
+    setCursorAMs((prev) =>
+      prev < start || prev > end ? Number((start + span * 0.25).toFixed(4)) : prev
+    );
+    setCursorBMs((prev) =>
+      prev < start || prev > end ? Number((start + span * 0.75).toFixed(4)) : prev
+    );
+  }, [visibleWindow.startMs, visibleWindow.endMs, visibleWindow.spanMs]);
 
   const ch1Pin = useMemo(() => {
     return (
@@ -223,7 +269,7 @@ export const PinWaveformOscilloscope: React.FC<PinWaveformOscilloscopeProps> = R
   const singleWaveform = useMemo(() => {
     if (!ch1Pin || isDualTrace) return null;
 
-    return SignalGenerator.samplePinWaveformSeries({
+    const sampled = SignalGenerator.samplePinWaveformSeries({
       pinId: ch1Pin.id,
       pinLabel: ch1Pin.label,
       mnaNodeVoltage: ch1MnaVoltage,
@@ -235,10 +281,18 @@ export const PinWaveformOscilloscope: React.FC<PinWaveformOscilloscopeProps> = R
       hasInjectorFault,
       isInjectorFiring,
       rpm,
-      tStartSec: simTimeSec,
-      windowMs,
-      sampleCount: 80,
+      tStartSec: simTimeSec + visibleWindow.startMs / 1000,
+      windowMs: visibleWindow.spanMs,
+      sampleCount: 120,
     });
+    const decimals = visibleWindow.spanMs < 5 ? 4 : 2;
+    return {
+      ...sampled,
+      samples: sampled.samples.map((s) => ({
+        ...s,
+        timeMs: Number((visibleWindow.startMs + s.timeMs).toFixed(decimals)),
+      })),
+    };
   }, [
     ch1Pin,
     isDualTrace,
@@ -252,13 +306,14 @@ export const PinWaveformOscilloscope: React.FC<PinWaveformOscilloscopeProps> = R
     isInjectorFiring,
     rpm,
     simTimeSec,
-    windowMs,
+    visibleWindow.startMs,
+    visibleWindow.spanMs,
   ]);
 
   const dualWaveform = useMemo(() => {
     if (!ch1Pin || !ch2Pin) return null;
 
-    return SignalGenerator.sampleDualPinWaveformSeries({
+    const sampled = SignalGenerator.sampleDualPinWaveformSeries({
       ch1PinId: ch1Pin.id,
       ch1PinLabel: ch1Pin.label,
       ch1MnaVoltage,
@@ -274,10 +329,18 @@ export const PinWaveformOscilloscope: React.FC<PinWaveformOscilloscopeProps> = R
       hasInjectorFault,
       isInjectorFiring,
       rpm,
-      tStartSec: simTimeSec,
-      windowMs,
-      sampleCount: 96,
+      tStartSec: simTimeSec + visibleWindow.startMs / 1000,
+      windowMs: visibleWindow.spanMs,
+      sampleCount: 120,
     });
+    const decimals = visibleWindow.spanMs < 5 ? 4 : 2;
+    return {
+      ...sampled,
+      samples: sampled.samples.map((s) => ({
+        ...s,
+        timeMs: Number((visibleWindow.startMs + s.timeMs).toFixed(decimals)),
+      })),
+    };
   }, [
     ch1Pin,
     ch2Pin,
@@ -293,8 +356,131 @@ export const PinWaveformOscilloscope: React.FC<PinWaveformOscilloscopeProps> = R
     isInjectorFiring,
     rpm,
     simTimeSec,
+    visibleWindow.startMs,
+    visibleWindow.spanMs,
+  ]);
+
+  // Miniature overview trace for the capture scrubber when zoomed horizontally
+  const overviewTrace = useMemo(() => {
+    if (!isPowerOn || !ch1Pin || zoomViewport.zoomX <= 1.001) return undefined;
+    const preview = SignalGenerator.samplePinWaveformSeries({
+      pinId: ch1Pin.id,
+      pinLabel: ch1Pin.label,
+      mnaNodeVoltage: ch1MnaVoltage,
+      faultType: ch1Fault?.faultType ?? 'NONE',
+      isPowerOn,
+      isEcuAwake,
+      ckpSignalLost,
+      hasCanFault,
+      hasInjectorFault,
+      isInjectorFiring,
+      rpm,
+      tStartSec: simTimeSec,
+      windowMs,
+      sampleCount: 64,
+    });
+    const span = preview.vMax - preview.vMin;
+    return span < 1e-3
+      ? preview.samples.map(() => 0.5)
+      : preview.samples.map((s) => (s.voltage - preview.vMin) / span);
+  }, [
+    isPowerOn,
+    ch1Pin,
+    zoomViewport.zoomX,
+    ch1MnaVoltage,
+    ch1Fault?.faultType,
+    isEcuAwake,
+    ckpSignalLost,
+    hasCanFault,
+    hasInjectorFault,
+    isInjectorFiring,
+    rpm,
+    simTimeSec,
     windowMs,
   ]);
+
+  // Cursor-anchored wheel zoom on the Recharts plot container
+  useEffect(() => {
+    const container = chartContainerRef.current;
+    if (!container) return;
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) < 1) return;
+      e.preventDefault();
+      const rect = container.getBoundingClientRect();
+      const anchorX =
+        rect.width > 0 ? Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width)) : 0.5;
+      const anchorY =
+        rect.height > 0
+          ? Math.min(1, Math.max(0, 1 - (e.clientY - rect.top) / rect.height))
+          : 0.5;
+      const dir = e.deltaY < 0 ? 'in' : 'out';
+      setZoomViewport((prev) =>
+        e.shiftKey ? stepScopeZoomY(prev, dir, anchorY) : stepScopeZoomX(prev, dir, anchorX)
+      );
+    };
+    container.addEventListener('wheel', onWheel, { passive: false });
+    return () => container.removeEventListener('wheel', onWheel);
+  }, []);
+
+  const handleChartPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    const container = chartContainerRef.current;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    if (rect.width <= 0) return;
+    const ratioX = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    const effectiveMode: ScopeDragInteractionMode =
+      e.shiftKey || e.button === 1 ? 'PAN' : interactionMode;
+
+    container.setPointerCapture(e.pointerId);
+    chartPointerRef.current = {
+      active: true,
+      pointerId: e.pointerId,
+      mode: effectiveMode,
+      startClientX: e.clientX,
+      startClientY: e.clientY,
+      startRatioX: ratioX,
+      startViewport: zoomViewport,
+    };
+    if (effectiveMode === 'ZOOM_BOX') {
+      setDragSelection({ startRatio: ratioX, currentRatio: ratioX });
+    }
+  };
+
+  const handleChartPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const drag = chartPointerRef.current;
+    const container = chartContainerRef.current;
+    if (!drag?.active || !container) return;
+    const rect = container.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return;
+    const ratioX = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+
+    if (drag.mode === 'ZOOM_BOX') {
+      setDragSelection({ startRatio: drag.startRatioX, currentRatio: ratioX });
+    } else {
+      const dxRatio = (e.clientX - drag.startClientX) / rect.width;
+      const dyRatio = (e.clientY - drag.startClientY) / rect.height;
+      setZoomViewport(panScopeViewport(drag.startViewport, dxRatio, dyRatio));
+    }
+  };
+
+  const handleChartPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    const container = chartContainerRef.current;
+    const drag = chartPointerRef.current;
+    if (drag?.active && container?.hasPointerCapture(e.pointerId)) {
+      container.releasePointerCapture(e.pointerId);
+    }
+    if (drag?.active && drag.mode === 'ZOOM_BOX' && dragSelection) {
+      const span = Math.abs(dragSelection.currentRatio - dragSelection.startRatio);
+      if (span >= 0.02) {
+        setZoomViewport((prev) =>
+          zoomToSelectionRange(prev, dragSelection.startRatio, dragSelection.currentRatio)
+        );
+        setIsRunning(false);
+      }
+    }
+    chartPointerRef.current = null;
+    setDragSelection(null);
+  };
 
   const ch1Domain: [number, number] = useMemo(() => {
     if (dualWaveform) {
@@ -338,7 +524,11 @@ export const PinWaveformOscilloscope: React.FC<PinWaveformOscilloscopeProps> = R
     return Math.max(span1, span2) / Math.min(span1, span2) > 2.2;
   }, [dualWaveform, isAutoScale, axisScaleMode, ch1Domain, ch2Domain]);
 
-  const effectiveCh1Domain: [number, number] = isAutoScale && dualWaveform ? [-6, 106] : ch1Domain;
+  const effectiveCh1Domain: [number, number] =
+    isAutoScale && dualWaveform
+      ? [-6, 106]
+      : getVisibleVoltageDomain(ch1Domain, zoomViewport);
+  const effectiveCh2Domain: [number, number] = getVisibleVoltageDomain(ch2Domain, zoomViewport);
 
   const isOverlay = variant === 'overlay';
   const chartHeightClass = isOverlay ? 'h-[175px] sm:h-[205px]' : 'h-[225px] sm:h-[265px]';
@@ -789,7 +979,21 @@ export const PinWaveformOscilloscope: React.FC<PinWaveformOscilloscopeProps> = R
       )}
 
       {/* Recharts Real-Time Waveform Plot */}
-      <div className={`w-full ${chartHeightClass} hw-lcd-well rounded-[2px] p-1.5 relative`}>
+      <div
+        ref={chartContainerRef}
+        onPointerDown={handleChartPointerDown}
+        onPointerMove={handleChartPointerMove}
+        onPointerUp={handleChartPointerUp}
+        onPointerCancel={handleChartPointerUp}
+        onDoubleClick={() => setZoomViewport(DEFAULT_SCOPE_ZOOM)}
+        className={`w-full ${chartHeightClass} hw-lcd-well rounded-[2px] p-1.5 relative select-none touch-none ${
+          interactionMode === 'PAN'
+            ? isScopeZoomed(zoomViewport)
+              ? 'cursor-grab active:cursor-grabbing'
+              : 'cursor-default'
+            : 'cursor-crosshair'
+        }`}
+      >
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={chartData}
@@ -805,26 +1009,39 @@ export const PinWaveformOscilloscope: React.FC<PinWaveformOscilloscopeProps> = R
             <XAxis
               dataKey="timeMs"
               type="number"
-              domain={[0, windowMs]}
+              allowDataOverflow
+              domain={[visibleWindow.startMs, visibleWindow.endMs]}
               tick={{ fill: '#64748b', fontSize: 10 }}
-              tickFormatter={(v: number) => `${v}ms`}
+              tickFormatter={(v: number) => formatScopeTimeAxisTick(v, visibleWindow.spanMs)}
               stroke="#242c29"
             />
             <YAxis
               yAxisId="ch1"
+              allowDataOverflow
               domain={effectiveCh1Domain}
               tick={{ fill: '#4ade80', fontSize: 10 }}
-              tickFormatter={(v: number) => (isAutoScale && dualWaveform ? `${v}%` : `${v}V`)}
+              tickFormatter={(v: number) =>
+                isAutoScale && dualWaveform
+                  ? `${v}%`
+                  : `${Number(v).toFixed(
+                      effectiveCh1Domain[1] - effectiveCh1Domain[0] < 3 ? 2 : 1
+                    )}V`
+              }
               stroke="#242c29"
             />
             {useSplitYAxis && (
               <YAxis
                 yAxisId="ch2"
                 orientation="right"
-                domain={ch2Domain}
+                allowDataOverflow
+                domain={effectiveCh2Domain}
                 width={34}
                 tick={{ fill: '#f59e0b', fontSize: 10 }}
-                tickFormatter={(v: number) => `${v}V`}
+                tickFormatter={(v: number) =>
+                  `${Number(v).toFixed(
+                    effectiveCh2Domain[1] - effectiveCh2Domain[0] < 3 ? 2 : 1
+                  )}V`
+                }
                 stroke="#242c29"
               />
             )}
@@ -954,6 +1171,26 @@ export const PinWaveformOscilloscope: React.FC<PinWaveformOscilloscopeProps> = R
           </ComposedChart>
         </ResponsiveContainer>
 
+        {/* Drag-to-Zoom Transient Selection Marquee */}
+        {dragSelection &&
+          Math.abs(dragSelection.currentRatio - dragSelection.startRatio) >= 0.01 && (
+            <div
+              className="pointer-events-none absolute inset-y-1.5 border-x border-cyan-300 bg-cyan-400/15"
+              style={{
+                left: `${Math.min(dragSelection.startRatio, dragSelection.currentRatio) * 100}%`,
+                width: `${Math.abs(dragSelection.currentRatio - dragSelection.startRatio) * 100}%`,
+              }}
+            >
+              <span className="absolute top-3 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-[2px] bg-[#0b1014]/95 border border-cyan-400/60 text-[9px] font-mono font-bold text-cyan-200 whitespace-nowrap tabular-nums">
+                Δt{' '}
+                {formatScopeTimeUnit(
+                  Math.abs(dragSelection.currentRatio - dragSelection.startRatio) *
+                    visibleWindow.spanMs
+                )}
+              </span>
+            </div>
+          )}
+
         {!isPowerOn && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/55 rounded-[2px]">
             <span className="px-2.5 py-1 rounded-[2px] bg-[#141820]/95 border border-[#323a48] text-[10px] text-amber-300 font-bold">
@@ -972,6 +1209,19 @@ export const PinWaveformOscilloscope: React.FC<PinWaveformOscilloscopeProps> = R
         )}
       </div>
 
+      {/* Hardware DSO Transient Zoom Bar & Overview Minimap */}
+      <OscilloscopeZoomControls
+        viewport={zoomViewport}
+        onChangeViewport={setZoomViewport}
+        baseWindowMs={windowMs}
+        interactionMode={interactionMode}
+        onChangeInteractionMode={setInteractionMode}
+        overviewTrace={overviewTrace}
+        compact={isOverlay}
+        theme="chassis"
+        divisionsX={10}
+      />
+
       {/* Interactive A/B Cursors Readout & Rotary Encoder Controls */}
       {showCursors && cursorMetrics && (
         <div
@@ -980,13 +1230,13 @@ export const PinWaveformOscilloscope: React.FC<PinWaveformOscilloscopeProps> = R
         >
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-slate-300">
             <span className="text-amber-300 font-bold">
-              A: {cursorMetrics.tA.toFixed(1)}ms ({cursorMetrics.ch1A.toFixed(2)}V{dualWaveform ? ` / ${cursorMetrics.ch2A.toFixed(2)}V` : ''})
+              A: {formatScopeTimeUnit(cursorMetrics.tA)} ({cursorMetrics.ch1A.toFixed(2)}V{dualWaveform ? ` / ${cursorMetrics.ch2A.toFixed(2)}V` : ''})
             </span>
             <span className="text-slate-200 font-bold">
-              B: {cursorMetrics.tB.toFixed(1)}ms ({cursorMetrics.ch1B.toFixed(2)}V{dualWaveform ? ` / ${cursorMetrics.ch2B.toFixed(2)}V` : ''})
+              B: {formatScopeTimeUnit(cursorMetrics.tB)} ({cursorMetrics.ch1B.toFixed(2)}V{dualWaveform ? ` / ${cursorMetrics.ch2B.toFixed(2)}V` : ''})
             </span>
             <span>
-              Δt: <strong className="text-emerald-300">{cursorMetrics.dtMs.toFixed(2)} ms</strong>
+              Δt: <strong className="text-emerald-300">{formatScopeTimeUnit(cursorMetrics.dtMs)}</strong>
               {cursorMetrics.invFreqHz > 0 ? ` (${cursorMetrics.invFreqHz >= 1000 ? `${(cursorMetrics.invFreqHz / 1000).toFixed(2)} kHz` : `${cursorMetrics.invFreqHz.toFixed(1)} Hz`})` : ''}
             </span>
             <span>
@@ -1002,32 +1252,34 @@ export const PinWaveformOscilloscope: React.FC<PinWaveformOscilloscopeProps> = R
             <RotaryEncoderDial
               label="CURSOR A"
               ariaLabel="Cursor A Time Position (ms)"
-              value={Number(cursorAMs.toFixed(1))}
-              min={0}
-              max={windowMs}
-              step={Math.max(0.5, Number((windowMs / 80).toFixed(1)))}
+              value={Number(cursorAMs.toFixed(visibleWindow.spanMs < 5 ? 3 : 1))}
+              min={Number(visibleWindow.startMs.toFixed(3))}
+              max={Number(visibleWindow.endMs.toFixed(3))}
+              step={Math.max(0.01, Number((visibleWindow.spanMs / 80).toFixed(3)))}
               unit="ms"
               accent="amber"
               size="sm"
+              formatValue={(v) => formatScopeTimeUnit(v)}
               inlineFlankButtons={{
-                dec: { label: '-', delta: -Math.max(0.5, windowMs / 40) },
-                inc: { label: '+', delta: Math.max(0.5, windowMs / 40) },
+                dec: { label: '-', delta: -Math.max(0.01, visibleWindow.spanMs / 40) },
+                inc: { label: '+', delta: Math.max(0.01, visibleWindow.spanMs / 40) },
               }}
               onChange={(nextVal) => setCursorAMs(nextVal)}
             />
             <RotaryEncoderDial
               label="CURSOR B"
               ariaLabel="Cursor B Time Position (ms)"
-              value={Number(cursorBMs.toFixed(1))}
-              min={0}
-              max={windowMs}
-              step={Math.max(0.5, Number((windowMs / 80).toFixed(1)))}
+              value={Number(cursorBMs.toFixed(visibleWindow.spanMs < 5 ? 3 : 1))}
+              min={Number(visibleWindow.startMs.toFixed(3))}
+              max={Number(visibleWindow.endMs.toFixed(3))}
+              step={Math.max(0.01, Number((visibleWindow.spanMs / 80).toFixed(3)))}
               unit="ms"
               accent="steel"
               size="sm"
+              formatValue={(v) => formatScopeTimeUnit(v)}
               inlineFlankButtons={{
-                dec: { label: '-', delta: -Math.max(0.5, windowMs / 40) },
-                inc: { label: '+', delta: Math.max(0.5, windowMs / 40) },
+                dec: { label: '-', delta: -Math.max(0.01, visibleWindow.spanMs / 40) },
+                inc: { label: '+', delta: Math.max(0.01, visibleWindow.spanMs / 40) },
               }}
               onChange={(nextVal) => setCursorBMs(nextVal)}
             />

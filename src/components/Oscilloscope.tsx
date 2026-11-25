@@ -8,6 +8,21 @@ import { Activity, ArrowLeftRight, ArrowUpDown, GitCompare, Pause, Play, Zap } f
 import { EcuPin, InjectedFault } from '../types/ecu';
 import { SignalGenerator } from '../simulation/signals/SignalGenerator';
 import { RackCornerScrews, RotaryEncoderDial } from './HardwareControls';
+import { OscilloscopeZoomControls } from './OscilloscopeZoomControls';
+import {
+  DEFAULT_SCOPE_ZOOM,
+  ScopeDragInteractionMode,
+  ScopeZoomViewport,
+  formatScopeTimeAxisTick,
+  formatScopeTimeUnit,
+  formatZoomFactor,
+  getVisibleTimeWindowMs,
+  isScopeZoomed,
+  panScopeViewport,
+  stepScopeZoomX,
+  stepScopeZoomY,
+  zoomToSelectionRange,
+} from '../utils/oscilloscopeZoomUtils';
 
 type ScopeSignalMode =
   | 'CAN_BUS'
@@ -81,12 +96,30 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
   const [triggerSource, setTriggerSource] = useState<'CH1' | 'CH2'>('CH1');
   const [triggerMode, setTriggerMode] = useState<'Auto' | 'Normal' | 'Single'>('Auto');
   const [triggerLevelV, setTriggerLevelV] = useState<number>(2.5);
+  const [zoomViewport, setZoomViewport] = useState<ScopeZoomViewport>(DEFAULT_SCOPE_ZOOM);
+  const [interactionMode, setInteractionMode] = useState<ScopeDragInteractionMode>('ZOOM_BOX');
+  const [dragSelection, setDragSelection] = useState<{ startRatio: number; currentRatio: number } | null>(null);
+  const [hoverTimeRatio, setHoverTimeRatio] = useState<number | null>(null);
+  const crtPointerRef = useRef<{
+    active: boolean;
+    pointerId: number;
+    mode: ScopeDragInteractionMode;
+    startClientX: number;
+    startClientY: number;
+    startRatioX: number;
+    startViewport: ScopeZoomViewport;
+  } | null>(null);
 
   useEffect(() => {
     setActiveSignal((prev) =>
       prev === 'DUAL_PIN' || prev === 'GPT_BENCH' ? prev : selectedSignal
     );
   }, [selectedSignal]);
+
+  // Reset zoom window cleanly when switching signal mode
+  useEffect(() => {
+    setZoomViewport(DEFAULT_SCOPE_ZOOM);
+  }, [activeSignal]);
 
   const effectiveCh1PinId = selectedPinId || localCh1PinId;
 
@@ -141,8 +174,95 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
 
   const activeRpm = isRpmEmulatorActive ? emulatorRpm : 850;
   const dualWindowMs = Math.max(10, Math.round(40 / timeDiv));
+  const baseWindowMs = useMemo(() => {
+    switch (activeSignal) {
+      case 'DUAL_PIN':
+        return dualWindowMs;
+      case 'CAN_BUS':
+        return 5 / timeDiv;
+      case 'INJECTOR_PWM':
+        return 90 / timeDiv;
+      case 'CRANK_CKP':
+        return 48 / timeDiv;
+      case 'O2_LAMBDA':
+        return 1200 / timeDiv;
+      case 'GPT_BENCH':
+        return 2.4 / timeDiv;
+      default:
+        return 50 / timeDiv;
+    }
+  }, [activeSignal, dualWindowMs, timeDiv]);
+
+  const visibleTimeWindow = useMemo(
+    () => getVisibleTimeWindowMs(baseWindowMs, zoomViewport, 10),
+    [baseWindowMs, zoomViewport]
+  );
+
   const simTimeRef = useRef<number>(0);
   const [hudSimTimeSec, setHudSimTimeSec] = useState<number>(0);
+
+  // Miniature overview trace for the capture minimap scrubber when zoomed horizontally
+  const overviewTrace = useMemo(() => {
+    if (!isPowerOn || zoomViewport.zoomX <= 1.001) return undefined;
+    const count = 64;
+    const raw: number[] = [];
+    const baseSec = baseWindowMs / 1000;
+    const t0 = hudSimTimeSec;
+    for (let i = 0; i < count; i++) {
+      const t = t0 + (i / (count - 1)) * baseSec;
+      let v = 0;
+      if (activeSignal === 'CAN_BUS') {
+        v = isCanBusHealthy ? SignalGenerator.getCanBusSignals(t, false).canHigh : canHMnaV;
+      } else if (activeSignal === 'INJECTOR_PWM') {
+        const injHardFault =
+          !isEcuAwake ||
+          ckpSignalLost ||
+          hasInjectorFault ||
+          injPinFault === 'SHORT_TO_GND' ||
+          injPinFault === 'SHORT_TO_VBAT' ||
+          injPinFault === 'OPEN_CIRCUIT';
+        v =
+          isInjectorFiring && !injHardFault
+            ? SignalGenerator.getInjectorWaveform(t, false, injMnaV, activeRpm)
+            : injMnaV;
+      } else if (activeSignal === 'CRANK_CKP') {
+        v = SignalGenerator.getCrankshaftVrSignal(t, activeRpm, ckpSignalLost);
+      } else if (activeSignal === 'O2_LAMBDA') {
+        v = Math.min(1.1, Math.max(0.05, o2MnaV + 0.35 * Math.sin(t * 2 * Math.PI * 1.25)));
+      } else if (activeSignal === 'GPT_BENCH') {
+        v = SignalGenerator.getGptBenchSignals(t).gpt1V;
+      } else {
+        v = tpsMnaV;
+      }
+      raw.push(v);
+    }
+    let vMin = Infinity;
+    let vMax = -Infinity;
+    for (const v of raw) {
+      if (v < vMin) vMin = v;
+      if (v > vMax) vMax = v;
+    }
+    const span = vMax - vMin;
+    if (span < 1e-3) return raw.map(() => 0.5);
+    return raw.map((v) => (v - vMin) / span);
+  }, [
+    isPowerOn,
+    zoomViewport.zoomX,
+    baseWindowMs,
+    hudSimTimeSec,
+    activeSignal,
+    isCanBusHealthy,
+    canHMnaV,
+    isEcuAwake,
+    ckpSignalLost,
+    hasInjectorFault,
+    injPinFault,
+    isInjectorFiring,
+    injMnaV,
+    activeRpm,
+    o2MnaV,
+    tpsMnaV,
+  ]);
 
   // Live telemetry snapshot for DUAL_PIN mode, synced at ~7 Hz with advancing CRT simTime
   const dualTelemetry = useMemo(() => {
@@ -163,8 +283,8 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
       hasInjectorFault,
       isInjectorFiring,
       rpm: activeRpm,
-      tStartSec: hudSimTimeSec,
-      windowMs: dualWindowMs,
+      tStartSec: hudSimTimeSec + visibleTimeWindow.startMs / 1000,
+      windowMs: visibleTimeWindow.spanMs,
       sampleCount: 128,
     });
   }, [
@@ -182,7 +302,8 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
     hasInjectorFault,
     isInjectorFiring,
     activeRpm,
-    dualWindowMs,
+    visibleTimeWindow.startMs,
+    visibleTimeWindow.spanMs,
     hudSimTimeSec,
   ]);
 
@@ -308,6 +429,8 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
     ch1FaultType,
     ch2FaultType,
     dualWindowMs,
+    baseWindowMs,
+    zoomViewport,
     isAutoScale,
     triggerLevelV,
   });
@@ -342,6 +465,8 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
     ch1FaultType,
     ch2FaultType,
     dualWindowMs,
+    baseWindowMs,
+    zoomViewport,
     isAutoScale,
     triggerLevelV,
   };
@@ -438,6 +563,14 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
         simTimeRef.current = (simTimeRef.current + 0.0004 * p.timeDiv * p.simulationSpeed) % 60;
       }
       const simTime = simTimeRef.current;
+      const zWindow = getVisibleTimeWindowMs(p.baseWindowMs, p.zoomViewport, 10);
+      const tVisibleStartSec = simTime + zWindow.startMs / 1000;
+      const tVisibleSpanSec = zWindow.spanMs / 1000;
+      const zoomY = p.zoomViewport.zoomY;
+      const panYPx = p.zoomViewport.panY * height * zoomY;
+      const projectY = (rawY: number) =>
+        height / 2 + (rawY - height / 2) * zoomY + panYPx;
+      const pxDenom = Math.max(1, width - 1);
 
       ctx.lineWidth = 2.5;
 
@@ -456,8 +589,8 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
           hasInjectorFault: p.hasInjectorFault,
           isInjectorFiring: p.isInjectorFiring,
           rpm: p.activeRpm,
-          tStartSec: simTime,
-          windowMs: p.dualWindowMs,
+          tStartSec: tVisibleStartSec,
+          windowMs: zWindow.spanMs,
           sampleCount: dualSampleCount,
           ch1Out: dualCh1Buf,
           ch2Out: dualCh2Buf,
@@ -506,7 +639,7 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
               ? 0.5
               : Math.max(0, Math.min(1, (dualCh1Buf[i] - dualStats.ch1Min) / ch1Span));
             const x = (i / Math.max(1, n - 1)) * width;
-            const y = padTop + (1 - normRatio) * usableH;
+            const y = projectY(padTop + (1 - normRatio) * usableH);
             if (i === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
           }
@@ -522,7 +655,7 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
               ? 0.5
               : Math.max(0, Math.min(1, (dualCh2Buf[i] - dualStats.ch2Min) / ch2Span));
             const x = (i / Math.max(1, n - 1)) * width;
-            const y = padTop + (1 - normRatio) * usableH;
+            const y = projectY(padTop + (1 - normRatio) * usableH);
             if (i === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
           }
@@ -538,8 +671,8 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
           ctx.lineWidth = 1;
           ctx.setLineDash([4, 4]);
           ctx.beginPath();
-          ctx.moveTo(0, midY);
-          ctx.lineTo(width, midY);
+          ctx.moveTo(0, projectY(midY));
+          ctx.lineTo(width, projectY(midY));
           ctx.stroke();
           ctx.setLineDash([]);
 
@@ -552,7 +685,7 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
           for (let i = 0; i < n; i++) {
             const x = (i / Math.max(1, n - 1)) * width;
             const norm = Math.min(1.15, Math.max(-0.15, dualCh1Buf[i] / ch1BandMax));
-            const y = midY - 6 - norm * halfBand * Math.min(1.3, p.voltDiv);
+            const y = projectY(midY - 6 - norm * halfBand * Math.min(1.3, p.voltDiv));
             if (i === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
           }
@@ -566,14 +699,13 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
           for (let i = 0; i < n; i++) {
             const x = (i / Math.max(1, n - 1)) * width;
             const norm = Math.min(1.15, Math.max(-0.15, dualCh2Buf[i] / ch2BandMax));
-            const y = height - padBottom - norm * halfBand * Math.min(1.3, p.voltDiv);
+            const y = projectY(height - padBottom - norm * halfBand * Math.min(1.3, p.voltDiv));
             if (i === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
           }
           ctx.stroke();
         }
       } else if (p.activeSignal === 'CAN_BUS') {
-        const dt = 0.000008 / p.timeDiv;
         const halfH = height / 2;
         const scale = 38 * p.voltDiv;
         const canHardFault =
@@ -586,14 +718,15 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
 
         for (let x = 0; x < width; x++) {
           if (canHardFault) {
-            canHighBuf[x] = halfH - (p.canHMnaV - 2.5) * scale - 20;
-            canLowBuf[x] = halfH - (p.canLMnaV - 2.5) * scale + 20;
+            canHighBuf[x] = projectY(halfH - (p.canHMnaV - 2.5) * scale - 20);
+            canLowBuf[x] = projectY(halfH - (p.canLMnaV - 2.5) * scale + 20);
           } else {
-            const sig = SignalGenerator.getCanBusSignals(simTime + x * dt, false);
+            const tPoint = tVisibleStartSec + (x / pxDenom) * tVisibleSpanSec;
+            const sig = SignalGenerator.getCanBusSignals(tPoint, false);
             const vH = Math.max(0, sig.canHigh + mnaOffsetH);
             const vL = Math.max(0, sig.canLow + mnaOffsetL);
-            canHighBuf[x] = halfH - (vH - 2.5) * scale - 20;
-            canLowBuf[x] = halfH - (vL - 2.5) * scale + 20;
+            canHighBuf[x] = projectY(halfH - (vH - 2.5) * scale - 20);
+            canLowBuf[x] = projectY(halfH - (vL - 2.5) * scale + 20);
           }
         }
 
@@ -631,12 +764,12 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
         ctx.shadowBlur = 4;
         ctx.beginPath();
         for (let x = 0; x < width; x++) {
-          const tPoint = simTime + (x * 0.00015 / p.timeDiv);
+          const tPoint = tVisibleStartSec + (x / pxDenom) * tVisibleSpanSec;
           const v =
             p.isInjectorFiring && !injHardFault
               ? SignalGenerator.getInjectorWaveform(tPoint, false, p.injMnaV, p.activeRpm)
               : p.injMnaV;
-          const y = height - 30 - v * 2.6 * p.voltDiv;
+          const y = projectY(height - 30 - v * 2.6 * p.voltDiv);
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
@@ -649,9 +782,9 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
         ctx.beginPath();
         const ckpCenterY = height * 0.38;
         for (let x = 0; x < width; x++) {
-          const tPoint = simTime + (x * 0.00008 / p.timeDiv);
+          const tPoint = tVisibleStartSec + (x / pxDenom) * tVisibleSpanSec;
           const v = SignalGenerator.getCrankshaftVrSignal(tPoint, p.activeRpm, p.ckpSignalLost);
-          const y = ckpCenterY - v * 8 * p.voltDiv;
+          const y = projectY(ckpCenterY - v * 8 * p.voltDiv);
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
@@ -664,9 +797,9 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
         ctx.beginPath();
         const cmpBaseY = height * 0.80;
         for (let x = 0; x < width; x++) {
-          const tPoint = simTime + (x * 0.00008 / p.timeDiv);
+          const tPoint = tVisibleStartSec + (x / pxDenom) * tVisibleSpanSec;
           const vCmp = SignalGenerator.getCamshaftHallSignal(tPoint, p.activeRpm, p.camPhaseOffsetDeg);
-          const y = cmpBaseY - vCmp * 6 * p.voltDiv;
+          const y = projectY(cmpBaseY - vCmp * 6 * p.voltDiv);
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
@@ -681,11 +814,11 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
         ctx.shadowBlur = 4;
         ctx.beginPath();
         for (let x = 0; x < width; x++) {
-          const tPoint = simTime + (x * 0.002 / p.timeDiv);
+          const tPoint = tVisibleStartSec + (x / pxDenom) * tVisibleSpanSec;
           const v = o2HardFault
             ? p.o2MnaV
             : Math.min(1.1, Math.max(0.05, p.o2MnaV + 0.35 * Math.sin(tPoint * 2 * Math.PI * 1.25)));
-          const y = height / 2 - (v - 0.5) * 100 * p.voltDiv;
+          const y = projectY(height / 2 - (v - 0.5) * 100 * p.voltDiv);
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
@@ -695,15 +828,15 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
         const gpt1BaseY = height * 0.40;
         const gpt2BaseY = height * 0.80;
         const ampPx = 28 * Math.min(1.5, p.voltDiv);
-        const gptDt = 0.000004 / p.timeDiv;
 
         ctx.strokeStyle = '#f59e0b';
         ctx.shadowColor = '#f59e0b';
         ctx.shadowBlur = 4;
         ctx.beginPath();
         for (let x = 0; x < width; x++) {
-          const sig = SignalGenerator.getGptBenchSignals(simTime + x * gptDt);
-          const y = gpt1BaseY - (sig.gpt1V / 5.0) * ampPx;
+          const tPoint = tVisibleStartSec + (x / pxDenom) * tVisibleSpanSec;
+          const sig = SignalGenerator.getGptBenchSignals(tPoint);
+          const y = projectY(gpt1BaseY - (sig.gpt1V / 5.0) * ampPx);
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
@@ -715,8 +848,9 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
         ctx.shadowBlur = 4;
         ctx.beginPath();
         for (let x = 0; x < width; x++) {
-          const sig = SignalGenerator.getGptBenchSignals(simTime + x * gptDt);
-          const y = gpt2BaseY - (sig.gpt2V / 5.0) * ampPx;
+          const tPoint = tVisibleStartSec + (x / pxDenom) * tVisibleSpanSec;
+          const sig = SignalGenerator.getGptBenchSignals(tPoint);
+          const y = projectY(gpt2BaseY - (sig.gpt2V / 5.0) * ampPx);
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
@@ -727,7 +861,7 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
         ctx.shadowColor = '#4ade80';
         ctx.shadowBlur = 4;
         ctx.beginPath();
-        const y = height - 35 - p.tpsMnaV * 28 * p.voltDiv;
+        const y = projectY(height - 35 - p.tpsMnaV * 28 * p.voltDiv);
         ctx.moveTo(0, y);
         ctx.lineTo(width, y);
         ctx.stroke();
@@ -737,7 +871,7 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
       ctx.save();
       ctx.shadowBlur = 0;
       const trigRatio = Math.min(0.88, Math.max(0.12, 1 - p.triggerLevelV / 15));
-      const trigY = trigRatio * height;
+      const trigY = projectY(trigRatio * height);
       ctx.strokeStyle = 'rgba(245, 158, 11, 0.32)';
       ctx.lineWidth = 1;
       ctx.setLineDash([3, 4]);
@@ -745,6 +879,20 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
       ctx.moveTo(0, trigY);
       ctx.lineTo(width, trigY);
       ctx.stroke();
+
+      // Calibrated CRT bottom timebase reticle tick labels (auto-switches ms / µs under zoom)
+      ctx.setLineDash([]);
+      ctx.font = '9px monospace';
+      ctx.fillStyle = 'rgba(148, 163, 184, 0.72)';
+      const tickDivs = [0, 2, 4, 6, 8];
+      for (let idx = 0; idx < tickDivs.length; idx++) {
+        const div = tickDivs[idx];
+        const frac = div / 10;
+        const tx = frac * width + 4;
+        const tMs = zWindow.startMs + frac * zWindow.spanMs;
+        ctx.textAlign = 'left';
+        ctx.fillText(formatScopeTimeAxisTick(tMs, zWindow.spanMs), tx, height - 5);
+      }
       ctx.restore();
 
       ctx.restore();
@@ -841,9 +989,108 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
     ch1FaultType,
     ch2FaultType,
     dualWindowMs,
+    baseWindowMs,
+    zoomViewport,
     isAutoScale,
     triggerLevelV,
   ]);
+
+  // Cursor-anchored wheel zoom on the CRT screen (non-passive so wheel does not scroll page while zooming)
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) < 1) return;
+      e.preventDefault();
+      const rect = container.getBoundingClientRect();
+      const anchorX =
+        rect.width > 0 ? Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width)) : 0.5;
+      const anchorY =
+        rect.height > 0
+          ? Math.min(1, Math.max(0, 1 - (e.clientY - rect.top) / rect.height))
+          : 0.5;
+      const dir = e.deltaY < 0 ? 'in' : 'out';
+
+      setZoomViewport((prev) => {
+        if (e.shiftKey) {
+          return stepScopeZoomY(prev, dir, anchorY);
+        }
+        return stepScopeZoomX(prev, dir, anchorX);
+      });
+    };
+    container.addEventListener('wheel', onWheel, { passive: false });
+    return () => container.removeEventListener('wheel', onWheel);
+  }, []);
+
+  const handleCrtPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    const container = containerRef.current;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    if (rect.width <= 0) return;
+
+    const ratioX = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    const effectiveMode: ScopeDragInteractionMode =
+      e.shiftKey || e.button === 1 ? 'PAN' : interactionMode;
+
+    container.setPointerCapture(e.pointerId);
+    crtPointerRef.current = {
+      active: true,
+      pointerId: e.pointerId,
+      mode: effectiveMode,
+      startClientX: e.clientX,
+      startClientY: e.clientY,
+      startRatioX: ratioX,
+      startViewport: zoomViewport,
+    };
+
+    if (effectiveMode === 'ZOOM_BOX') {
+      setDragSelection({ startRatio: ratioX, currentRatio: ratioX });
+    }
+  };
+
+  const handleCrtPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const container = containerRef.current;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return;
+
+    const ratioX = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    setHoverTimeRatio(ratioX);
+
+    const drag = crtPointerRef.current;
+    if (!drag?.active) return;
+
+    if (drag.mode === 'ZOOM_BOX') {
+      setDragSelection({ startRatio: drag.startRatioX, currentRatio: ratioX });
+    } else {
+      const dxRatio = (e.clientX - drag.startClientX) / rect.width;
+      const dyRatio = (e.clientY - drag.startClientY) / rect.height;
+      setZoomViewport(panScopeViewport(drag.startViewport, dxRatio, dyRatio));
+    }
+  };
+
+  const handleCrtPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    const container = containerRef.current;
+    const drag = crtPointerRef.current;
+    if (drag?.active && container?.hasPointerCapture(e.pointerId)) {
+      container.releasePointerCapture(e.pointerId);
+    }
+
+    if (drag?.active && drag.mode === 'ZOOM_BOX' && dragSelection) {
+      const span = Math.abs(dragSelection.currentRatio - dragSelection.startRatio);
+      if (span >= 0.02) {
+        setZoomViewport((prev) =>
+          zoomToSelectionRange(prev, dragSelection.startRatio, dragSelection.currentRatio)
+        );
+        // Auto-HOLD on drag-box capture so rapid transients stay frozen for inspection
+        setIsRunning(false);
+        setHudSimTimeSec(simTimeRef.current);
+      }
+    }
+
+    crtPointerRef.current = null;
+    setDragSelection(null);
+  };
 
   const handleSelectCh1Pin = (pinId: string) => {
     setLocalCh1PinId(pinId);
@@ -895,9 +1142,49 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
       {/* Recessed Phosphor CRT Screen Container */}
       <div
         ref={containerRef}
-        className="relative hw-lcd-well border border-[#203653] rounded-xl overflow-hidden bg-[#050A12] h-[200px] sm:h-[230px] w-full"
+        onPointerDown={handleCrtPointerDown}
+        onPointerMove={handleCrtPointerMove}
+        onPointerUp={handleCrtPointerUp}
+        onPointerCancel={handleCrtPointerUp}
+        onPointerLeave={() => {
+          if (!crtPointerRef.current?.active) setHoverTimeRatio(null);
+        }}
+        onDoubleClick={() => setZoomViewport(DEFAULT_SCOPE_ZOOM)}
+        className={`relative hw-lcd-well border border-[#203653] rounded-xl overflow-hidden bg-[#050A12] h-[200px] sm:h-[230px] w-full select-none touch-none ${
+          interactionMode === 'PAN'
+            ? isScopeZoomed(zoomViewport)
+              ? 'cursor-grab active:cursor-grabbing'
+              : 'cursor-default'
+            : 'cursor-crosshair'
+        }`}
       >
         <canvas ref={canvasRef} data-scope-canvas="true" className="w-full h-full block" />
+
+        {/* Hover Crosshair & Transient Probe Line */}
+        {hoverTimeRatio !== null && !dragSelection && (
+          <div
+            className="pointer-events-none absolute inset-y-0 border-l border-cyan-400/45"
+            style={{ left: `${hoverTimeRatio * 100}%` }}
+          />
+        )}
+
+        {/* Drag-to-Zoom Transient Selection Marquee */}
+        {dragSelection && Math.abs(dragSelection.currentRatio - dragSelection.startRatio) >= 0.01 && (
+          <div
+            className="pointer-events-none absolute inset-y-0 border-x border-cyan-300 bg-cyan-400/15"
+            style={{
+              left: `${Math.min(dragSelection.startRatio, dragSelection.currentRatio) * 100}%`,
+              width: `${Math.abs(dragSelection.currentRatio - dragSelection.startRatio) * 100}%`,
+            }}
+          >
+            <span className="absolute top-8 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-[2px] bg-[#050A12]/95 border border-cyan-400/60 text-[9px] font-mono font-bold text-cyan-200 whitespace-nowrap tabular-nums">
+              Δt {formatScopeTimeUnit(
+                Math.abs(dragSelection.currentRatio - dragSelection.startRatio) *
+                  visibleTimeWindow.spanMs
+              )}
+            </span>
+          </div>
+        )}
 
         {/* Channel Readout Chips */}
         <div className="absolute top-2 left-2 right-2 flex flex-wrap gap-1.5 text-[9.5px] sm:text-[10px] font-mono pointer-events-none">
@@ -958,11 +1245,35 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
           )}
         </div>
 
+        {/* Hover Cursor Probe Readout (Bottom-Left) */}
+        {hoverTimeRatio !== null && (
+          <div className="absolute bottom-5 left-2 text-[9px] font-mono text-cyan-200 bg-[#050A12]/92 border border-cyan-500/45 px-1.5 py-0.5 rounded-[2px] pointer-events-none tabular-nums">
+            t = {formatScopeTimeUnit(
+              visibleTimeWindow.startMs + hoverTimeRatio * visibleTimeWindow.spanMs
+            )}
+            {isScopeZoomed(zoomViewport)
+              ? ` · ${formatZoomFactor(zoomViewport.zoomX)} H`
+              : ''}
+          </div>
+        )}
+
         {/* Trigger Status Overlay Strip */}
-        <div className="absolute bottom-1.5 right-2 text-[9px] font-mono text-[#91A4BD] bg-[#050A12]/90 border border-[#203653] px-2 py-0.5 rounded-md pointer-events-none tabular-nums">
+        <div className="absolute bottom-5 right-2 text-[9px] font-mono text-[#91A4BD] bg-[#050A12]/90 border border-[#203653] px-2 py-0.5 rounded-md pointer-events-none tabular-nums">
           TRIG: {triggerSource} · {triggerMode.toUpperCase()} @ {triggerLevelV.toFixed(1)}V
         </div>
       </div>
+
+      {/* Hardware DSO Transient Zoom Bar & Overview Capture Minimap */}
+      <OscilloscopeZoomControls
+        viewport={zoomViewport}
+        onChangeViewport={setZoomViewport}
+        baseWindowMs={baseWindowMs}
+        interactionMode={interactionMode}
+        onChangeInteractionMode={setInteractionMode}
+        overviewTrace={overviewTrace}
+        theme="crt"
+        divisionsX={10}
+      />
 
       {/* Signal Source Tactile Selector Bar */}
       <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-mono">
@@ -1100,7 +1411,7 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
             step={0.25}
             accent="green"
             size="sm"
-            formatValue={(v) => `${Math.round(50 / v)}ms/div`}
+            formatValue={() => `${formatScopeTimeUnit(visibleTimeWindow.msPerDiv)}/div`}
             onChange={setTimeDiv}
             inlineFlankButtons={{
               dec: { label: '-', delta: -0.25 },
@@ -1116,7 +1427,7 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
             step={0.25}
             accent="amber"
             size="sm"
-            formatValue={(v) => `${(2 / v).toFixed(1)}V/div`}
+            formatValue={(v) => `${(2 / (v * zoomViewport.zoomY)).toFixed(2)}V/div`}
             onChange={setVoltDiv}
             inlineFlankButtons={{
               dec: { label: '-', delta: -0.25 },
