@@ -17,7 +17,6 @@ import {
   type Firestore,
 } from 'firebase/firestore';
 
-import firebaseAppletConfig from '../../firebase-applet-config.json';
 
 interface FirebaseAppletConfigShape {
   projectId?: string;
@@ -91,8 +90,58 @@ export function resolveFirebaseClientConfig(
   };
 }
 
-const fileConfig: FirebaseAppletConfigShape =
-  (firebaseAppletConfig as FirebaseAppletConfigShape) ?? {};
+function loadFirebaseAppletConfig(): FirebaseAppletConfigShape {
+  try {
+    const configModules = import.meta.glob<FirebaseAppletConfigShape>(
+      '/firebase-applet-config.json',
+      { eager: true, import: 'default' }
+    );
+    const matched = Object.values(configModules)[0];
+    if (matched && typeof matched === 'object') {
+      return matched;
+    }
+  } catch {
+    // Non-Vite runtime (e.g., Node/tsx test runner): fall through to Node filesystem read
+  }
+
+  try {
+    const nodeProc = (globalThis as {
+      process?: {
+        cwd?: () => string;
+        getBuiltinModule?: (id: string) => unknown;
+      };
+    }).process;
+    if (
+      nodeProc &&
+      typeof nodeProc.getBuiltinModule === 'function' &&
+      typeof nodeProc.cwd === 'function'
+    ) {
+      const fsMod = nodeProc.getBuiltinModule('node:fs') as
+        | {
+            existsSync?: (p: string) => boolean;
+            readFileSync?: (p: string, enc: string) => string;
+          }
+        | undefined;
+      const pathMod = nodeProc.getBuiltinModule('node:path') as
+        | {
+            resolve?: (...paths: string[]) => string;
+          }
+        | undefined;
+      if (fsMod?.existsSync && fsMod.readFileSync && pathMod?.resolve) {
+        const configPath = pathMod.resolve(nodeProc.cwd(), 'firebase-applet-config.json');
+        if (fsMod.existsSync(configPath)) {
+          return JSON.parse(fsMod.readFileSync(configPath, 'utf8')) as FirebaseAppletConfigShape;
+        }
+      }
+    }
+  } catch {
+    // Ignore filesystem errors and fall back to VITE_FIREBASE_* env vars
+  }
+
+  return {};
+}
+
+const fileConfig: FirebaseAppletConfigShape = loadFirebaseAppletConfig();
 
 export const resolvedFirebaseConfig = resolveFirebaseClientConfig(fileConfig, clientEnv);
 
