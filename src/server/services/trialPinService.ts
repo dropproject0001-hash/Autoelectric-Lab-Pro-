@@ -1130,9 +1130,11 @@ export function getTrialStatusForDevice(
   if (status === 'ACTIVE') {
     return {
       accessState: 'TRIAL_ACTIVE',
-      hasAccess: true,
+      // Security: Never mint or return a signed Bearer token from a bare deviceId lookup.
+      // Active session recovery requires presenting a valid Bearer token or HttpOnly session cookie.
+      hasAccess: false,
       trial: toPublicTrialPinRecord(latest, nowMs),
-      trialToken: signTrialSessionToken(latest, nowMs),
+      trialToken: null,
       serverNowMs: nowMs,
     };
   }

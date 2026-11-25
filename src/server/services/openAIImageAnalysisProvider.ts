@@ -152,8 +152,9 @@ Return ONLY valid JSON with keys: confidenceScore (number 0..1), analysisSummary
             'TIMEOUT'
           );
         }
+        console.error('[OpenAIVision] Unexpected upstream error:', msg);
         throw new ImageAnalysisProviderError(
-          `OpenAI vision upstream failure: ${msg}`,
+          'OpenAI vision upstream request failed. Please retry shortly.',
           502,
           'openai',
           'UPSTREAM_ERROR'

@@ -56,6 +56,7 @@ const LEGACY_LEASE_TOKEN_STORAGE_KEY = 'vecl_offline_lease_token_v1';
 
 // Keep signed license lease tokens strictly in JS memory (never localStorage/sessionStorage)
 let inMemoryOfflineLeaseToken: string | null = null;
+let inMemoryFallbackDeviceId: string | null = null;
 
 function generateCryptographicDeviceSuffix(): string {
   if (typeof globalThis !== 'undefined' && globalThis.crypto?.getRandomValues) {
@@ -79,7 +80,11 @@ export function getOrCreateWorkstationDeviceId(): string {
     window.localStorage.setItem(DEVICE_ID_STORAGE_KEY, created);
     return created;
   } catch {
-    return 'vecl_dev_fallback';
+    // Generate an ephemeral cryptographically random per-session device ID instead of a static fallback
+    if (!inMemoryFallbackDeviceId) {
+      inMemoryFallbackDeviceId = `vecl_dev_${generateCryptographicDeviceSuffix()}`;
+    }
+    return inMemoryFallbackDeviceId;
   }
 }
 
@@ -163,8 +168,9 @@ export async function fetchUserLicenseStatus(forceRefresh = false): Promise<{
     license: ClientLicenseRecord | null;
     deviceRegistered: boolean;
     leaseToken: string | null;
-  }>(`/api/autoelectric/license/status?deviceId=${encodeURIComponent(deviceId)}`, {
+  }>('/api/autoelectric/license/status', {
     method: 'GET',
+    headers: { 'X-VECL-Device-Id': deviceId },
   });
 
   if (data.leaseToken) {

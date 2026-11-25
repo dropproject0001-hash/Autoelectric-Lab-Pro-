@@ -567,6 +567,58 @@ export function createAutoelectricApiApp(): express.Express {
     });
   };
 
+  const TRIAL_SESSION_COOKIE_NAME = 'vecl_trial_session';
+
+  const readCookieValue = (req: express.Request, name: string): string | undefined => {
+    const rawCookie = req.headers.cookie;
+    if (!rawCookie || typeof rawCookie !== 'string') return undefined;
+    for (const part of rawCookie.split(';')) {
+      const idx = part.indexOf('=');
+      if (idx === -1) continue;
+      const key = part.slice(0, idx).trim();
+      if (key === name) {
+        const val = part.slice(idx + 1).trim();
+        try {
+          return decodeURIComponent(val);
+        } catch {
+          return val;
+        }
+      }
+    }
+    return undefined;
+  };
+
+  const isHttpsRequest = (req: express.Request): boolean => {
+    if (req.secure) return true;
+    const proto = req.headers['x-forwarded-proto'];
+    const raw = Array.isArray(proto) ? proto[0] : proto;
+    return typeof raw === 'string' && raw.split(',')[0].trim().toLowerCase() === 'https';
+  };
+
+  const setTrialSessionCookie = (
+    req: express.Request,
+    res: express.Response,
+    token: string,
+    expiresAtMs: number | null
+  ) => {
+    const maxAgeSec = expiresAtMs
+      ? Math.max(60, Math.min(365 * 24 * 3600, Math.floor((expiresAtMs - Date.now()) / 1000)))
+      : 3600;
+    const secureAttr = isHttpsRequest(req) ? '; Secure' : '';
+    res.setHeader(
+      'Set-Cookie',
+      `${TRIAL_SESSION_COOKIE_NAME}=${encodeURIComponent(token)}; Path=/api/autoelectric/trial; HttpOnly; SameSite=Lax; Max-Age=${maxAgeSec}${secureAttr}`
+    );
+  };
+
+  const clearTrialSessionCookie = (req: express.Request, res: express.Response) => {
+    const secureAttr = isHttpsRequest(req) ? '; Secure' : '';
+    res.setHeader(
+      'Set-Cookie',
+      `${TRIAL_SESSION_COOKIE_NAME}=; Path=/api/autoelectric/trial; HttpOnly; SameSite=Lax; Max-Age=0${secureAttr}`
+    );
+  };
+
   const trialStatusIpBuckets = new Map<string, number[]>();
 
   app.get('/api/autoelectric/trial/status', (req, res) => {
@@ -580,18 +632,53 @@ export function createAutoelectricApiApp(): express.Express {
       });
     }
 
+    // Read deviceId strictly from request header (never query string) to avoid URL/log leakage
     const deviceId =
-      typeof req.query.deviceId === 'string'
-        ? req.query.deviceId
-        : typeof req.headers['x-vecl-device-id'] === 'string'
-          ? req.headers['x-vecl-device-id']
-          : '';
+      typeof req.headers['x-vecl-device-id'] === 'string'
+        ? req.headers['x-vecl-device-id'].trim()
+        : '';
     const authHeader = req.headers.authorization;
-    const bearer =
+    const headerBearer =
       typeof authHeader === 'string' && authHeader.startsWith('Bearer ')
         ? authHeader.slice('Bearer '.length).trim()
         : undefined;
-    const status = getTrialStatusForDevice(deviceId, bearer);
+    const cookieToken = readCookieValue(req, TRIAL_SESSION_COOKIE_NAME);
+    const candidateToken = headerBearer || cookieToken;
+
+    if (!candidateToken || !candidateToken.startsWith('vecl_trial_v1.')) {
+      if (cookieToken) {
+        clearTrialSessionCookie(req, res);
+      }
+      return res.json({
+        status: 'SUCCESS',
+        accessState: 'UNLICENSED',
+        hasAccess: false,
+        trial: null,
+        trialToken: null,
+        serverNowMs: Date.now(),
+      });
+    }
+
+    const status = getTrialStatusForDevice(deviceId, candidateToken);
+    if (!status.hasAccess) {
+      if (cookieToken) {
+        clearTrialSessionCookie(req, res);
+      }
+      // Do not leak trial metadata or mint a token if bearer/cookie verification failed
+      const safeAccessState =
+        status.accessState === 'TRIAL_REVOKED' || status.accessState === 'TRIAL_EXPIRED'
+          ? status.accessState
+          : 'UNLICENSED';
+      return res.json({
+        status: 'SUCCESS',
+        accessState: safeAccessState,
+        hasAccess: false,
+        trial: safeAccessState === 'UNLICENSED' ? null : status.trial,
+        trialToken: null,
+        serverNowMs: status.serverNowMs,
+      });
+    }
+
     return res.json({
       status: 'SUCCESS',
       ...status,
@@ -606,14 +693,27 @@ export function createAutoelectricApiApp(): express.Express {
         : typeof req.headers['x-vecl-device-id'] === 'string'
           ? req.headers['x-vecl-device-id'].trim()
           : '';
-    const rateKey = `trial-redeem:${resolvedDeviceId || 'nodev'}:${req.ip || 'unknown'}`;
-    const rate = checkTrialRedeemRateLimit(rateKey);
-    if (!rate.allowed) {
-      res.setHeader('Retry-After', String(rate.retryAfterSec || 60));
+    // Enforce per-IP rate limit first so rotating client-supplied deviceId cannot bypass PIN throttling
+    const ipRate = checkTrialRedeemRateLimit(
+      `trial-redeem-ip:${req.ip || req.socket.remoteAddress || 'unknown'}`
+    );
+    if (!ipRate.allowed) {
+      res.setHeader('Retry-After', String(ipRate.retryAfterSec || 60));
       return res.status(429).json({
-        error: `Too many trial PIN attempts. Please wait ${rate.retryAfterSec}s before trying again.`,
+        error: `Too many trial PIN attempts. Please wait ${ipRate.retryAfterSec}s before trying again.`,
         code: 'TRIAL_RATE_LIMITED',
       });
+    }
+
+    if (resolvedDeviceId) {
+      const deviceRate = checkTrialRedeemRateLimit(`trial-redeem-dev:${resolvedDeviceId.slice(0, 80)}`);
+      if (!deviceRate.allowed) {
+        res.setHeader('Retry-After', String(deviceRate.retryAfterSec || 60));
+        return res.status(429).json({
+          error: `Too many trial PIN attempts. Please wait ${deviceRate.retryAfterSec}s before trying again.`,
+          code: 'TRIAL_RATE_LIMITED',
+        });
+      }
     }
 
     try {
@@ -629,6 +729,8 @@ export function createAutoelectricApiApp(): express.Express {
         deviceId: resolvedDeviceId,
         deviceLabel: typeof deviceLabel === 'string' ? deviceLabel : undefined,
       });
+
+      setTrialSessionCookie(req, res, result.trialToken, result.record.expiresAtMs);
 
       return res.json({
         status: 'SUCCESS',
@@ -1126,10 +1228,10 @@ Execute Google Search Grounding to retrieve ${
           if (observedRetryAfterSec > 0 && lastClassified.statusCode === 429) {
             res.setHeader('Retry-After', String(observedRetryAfterSec));
           }
+          console.error('[GroundedSearch] All candidate routes failed:', JSON.stringify(modelErrors));
           return res.status(lastClassified.statusCode).json({
             error: lastClassified.userMessage,
             code: lastClassified.category,
-            details: JSON.stringify(modelErrors),
             attemptedModels,
             attemptedKeyIds,
             retryAfterSec: observedRetryAfterSec || lastClassified.retryAfterSec,
@@ -1204,7 +1306,6 @@ Execute Google Search Grounding to retrieve ${
         res.status(classified.statusCode).json({
           error: classified.userMessage,
           code: classified.category,
-          details: classified.rawMessage,
         });
       }
     }
@@ -2181,7 +2282,10 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
         }
         const msg = err instanceof Error ? err.message : 'NHTSA VIN lookup failed.';
         console.error('[NHTSA] VIN decode error:', msg);
-        return res.status(502).json({ error: msg, code: 'NHTSA_UPSTREAM_ERROR' });
+        return res.status(502).json({
+          error: 'Unable to reach the official NHTSA VIN service right now. Please try again shortly.',
+          code: 'NHTSA_UPSTREAM_ERROR',
+        });
       }
     }
   );
@@ -2202,7 +2306,10 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
         }
         const msg = err instanceof Error ? err.message : 'NHTSA VIN lookup failed.';
         console.error('[NHTSA] VIN decode error:', msg);
-        return res.status(502).json({ error: msg, code: 'NHTSA_UPSTREAM_ERROR' });
+        return res.status(502).json({
+          error: 'Unable to reach the official NHTSA VIN service right now. Please try again shortly.',
+          code: 'NHTSA_UPSTREAM_ERROR',
+        });
       }
     }
   );
@@ -2250,7 +2357,10 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
       }
       const msg = err instanceof Error ? err.message : 'NHTSA vehicle safety lookup failed.';
       console.error('[NHTSA] Vehicle safety lookup error:', msg);
-      return res.status(502).json({ error: msg, code: 'NHTSA_UPSTREAM_ERROR' });
+      return res.status(502).json({
+        error: 'Unable to reach the official NHTSA safety lookup service right now. Please try again shortly.',
+        code: 'NHTSA_UPSTREAM_ERROR',
+      });
     }
   };
 
@@ -2286,7 +2396,10 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
         }
         const msg = err instanceof Error ? err.message : 'NHTSA vehicle makes lookup failed.';
         console.error('[NHTSA] Vehicle makes lookup error:', msg);
-        return res.status(502).json({ error: msg, code: 'NHTSA_UPSTREAM_ERROR' });
+        return res.status(502).json({
+          error: 'Unable to reach the official NHTSA vehicle directory right now. Please try again shortly.',
+          code: 'NHTSA_UPSTREAM_ERROR',
+        });
       }
     }
   );

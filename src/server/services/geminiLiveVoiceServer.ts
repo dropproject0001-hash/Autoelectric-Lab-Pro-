@@ -98,13 +98,34 @@ export function isAllowedLiveVoiceOrigin(
   return false;
 }
 
-function getUpgradeClientIp(request: http.IncomingMessage): string {
+function isTrustedProxyPeer(remoteAddress: string | undefined): boolean {
+  if (!remoteAddress) return false;
+  const clean = remoteAddress.replace(/^::ffff:/i, '').trim().toLowerCase();
+  return (
+    clean === '127.0.0.1' ||
+    clean === '::1' ||
+    clean.startsWith('10.') ||
+    clean.startsWith('192.168.') ||
+    /^172\.(1[6-9]|2\d|3[0-1])\./.test(clean)
+  );
+}
+
+export function getUpgradeClientIp(request: http.IncomingMessage): string {
+  const remoteAddr = (request.socket?.remoteAddress || 'unknown').trim();
   const xff = request.headers['x-forwarded-for'];
-  const raw = Array.isArray(xff) ? xff[0] : xff;
-  if (raw && raw.trim()) {
-    return raw.split(',')[0].trim().slice(0, 64);
+  const raw = Array.isArray(xff) ? xff[xff.length - 1] : xff;
+  if (raw && raw.trim() && isTrustedProxyPeer(remoteAddr)) {
+    const entries = raw
+      .split(',')
+      .map((part) => part.trim())
+      .filter(Boolean);
+    if (entries.length > 0) {
+      // Match Express `trust proxy = 1`: trust only the rightmost hop added by the reverse proxy,
+      // ignoring any client-spoofed leftmost entries.
+      return entries[entries.length - 1].slice(0, 64);
+    }
   }
-  return (request.socket.remoteAddress || 'unknown').slice(0, 64);
+  return remoteAddr.slice(0, 64);
 }
 
 function rejectUpgrade(socket: Duplex, statusCode: number, statusText: string, body: string): void {

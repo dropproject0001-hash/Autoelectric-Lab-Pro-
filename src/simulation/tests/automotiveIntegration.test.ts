@@ -23,6 +23,7 @@ import {
   recordModelFailure,
   resetFreeTierRouterForTests,
 } from '../../server/services/geminiFreeTierRouter';
+import { getUpgradeClientIp } from '../../server/services/geminiLiveVoiceServer';
 import {
   resetLicenseStoreForTests,
   setAdminUidForTests,
@@ -2247,6 +2248,162 @@ async function main() {
     } finally {
       unsubSessions();
       unsubLogs();
+    }
+  });
+
+  // 34. Security Hardening Regression Suite (Trial Session Recovery, Per-IP PIN Throttling, WS IP Spoof Guard, Error Sanitization)
+  await runTest('Security hardening blocks unauthenticated trial token minting, deviceId-rotated PIN brute force, WS X-Forwarded-For spoofing, and raw error leakage', async () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'vecl-sec-hardening-'));
+    const storePath = path.join(tmpDir, 'trials.store.json');
+    const prevMasterPin = process.env.VECL_ADMIN_MASTER_PIN;
+    process.env.VECL_ADMIN_MASTER_PIN = '61948273';
+    setTrialStoreFilePathForTests(storePath);
+    resetTrialStoreForTests();
+
+    const app = createAutoelectricApiApp();
+    const server = http.createServer(app);
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', () => resolve()));
+    const address = server.address();
+    assert.ok(address && typeof address === 'object');
+    const baseUrl = `http://127.0.0.1:${address.port}`;
+
+    try {
+      // 1. Admin creates a trial PIN and legitimate workstation redeems it (receiving HttpOnly cookie)
+      const adminRes = await fetch(`${baseUrl}/api/autoelectric/trial/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ masterPin: '61948273' }),
+      });
+      assert.equal(adminRes.status, 200);
+      const { adminToken } = (await adminRes.json()) as { adminToken: string };
+
+      const genRes = await fetch(`${baseUrl}/api/autoelectric/trial/admin/generate`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${adminToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ durationHours: 4, notes: 'Security Regression Trial' }),
+      });
+      assert.equal(genRes.status, 201);
+      const genBody = (await genRes.json()) as { plainPin: string };
+
+      const victimDeviceId = 'vecl_dev_victim_workstation_9988';
+      const redeemRes = await fetch(`${baseUrl}/api/autoelectric/trial/redeem`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-VECL-Device-Id': victimDeviceId },
+        body: JSON.stringify({ pin: genBody.plainPin, deviceId: victimDeviceId, deviceLabel: 'Victim Bay' }),
+      });
+      assert.equal(redeemRes.status, 200);
+      const setCookieHeader = redeemRes.headers.get('set-cookie') || '';
+      assert.ok(setCookieHeader.includes('vecl_trial_session='), 'Expected HttpOnly trial session cookie');
+      assert.ok(setCookieHeader.toLowerCase().includes('httponly'), 'Trial session cookie must be HttpOnly');
+      const cookiePair = setCookieHeader.split(';')[0];
+
+      // 2. Unauthenticated attacker knowing victimDeviceId CANNOT mint a trialToken via query or header
+      const attackStatusRes = await fetch(
+        `${baseUrl}/api/autoelectric/trial/status?deviceId=${encodeURIComponent(victimDeviceId)}`,
+        {
+          method: 'GET',
+          headers: { 'X-VECL-Device-Id': victimDeviceId },
+        }
+      );
+      assert.equal(attackStatusRes.status, 200);
+      const attackStatusBody = (await attackStatusRes.json()) as {
+        hasAccess: boolean;
+        trialToken: string | null;
+        trial: unknown;
+        accessState: string;
+      };
+      assert.equal(attackStatusBody.hasAccess, false);
+      assert.equal(attackStatusBody.trialToken, null);
+      assert.equal(attackStatusBody.trial, null);
+      assert.equal(attackStatusBody.accessState, 'UNLICENSED');
+
+      // 3. Legitimate browser sending HttpOnly session cookie + matching device header restores active session
+      const legitCookieStatusRes = await fetch(`${baseUrl}/api/autoelectric/trial/status`, {
+        method: 'GET',
+        headers: {
+          'X-VECL-Device-Id': victimDeviceId,
+          Cookie: cookiePair,
+        },
+      });
+      assert.equal(legitCookieStatusRes.status, 200);
+      const legitCookieBody = (await legitCookieStatusRes.json()) as {
+        hasAccess: boolean;
+        trialToken: string | null;
+        accessState: string;
+      };
+      assert.equal(legitCookieBody.hasAccess, true);
+      assert.equal(legitCookieBody.accessState, 'TRIAL_ACTIVE');
+      assert.ok(legitCookieBody.trialToken?.startsWith('vecl_trial_v1.'));
+
+      // 4. Rotating deviceId on /api/autoelectric/trial/redeem from the same IP triggers 429 TRIAL_RATE_LIMITED
+      let saw429 = false;
+      for (let i = 0; i < 10; i += 1) {
+        const bruteRes = await fetch(`${baseUrl}/api/autoelectric/trial/redeem`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pin: String(10000000 + i),
+            deviceId: `attacker_rotating_device_${i}`,
+          }),
+        });
+        if (bruteRes.status === 429) {
+          saw429 = true;
+          const body = (await bruteRes.json()) as { code?: string };
+          assert.equal(body.code, 'TRIAL_RATE_LIMITED');
+          break;
+        }
+      }
+      assert.equal(saw429, true, 'Rotating deviceId must not bypass per-IP trial PIN rate limiting');
+
+      // 5. WebSocket getUpgradeClientIp resists X-Forwarded-For spoofing
+      const spoofedProxiedReq = {
+        socket: { remoteAddress: '127.0.0.1' },
+        headers: { 'x-forwarded-for': '203.0.113.99, 198.51.100.42' },
+      } as unknown as http.IncomingMessage;
+      assert.equal(
+        getUpgradeClientIp(spoofedProxiedReq),
+        '198.51.100.42',
+        'Must select rightmost proxy-appended IP, not leftmost spoofable entry'
+      );
+
+      const spoofedDirectReq = {
+        socket: { remoteAddress: '198.51.100.77' },
+        headers: { 'x-forwarded-for': '203.0.113.10' },
+      } as unknown as http.IncomingMessage;
+      assert.equal(
+        getUpgradeClientIp(spoofedDirectReq),
+        '198.51.100.77',
+        'Must ignore X-Forwarded-For when direct peer is not a trusted proxy'
+      );
+
+      // 6. Unexpected NHTSA errors do not leak internal error details to clients
+      setNhtsaFetchForTests(async () => {
+        throw new Error('INTERNAL_SOCKET_DETAIL: ECONNREFUSED 10.128.0.5:443');
+      });
+      try {
+        const errVinRes = await fetch(`${baseUrl}/api/autoelectric/vin/1FTEW1EF3GKE12345`, {
+          headers: {
+            Authorization: `Bearer ${legitCookieBody.trialToken}`,
+            'X-VECL-Device-Id': victimDeviceId,
+          },
+        });
+        assert.equal(errVinRes.status, 502);
+        const errVinText = await errVinRes.text();
+        assert.equal(errVinText.includes('INTERNAL_SOCKET_DETAIL'), false);
+        assert.equal(errVinText.includes('10.128.0.5'), false);
+      } finally {
+        resetNhtsaStateForTests();
+      }
+    } finally {
+      if (prevMasterPin === undefined) {
+        delete process.env.VECL_ADMIN_MASTER_PIN;
+      } else {
+        process.env.VECL_ADMIN_MASTER_PIN = prevMasterPin;
+      }
+      server.close();
+      resetTrialStoreForTests();
+      setTrialStoreFilePathForTests(null);
+      fs.rmSync(tmpDir, { recursive: true, force: true });
     }
   });
 

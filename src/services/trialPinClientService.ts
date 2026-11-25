@@ -210,10 +210,11 @@ export async function fetchTrialDeviceStatus(): Promise<TrialDeviceStatusRespons
     ...(inMemoryTrialToken ? { Authorization: `Bearer ${inMemoryTrialToken}` } : {}),
   };
 
-  const res = await fetch(
-    `/api/autoelectric/trial/status?deviceId=${encodeURIComponent(deviceId)}`,
-    { method: 'GET', headers }
-  );
+  const res = await fetch('/api/autoelectric/trial/status', {
+    method: 'GET',
+    headers,
+    credentials: 'same-origin',
+  });
   const data = (await res.json().catch(() => ({}))) as Partial<TrialDeviceStatusResponse> & {
     error?: string;
   };
@@ -242,6 +243,7 @@ export async function redeemTrialPinClient(
   const deviceId = getOrCreateWorkstationDeviceId();
   const res = await fetch('/api/autoelectric/trial/redeem', {
     method: 'POST',
+    credentials: 'same-origin',
     headers: {
       'Content-Type': 'application/json',
       'X-VECL-Device-Id': deviceId,

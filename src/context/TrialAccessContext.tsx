@@ -170,7 +170,12 @@ export const TrialAccessProvider: React.FC<{ children: React.ReactNode }> = ({ c
       setServerSkewMs(skew);
       setTrialRecord(trialStatus.trial);
 
-      if (trialStatus.accessState === 'TRIAL_ACTIVE' && trialStatus.trial?.expiresAtMs) {
+      if (
+        trialStatus.accessState === 'TRIAL_ACTIVE' &&
+        trialStatus.hasAccess &&
+        Boolean(trialStatus.trialToken) &&
+        trialStatus.trial?.expiresAtMs
+      ) {
         setAccessMode('TRIAL_ACTIVE');
         setExpiresAtMs(trialStatus.trial.expiresAtMs);
         setRemainingSeconds(computeRemaining(trialStatus.trial.expiresAtMs, skew));

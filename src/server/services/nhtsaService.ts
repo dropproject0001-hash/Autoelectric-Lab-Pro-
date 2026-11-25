@@ -481,8 +481,12 @@ async function fetchJsonOnce(url: string, timeoutMs: number): Promise<unknown> {
         true
       );
     }
+    console.error(
+      '[NHTSA] Upstream network failure:',
+      err instanceof Error ? err.message : String(err)
+    );
     throw new NhtsaUpstreamError(
-      err instanceof Error ? `NHTSA network error: ${err.message}` : 'NHTSA API unreachable.',
+      'NHTSA public API is temporarily unreachable. Please retry shortly.',
       502,
       true
     );
