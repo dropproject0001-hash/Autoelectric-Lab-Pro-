@@ -12,6 +12,7 @@ import {
   FileText,
   Folder,
   FolderPlus,
+  FolderSearch,
   HardDrive,
   Image as ImageIcon,
   Pencil,
@@ -65,6 +66,8 @@ interface GoogleDriveTabProps {
   onStageBenchSnapshotUpload: () => void;
   onStageReportTxtUpload: () => void;
   onLocalFileSelected: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onOpenGooglePicker?: () => void;
+  isPickerOpening?: boolean;
   onSetPendingAction: (action: PendingWorkspaceAction) => void;
   onLoadBenchSnapshot?: (snapshot: DriveBenchSnapshot) => void;
   onSetStatusBanner: (banner: WorkspaceStatusBanner | null) => void;
@@ -102,6 +105,8 @@ export const GoogleDriveTab: React.FC<GoogleDriveTabProps> = ({
   onStageBenchSnapshotUpload,
   onStageReportTxtUpload,
   onLocalFileSelected,
+  onOpenGooglePicker,
+  isPickerOpening = false,
   onSetPendingAction,
   onLoadBenchSnapshot,
   onSetStatusBanner,
@@ -223,6 +228,19 @@ export const GoogleDriveTab: React.FC<GoogleDriveTabProps> = ({
               onChange={onLocalFileSelected}
               className="hidden"
             />
+            {onOpenGooglePicker && (
+              <button
+                type="button"
+                data-testid="google-drive-picker-btn"
+                disabled={isPickerOpening}
+                onClick={onOpenGooglePicker}
+                className="hw-btn border-sky-500/60 bg-sky-950/50 hover:bg-sky-900/50 text-sky-200 px-2.5 py-1.5 rounded-[2px] text-[11px] font-bold flex items-center gap-1 transition disabled:opacity-50 cursor-pointer"
+                title="Select a file directly via Google Picker"
+              >
+                <FolderSearch className="w-3.5 h-3.5" />
+                <span>{isPickerOpening ? 'Opening Picker...' : 'Google Picker'}</span>
+              </button>
+            )}
             <button
               type="button"
               onClick={onToggleNewFolderInput}

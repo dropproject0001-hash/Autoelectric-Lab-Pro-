@@ -62,6 +62,7 @@ import {
 } from './harness/useProbeTransitionMotion';
 import { ProbeTransitionOverlay } from './harness/ProbeTransitionOverlay';
 import { WireOverviewMapPanel } from './harness/WireOverviewMapPanel';
+import { formatStandardConnectionTag } from '../simulation/telemetry/efiHarnessStandard';
 
 interface WiringCanvasProps {
   pins: EcuPin[];
@@ -590,7 +591,7 @@ export const WiringCanvas: React.FC<WiringCanvasProps> = ({
             </button>
           </div>
 
-          <div className="relative flex items-center bg-[#050A12] border border-[#203653] rounded-lg px-2 py-1 focus-within:border-[#19c8f5] min-w-0">
+          <div className="relative flex items-center bg-[#050A12] border border-[#203653] rounded-lg px-2 py-1 focus-within:border-[#19c8f5] shrink-0 overflow-hidden">
             <Search className="w-3 h-3 text-[#91a4bd] shrink-0 mr-1.5" />
             <input
               type="text"
@@ -598,7 +599,7 @@ export const WiringCanvas: React.FC<WiringCanvasProps> = ({
               onChange={(e) => setTopologyQuery(e.target.value)}
               placeholder="Search pins / nets..."
               aria-label="Search harness topology"
-              className="w-24 sm:w-28 xl:w-32 2xl:w-44 bg-transparent text-[10.5px] font-mono text-[#eaf3ff] placeholder:text-[#6f87a6] focus:outline-none"
+              className="w-20 sm:w-24 xl:w-28 2xl:w-40 min-w-0 bg-transparent text-[10.5px] font-mono text-[#eaf3ff] placeholder:text-[#6f87a6] focus:outline-none"
             />
             {isSearchActive && (
               <>
@@ -734,6 +735,27 @@ export const WiringCanvas: React.FC<WiringCanvasProps> = ({
           </div>
         </div>
       </div>
+
+      {selectedPinId && (() => {
+        const tag = formatStandardConnectionTag(selectedPinId, pins);
+        return (
+          <div
+            data-testid="wiring-standard-connection-tag"
+            className="flex items-center justify-between gap-2 px-3 py-1 bg-[#081220] border-b border-[#182B46] text-[10px] font-mono shrink-0"
+            title="Standardized EFI Connection Tag (Synced with 3D Digital Twin)"
+          >
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-[9px] uppercase tracking-wider text-slate-400 shrink-0">
+                3D-Synced Pin Tag
+              </span>
+              <span className="font-semibold text-cyan-200 truncate">{tag.formattedTag}</span>
+            </div>
+            <span className="text-[9px] text-amber-300/90 shrink-0 hidden sm:inline">
+              {tag.corridor.replace(/_/g, ' ')}
+            </span>
+          </div>
+        );
+      })()}
 
       {canvasViewMode === 'TOPOLOGY_GRAPH' ? (
         <div className="flex-1 min-h-0 min-w-0 p-1.5 sm:p-2 flex flex-col">

@@ -335,8 +335,8 @@ export const LabStatusFooter: React.FC<LabStatusFooterProps> = ({
   return (
     <footer className="relative min-h-[36px] bg-gradient-to-b from-[#0b1526]/84 to-[#060c17]/90 backdrop-blur-md border-t border-[#203653] px-2.5 sm:px-3.5 lg:px-4 py-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] flex flex-wrap lg:flex-nowrap items-center justify-between gap-2 text-[10.5px] font-mono shrink-0 text-[#d9e8fa] overflow-x-auto scrollbar-none">
       {/* Left Existing Bench Telemetry Strip */}
-      <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap lg:flex-nowrap min-w-0">
-        <span className="inline-flex items-center gap-1.5 text-[#eaf3ff] whitespace-nowrap min-w-0">
+      <div className="flex items-center gap-1.5 sm:gap-2 flex-nowrap min-w-0 flex-1 overflow-x-auto scrollbar-none">
+        <span className="inline-flex items-center gap-1.5 text-[#eaf3ff] whitespace-nowrap shrink-0">
           <span
             aria-hidden="true"
             className={`h-2 w-2 rounded-full shrink-0 ${
@@ -345,31 +345,31 @@ export const LabStatusFooter: React.FC<LabStatusFooterProps> = ({
                 : 'bg-[#20d889] shadow-[0_0_8px_rgba(32,216,137,0.75)]'
             }`}
           />
-          <span className="text-[#91a4bd]">TARGET:</span>
-          <strong className="font-semibold text-[#19c8f5] truncate max-w-[130px] xl:max-w-[190px]">
+          <span className="text-[#91a4bd] hidden 2xl:inline">TARGET:</span>
+          <strong className="font-semibold text-[#19c8f5] truncate max-w-[105px] 2xl:max-w-[175px]">
             {selectedPin ? `#${selectedPin.pinNumber} ${selectedPin.label}` : 'None'}
           </strong>
         </span>
 
-        <span className="text-[#203653] hidden xs:inline">|</span>
+        <span className="text-[#203653] hidden sm:inline shrink-0">|</span>
 
-        <span className="whitespace-nowrap tabular-nums text-[#91a4bd]">
+        <span className="whitespace-nowrap tabular-nums text-[#91a4bd] shrink-0">
           DMM:{' '}
           <strong className="text-[#ffb020] font-semibold">
             {circuitSolution.multimeterReading.display} {circuitSolution.multimeterReading.unit}
           </strong>
         </span>
 
-        <span className="text-[#203653] hidden xl:inline">|</span>
+        <span className="text-[#203653] hidden 2xl:inline shrink-0">|</span>
 
-        <span className="whitespace-nowrap hidden xl:inline tabular-nums text-[#91a4bd]">
+        <span className="whitespace-nowrap hidden 2xl:inline tabular-nums text-[#91a4bd] shrink-0">
           HARNESS:{' '}
           <strong className="text-[#eaf3ff]">
             {wires.filter((w) => !w.isCut).length}/{wires.length}
           </strong>
         </span>
 
-        <span className="text-[#203653] hidden sm:inline">|</span>
+        <span className="text-[#203653] hidden sm:inline shrink-0">|</span>
 
         <button
           type="button"
@@ -379,7 +379,7 @@ export const LabStatusFooter: React.FC<LabStatusFooterProps> = ({
           aria-label={twinSync.ariaLabel}
           title={twinSync.tooltip}
           onClick={onOpenTwinView}
-          className={`hw-btn text-[10px] inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md whitespace-nowrap tabular-nums transition-colors ${
+          className={`hw-btn text-[10px] inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md whitespace-nowrap shrink-0 tabular-nums transition-colors ${
             onOpenTwinView ? 'cursor-pointer' : 'cursor-default'
           } ${
             twinSync.tone === 'COMM_FAULT' || twinSync.tone === 'OCP_TRIPPED'
@@ -428,7 +428,7 @@ export const LabStatusFooter: React.FC<LabStatusFooterProps> = ({
                 ? 'Streaming Live Data to 3D EMS Twin — Click to freeze snapshot for Manual Review'
                 : '3D EMS Twin paused in Manual Review — Click to resume Live Data sync'
             }
-            className={`hw-btn text-[10px] inline-flex items-center gap-1 px-2 py-0.5 rounded-md whitespace-nowrap cursor-pointer transition-colors ${
+            className={`hw-btn text-[10px] inline-flex items-center gap-1 px-2 py-0.5 rounded-md whitespace-nowrap shrink-0 cursor-pointer transition-colors ${
               twinSyncMode === 'MANUAL_REVIEW'
                 ? 'hw-btn-amber font-semibold'
                 : 'hw-btn-blue text-[#d9e8fa]'
@@ -452,7 +452,7 @@ export const LabStatusFooter: React.FC<LabStatusFooterProps> = ({
             aria-label={syncIndicator.ariaLabel}
             onClick={onRetryCloudSync}
             disabled={syncStatus.state === 'SYNCING'}
-            className={`hw-btn text-[10px] flex items-center gap-1.5 px-2 py-0.5 rounded-md whitespace-nowrap tabular-nums cursor-pointer ${
+            className={`hw-btn text-[10px] flex items-center gap-1.5 px-2 py-0.5 rounded-md whitespace-nowrap shrink-0 tabular-nums cursor-pointer ${
               syncIndicator.tone === 'ERROR'
                 ? 'bg-rose-950/75 border-[#ff4d62]/70 text-rose-200'
                 : syncIndicator.tone === 'SYNCING'

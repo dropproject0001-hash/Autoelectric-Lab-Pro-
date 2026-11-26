@@ -3,11 +3,14 @@
  * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
  */
 
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  AlertTriangle,
   CheckCircle2,
+  Cloud,
   Copy,
   Download,
+  ExternalLink,
   FileCode2,
   FileText,
   Lock,
@@ -16,8 +19,22 @@ import {
   ShieldCheck,
   X,
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import { useTrialAccess } from '../context/TrialAccessContext';
-import { buildBenchReportText } from '../services/googleDocsService';
+import {
+  appendToGoogleDoc,
+  buildBenchReportText,
+  createBenchReportDoc,
+  extractGoogleConsoleUrl,
+  formatWorkspaceBannerText,
+  getGoogleDoc,
+  GoogleDriveDocItem,
+  GoogleWorkspaceAuthError,
+  listGoogleDocs,
+  ParsedGoogleDoc,
+  replaceGoogleDocBody,
+  trashGoogleDoc,
+} from '../services/googleDocsService';
 import {
   generateSignedClientDiagnosticPdf,
   verifySignedClientDiagnosticToken,
@@ -32,6 +49,13 @@ import {
   WireConnection,
 } from '../types/ecu';
 import { CircuitSolution } from '../utils/circuitSolver';
+import { toSafeExternalHttpUrl } from '../utils/safeExternalUrl';
+import { GoogleDocsTab } from './workspace/GoogleDocsTab';
+import {
+  GoogleSignInButton,
+  WorkspaceActionConfirmDialog,
+} from './workspace/WorkspaceAuthBanner';
+import type { PendingWorkspaceAction } from './workspace/workspaceTypes';
 
 interface GoogleDocsModalProps {
   isOpen: boolean;
@@ -45,6 +69,8 @@ interface GoogleDocsModalProps {
   defaultVehicleLabel?: string;
   defaultEcuProfileLabel?: string;
 }
+
+type DocsStudioMode = 'LOCAL_PDF' | 'GOOGLE_DOCS';
 
 function sanitizeFileSlug(input: string): string {
   return (
@@ -82,7 +108,16 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
   defaultEcuProfileLabel,
 }) => {
   const { canUseExports, openAccessModal } = useTrialAccess();
+  const {
+    user,
+    workspaceToken,
+    needsWorkspaceAuth,
+    isSigningIn,
+    connectGoogleWorkspace,
+    invalidateWorkspaceToken,
+  } = useAuth();
 
+  const [studioMode, setStudioMode] = useState<DocsStudioMode>('LOCAL_PDF');
   const [reportTitle, setReportTitle] = useState(
     () => `ECU Bench Report - ${new Date().toISOString().slice(0, 10)}`
   );
@@ -107,7 +142,19 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
   const [statusMessage, setStatusMessage] = useState<{
     type: 'success' | 'error';
     text: string;
+    linkUrl?: string;
+    linkLabel?: string;
   } | null>(null);
+
+  // Live Google Docs API state
+  const [docsList, setDocsList] = useState<GoogleDriveDocItem[]>([]);
+  const [docsLoading, setDocsLoading] = useState(false);
+  const [docSearch, setDocSearch] = useState('');
+  const [selectedDoc, setSelectedDoc] = useState<ParsedGoogleDoc | null>(null);
+  const [docDetailLoading, setDocDetailLoading] = useState(false);
+  const [docEditableBody, setDocEditableBody] = useState('');
+  const [pendingAction, setPendingAction] = useState<PendingWorkspaceAction | null>(null);
+  const [isExecutingDocAction, setIsExecutingDocAction] = useState(false);
 
   const liveReportPreview = useMemo(
     () =>
@@ -167,6 +214,127 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
     pins,
     liveReportPreview,
   ]);
+
+  const reportDocError = useCallback(
+    (err: unknown) => {
+      if (err instanceof GoogleWorkspaceAuthError) {
+        invalidateWorkspaceToken();
+      }
+      const raw = err instanceof Error ? err.message : 'Google Docs request failed.';
+      const consoleUrl = extractGoogleConsoleUrl(raw);
+      setStatusMessage({
+        type: 'error',
+        text: formatWorkspaceBannerText(raw, Boolean(consoleUrl)),
+        linkUrl: consoleUrl || undefined,
+        linkLabel: consoleUrl ? 'Enable API in Console' : undefined,
+      });
+    },
+    [invalidateWorkspaceToken]
+  );
+
+  const refreshGoogleDocs = useCallback(
+    async (qOverride?: string, tokenOverride?: string) => {
+      const token = tokenOverride ?? workspaceToken;
+      if (!token) return;
+      setDocsLoading(true);
+      try {
+        const docs = await listGoogleDocs(token, qOverride ?? docSearch);
+        setDocsList(docs);
+      } catch (err) {
+        reportDocError(err);
+      } finally {
+        setDocsLoading(false);
+      }
+    },
+    [workspaceToken, docSearch, reportDocError]
+  );
+
+  useEffect(() => {
+    if (isOpen && studioMode === 'GOOGLE_DOCS' && workspaceToken) {
+      void refreshGoogleDocs(undefined, workspaceToken);
+    }
+  }, [isOpen, studioMode, workspaceToken, refreshGoogleDocs]);
+
+  const handleOpenGoogleDoc = useCallback(
+    async (item: GoogleDriveDocItem) => {
+      if (!workspaceToken) return;
+      setDocDetailLoading(true);
+      try {
+        const parsed = await getGoogleDoc(workspaceToken, item.id);
+        setSelectedDoc(parsed);
+        setDocEditableBody(parsed.plainText);
+      } catch (err) {
+        reportDocError(err);
+      } finally {
+        setDocDetailLoading(false);
+      }
+    },
+    [workspaceToken, reportDocError]
+  );
+
+  const handleConfirmDocAction = useCallback(async () => {
+    if (!pendingAction || !workspaceToken) return;
+    setIsExecutingDocAction(true);
+    setStatusMessage(null);
+    try {
+      if (pendingAction.kind === 'CREATE_GOOGLE_DOC') {
+        const created = await createBenchReportDoc(
+          workspaceToken,
+          pendingAction.title,
+          pendingAction.bodyText
+        );
+        setStatusMessage({
+          type: 'success',
+          text: `Created Google Doc "${created.title}".`,
+          linkUrl: created.webViewLink,
+          linkLabel: 'Open in Docs',
+        });
+        await refreshGoogleDocs(undefined, workspaceToken);
+        const loaded = await getGoogleDoc(workspaceToken, created.documentId);
+        setSelectedDoc(loaded);
+        setDocEditableBody(loaded.plainText);
+      } else if (pendingAction.kind === 'APPEND_GOOGLE_DOC') {
+        const updated = await appendToGoogleDoc(
+          workspaceToken,
+          pendingAction.documentId,
+          pendingAction.textToAppend
+        );
+        setSelectedDoc(updated);
+        setDocEditableBody(updated.plainText);
+        setStatusMessage({
+          type: 'success',
+          text: `Appended live MNA report to Google Doc "${updated.title}".`,
+        });
+      } else if (pendingAction.kind === 'REPLACE_GOOGLE_DOC') {
+        const updated = await replaceGoogleDocBody(
+          workspaceToken,
+          pendingAction.documentId,
+          pendingAction.newBodyText
+        );
+        setSelectedDoc(updated);
+        setDocEditableBody(updated.plainText);
+        setStatusMessage({
+          type: 'success',
+          text: `Saved updated text to Google Doc "${updated.title}".`,
+        });
+      } else if (pendingAction.kind === 'TRASH_GOOGLE_DOC') {
+        await trashGoogleDoc(workspaceToken, pendingAction.documentId);
+        if (selectedDoc?.documentId === pendingAction.documentId) {
+          setSelectedDoc(null);
+        }
+        setStatusMessage({
+          type: 'success',
+          text: `Moved Google Doc "${pendingAction.title}" to Drive Trash.`,
+        });
+        await refreshGoogleDocs(undefined, workspaceToken);
+      }
+      setPendingAction(null);
+    } catch (err) {
+      reportDocError(err);
+    } finally {
+      setIsExecutingDocAction(false);
+    }
+  }, [pendingAction, workspaceToken, selectedDoc?.documentId, refreshGoogleDocs, reportDocError]);
 
   if (!isOpen) return null;
 
@@ -255,7 +423,7 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
     setIsSavingLog(true);
     setStatusMessage(null);
     try {
-      await saveDiagnosticLog(LOCAL_WORKSTATION_UID, {
+      await saveDiagnosticLog(user?.uid || LOCAL_WORKSTATION_UID, {
         title: reportTitle.trim() || `ECU Bench Report - ${new Date().toISOString().slice(0, 10)}`,
         dtcCode: circuitSolution.activeDTCs.map((d) => d.code).join(', ') || 'NOMINAL',
         ecuModel: ecuProfileLabel.trim() || 'Universal ECU Bench',
@@ -264,12 +432,14 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
       });
       setStatusMessage({
         type: 'success',
-        text: 'Saved diagnostic report snapshot into Local Saved Benches > Diagnostic Logs.',
+        text: user?.uid
+          ? 'Saved diagnostic report snapshot to Firebase Cloud & Local Saved Benches.'
+          : 'Saved diagnostic report snapshot into Local Saved Benches > Diagnostic Logs.',
       });
     } catch (err) {
       setStatusMessage({
         type: 'error',
-        text: err instanceof Error ? err.message : 'Failed to save diagnostic log locally.',
+        text: err instanceof Error ? err.message : 'Failed to save diagnostic log.',
       });
     } finally {
       setIsSavingLog(false);
@@ -277,29 +447,55 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4">
-      <div className="relative flex flex-col w-full max-w-4xl max-h-[92vh] bg-slate-900 border border-sky-500/30 rounded-xl shadow-2xl overflow-hidden text-slate-200">
+    <div
+      data-testid="google-docs-modal"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4"
+    >
+      <div className="relative flex flex-col w-full max-w-5xl max-h-[92vh] bg-slate-900 border border-sky-500/30 rounded-xl shadow-2xl overflow-hidden text-slate-200">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 sm:px-5 py-3.5 bg-slate-950 border-b border-slate-800">
+        <div className="flex items-center justify-between px-4 sm:px-5 py-3.5 bg-slate-950 border-b border-slate-800 shrink-0">
           <div className="flex items-center gap-3 min-w-0">
             <div className="p-2 rounded-lg bg-sky-500/15 border border-sky-400/30 text-sky-400 shrink-0">
               <FileText className="w-5 h-5" />
             </div>
             <div className="min-w-0">
               <h2 className="text-sm sm:text-base font-bold text-white tracking-tight truncate">
-                Local ECU Diagnostic Report Studio
+                Google Docs &amp; Diagnostic Report Studio
               </h2>
               <p className="text-[11px] text-slate-400 truncate">
-                Export live MNA telemetry reports as local TXT, Markdown, Print/PDF, or IndexedDB Logs
+                Publish live MNA telemetry reports to Google Docs or export Signed A4 PDF, TXT, Markdown &amp; Logs
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-semibold text-emerald-300">
-              <CheckCircle2 className="w-3 h-3" />
-              Local Workstation
-            </span>
+            <div className="flex items-center gap-1 rounded-lg bg-slate-900 p-1 border border-slate-800">
+              <button
+                type="button"
+                data-testid="docs-mode-local-btn"
+                onClick={() => setStudioMode('LOCAL_PDF')}
+                className={`px-2.5 py-1 rounded text-[11px] font-semibold transition cursor-pointer ${
+                  studioMode === 'LOCAL_PDF'
+                    ? 'bg-sky-600 text-white'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Signed PDF &amp; Local
+              </button>
+              <button
+                type="button"
+                data-testid="docs-mode-cloud-btn"
+                onClick={() => setStudioMode('GOOGLE_DOCS')}
+                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-semibold transition cursor-pointer ${
+                  studioMode === 'GOOGLE_DOCS'
+                    ? 'bg-emerald-600 text-white'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Cloud className="w-3 h-3" />
+                <span>Google Docs Cloud</span>
+              </button>
+            </div>
             <button
               type="button"
               onClick={onClose}
@@ -314,20 +510,35 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
         {/* Status Banner */}
         {statusMessage && (
           <div
-            className={`px-5 py-2.5 text-xs flex items-center justify-between gap-2 border-b ${
+            className={`px-5 py-2.5 text-xs flex flex-wrap items-center justify-between gap-2 border-b shrink-0 ${
               statusMessage.type === 'success'
                 ? 'bg-emerald-950/70 border-emerald-700/40 text-emerald-200'
                 : 'bg-rose-950/70 border-rose-700/40 text-rose-200'
             }`}
           >
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 shrink-0" />
+              {statusMessage.type === 'success' ? (
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+              ) : (
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+              )}
               <span>{statusMessage.text}</span>
+              {statusMessage.linkUrl && toSafeExternalHttpUrl(statusMessage.linkUrl) && (
+                <a
+                  href={toSafeExternalHttpUrl(statusMessage.linkUrl)!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 underline font-semibold"
+                >
+                  <span>{statusMessage.linkLabel || 'Open'}</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
             </div>
             <button
               type="button"
               onClick={() => setStatusMessage(null)}
-              className="text-slate-400 hover:text-white"
+              className="text-slate-400 hover:text-white cursor-pointer"
               aria-label="Dismiss notification"
             >
               <X className="w-3.5 h-3.5" />
@@ -345,9 +556,7 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
               Diagnostic Report Exports Require an Active PIN
             </h3>
             <p className="text-xs text-slate-400 max-w-md mb-5 leading-relaxed">
-              Your 3–6 hour trial PIN session has expired or is not active. Local bench simulation
-              remains open; enter an active 8-digit Trial PIN or Master Admin PIN to unlock local
-              report downloads.
+              Your 3–6 hour trial PIN session has expired or is not active. Enter an active 8-digit Trial PIN or Master Admin PIN to unlock diagnostic report exports.
             </p>
             <button
               type="button"
@@ -356,7 +565,7 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
                 openAccessModal({
                   tab: 'TRIAL_PIN',
                   notice:
-                    'Enter an active 8-digit Trial PIN or Master Admin PIN to unlock local diagnostic report exports.',
+                    'Enter an active 8-digit Trial PIN or Master Admin PIN to unlock diagnostic report exports.',
                 });
               }}
               className="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition cursor-pointer"
@@ -364,6 +573,47 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
               Enter 8-Digit Trial PIN
             </button>
           </div>
+        ) : studioMode === 'GOOGLE_DOCS' ? (
+          needsWorkspaceAuth || !workspaceToken ? (
+            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-4">
+              <div className="w-14 h-14 rounded-2xl bg-sky-500/15 border border-sky-400/30 flex items-center justify-center text-sky-400">
+                <FileText className="w-7 h-7" />
+              </div>
+              <div className="space-y-1.5 max-w-md">
+                <h3 className="text-base font-bold text-white">
+                  Connect Google Docs to Sync Bench Reports
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Sign in with Google to browse existing Google Docs, publish live ECU telemetry reports directly to Google Docs, or append new diagnostic findings with confirmation.
+                </p>
+              </div>
+              <GoogleSignInButton
+                testId="docs-google-signin-btn"
+                disabled={isSigningIn}
+                label={isSigningIn ? 'Authorizing Google Docs...' : 'Sign in with Google'}
+                onClick={() => void connectGoogleWorkspace(true)}
+              />
+            </div>
+          ) : (
+            <div className="flex-1 flex flex-col min-h-[480px] overflow-hidden">
+              <GoogleDocsTab
+                docsList={docsList}
+                docsLoading={docsLoading}
+                docSearch={docSearch}
+                onChangeDocSearch={setDocSearch}
+                selectedDoc={selectedDoc}
+                docDetailLoading={docDetailLoading}
+                docEditableBody={docEditableBody}
+                onChangeDocEditableBody={setDocEditableBody}
+                defaultNewTitle={reportTitle}
+                liveReportBody={liveReportPreview}
+                isExecuting={isExecutingDocAction}
+                onRefreshDocs={(qOverride) => void refreshGoogleDocs(qOverride)}
+                onOpenDoc={(item) => void handleOpenGoogleDoc(item)}
+                onSetPendingAction={setPendingAction}
+              />
+            </div>
+          )
         ) : (
           <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
             {/* Metadata Fields */}
@@ -470,6 +720,24 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
               </button>
               <button
                 type="button"
+                onClick={() => {
+                  if (workspaceToken) {
+                    setPendingAction({
+                      kind: 'CREATE_GOOGLE_DOC',
+                      title: reportTitle.trim() || `ECU Bench Report - ${new Date().toISOString().slice(0, 10)}`,
+                      bodyText: liveReportPreview,
+                    });
+                  } else {
+                    setStudioMode('GOOGLE_DOCS');
+                  }
+                }}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition cursor-pointer"
+              >
+                <Cloud className="w-3.5 h-3.5" />
+                Publish to Google Docs
+              </button>
+              <button
+                type="button"
                 onClick={handleDownloadTxt}
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold transition cursor-pointer"
               >
@@ -479,14 +747,14 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
               <button
                 type="button"
                 onClick={handleDownloadMarkdown}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold transition cursor-pointer"
               >
                 <FileCode2 className="w-3.5 h-3.5" />
                 Download .MD
               </button>
               <button
                 type="button"
-                onClick={handleCopyReport}
+                onClick={() => void handleCopyReport()}
                 className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold transition cursor-pointer"
               >
                 <Copy className="w-3.5 h-3.5" />
@@ -504,11 +772,11 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
               <button
                 type="button"
                 disabled={isSavingLog}
-                onClick={handleSaveLocalDiagnosticLog}
+                onClick={() => void handleSaveLocalDiagnosticLog()}
                 className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-600/90 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-semibold transition cursor-pointer sm:ml-auto"
               >
                 <Save className="w-3.5 h-3.5" />
-                {isSavingLog ? 'Saving...' : 'Save to Local Logs'}
+                {isSavingLog ? 'Saving...' : 'Save to Logs'}
               </button>
             </div>
 
@@ -543,7 +811,10 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
                     )}
                   </div>
                   <div className="font-mono text-[10.5px] text-slate-300 break-all">
-                    SHA-256: <span className="text-emerald-200">{signedPdfResult.result.envelope.sha256Hash}</span>
+                    SHA-256:{' '}
+                    <span className="text-emerald-200">
+                      {signedPdfResult.result.envelope.sha256Hash}
+                    </span>
                   </div>
                   <div className="flex flex-wrap gap-2 pt-1">
                     <button
@@ -595,6 +866,15 @@ export const GoogleDocsModal: React.FC<GoogleDocsModalProps> = ({
           </div>
         )}
       </div>
+
+      <WorkspaceActionConfirmDialog
+        action={pendingAction}
+        isExecuting={isExecutingDocAction}
+        onCancel={() => {
+          if (!isExecutingDocAction) setPendingAction(null);
+        }}
+        onConfirm={() => void handleConfirmDocAction()}
+      />
     </div>
   );
 };

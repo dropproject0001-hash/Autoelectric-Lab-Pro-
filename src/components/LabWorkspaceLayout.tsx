@@ -17,7 +17,10 @@ import { lazyWithRetry } from "../utils/lazyWithRetry";
 import {
   Activity,
   AlertTriangle,
+  Box,
+  Columns2,
   Layers,
+  Network,
   Pause,
   Play,
   RotateCcw,
@@ -72,6 +75,7 @@ import type {
 import type { LogicCheckIncidentEntry } from "./LogicCheckPanel";
 import type { PinoutSafetyEvaluation } from "../utils/automotiveSafetyGuard";
 import type { GaugeMonitorState } from "../simulation/telemetry/telemetryTypes";
+import type { BenchVoiceSimulationAction } from "../simulation/telemetry/efiHarnessStandard";
 import {
   PH_BENCH_TROUBLE_SCENARIOS,
   evaluateBenchPulseAndSignalStatus,
@@ -116,6 +120,9 @@ const EcuRepairKnowledgeBase = lazyWithRetry(() =>
 );
 const ThreeBenchTwin = lazyWithRetry(() =>
   import("./ThreeBenchTwin").then((m) => ({ default: m.ThreeBenchTwin })),
+);
+const ThreeDViewport = lazyWithRetry(() =>
+  import("./ThreeDViewport").then((m) => ({ default: m.ThreeDViewport })),
 );
 const D3OscilloscopeView = lazyWithRetry(() =>
   import("./D3OscilloscopeView").then((m) => ({ default: m.D3OscilloscopeView })),
@@ -213,6 +220,10 @@ export interface LabNavigationProps {
   onActiveUniversityModuleChange?: (moduleId: string | null) => void;
   isAiCoachOpen?: boolean;
   onOpenAiCoach?: () => void;
+  benchVoiceActionRequest?: {
+    action: BenchVoiceSimulationAction;
+    nonce: number;
+  } | null;
 }
 export interface LabSimulationProps {
   simulationSpeed: number;
@@ -817,6 +828,22 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
   const [paneOrder, setPaneOrder] = useState<MobileBenchPane[]>(() => [
     ...DEFAULT_PANE_ORDER,
   ]);
+  const [benchViewportMode, setBenchViewportMode] = useState<
+    "2D_HARNESS" | "SPLIT" | "3D_EMS"
+  >("SPLIT");
+  useEffect(() => {
+    if (!props.benchVoiceActionRequest) return;
+    const t = props.benchVoiceActionRequest.action.type;
+    if (
+      t === "SHOW_ENGINE_BLOCK" ||
+      t === "TOGGLE_FAULT_MESH" ||
+      t === "SET_CAMERA_PRESET" ||
+      t === "SET_EXPLODE" ||
+      t === "START_GUIDED_TOUR"
+    ) {
+      setBenchViewportMode((prev) => (prev === "2D_HARNESS" ? "SPLIT" : prev));
+    }
+  }, [props.benchVoiceActionRequest]);
   const [isContainerMoveMode, setIsContainerMoveMode] = useState(false);
   const [showPinScopeOverlay, setShowPinScopeOverlay] = useState(false);
   const [isTroubleDrawerOpen, setIsTroubleDrawerOpen] = useState(false);
@@ -2436,11 +2463,128 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
                   <section
                     key={pane}
                     id={paneId(pane)}
-                    aria-label="Harness wiring canvas"
+                    aria-label="Bench harness and 3D EMS viewport"
                     className={`min-h-0 min-w-0 flex-1 flex-col gap-1.5 overflow-hidden ${mobileBenchPane === pane ? "flex" : "hidden lg:flex"}`}
                   >
                     {moveControls(pane)}
-                    <WiringCanvas {...canvasProps} />
+                    {/* Compact BENCH_LAB Center Workspace Mode Bar (2D Harness | Split 2D+3D | 3D EMS) */}
+                    <div className="flex items-center justify-between gap-2 rounded-[3px] border border-[#203653] bg-[#0a1322] px-2 py-1 shrink-0">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="font-hud text-[10px] font-bold uppercase tracking-wider text-[#91a4bd] truncate">
+                          Bench Stage
+                        </span>
+                        <span className="hidden sm:inline text-[9.5px] font-mono text-sky-300/90 truncate">
+                          {activeProfileLabel}
+                        </span>
+                      </div>
+                      <div
+                        role="group"
+                        aria-label="Bench viewport layout mode"
+                        className="flex items-center gap-1 bg-[#050a12] p-0.5 rounded-[2px] border border-[#203653]"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => setBenchViewportMode("2D_HARNESS")}
+                          aria-pressed={benchViewportMode === "2D_HARNESS"}
+                          className={`hw-btn px-2 py-0.5 rounded-[2px] text-[10px] font-mono flex items-center gap-1 cursor-pointer whitespace-nowrap ${
+                            benchViewportMode === "2D_HARNESS"
+                              ? "hw-btn-amber font-bold"
+                              : "text-slate-300 hover:text-white"
+                          }`}
+                        >
+                          <Network className="w-3 h-3" aria-hidden="true" />
+                          <span>2D Harness</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setBenchViewportMode("SPLIT")}
+                          aria-pressed={benchViewportMode === "SPLIT"}
+                          className={`hw-btn px-2 py-0.5 rounded-[2px] text-[10px] font-mono flex items-center gap-1 cursor-pointer whitespace-nowrap ${
+                            benchViewportMode === "SPLIT"
+                              ? "hw-btn-green font-bold"
+                              : "text-slate-300 hover:text-white"
+                          }`}
+                        >
+                          <Columns2 className="w-3 h-3" aria-hidden="true" />
+                          <span>Split 2D+3D</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setBenchViewportMode("3D_EMS")}
+                          aria-pressed={benchViewportMode === "3D_EMS"}
+                          className={`hw-btn px-2 py-0.5 rounded-[2px] text-[10px] font-mono flex items-center gap-1 cursor-pointer whitespace-nowrap ${
+                            benchViewportMode === "3D_EMS"
+                              ? "hw-btn-amber font-bold"
+                              : "text-slate-300 hover:text-white"
+                          }`}
+                        >
+                          <Box className="w-3 h-3" aria-hidden="true" />
+                          <span>3D EMS</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex-1 min-h-0 flex flex-col gap-1.5 overflow-hidden">
+                      {benchViewportMode !== "2D_HARNESS" && (
+                        <div
+                          className={`min-h-0 flex flex-col overflow-hidden ${
+                            benchViewportMode === "SPLIT" ? "flex-[1.08]" : "flex-1"
+                          }`}
+                        >
+                          {module(
+                            "3D EMS Viewport",
+                            <ThreeDViewport
+                              compact={benchViewportMode === "SPLIT"}
+                              pins={pins}
+                              wires={wires}
+                              components={components}
+                              faults={faults}
+                              activeDTCs={circuitSolution.activeDTCs}
+                              nodeVoltages={circuitSolution.nodeVoltages}
+                              wireCurrentsMa={circuitSolution.wireCurrentsMa}
+                              supplyCurrentDrawAmps={
+                                circuitSolution.supplyCurrentDrawAmps
+                              }
+                              isSupplyCurrentTripped={
+                                circuitSolution.isSupplyCurrentTripped
+                              }
+                              multimeter={multimeter}
+                              powerSupply={powerSupply}
+                              selectedPinId={selectedPinId}
+                              simulationSpeed={simulationSpeed}
+                              rpmEmulator={rpmEmulator}
+                              gaugeMonitor={gaugeMonitor}
+                              vehicleContext={vehicleContext}
+                              selectedEcuProfileId={selectedEcuProfileId}
+                              twinSyncMode={twinSyncMode}
+                              onToggleTwinSyncMode={onToggleTwinSyncMode}
+                              onSelectPin={onSelectPin}
+                              onAttachProbe={onAttachProbe}
+                              onToggleIgnition={() =>
+                                onChangePowerSupply((prev) => ({
+                                  ...prev,
+                                  isOutputEnabled: !prev.isOutputEnabled,
+                                }))
+                              }
+                              onExpandFullView={() =>
+                                onNavigateTab("THREE_D_TWIN")
+                              }
+                              onOpenVoiceGuide={props.onOpenAiCoach}
+                              voiceActionRequest={props.benchVoiceActionRequest}
+                            />,
+                          )}
+                        </div>
+                      )}
+                      {benchViewportMode !== "3D_EMS" && (
+                        <div
+                          className={`min-h-0 flex flex-col overflow-hidden ${
+                            benchViewportMode === "SPLIT" ? "flex-[0.92]" : "flex-1"
+                          }`}
+                        >
+                          <WiringCanvas {...canvasProps} />
+                        </div>
+                      )}
+                    </div>
                   </section>
                 );
               return (
@@ -2535,6 +2679,8 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
                 }
                 onOpenOfflineBot={onOpenOfflineBot}
                 onOpenGroundedSearch={onOpenGroundedSearch}
+                onOpenVoiceGuide={props.onOpenAiCoach}
+                voiceActionRequest={props.benchVoiceActionRequest}
               />,
             )}
           </section>

@@ -30,6 +30,7 @@ import {
   type HandsFreeVoiceStatus,
 } from '../../hooks/useHandsFreeVoice';
 import type { VoiceModalAction } from '../../services/ai/systemVoiceKnowledgeBase';
+import type { BenchVoiceSimulationAction } from '../../simulation/telemetry/efiHarnessStandard';
 import type { BenchTelemetry, BilingualLang } from '../../types/aiAssistant';
 import type { EcuPin } from '../../types/ecu';
 
@@ -47,6 +48,7 @@ interface HandsFreeVoiceCoachProps {
   onConsumedIncomingCommand?: () => void;
   onNavigateTab?: (tab: LabTab) => void;
   onOpenModal?: (modal: VoiceModalAction) => void;
+  onBenchVoiceAction?: (action: BenchVoiceSimulationAction) => void;
 }
 
 const STATUS_META: Record<
@@ -80,19 +82,21 @@ const STATUS_META: Record<
 };
 
 const DEFAULT_SYSTEM_CHIPS_TL = [
+  'Simulan ang guided tour',
+  'Ipakita ang engine block',
+  'Buksan ang tunog',
+  'I-on ang ignition',
   'Ano reading ngayon?',
-  "Ok ba 'to?",
-  'Paano gamitin ang BenchLab?',
-  'Paano gamitin ang 3D twin?',
-  'Saan nakakabit?',
+  'Bakit hiwalay ang SGND sa PGND?',
 ];
 
 const DEFAULT_SYSTEM_CHIPS_EN = [
+  'Start guided tour',
+  'Show engine block',
+  'Sound on',
+  'Turn ignition on',
   'What is the bench status?',
-  'How to use BenchLab?',
-  'How to use pinouts?',
-  'How to use 3D twin?',
-  "What's inside there?",
+  'Why isolate sensor ground SGND?',
 ];
 
 export const HandsFreeVoiceCoach: React.FC<HandsFreeVoiceCoachProps> = ({
@@ -109,6 +113,7 @@ export const HandsFreeVoiceCoach: React.FC<HandsFreeVoiceCoachProps> = ({
   onConsumedIncomingCommand,
   onNavigateTab,
   onOpenModal,
+  onBenchVoiceAction,
 }) => {
   const [selectedModuleId, setSelectedModuleId] = useState(
     activeModuleId || ACADEMY_CURRICULUM_MODULES[0].id
@@ -145,6 +150,7 @@ export const HandsFreeVoiceCoach: React.FC<HandsFreeVoiceCoachProps> = ({
     nodeVoltages,
     onNavigateTab,
     onOpenModal,
+    onBenchVoiceAction,
   });
 
   const formatRelativeTime = (timestampMs: number): string => {
@@ -302,7 +308,7 @@ export const HandsFreeVoiceCoach: React.FC<HandsFreeVoiceCoachProps> = ({
                   {statusMeta.glyph} {statusText}
                 </span>
                 <span aria-hidden="true">·</span>
-                <span>{lang === 'TL' ? 'Buong Offline DB' : 'Full Offline DB'}</span>
+                <span>{lang === 'TL' ? 'Hybrid AI + Offline DB' : 'Hybrid AI + Offline DB'}</span>
                 <span aria-hidden="true">·</span>
                 <span className="tabular-nums">{activeTab.replace('_', ' ')}</span>
               </div>
@@ -441,8 +447,8 @@ export const HandsFreeVoiceCoach: React.FC<HandsFreeVoiceCoachProps> = ({
             <p className="text-[13px] text-slate-100 leading-relaxed">
               {lastTurn?.displayText ||
                 (lang === 'EN'
-                  ? 'Ready to help across AutoElectric Lab Pro. Ask "How to use BenchLab?", "How to use pinouts?", "How to use 3D twin?", or say "Open 3D twin".'
-                  : 'Handa na po ako sa buong AutoElectric Lab Pro. Magtanong ng "Paano gamitin ang BenchLab?", "Paano gamitin ang pinouts?", "Paano gamitin ang 3D twin?", o sabihing "Anong meron doon?"')}
+                  ? 'Hands-Free AI Guide ready. Say "Start guided tour", "Show engine block", "Sound on", or ask any automotive electrical question — I will answer aloud and control the 3D EMS bench for you.'
+                  : 'Handa na po ang Hands-Free AI Guide. Sabihin ang "Simulan ang guided tour", "Ipakita ang engine block", "Buksan ang tunog", o magtanong ng kahit anong automotive diagnostic question.')}
             </p>
           </div>
 

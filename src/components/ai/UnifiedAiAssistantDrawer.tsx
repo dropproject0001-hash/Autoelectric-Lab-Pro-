@@ -26,6 +26,7 @@ import type {
 import type { EcuPin } from '../../types/ecu';
 import type { LabTab } from '../LabTopNav';
 import type { VoiceModalAction } from '../../services/ai/systemVoiceKnowledgeBase';
+import type { BenchVoiceSimulationAction } from '../../simulation/telemetry/efiHarnessStandard';
 import {
   AI_TIER_CASCADE,
   getAiRouterStatus,
@@ -118,6 +119,7 @@ export interface UnifiedAiAssistantDrawerProps {
   onNavigateTab?: (tab: LabTab) => void;
   onOpenModal?: (modal: VoiceModalAction) => void;
   onVoiceTranscript?: (transcript: string) => void;
+  onBenchVoiceAction?: (action: BenchVoiceSimulationAction) => void;
 }
 
 export const UnifiedAiAssistantDrawer: React.FC<UnifiedAiAssistantDrawerProps> = ({
@@ -141,6 +143,7 @@ export const UnifiedAiAssistantDrawer: React.FC<UnifiedAiAssistantDrawerProps> =
   onNavigateTab,
   onOpenModal,
   onVoiceTranscript,
+  onBenchVoiceAction,
 }) => {
   const [routerSnapshot, setRouterSnapshot] = useState<AiRouterStatusSnapshot>(() =>
     getAiRouterStatus()
@@ -461,6 +464,7 @@ export const UnifiedAiAssistantDrawer: React.FC<UnifiedAiAssistantDrawerProps> =
             onConsumedIncomingCommand={onConsumedIncomingVoiceCommand}
             onNavigateTab={onNavigateTab}
             onOpenModal={onOpenModal}
+            onBenchVoiceAction={onBenchVoiceAction}
           />
         ) : (
           <AiDiagnosticAssistantPanel

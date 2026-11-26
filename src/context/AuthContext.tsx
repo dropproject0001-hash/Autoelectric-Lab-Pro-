@@ -29,6 +29,12 @@ import {
   subscribeSyncStatus,
 } from '../services/benchStorageService';
 
+import {
+  clearCachedWorkspaceAccessToken,
+  getCachedWorkspaceAccessToken,
+  signInForGoogleWorkspace,
+} from '../services/googleWorkspaceAuth';
+
 export interface AuthErrorDetails {
   code: string;
   message: string;
@@ -47,6 +53,7 @@ interface AuthContextValue {
   needsWorkspaceAuth: boolean;
   syncStatus: CloudSyncStatusSnapshot;
   signInWithGoogle: () => Promise<string | null>;
+  connectGoogleWorkspace: (forceConsent?: boolean) => Promise<string | null>;
   signOutUser: () => Promise<void>;
   invalidateWorkspaceToken: () => void;
   retryCloudSync: () => Promise<void>;
@@ -60,9 +67,10 @@ const AuthContext = createContext<AuthContextValue>({
   authErrorDetails: null,
   clearAuthError: () => {},
   workspaceToken: null,
-  needsWorkspaceAuth: false,
+  needsWorkspaceAuth: true,
   syncStatus: getSyncStatusSnapshot(),
   signInWithGoogle: async () => null,
+  connectGoogleWorkspace: async () => null,
   signOutUser: async () => {},
   invalidateWorkspaceToken: () => {},
   retryCloudSync: async () => {},
@@ -198,7 +206,7 @@ export function formatFirebaseAuthError(err: unknown, hostnameOverride?: string)
 }
 
 /**
- * Firebase Authentication & Firestore Cloud Sync Context with Offline IndexedDB Fallback.
+ * Firebase Authentication, Firestore Cloud Sync & In-Memory Google Workspace OAuth Context.
  * Supports Google Sign-In alongside Trial PIN / Master Admin PIN modes.
  */
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -207,7 +215,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [authErrorDetails, setAuthErrorDetails] = useState<AuthErrorDetails | null>(null);
-  const [workspaceToken, setWorkspaceToken] = useState<string | null>(null);
+  const [workspaceToken, setWorkspaceToken] = useState<string | null>(() =>
+    getCachedWorkspaceAccessToken()
+  );
   const [syncStatus, setSyncStatus] = useState<CloudSyncStatusSnapshot>(() => getSyncStatusSnapshot());
 
   useEffect(() => {
@@ -241,6 +251,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setAuthReady(true);
       if (nextUser) {
         void syncSignedInUserBench(nextUser);
+      } else {
+        clearCachedWorkspaceAccessToken();
+        setWorkspaceToken(null);
       }
     });
 
@@ -284,10 +297,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [syncSignedInUserBench]);
 
+  const connectGoogleWorkspace = useCallback(
+    async (forceConsent = false): Promise<string | null> => {
+      if (!isFirebaseConfigured || !firebaseAuth) {
+        const msg =
+          'Google Workspace OAuth is not configured in this environment. Offline local exports remain active.';
+        setAuthError(msg);
+        setAuthErrorDetails({ code: 'auth/not-configured', message: msg });
+        return null;
+      }
+      setIsSigningIn(true);
+      setAuthError(null);
+      setAuthErrorDetails(null);
+      try {
+        const result = await signInForGoogleWorkspace(forceConsent);
+        setUser(result.user);
+        setWorkspaceToken(result.accessToken);
+        await syncSignedInUserBench(result.user);
+        if (!result.accessToken) {
+          const msg =
+            'Signed in with Google, but no Workspace OAuth access token was returned. Please retry and approve Workspace permissions.';
+          setAuthError(msg);
+          setAuthErrorDetails({ code: 'auth/missing-workspace-token', message: msg });
+        }
+        return result.accessToken;
+      } catch (err: unknown) {
+        const details = formatFirebaseAuthErrorDetails(err);
+        setAuthError(details.message);
+        setAuthErrorDetails(details);
+        return null;
+      } finally {
+        setIsSigningIn(false);
+      }
+    },
+    [syncSignedInUserBench]
+  );
+
   const signOutUser = useCallback(async () => {
     cancelScheduledBenchSyncRetries(user?.uid);
     setAuthError(null);
     setAuthErrorDetails(null);
+    clearCachedWorkspaceAccessToken();
     setWorkspaceToken(null);
     if (!firebaseAuth) {
       setUser(null);
@@ -309,6 +359,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const invalidateWorkspaceToken = useCallback(() => {
+    clearCachedWorkspaceAccessToken();
     setWorkspaceToken(null);
   }, []);
 
@@ -327,9 +378,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         authErrorDetails,
         clearAuthError,
         workspaceToken,
-        needsWorkspaceAuth: false,
+        needsWorkspaceAuth: !workspaceToken,
         syncStatus,
         signInWithGoogle,
+        connectGoogleWorkspace,
         signOutUser,
         invalidateWorkspaceToken,
         retryCloudSync,

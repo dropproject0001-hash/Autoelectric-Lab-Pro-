@@ -34,6 +34,16 @@ import {
   EmsEcuSyncProfile,
   evaluateSequentialFiringPhase,
 } from '../../simulation/telemetry/emsDigitalTwinSync';
+import type {
+  EngineBlockFaultOverlayState,
+  EngineBlockZoneStatus,
+} from '../../hooks/useEmsTelemetrySync';
+import {
+  buildOrthogonalTrunkWaypoints,
+  classifyPinCircuitGroup,
+  EFI_FUNCTIONAL_COLOR_STANDARD,
+  formatStandardConnectionTag,
+} from '../../simulation/telemetry/efiHarnessStandard';
 
 export type CameraPresetKey =
   | 'OVERVIEW'
@@ -64,9 +74,11 @@ export interface BenchTelemetrySnapshot {
   isRpmRunning?: boolean;
   ckpSignalLost?: boolean;
   showEngineBlock?: boolean;
+  showFaultWireOverlay?: boolean;
   circuitLayerFilter?: EmsCircuitLayer;
   emsProfile?: EmsEcuSyncProfile;
   emsState?: EmsDigitalTwinState;
+  engineBlockFaultOverlay?: EngineBlockFaultOverlayState;
 }
 
 export interface ProjectedCallout {
@@ -105,8 +117,11 @@ interface ProbeLeadVisual {
 
 // Pre-allocated scratch math helpers (Zero-GC render loop)
 const _color = new THREE.Color();
+const _pulseColor = new THREE.Color();
 const _pointerNdc = new THREE.Vector2();
 const _projVec3 = new THREE.Vector3();
+const _curvePt = new THREE.Vector3();
+const _dummyObj = new THREE.Object3D();
 
 const CAMERA_PRESETS: Record<
   CameraPresetKey,
@@ -164,7 +179,7 @@ export class BenchSceneManager {
   private scene: THREE.Scene;
   private camera: THREE.PerspectiveCamera;
   private controls: OrbitControls;
-  private envTexture: THREE.Texture;
+  private envTexture: THREE.Texture | null;
   private textures: BenchTextureBundle;
   private dynamicNameplateTex: THREE.CanvasTexture | null = null;
   private lastProfileSignature = '';
@@ -236,16 +251,22 @@ export class BenchSceneManager {
     const width = Math.max(320, container.clientWidth || 960);
     const height = Math.max(240, container.clientHeight || 600);
 
-    // 1. Modern ACESFilmic Renderer
+    // 1. Modern ACESFilmic Renderer (preserveDrawingBuffer ensures demand-driven & software GL frames remain visible)
     this.renderer = new THREE.WebGLRenderer({
       antialias: !this.isSoftwareGl,
       powerPreference: 'high-performance',
+      preserveDrawingBuffer: true,
+      alpha: false,
     });
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.08;
+    this.renderer.toneMappingExposure = 1.15;
     this.renderer.setPixelRatio(
-      this.isSoftwareGl ? 1 : Math.min(window.devicePixelRatio || 1, 2)
+      this.isSoftwareGl
+        ? width > 960
+          ? 0.78
+          : 0.9
+        : Math.min(window.devicePixelRatio || 1, 2)
     );
     this.renderer.setSize(width, height, false);
     this.renderer.domElement.style.width = '100%';
@@ -258,14 +279,23 @@ export class BenchSceneManager {
     // 2. Scene + Subtle Horizon Fog + Procedural Studio Reflections (RoomEnvironment)
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x0b111b);
-    this.scene.fog = new THREE.FogExp2(0x0b111b, 0.015);
+    this.scene.fog = new THREE.FogExp2(0x0b111b, 0.014);
 
-    const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
-    const roomEnv = new RoomEnvironment();
-    this.envTexture = pmremGenerator.fromScene(roomEnv, 0.04).texture;
-    this.scene.environment = this.envTexture;
-    roomEnv.dispose();
-    pmremGenerator.dispose();
+    let generatedEnv: THREE.Texture | null = null;
+    if (!this.isSoftwareGl) {
+      try {
+        const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
+        const roomEnv = new RoomEnvironment();
+        generatedEnv = pmremGenerator.fromScene(roomEnv, 0.04).texture;
+        this.scene.environment = generatedEnv;
+        roomEnv.dispose();
+        pmremGenerator.dispose();
+      } catch {
+        // Fallback safely to 3-point studio lighting if PMREM float target is unsupported
+        generatedEnv = null;
+      }
+    }
+    this.envTexture = generatedEnv;
 
     // 3. Camera & Damped OrbitControls
     this.camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100);
@@ -289,10 +319,14 @@ export class BenchSceneManager {
     });
 
     // 4. Calibrated Three-Point Studio Lighting Rig
-    const hemiFill = new THREE.HemisphereLight(0xcbd5e1, 0x0f172a, 0.72);
+    const hemiFill = new THREE.HemisphereLight(
+      0xdbeafe,
+      0x1e293b,
+      this.isSoftwareGl ? 1.55 : 1.05
+    );
     this.scene.add(hemiFill);
 
-    const keyLight = new THREE.DirectionalLight(0xfff4e0, 1.85);
+    const keyLight = new THREE.DirectionalLight(0xfff4e0, this.isSoftwareGl ? 2.25 : 2.05);
     keyLight.position.set(6.5, 11.5, 6.2);
     if (!this.isSoftwareGl) {
       keyLight.castShadow = true;
@@ -309,12 +343,12 @@ export class BenchSceneManager {
     }
     this.scene.add(keyLight);
 
-    const rimLight = new THREE.DirectionalLight(0x94a3b8, 0.62);
+    const rimLight = new THREE.DirectionalLight(0x94a3b8, this.isSoftwareGl ? 1.05 : 0.85);
     rimLight.position.set(-9.5, 5.2, -7.5);
     this.scene.add(rimLight);
 
     // 5. Procedural Textures & Composite EMS Bench Hardware
-    this.maxAniso = this.renderer.capabilities.getMaxAnisotropy();
+    this.maxAniso = this.isSoftwareGl ? 1 : Math.min(4, this.renderer.capabilities.getMaxAnisotropy());
     this.textures = createBenchTextures(this.maxAniso, initialTelemetry.emsProfile ?? null);
     this.rig = buildEcuBenchRig(this.textures, this.registry, this.isSoftwareGl);
     this.scene.add(this.rig.root);
@@ -374,16 +408,24 @@ export class BenchSceneManager {
       this.resizeObserver = new ResizeObserver((entries) => {
         const entry = entries[0];
         if (!entry) return;
-        const w = Math.max(320, Math.floor(entry.contentRect.width));
-        const h = Math.max(240, Math.floor(entry.contentRect.height));
+        const rawW = Math.floor(entry.contentRect.width);
+        const rawH = Math.floor(entry.contentRect.height);
+        if (rawW < 10 || rawH < 10) return;
+        const w = Math.max(320, rawW);
+        const h = Math.max(240, rawH);
         this.camera.aspect = w / h;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(w, h, false);
+        this.renderer.render(this.scene, this.camera);
+        this.emitProjectedCallout();
         this.requestRender();
       });
       this.resizeObserver.observe(container);
     }
 
+    // Immediate first paint so the 3D bench is visible on mount without waiting for idle RAF
+    this.renderer.render(this.scene, this.camera);
+    this.emitProjectedCallout();
     this.requestRender();
   }
 
@@ -518,25 +560,60 @@ export class BenchSceneManager {
       const p0 = srcAnchor.worldAnchor.clone();
       const p3 = dstAnchor.worldAnchor.clone();
 
-      const archHeight = 0.28 + (i % 5) * 0.07;
-      const midA = p0.clone().lerp(p3, 0.35);
-      midA.y = Math.max(p0.y, p3.y) + archHeight;
-      midA.z += (i % 2 === 0 ? 1 : -1) * 0.1;
+      const groupKey = classifyPinCircuitGroup(`${wire.sourcePinId} ${wire.targetPinId}`);
+      const spec = EFI_FUNCTIONAL_COLOR_STANDARD[groupKey];
+      const laneOffset = ((i % 5) - 2) * 0.28;
+      const rawWaypoints = buildOrthogonalTrunkWaypoints(p0, p3, spec.corridor, laneOffset).map(
+        (pt) => new THREE.Vector3(pt.x, pt.y, pt.z)
+      );
 
-      const midB = p0.clone().lerp(p3, 0.68);
-      midB.y = Math.max(p0.y, p3.y) + archHeight * 0.82;
+      // Deduplicate near-coincident consecutive points before building crisp chamfered 90° elbows
+      const cleanPts: THREE.Vector3[] = [];
+      for (const pt of rawWaypoints) {
+        if (cleanPts.length === 0 || cleanPts[cleanPts.length - 1].distanceTo(pt) > 0.03) {
+          cleanPts.push(pt);
+        }
+      }
+      if (cleanPts.length < 2) continue;
 
-      const curve = new THREE.CatmullRomCurve3([p0, midA, midB, p3]);
-      const geo = new THREE.TubeGeometry(curve, 24, wire.isCut ? 0.016 : 0.025, 7, false);
-      const baseColor = new THREE.Color(wire.color || '#38bdf8');
+      const curvePath = new THREE.CurvePath<THREE.Vector3>();
+      let prevAnchor = cleanPts[0];
+      for (let idx = 1; idx < cleanPts.length - 1; idx++) {
+        const curr = cleanPts[idx];
+        const next = cleanPts[idx + 1];
+        const lenIn = prevAnchor.distanceTo(curr);
+        const lenOut = curr.distanceTo(next);
+        const chamfer = Math.min(0.08, lenIn * 0.35, lenOut * 0.35);
+        if (chamfer > 0.015) {
+          const dirIn = curr.clone().sub(prevAnchor).normalize();
+          const dirOut = next.clone().sub(curr).normalize();
+          const enterPt = curr.clone().addScaledVector(dirIn, -chamfer);
+          const exitPt = curr.clone().addScaledVector(dirOut, chamfer);
+          if (prevAnchor.distanceTo(enterPt) > 0.005) {
+            curvePath.add(new THREE.LineCurve3(prevAnchor, enterPt));
+          }
+          curvePath.add(new THREE.QuadraticBezierCurve3(enterPt, curr, exitPt));
+          prevAnchor = exitPt;
+        } else {
+          curvePath.add(new THREE.LineCurve3(prevAnchor, curr));
+          prevAnchor = curr;
+        }
+      }
+      const lastPt = cleanPts[cleanPts.length - 1];
+      if (prevAnchor.distanceTo(lastPt) > 0.005) {
+        curvePath.add(new THREE.LineCurve3(prevAnchor, lastPt));
+      }
+
+      const geo = new THREE.TubeGeometry(curvePath, 28, wire.isCut ? 0.013 : 0.017, 6, false);
+      const baseColor = new THREE.Color(spec.primaryHex);
       const mat = new THREE.MeshStandardMaterial({
         color: baseColor,
         emissive: 0x000000,
         emissiveIntensity: 0,
-        roughness: 0.55,
+        roughness: 0.52,
         metalness: 0.08,
         transparent: true,
-        opacity: wire.isCut ? 0.25 : 1.0,
+        opacity: wire.isCut ? 0.25 : 0.94,
       });
 
       const mesh = new THREE.Mesh(geo, mat);
@@ -999,6 +1076,231 @@ export class BenchSceneManager {
         }
       }
     }
+
+    // 11. 4-Cylinder Engine Block Live Diagnostic Wire-Mesh Fault Overlay
+    const faultOverlayVis = this.rig.engineBlockFaultOverlay;
+    const faultState = this.telemetry.engineBlockFaultOverlay;
+    const showOverlay =
+      Boolean(this.telemetry.showEngineBlock) &&
+      (this.telemetry.showFaultWireOverlay ?? true);
+    faultOverlayVis.overlayGroup.visible = showOverlay;
+
+    if (showOverlay) {
+      const pulseWave = 0.5 + 0.5 * Math.sin(this.elapsedSim * 6.5);
+      const applyZoneStyle = (
+        mat: THREE.MeshBasicMaterial,
+        status: EngineBlockZoneStatus,
+        healthyHex: number,
+        healthyOpacity: number,
+        livePulseBoost = 0,
+        livePulseHex = 0x38bdf8
+      ) => {
+        if (status === 'SHORT') {
+          mat.color.setHex(0xef4444);
+          mat.opacity = 0.72 + pulseWave * 0.24;
+        } else if (status === 'FAULT') {
+          mat.color.setHex(0xf43f5e);
+          mat.opacity = 0.6 + pulseWave * 0.2;
+        } else if (status === 'OPEN') {
+          mat.color.setHex(0xf59e0b);
+          mat.opacity = 0.68 + pulseWave * 0.2;
+        } else if (status === 'HIGH_R') {
+          mat.color.setHex(0xfbbf24);
+          mat.opacity = 0.56 + pulseWave * 0.16;
+        } else if (livePulseBoost > 0.05) {
+          mat.color.setHex(livePulseHex);
+          mat.opacity = Math.min(0.88, healthyOpacity + livePulseBoost * 0.52);
+        } else {
+          mat.color.setHex(healthyHex);
+          mat.opacity = healthyOpacity;
+        }
+      };
+
+      const shellStatus = faultState?.blockShellStatus ?? 'OK';
+      const shellHealthyOpacity = faultState?.hasActiveFault ? 0.14 : 0.2;
+      applyZoneStyle(
+        faultOverlayVis.blockShellMat,
+        shellStatus,
+        isPowerActive ? 0x38bdf8 : 0x475569,
+        shellHealthyOpacity
+      );
+
+      for (let i = 0; i < 4; i++) {
+        const phase = phases[i];
+        const injStatus = faultState?.injectors[i]?.status ?? 'OK';
+        const coilStatus = faultState?.coils[i]?.status ?? 'OK';
+
+        const injMat = faultOverlayVis.injectorWireMats[i];
+        if (injMat) {
+          applyZoneStyle(
+            injMat,
+            injStatus,
+            isMainLatched ? 0x0ea5e9 : 0x475569,
+            0.3,
+            phase?.injectorPulse ?? 0,
+            0x38bdf8
+          );
+        }
+
+        const coilMat = faultOverlayVis.coilWireMats[i];
+        if (coilMat) {
+          const coilActivity = Math.max(phase?.coilDwell ?? 0, (phase?.sparkArc ?? 0) * 1.2);
+          applyZoneStyle(
+            coilMat,
+            coilStatus,
+            isMainLatched ? 0x38bdf8 : 0x475569,
+            0.32,
+            coilActivity,
+            phase && phase.sparkArc > 0.1 ? 0xe0f2fe : 0xf97316
+          );
+        }
+      }
+
+      applyZoneStyle(
+        faultOverlayVis.sensorBusWireMat,
+        faultState?.sensorBus.status ?? 'OK',
+        isPowerActive ? 0x22d3ee : 0x475569,
+        0.26
+      );
+
+      applyZoneStyle(
+        faultOverlayVis.groundStrapWireMat,
+        faultState?.groundStrap.status ?? 'OK',
+        isPowerActive ? 0x22c55e : 0x475569,
+        0.34
+      );
+    }
+
+    // 12. Animated Current-Flow Pulse Beads along Energized Orthogonal EMS Trunks
+    const pulseMesh = this.rig.currentFlowPulsesInstanced;
+    const maxPulses = pulseMesh.count;
+    let pulseCursor = 0;
+    const speedFactor = Math.max(0.35, simulationSpeed);
+
+    if (isPowerActive) {
+      for (let wIdx = 0; wIdx < this.rig.emsHarnessWires.length && pulseCursor < maxPulses; wIdx++) {
+        const ew = this.rig.emsHarnessWires[wIdx];
+        const isLayerActive = layerFilter === 'ALL' || ew.layer === layerFilter;
+        if (!isLayerActive) continue;
+
+        const fault = faultByPin.get(ew.mappedPinId);
+        let energized = false;
+        let flowSpeed = 0.42;
+
+        switch (ew.signalRole) {
+          case 'kl30':
+            energized = (emsState?.batteryVoltageV ?? powerSupply.voltageSetting) > 6;
+            flowSpeed = 0.36;
+            _pulseColor.setHex(fault ? 0xf43f5e : 0xff6b6b);
+            break;
+          case 'kl15':
+            energized = isIgnitionOn;
+            flowSpeed = 0.44;
+            _pulseColor.setHex(fault ? 0xf43f5e : 0xfbbf24);
+            break;
+          case 'switched_rail':
+            energized = isMainLatched;
+            flowSpeed = 0.52;
+            _pulseColor.setHex(fault ? 0xf43f5e : 0xfb923c);
+            break;
+          case 'fuel_pump':
+            energized = isPumpRunning;
+            flowSpeed = 0.68;
+            _pulseColor.setHex(fault ? 0xf43f5e : 0x22d3ee);
+            break;
+          case 'inj':
+            energized = isRunning && isMainLatched;
+            flowSpeed = 0.95;
+            _pulseColor.setHex(fault ? 0xf43f5e : 0x4ade80);
+            break;
+          case 'coil':
+            energized = isRunning && isMainLatched;
+            flowSpeed = 1.05;
+            _pulseColor.setHex(fault ? 0xf43f5e : 0xc084fc);
+            break;
+          case 'sgnd':
+          case 'chassis_gnd':
+            energized = isMainLatched && (hasGndFault || isRunning);
+            flowSpeed = 0.32;
+            _pulseColor.setHex(hasGndFault ? 0xf59e0b : 0x94a3b8);
+            break;
+          default:
+            energized = isMainLatched;
+            _pulseColor.setHex(0x38bdf8);
+            break;
+        }
+
+        if (!energized) continue;
+
+        const beadsPerWire = ew.signalRole === 'inj' || ew.signalRole === 'coil' ? 2 : 2;
+        for (let b = 0; b < beadsPerWire && pulseCursor < maxPulses; b++) {
+          const t = (this.elapsedSim * flowSpeed * speedFactor + wIdx * 0.13 + b / beadsPerWire) % 1;
+          ew.curve.getPointAt(t, _curvePt);
+          _dummyObj.position.copy(_curvePt);
+          const s = fault ? 1.35 : 1.05;
+          _dummyObj.scale.set(s, s, s);
+          _dummyObj.rotation.set(0, 0, 0);
+          _dummyObj.updateMatrix();
+          pulseMesh.setMatrixAt(pulseCursor, _dummyObj.matrix);
+          pulseMesh.setColorAt(pulseCursor, _pulseColor);
+          pulseCursor++;
+        }
+      }
+    }
+
+    // Hide remaining unused pulse bead instances cleanly
+    _dummyObj.position.set(0, -10, 0);
+    _dummyObj.scale.set(0.0001, 0.0001, 0.0001);
+    _dummyObj.updateMatrix();
+    for (let idx = pulseCursor; idx < maxPulses; idx++) {
+      pulseMesh.setMatrixAt(idx, _dummyObj.matrix);
+    }
+    pulseMesh.instanceMatrix.needsUpdate = true;
+    if (pulseMesh.instanceColor) {
+      pulseMesh.instanceColor.needsUpdate = true;
+    }
+
+    // 13. Animated Fuel Tank Micro-Bubbles when Fuel Pump Runs / Primes
+    const bubblesMesh = this.rig.fuelBubblesInstanced;
+    const bubbleCount = bubblesMesh.count;
+    if (isPumpRunning) {
+      for (let i = 0; i < bubbleCount; i++) {
+        const seed = (i * 0.6180339) % 1;
+        const cycle = (this.elapsedSim * (0.55 + seed * 0.45) * speedFactor + seed) % 1;
+        const angle = this.elapsedSim * (1.8 + seed * 1.4) + i * 1.7;
+        const radius = 0.24 + (i % 5) * 0.11;
+        const bx = 6.45 + Math.cos(angle) * radius;
+        const bz = 1.35 + Math.sin(angle) * radius * 0.85;
+        const by = 0.28 + cycle * 1.38;
+        const bs = 0.65 + Math.sin(cycle * Math.PI) * 0.75;
+        _dummyObj.position.set(bx, by, bz);
+        _dummyObj.scale.set(bs, bs, bs);
+        _dummyObj.updateMatrix();
+        bubblesMesh.setMatrixAt(i, _dummyObj.matrix);
+      }
+    } else {
+      _dummyObj.position.set(6.45, -10, 1.35);
+      _dummyObj.scale.set(0.0001, 0.0001, 0.0001);
+      _dummyObj.updateMatrix();
+      for (let i = 0; i < bubbleCount; i++) {
+        bubblesMesh.setMatrixAt(i, _dummyObj.matrix);
+      }
+    }
+    bubblesMesh.instanceMatrix.needsUpdate = true;
+
+    // 14. Subtle Realistic Harmonic 4-Cylinder Engine Block Vibration (Idle / Rev / Misfire)
+    if (this.rig.engineBlockGroup.visible && isRunning) {
+      const misfireCount = cylinders.filter((c) => c.isInjectorFaulted || c.isCoilFaulted).length;
+      const vibAmp = 0.005 + misfireCount * 0.0035;
+      const freq = Math.min(48, Math.max(14, (liveRpm / 60) * 1.1));
+      this.rig.engineBlockGroup.position.set(
+        -5.6 + Math.sin(this.elapsedSim * freq) * vibAmp,
+        Math.cos(this.elapsedSim * freq * 1.5) * (vibAmp * 0.65),
+        -0.3 + Math.sin(this.elapsedSim * freq * 0.85) * (vibAmp * 0.5)
+      );
+    } else {
+      this.rig.engineBlockGroup.position.set(-5.6, 0, -0.3);
+    }
   }
 
   private updateKinematics(dt: number): boolean {
@@ -1033,8 +1335,14 @@ export class BenchSceneManager {
       }
     }
 
-    // Active continuous motion while Bench Power is ON (Fuel pump impeller, 1-3-4-2 firing, pulleys)
-    if (this.telemetry.powerSupply.isOutputEnabled || this.crankSpeedRadPerSec > 0.02) {
+    // Active continuous motion while Bench Power is ON or Engine Block Fault Wire-Mesh is highlighting faults
+    if (
+      this.telemetry.powerSupply.isOutputEnabled ||
+      this.crankSpeedRadPerSec > 0.02 ||
+      (this.telemetry.showEngineBlock &&
+        (this.telemetry.showFaultWireOverlay ?? true) &&
+        this.telemetry.engineBlockFaultOverlay?.hasActiveFault)
+    ) {
       needsMoreFrames = true;
     }
 
@@ -1109,19 +1417,19 @@ export class BenchSceneManager {
           }
           const state = sync ? gl.getSyncParameter(sync, gl.SYNC_STATUS) : gl.SIGNALED;
           if (state === gl.UNSIGNALED) {
-            scheduleTimer(poll, 5);
+            scheduleTimer(poll, 16);
           } else {
             if (sync) gl.deleteSync(sync);
-            scheduleTimer(cb, 80);
+            scheduleTimer(cb, 220);
           }
         };
-        scheduleTimer(poll, 5);
+        scheduleTimer(poll, 16);
         return;
       }
     } catch {
       // Fallback if fenceSync unavailable
     }
-    scheduleTimer(cb, 80);
+    scheduleTimer(cb, 220);
   }
 
   public requestRender(): void {
@@ -1176,7 +1484,15 @@ export class BenchSceneManager {
       : this.rig.breakoutAnchorWorld;
 
     const pinMeta = selectedPinAnchor?.colliderMesh.userData.pickMeta as PickTargetMeta | undefined;
-    const label = selectedPinAnchor ? pinMeta?.label || 'EMS Multi-Plug' : 'EMS Multi-Plug';
+    const label = this.telemetry.selectedPinId
+      ? formatStandardConnectionTag(
+          this.telemetry.selectedPinId,
+          this.telemetry.pins,
+          this.telemetry.emsProfile
+        ).formattedTag
+      : selectedPinAnchor
+        ? pinMeta?.label || 'ECU-A:01 | EMS_MULTI_PLUG | BLK 2.5mm²'
+        : `${this.telemetry.emsProfile?.modelCode || 'EMS-ECU'} | 4-CYL EFI HARNESS`;
 
     _projVec3.copy(worldPoint);
     _projVec3.project(this.camera);
@@ -1241,7 +1557,7 @@ export class BenchSceneManager {
 
     this.registry.disposeAll();
     this.textures.dispose();
-    this.envTexture.dispose();
+    this.envTexture?.dispose();
     this.renderer.dispose();
 
     if (canvas.parentElement === this.container) {

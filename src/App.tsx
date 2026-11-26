@@ -97,6 +97,7 @@ import { SubscriptionPricingModal } from './components/billing/SubscriptionPrici
 import { AdminPinManagerModal } from './components/billing/AdminPinManagerModal';
 import type { LabModule } from './data/academy/universityCurriculum';
 import type { BilingualLang } from './types/aiAssistant';
+import type { BenchVoiceSimulationAction } from './simulation/telemetry/efiHarnessStandard';
 
 const IntroductionModal = lazyWithRetry(() =>
   import('./components/IntroductionModal').then((m) => ({ default: m.IntroductionModal }))
@@ -1518,6 +1519,43 @@ function AuthorizedBenchLabWorkspace() {
     [activeTab, showDiagnosticGuide, diagnosticPanelMode]
   );
 
+  const [benchVoiceActionRequest, setBenchVoiceActionRequest] = useState<{
+    action: BenchVoiceSimulationAction;
+    nonce: number;
+  } | null>(null);
+
+  const handleBenchVoiceAction = useCallback(
+    (action: BenchVoiceSimulationAction) => {
+      if (action.type === 'SET_IGNITION') {
+        if (action.enabled) {
+          handleBypassPreBenchGate();
+        }
+        handlePowerSupplyChange((prev) => ({
+          ...prev,
+          isOutputEnabled: action.enabled,
+        }));
+        return;
+      }
+      if (action.type === 'SET_SYNC_MODE') {
+        setTwinSyncMode(action.mode);
+        return;
+      }
+      if (
+        action.type === 'START_GUIDED_TOUR' ||
+        action.type === 'SHOW_ENGINE_BLOCK' ||
+        action.type === 'TOGGLE_FAULT_MESH' ||
+        action.type === 'SET_CAMERA_PRESET' ||
+        action.type === 'SET_EXPLODE'
+      ) {
+        if (activeTab !== 'BENCH_LAB' && activeTab !== 'THREE_D_TWIN') {
+          setActiveTab('BENCH_LAB');
+        }
+      }
+      setBenchVoiceActionRequest({ action, nonce: Date.now() });
+    },
+    [activeTab, handleBypassPreBenchGate, handlePowerSupplyChange]
+  );
+
   return (
     <div className="relative isolate flex flex-col h-[100dvh] hud-shell text-slate-100 font-body select-none overflow-hidden">
       {/* Official AutoElectric Lab Pro Cover Image Blended Atmospheric Backdrop */}
@@ -1680,6 +1718,7 @@ function AuthorizedBenchLabWorkspace() {
           setUnifiedAiSubTab('VOICE');
           setShowUnifiedAiDrawer((prev) => !prev);
         }}
+        benchVoiceActionRequest={benchVoiceActionRequest}
         simulationSpeed={simulationSpeed}
         powerSupply={powerSupply}
         onChangePowerSupply={handlePowerSupplyChange}
@@ -2185,6 +2224,7 @@ function AuthorizedBenchLabWorkspace() {
         onNavigateTab={setActiveTab}
         onOpenModal={handleHandsFreeModalAction}
         onVoiceTranscript={handleTopBarVoiceTranscript}
+        onBenchVoiceAction={handleBenchVoiceAction}
       />
     </div>
   );

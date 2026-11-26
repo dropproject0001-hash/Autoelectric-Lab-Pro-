@@ -6,7 +6,16 @@
 import { DriveBenchSnapshot, DriveFileItem, DriveMimeFilter } from '../../services/googleDriveService';
 import { GmailMessageDetail, GmailMessageSummary } from '../../services/gmailService';
 
-export type WorkspaceTab = 'DRIVE' | 'GMAIL' | 'SHEETS' | 'SLIDES' | 'TASKS' | 'KEEP';
+export type WorkspaceTab =
+  | 'DRIVE'
+  | 'GMAIL'
+  | 'DOCS'
+  | 'TASKS'
+  | 'CLASSROOM'
+  | 'LOCAL'
+  | 'SHEETS'
+  | 'SLIDES'
+  | 'KEEP';
 
 export type GmailFilterBox = 'INBOX' | 'SENT' | 'DRAFT' | 'STARRED' | 'ALL';
 
@@ -76,6 +85,28 @@ export type PendingWorkspaceAction =
       name: string;
     }
   | {
+      kind: 'CREATE_GOOGLE_DOC';
+      title: string;
+      bodyText: string;
+    }
+  | {
+      kind: 'APPEND_GOOGLE_DOC';
+      documentId: string;
+      title: string;
+      textToAppend: string;
+    }
+  | {
+      kind: 'REPLACE_GOOGLE_DOC';
+      documentId: string;
+      title: string;
+      newBodyText: string;
+    }
+  | {
+      kind: 'TRASH_GOOGLE_DOC';
+      documentId: string;
+      title: string;
+    }
+  | {
       kind: 'APPEND_SHEET_TELEMETRY';
       spreadsheetId: string;
       spreadsheetTitle: string;
@@ -97,6 +128,14 @@ export type PendingWorkspaceAction =
       title: string;
     }
   | {
+      kind: 'CREATE_TASK_ITEM';
+      taskListId: string;
+      taskListTitle: string;
+      title: string;
+      notes: string;
+      dueIsoDate: string;
+    }
+  | {
       kind: 'TOGGLE_TASK_STATUS';
       taskListId: string;
       taskId: string;
@@ -114,6 +153,20 @@ export type PendingWorkspaceAction =
       taskListId: string;
       taskListTitle: string;
       tasks: { title: string; notes: string }[];
+    }
+  | {
+      kind: 'POST_CLASSROOM_ANNOUNCEMENT';
+      courseId: string;
+      courseName: string;
+      text: string;
+    }
+  | {
+      kind: 'CREATE_CLASSROOM_ASSIGNMENT';
+      courseId: string;
+      courseName: string;
+      title: string;
+      description: string;
+      maxPoints?: number;
     }
   | {
       kind: 'DELETE_KEEP_NOTE';

@@ -29,6 +29,11 @@ import {
   type VoiceInteractionCacheStats,
 } from '../services/ai/voiceInteractionCache';
 import type { VoiceModalAction } from '../services/ai/systemVoiceKnowledgeBase';
+import { queryAiDiagnosticRouter } from '../services/ai/aiRouter';
+import {
+  parseThreeDVoiceCommand,
+  type BenchVoiceSimulationAction,
+} from '../simulation/telemetry/efiHarnessStandard';
 import type {
   BenchTelemetry,
   BilingualLang,
@@ -148,6 +153,7 @@ export function useHandsFreeVoice(params: {
   nodeVoltages?: Record<string, number>;
   onNavigateTab?: (tab: LabTab) => void;
   onOpenModal?: (modal: VoiceModalAction) => void;
+  onBenchVoiceAction?: (action: BenchVoiceSimulationAction) => void;
 }) {
   const {
     activeModuleId,
@@ -158,6 +164,7 @@ export function useHandsFreeVoice(params: {
     nodeVoltages,
     onNavigateTab,
     onOpenModal,
+    onBenchVoiceAction,
   } = params;
 
   const [isHandsFreeActive, setIsHandsFreeActive] = useState(false);
@@ -192,6 +199,8 @@ export function useHandsFreeVoice(params: {
   const nodeVoltagesRef = useRef(nodeVoltages);
   const onNavigateTabRef = useRef(onNavigateTab);
   const onOpenModalRef = useRef(onOpenModal);
+  const onBenchVoiceActionRef = useRef(onBenchVoiceAction);
+  const aiRequestSeqRef = useRef(0);
 
   useEffect(() => {
     memoryRef.current = memory;
@@ -224,6 +233,10 @@ export function useHandsFreeVoice(params: {
   useEffect(() => {
     onOpenModalRef.current = onOpenModal;
   }, [onOpenModal]);
+
+  useEffect(() => {
+    onBenchVoiceActionRef.current = onBenchVoiceAction;
+  }, [onBenchVoiceAction]);
 
   // Hydrate browser TTS voices asynchronously (Chrome loads voices on `voiceschanged`)
   useEffect(() => {
@@ -421,11 +434,91 @@ export function useHandsFreeVoice(params: {
     (rawTranscript: string, speakReply = true) => {
       const cleaned = rawTranscript.trim();
       if (!cleaned) return;
+      const reqSeq = ++aiRequestSeqRef.current;
       setLastTranscript(cleaned);
       setInterimTranscript('');
       setStatus('CHINE_CHECK_SA_DB');
 
       const currentLang = langRef.current;
+
+      // 0. Direct 3D EMS Twin, Sound FX, Ignition, Sync Mode & Guided Tour Voice Commands
+      const benchCommand = parseThreeDVoiceCommand(cleaned);
+      if (benchCommand) {
+        onBenchVoiceActionRef.current?.(benchCommand.action);
+        const reply =
+          currentLang === 'EN' ? benchCommand.spokenReplyEN : benchCommand.spokenReplyTL;
+        const prevMem = memoryRef.current;
+        const updatedMemory: VoiceSessionMemory = {
+          ...prevMem,
+          lastIntent: 'WORKSPACE_NAVIGATION',
+          lastFiveResponses: [...prevMem.lastFiveResponses.slice(-4), reply],
+          activeTab: activeTabRef.current,
+          lang: currentLang,
+        };
+        const benchTurn: VoiceCoachTurnResult = {
+          intent: 'WORKSPACE_NAVIGATION',
+          confidence: 0.98,
+          spokenText: reply,
+          displayText: reply,
+          whyTip:
+            currentLang === 'EN'
+              ? 'Voice commands directly control the 3D EMS rig, procedural acoustics, ignition KL15, and camera focus.'
+              : 'Direktang kinokontrol ng boses ang 3D EMS rig, realistic sound effects, ignition KL15, at camera view.',
+          nextStepIndex: prevMem.currentStepIndex,
+          matchedSource: '3D EMS Voice Controller',
+          usedClarificationFallback: false,
+          updatedMemory,
+          navigationAction: null,
+          suggestedAction: null,
+          detailsBullets:
+            benchCommand.action.type === 'START_GUIDED_TOUR'
+              ? currentLang === 'EN'
+                ? [
+                    '1. Power Trunk (Red KL30 / Amber KL15) is isolated from Sensor/CAN Spine.',
+                    '2. Say "Turn ignition on" and "Sound on" to hear fuel pump prime & 1-3-4-2 firing.',
+                    '3. Say "Show engine block" to inspect live 3D wire-mesh fault overlays.',
+                    '4. Ask any automotive diagnostic question anytime — Hybrid AI will answer aloud.',
+                  ]
+                : [
+                    '1. Hiwalay ang Power Trunk (Red KL30 / Amber KL15) sa Sensor at CAN bus.',
+                    '2. Sabihin ang "I-on ang ignition" at "Buksan ang tunog" para sa fuel pump prime at 1-3-4-2 firing.',
+                    '3. Sabihin ang "Ipakita ang engine block" para makita ang live fault wire-mesh overlay.',
+                    '4. Magtanong ng kahit anong automotive diagnostic question — sasagutin ito ng Hybrid AI nang malakas.',
+                  ]
+              : undefined,
+          followUpChips:
+            currentLang === 'EN'
+              ? [
+                  'Turn ignition on',
+                  'Sound on',
+                  'Show engine block',
+                  'Explode ECU',
+                  'Why isolate SGND?',
+                ]
+              : [
+                  'I-on ang ignition',
+                  'Buksan ang tunog',
+                  'Ipakita ang engine block',
+                  'Buksan ang ECU',
+                  'Bakit hiwalay ang SGND?',
+                ],
+        };
+        memoryRef.current = updatedMemory;
+        setMemory(updatedMemory);
+        setLastTurn(benchTurn);
+        setLastTurnCacheMeta({
+          servedFromCache: false,
+          cacheHitCount: 0,
+          bypassedForLiveTelemetry: true,
+        });
+        if (speakReply) {
+          speakWithEchoShield(reply);
+        } else {
+          setStatus(isHandsFreeRef.current ? 'NAKIKINIG' : 'STANDBY');
+        }
+        return;
+      }
+
       const classified = classifyVoiceIntent(cleaned, pinsRef.current);
       const isLiveBypass = isLiveTelemetryQuery(cleaned, classified.intent);
 
@@ -510,6 +603,142 @@ export function useHandsFreeVoice(params: {
         nodeVoltages: nodeVoltagesRef.current,
         cachedKnowledge: cachedKnowledgeRef.current,
       });
+
+      const needsAiIntelligence =
+        !result.navigationAction &&
+        cleaned.length >= 6 &&
+        (result.usedClarificationFallback || result.confidence < 0.72);
+
+      if (needsAiIntelligence) {
+        const partialTel = telemetryRef.current;
+        const fullTelemetry: BenchTelemetry = {
+          vehicleLabel: partialTel?.vehicleLabel ?? 'Universal 4-Cyl EFI',
+          ecuProfileLabel: partialTel?.ecuProfileLabel ?? 'Universal 16-Pin EFI ECU',
+          psuEnabled: Boolean(partialTel?.psuEnabled),
+          psuVoltageSetting: Number(partialTel?.psuVoltageSetting ?? 12.6),
+          psuCurrentLimitAmps: Number(partialTel?.psuCurrentLimitAmps ?? 5),
+          psuCurrentDrawAmps: Number(partialTel?.psuCurrentDrawAmps ?? 0),
+          isOcpTripped: Boolean(partialTel?.isOcpTripped),
+          activeDtcs: partialTel?.activeDtcs ?? [],
+          activeFaults: partialTel?.activeFaults ?? [],
+          selectedPin: partialTel?.selectedPin,
+          dmm: partialTel?.dmm ?? {
+            isPowered: true,
+            mode: 'V_DC',
+            displayReading: '0.00',
+            unit: 'V',
+            redProbeLabel: 'Unattached',
+            blackProbeLabel: 'GND',
+          },
+          multimeterToleranceHook: partialTel?.multimeterToleranceHook,
+          pcbOverlayHook: partialTel?.pcbOverlayHook,
+        };
+
+        void queryAiDiagnosticRouter({
+          query: cleaned,
+          lang: currentLang,
+          telemetry: fullTelemetry,
+          timeoutMs: 9500,
+        })
+          .then((aiResult) => {
+            if (reqSeq !== aiRequestSeqRef.current) return;
+            const prevMem = memoryRef.current;
+            const rootCard = aiResult.cards.find((c) => c.stepNumber === 2);
+            const verifyCard = aiResult.cards.find((c) => c.stepNumber === 3);
+            const safetyCard = aiResult.cards.find((c) => c.stepNumber === 1);
+
+            const cleanDisplay = (aiResult.conversationalSummary || result.displayText).trim();
+            const spokenClean = cleanDisplay
+              .replace(/[*#`_]+/g, '')
+              .replace(/\s+/g, ' ')
+              .slice(0, 360);
+            const bullets = [rootCard?.body, verifyCard?.body]
+              .map((b) => (b || '').trim())
+              .filter(Boolean);
+
+            const updatedMemory: VoiceSessionMemory = {
+              ...prevMem,
+              lastIntent: 'DTC_OR_COMPONENT_LOOKUP',
+              lastFiveResponses: [...prevMem.lastFiveResponses.slice(-4), spokenClean],
+              activeTab: activeTabRef.current,
+              lang: currentLang,
+            };
+
+            const aiTurn: VoiceCoachTurnResult = {
+              intent: 'DTC_OR_COMPONENT_LOOKUP',
+              confidence: aiResult.confidence,
+              spokenText: spokenClean,
+              displayText: cleanDisplay,
+              whyTip: safetyCard?.body || result.whyTip,
+              nextStepIndex: prevMem.currentStepIndex,
+              matchedSource: `${aiResult.tierLabel} Intelligent Voice Guide`,
+              usedClarificationFallback: false,
+              updatedMemory,
+              navigationAction: null,
+              suggestedAction: null,
+              detailsBullets: bullets.length > 0 ? bullets : undefined,
+              followUpChips:
+                currentLang === 'EN'
+                  ? [
+                      'What is the bench status?',
+                      'Start guided tour',
+                      'Show engine block',
+                      'Focus power & relays',
+                    ]
+                  : [
+                      'Ano reading ngayon?',
+                      'Simulan ang guided tour',
+                      'Ipakita ang engine block',
+                      'Tingnan ang power at relays',
+                    ],
+            };
+
+            memoryRef.current = updatedMemory;
+            setMemory(updatedMemory);
+            setLastTurn(aiTurn);
+            setLastTurnCacheMeta({
+              servedFromCache: Boolean(aiResult.servedFromInteractionCache),
+              cacheHitCount: aiResult.cacheHitCount ?? 0,
+              bypassedForLiveTelemetry: isLiveBypass,
+            });
+
+            if (!isLiveBypass && aiResult.confidence >= VOICE_CACHE_MIN_CONFIDENCE) {
+              void saveVoiceInteractionCache({
+                channel: 'VOICE_COACH',
+                lang: currentLang,
+                query: cleaned,
+                intent: 'DTC_OR_COMPONENT_LOOKUP',
+                spokenText: aiTurn.spokenText,
+                displayText: aiTurn.displayText,
+                whyTip: aiTurn.whyTip,
+                matchedSource: aiTurn.matchedSource,
+                detailsBullets: aiTurn.detailsBullets,
+                followUpChips: aiTurn.followUpChips,
+                suggestedAction: null,
+                sourceOrigin: 'VERIFIED_ONLINE_AI',
+                confidence: aiResult.confidence,
+              }).catch(() => {});
+            }
+
+            if (speakReply) {
+              speakWithEchoShield(aiTurn.spokenText);
+            } else {
+              setStatus(isHandsFreeRef.current ? 'NAKIKINIG' : 'STANDBY');
+            }
+          })
+          .catch(() => {
+            if (reqSeq !== aiRequestSeqRef.current) return;
+            memoryRef.current = result.updatedMemory;
+            setMemory(result.updatedMemory);
+            setLastTurn(result);
+            if (speakReply) {
+              speakWithEchoShield(result.spokenText);
+            } else {
+              setStatus(isHandsFreeRef.current ? 'NAKIKINIG' : 'STANDBY');
+            }
+          });
+        return;
+      }
 
       memoryRef.current = result.updatedMemory;
       setMemory(result.updatedMemory);

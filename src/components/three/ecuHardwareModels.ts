@@ -6,6 +6,12 @@
 import * as THREE from 'three';
 import type { BenchTextureBundle } from './proceduralTextures';
 import type { EmsCircuitLayer, EmsFuseTelemetry } from '../../simulation/telemetry/emsDigitalTwinSync';
+import {
+  buildOrthogonalTrunkWaypoints,
+  EFI_FUNCTIONAL_COLOR_STANDARD,
+  EFI_TRUNK_CORRIDORS,
+  type EfiTrunkCorridor,
+} from '../../simulation/telemetry/efiHarnessStandard';
 
 export interface DisposableRegistry {
   trackGeo: <T extends THREE.BufferGeometry>(geo: T) => T;
@@ -96,6 +102,7 @@ export interface FuseVisual {
 export interface EmsHarnessWireVisual {
   id: string;
   layer: EmsCircuitLayer;
+  corridor: EfiTrunkCorridor;
   signalRole:
     | 'kl30'
     | 'kl15'
@@ -112,8 +119,18 @@ export interface EmsHarnessWireVisual {
     | 'can';
   mappedPinId: string;
   baseColor: THREE.Color;
+  curve: THREE.CatmullRomCurve3;
   mesh: THREE.Mesh;
   material: THREE.MeshStandardMaterial;
+}
+
+export interface EngineBlockFaultOverlayVisuals {
+  overlayGroup: THREE.Group;
+  blockShellMat: THREE.MeshBasicMaterial;
+  injectorWireMats: THREE.MeshBasicMaterial[];
+  coilWireMats: THREE.MeshBasicMaterial[];
+  sensorBusWireMat: THREE.MeshBasicMaterial;
+  groundStrapWireMat: THREE.MeshBasicMaterial;
 }
 
 export interface EcuBenchRig {
@@ -151,6 +168,7 @@ export interface EcuBenchRig {
   crankWheelGroup: THREE.Group;
   standaloneCrankBase: THREE.Group;
   engineBlockGroup: THREE.Group;
+  engineBlockFaultOverlay: EngineBlockFaultOverlayVisuals;
   engineCrankPulley: THREE.Group;
   engineCamPulley: THREE.Group;
   engineAltPulley: THREE.Group;
@@ -165,6 +183,8 @@ export interface EcuBenchRig {
   pinAnchors: Map<string, PinAnchorVisual>;
   mosfets: MosfetVisual[];
   emsHarnessWires: EmsHarnessWireVisual[];
+  currentFlowPulsesInstanced: THREE.InstancedMesh;
+  fuelBubblesInstanced: THREE.InstancedMesh;
   pickables: THREE.Object3D[];
 }
 
@@ -416,7 +436,7 @@ export function buildEcuBenchRig(
     return anchor;
   };
 
-  // Helper: route a dedicated color-coded EMS harness wire tube
+  // Helper: route a dedicated color-coded EMS harness wire tube along structured EMI trunks
   const addEmsWire = (
     id: string,
     points: THREE.Vector3[],
@@ -424,10 +444,11 @@ export function buildEcuBenchRig(
     radius: number,
     layer: EmsCircuitLayer,
     signalRole: EmsHarnessWireVisual['signalRole'],
-    mappedPinId: string
+    mappedPinId: string,
+    corridor: EfiTrunkCorridor = 'POWER_TRUNK'
   ) => {
-    const curve = new THREE.CatmullRomCurve3(points);
-    const geo = reg.trackGeo(new THREE.TubeGeometry(curve, 26, radius, 8, false));
+    const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal', 0.15);
+    const geo = reg.trackGeo(new THREE.TubeGeometry(curve, 30, radius, 8, false));
     const baseColor = new THREE.Color(colorHex);
     const mat = reg.trackMat(
       new THREE.MeshStandardMaterial({
@@ -447,9 +468,11 @@ export function buildEcuBenchRig(
     emsHarnessWires.push({
       id,
       layer,
+      corridor,
       signalRole,
       mappedPinId,
       baseColor,
+      curve,
       mesh,
       material: mat,
     });
@@ -2045,6 +2068,130 @@ export function buildEcuBenchRig(
   );
   engineBlockGroup.add(engineStrap);
 
+  // 12b. Live Diagnostic Wire-Mesh Fault Overlay over 4-Cylinder DOHC Engine Block
+  // Highlights MNA electrical faults (injector open/short, coil short/open, sensor bus, ground strap)
+  const faultOverlayGroup = new THREE.Group();
+  faultOverlayGroup.renderOrder = 4;
+
+  const makeWireMeshMat = (colorHex: number, opacity: number) =>
+    reg.trackMat(
+      new THREE.MeshBasicMaterial({
+        color: colorHex,
+        wireframe: true,
+        transparent: true,
+        opacity,
+        depthWrite: false,
+      })
+    );
+
+  // Outer DOHC block & head wireframe diagnostic cage (zero Z-fighting offset +0.08)
+  const blockShellMat = makeWireMeshMat(0x38bdf8, 0.2);
+  const blockShellWire = new THREE.Mesh(
+    reg.trackGeo(new THREE.BoxGeometry(2.74, 1.82, 4.62, 4, 3, 6)),
+    blockShellMat
+  );
+  blockShellWire.position.set(0, 1.54, 0);
+  faultOverlayGroup.add(blockShellWire);
+
+  const headShellWire = new THREE.Mesh(
+    reg.trackGeo(new THREE.BoxGeometry(2.88, 0.84, 4.68, 4, 2, 6)),
+    blockShellMat
+  );
+  headShellWire.position.set(0, 2.72, 0);
+  faultOverlayGroup.add(headShellWire);
+
+  // 4x Cylinder Injector Port Wire-Mesh Sleeves along Intake Manifold Runners
+  const injectorWireMats: THREE.MeshBasicMaterial[] = [];
+  for (let c = 0; c < 4; c++) {
+    const cylNum = (c + 1) as 1 | 2 | 3 | 4;
+    const mat = makeWireMeshMat(0x38bdf8, 0.34);
+    const sleeve = new THREE.Mesh(
+      reg.trackGeo(new THREE.CylinderGeometry(0.27, 0.27, 1.04, 10, 2, true)),
+      mat
+    );
+    sleeve.rotation.z = Math.PI / 2;
+    sleeve.position.set(1.42, 2.55, -1.45 + c * 0.96);
+    faultOverlayGroup.add(sleeve);
+
+    // Pickable zone on engine block runner for direct fault inspection
+    const injZoneHit = new THREE.Mesh(
+      reg.trackGeo(new THREE.BoxGeometry(1.05, 0.56, 0.56)),
+      invisiblePickMat
+    );
+    injZoneHit.position.set(1.42, 2.55, -1.45 + c * 0.96);
+    injZoneHit.layers.set(1);
+    injZoneHit.userData.pickMeta = {
+      kind: 'injector',
+      pinId: cylNum === 1 ? 'ecu-pin-10' : `ems-inj-${cylNum}`,
+      cylinder: cylNum,
+      label: `ENGINE BLOCK INJ #${cylNum}`,
+      subtitle: `Cylinder ${cylNum} Intake Runner Fuel Injector Zone`,
+    } satisfies PickTargetMeta;
+    faultOverlayGroup.add(injZoneHit);
+    pickables.push(injZoneHit);
+
+    injectorWireMats.push(mat);
+  }
+
+  // 4x Cylinder COP Ignition Well Wire-Mesh Cages atop DOHC Valve Cover
+  const coilWireMats: THREE.MeshBasicMaterial[] = [];
+  for (let c = 0; c < 4; c++) {
+    const cylNum = (c + 1) as 1 | 2 | 3 | 4;
+    const mat = makeWireMeshMat(0x38bdf8, 0.36);
+    const cage = new THREE.Mesh(
+      reg.trackGeo(new THREE.CylinderGeometry(0.35, 0.38, 0.54, 10, 2, true)),
+      mat
+    );
+    cage.position.set(0, 3.68, -1.45 + c * 0.96);
+    faultOverlayGroup.add(cage);
+
+    const coilZoneHit = new THREE.Mesh(
+      reg.trackGeo(new THREE.CylinderGeometry(0.4, 0.4, 0.62, 8)),
+      invisiblePickMat
+    );
+    coilZoneHit.position.set(0, 3.68, -1.45 + c * 0.96);
+    coilZoneHit.layers.set(1);
+    coilZoneHit.userData.pickMeta = {
+      kind: 'coil',
+      pinId: cylNum === 1 ? 'ecu-pin-11' : `ems-coil-${cylNum}`,
+      cylinder: cylNum,
+      label: `ENGINE BLOCK COIL #${cylNum}`,
+      subtitle: `Cylinder ${cylNum} DOHC Coil-on-Plug Well Zone`,
+    } satisfies PickTargetMeta;
+    faultOverlayGroup.add(coilZoneHit);
+    pickables.push(coilZoneHit);
+
+    coilWireMats.push(mat);
+  }
+
+  // Intake Plenum / Sensor Bus Wire-Mesh Sleeve (TPS / MAP / ECT / CKP)
+  const sensorBusWireMat = makeWireMeshMat(0x22d3ee, 0.3);
+  const sensorPlenumWire = new THREE.Mesh(
+    reg.trackGeo(new THREE.CylinderGeometry(0.51, 0.51, 4.02, 12, 4, true)),
+    sensorBusWireMat
+  );
+  sensorPlenumWire.rotation.x = Math.PI / 2;
+  sensorPlenumWire.position.set(1.85, 2.45, 0);
+  faultOverlayGroup.add(sensorPlenumWire);
+
+  // Engine Block Ground Strap Wire-Mesh Sleeve (SGND / G2 Ground Continuity)
+  const groundStrapWireMat = makeWireMeshMat(0x22c55e, 0.32);
+  const groundStrapWire = new THREE.Mesh(
+    reg.trackGeo(new THREE.TubeGeometry(engineStrapCurve, 18, 0.11, 8, false)),
+    groundStrapWireMat
+  );
+  faultOverlayGroup.add(groundStrapWire);
+
+  engineBlockGroup.add(faultOverlayGroup);
+  const engineBlockFaultOverlay: EngineBlockFaultOverlayVisuals = {
+    overlayGroup: faultOverlayGroup,
+    blockShellMat,
+    injectorWireMats,
+    coilWireMats,
+    sensorBusWireMat,
+    groundStrapWireMat,
+  };
+
   root.add(engineBlockGroup);
 
   // =========================================================================
@@ -2094,225 +2241,407 @@ export function buildEcuBenchRig(
   const fEcu = fuseVisuals[4].worldAnchor;
   const pIgnSw = new THREE.Vector3(-7.2, 0.65, 1.65);
 
-  // --- A. DEDICATED HEAVY-GAUGE RED +12V POWER & FUSE LINES ---
+  // --- Helper for clean orthogonal chassis-trunk routing (CHK-01: Zero crossed diagonals) ---
+  const orthoPts = (
+    start: THREE.Vector3,
+    end: THREE.Vector3,
+    corridor: EfiTrunkCorridor,
+    laneOffset = 0,
+    bypassX?: number
+  ): THREE.Vector3[] =>
+    buildOrthogonalTrunkWaypoints(start, end, corridor, laneOffset, bypassX).map(
+      (p) => new THREE.Vector3(p.x, p.y, p.z)
+    );
+
+  // --- Physical Corrugated Split-Loom Conduits & Instanced Virtual Zip-Ties ---
+  const splitLoomMat = reg.trackMat(
+    new THREE.MeshStandardMaterial({
+      color: 0x111827,
+      roughness: 0.88,
+      metalness: 0.08,
+    })
+  );
+  const zipTieMat = reg.trackMat(
+    new THREE.MeshStandardMaterial({
+      color: 0x38bdf8,
+      roughness: 0.45,
+      metalness: 0.15,
+    })
+  );
+
+  const trunkSpines: Array<{
+    x0: number;
+    x1: number;
+    z: number;
+    y: number;
+    radius: number;
+    stripeHex: number;
+  }> = [
+    // High-Current Power Trunk (KL30 / KL15 Red-Amber)
+    {
+      x0: -6.8,
+      x1: 5.2,
+      z: EFI_TRUNK_CORRIDORS.POWER_TRUNK.spineZ,
+      y: EFI_TRUNK_CORRIDORS.POWER_TRUNK.spineY - 0.04,
+      radius: 0.115,
+      stripeHex: EFI_FUNCTIONAL_COLOR_STANDARD.CONSTANT_POWER_KL30.primaryHex,
+    },
+    // Dedicated Star-Ground Bus Conduit (Black / Brown SGND)
+    {
+      x0: -5.8,
+      x1: 5.8,
+      z: EFI_TRUNK_CORRIDORS.GROUND_BUS.spineZ,
+      y: EFI_TRUNK_CORRIDORS.GROUND_BUS.spineY - 0.03,
+      radius: 0.095,
+      stripeHex: 0x94a3b8,
+    },
+    // High-Noise Actuator Driver Spine (Green Injectors / Violet Coils)
+    {
+      x0: -4.8,
+      x1: 4.8,
+      z: EFI_TRUNK_CORRIDORS.ACTUATOR_SPINE.spineZ,
+      y: EFI_TRUNK_CORRIDORS.ACTUATOR_SPINE.spineY - 0.04,
+      radius: 0.105,
+      stripeHex: EFI_FUNCTIONAL_COLOR_STANDARD.ACTUATOR_DRIVERS.primaryHex,
+    },
+  ];
+
+  const zipTiePositions: Array<{ x: number; y: number; z: number; scaleR: number }> = [];
+  for (const spine of trunkSpines) {
+    const length = spine.x1 - spine.x0;
+    const midX = (spine.x0 + spine.x1) * 0.5;
+    const conduit = new THREE.Mesh(
+      reg.trackGeo(new THREE.CylinderGeometry(spine.radius, spine.radius, length, 12, 1)),
+      splitLoomMat
+    );
+    conduit.rotation.z = Math.PI / 2;
+    conduit.position.set(midX, spine.y, spine.z);
+    root.add(conduit);
+
+    // Subtle color-coded EMI corridor identification tracer strip along conduit top
+    const tracer = new THREE.Mesh(
+      reg.trackGeo(new THREE.BoxGeometry(length, 0.014, 0.035)),
+      reg.trackMat(
+        new THREE.MeshStandardMaterial({
+          color: spine.stripeHex,
+          emissive: spine.stripeHex,
+          emissiveIntensity: 0.18,
+          roughness: 0.4,
+        })
+      )
+    );
+    tracer.position.set(midX, spine.y + spine.radius + 0.005, spine.z);
+    root.add(tracer);
+
+    for (let x = spine.x0 + 0.6; x <= spine.x1 - 0.4; x += 1.45) {
+      zipTiePositions.push({ x, y: spine.y, z: spine.z, scaleR: spine.radius * 1.15 });
+    }
+  }
+
+  const zipTieGeo = reg.trackGeo(new THREE.TorusGeometry(1.0, 0.14, 6, 14));
+  const zipTiesInstanced = new THREE.InstancedMesh(zipTieGeo, zipTieMat, zipTiePositions.length);
+  const _zipDummy = new THREE.Object3D();
+  zipTiePositions.forEach((zt, idx) => {
+    _zipDummy.position.set(zt.x, zt.y, zt.z);
+    _zipDummy.rotation.set(0, Math.PI / 2, 0);
+    _zipDummy.scale.set(zt.scaleR, zt.scaleR, zt.scaleR);
+    _zipDummy.updateMatrix();
+    zipTiesInstanced.setMatrixAt(idx, _zipDummy.matrix);
+  });
+  zipTiesInstanced.instanceMatrix.needsUpdate = true;
+  zipTiesInstanced.computeBoundingSphere();
+  root.add(zipTiesInstanced);
+
+  const cKl30 = EFI_FUNCTIONAL_COLOR_STANDARD.CONSTANT_POWER_KL30.primaryHex;
+  const cKl30Branch = EFI_FUNCTIONAL_COLOR_STANDARD.CONSTANT_POWER_KL30.secondaryHex;
+  const cKl15 = EFI_FUNCTIONAL_COLOR_STANDARD.SWITCHED_IGNITION_KL15.primaryHex;
+  const cKl15Sw = EFI_FUNCTIONAL_COLOR_STANDARD.SWITCHED_IGNITION_KL15.secondaryHex;
+  const cInj = EFI_FUNCTIONAL_COLOR_STANDARD.ACTUATOR_DRIVERS.primaryHex; // Green
+  const cCoil = EFI_FUNCTIONAL_COLOR_STANDARD.ACTUATOR_DRIVERS.secondaryHex; // Violet
+  const cGnd = EFI_FUNCTIONAL_COLOR_STANDARD.CHASSIS_ECU_GROUND.primaryHex; // Black
+  const cSgnd = EFI_FUNCTIONAL_COLOR_STANDARD.CHASSIS_ECU_GROUND.secondaryHex; // Brown
+
+  // --- A. DEDICATED HEAVY-GAUGE RED +12V POWER TRUNK (KL30) ---
   addEmsWire(
     'ems-w-batt-fmain',
-    [pBattPos, new THREE.Vector3(-6.7, 1.35, 2.3), new THREE.Vector3(-5.5, 0.95, 1.9), fMain],
-    0xef4444,
+    orthoPts(pBattPos, fMain, 'POWER_TRUNK', -1.5),
+    cKl30,
     0.052,
     'POWER_FUSES',
     'kl30',
-    'ecu-pin-3'
+    'ecu-pin-3',
+    'POWER_TRUNK'
   );
   addEmsWire(
     'ems-w-fmain-ign',
-    [fMain, new THREE.Vector3(-5.8, 0.85, 1.4), pIgnSw],
-    0xef4444,
-    0.044,
+    [fMain, new THREE.Vector3(fMain.x, 0.42, pIgnSw.z), pIgnSw],
+    cKl30,
+    0.042,
     'POWER_FUSES',
     'kl30',
-    'ecu-pin-3'
+    'ecu-pin-3',
+    'POWER_TRUNK'
   );
   addEmsWire(
     'ems-w-fecu-kl30',
-    [fEcu, new THREE.Vector3(-3.3, 0.42, 3.55), new THREE.Vector3(-2.1, 0.42, 3.1), pEcuKl30],
-    0xef4444,
-    0.044,
+    orthoPts(fEcu, pEcuKl30, 'POWER_TRUNK', -0.6),
+    cKl30,
+    0.042,
     'POWER_FUSES',
     'kl30',
-    'ecu-pin-3'
+    'ecu-pin-3',
+    'POWER_TRUNK'
   );
   addEmsWire(
     'ems-w-fmain-mrelay30',
-    [fMain, new THREE.Vector3(-2.8, 0.3, 3.25), new THREE.Vector3(0.6, 0.3, 3.25), new THREE.Vector3(1.25, 0.38, 1.85), pMain30],
-    0xdc2626,
-    0.046,
+    orthoPts(fMain, pMain30, 'POWER_TRUNK', 0.2),
+    cKl30Branch,
+    0.044,
     'POWER_FUSES',
     'kl30',
-    'relay-30'
+    'relay-30',
+    'POWER_TRUNK'
   );
   addEmsWire(
     'ems-w-ffuel-fprelay30',
-    [fFuel, new THREE.Vector3(-2.4, 0.24, 3.5), new THREE.Vector3(1.9, 0.24, 3.5), new THREE.Vector3(2.55, 0.36, 1.85), pFp30],
-    0xdc2626,
-    0.044,
+    orthoPts(fFuel, pFp30, 'POWER_TRUNK', 1.0),
+    cKl30Branch,
+    0.042,
     'FUEL_SYSTEM',
     'kl30',
-    'ecu-pin-16'
+    'ecu-pin-16',
+    'POWER_TRUNK'
   );
 
-  // --- B. SWITCHED IGNITION (KL15 AMBER) & RELAY TRIGGERS ---
+  // --- B. SWITCHED IGNITION (KL15 YELLOW/ORANGE) & RELAY TRIGGERS ---
   addEmsWire(
     'ems-w-ign-kl15',
-    [pIgnSw, new THREE.Vector3(-5.2, 0.45, 1.55), new THREE.Vector3(-3.4, 0.36, 2.7), pEcuKl15],
-    0xf59e0b,
+    orthoPts(pIgnSw, pEcuKl15, 'POWER_TRUNK', -2.0),
+    cKl15,
     0.036,
     'POWER_FUSES',
     'kl15',
-    'ecu-pin-4'
+    'ecu-pin-4',
+    'POWER_TRUNK'
   );
   addEmsWire(
     'ems-w-ign-mrelay86',
-    [pEcuKl15, new THREE.Vector3(-0.6, 0.28, 2.85), new THREE.Vector3(1.73, 0.32, 2.2), pMain86],
-    0xf59e0b,
+    orthoPts(pEcuKl15, pMain86, 'POWER_TRUNK', -1.2),
+    cKl15,
     0.032,
     'RELAYS',
     'kl15',
-    'relay-86'
+    'relay-86',
+    'POWER_TRUNK'
   );
   addEmsWire(
     'ems-w-ecu-mrelay85',
-    [pEcuMRelay, new THREE.Vector3(-0.9, 0.22, 2.65), new THREE.Vector3(1.95, 0.28, 2.0), pMain85],
-    0xfbbf24,
+    orthoPts(pEcuMRelay, pMain85, 'POWER_TRUNK', -0.2),
+    cKl15Sw,
     0.03,
     'RELAYS',
     'mrelay',
-    'ecu-pin-12'
+    'ecu-pin-12',
+    'POWER_TRUNK'
   );
   addEmsWire(
     'ems-w-mrelay87-fprelay86',
-    [pMain87, new THREE.Vector3(2.2, 0.35, 1.65), pFp86],
-    0xf97316,
+    [pMain87, new THREE.Vector3(pMain87.x, 0.36, 1.55), new THREE.Vector3(pFp86.x, 0.36, 1.55), pFp86],
+    cKl15Sw,
     0.032,
     'RELAYS',
     'switched_rail',
-    'relay-87'
+    'relay-87',
+    'POWER_TRUNK'
   );
   addEmsWire(
     'ems-w-ecu-fprelay85',
-    [pEcuFpRelay, new THREE.Vector3(1.2, 0.22, 2.55), new THREE.Vector3(3.29, 0.28, 2.0), pFp85],
-    0xfbbf24,
+    orthoPts(pEcuFpRelay, pFp85, 'POWER_TRUNK', 0.6),
+    cKl15Sw,
     0.03,
     'FUEL_SYSTEM',
     'fprelay',
-    'ecu-pin-16'
+    'ecu-pin-16',
+    'POWER_TRUNK'
   );
 
-  // --- C. FUEL PUMP RELAY 87 -> SUBMERGED FUEL PUMP (+12V) ---
+  // --- C. FUEL PUMP RELAY 87 -> SUBMERGED FUEL PUMP (+12V SWITCHED) ---
   addEmsWire(
     'ems-w-fp87-pump',
-    [pFp87, new THREE.Vector3(3.9, 0.35, 1.6), new THREE.Vector3(4.95, 0.85, 1.6), new THREE.Vector3(5.6, 2.1, 1.55), pFuelPos],
-    0xef4444,
+    orthoPts(pFp87, pFuelPos, 'POWER_TRUNK', 1.6),
+    cKl30,
     0.044,
     'FUEL_SYSTEM',
     'fuel_pump',
-    'ecu-pin-16'
+    'ecu-pin-16',
+    'POWER_TRUNK'
   );
 
-  // --- D. SWITCHED +12V TO 4x INJECTORS (20A INJ) & 4x COILS (15A COIL) ---
+  // --- D. HIGH-NOISE ACTUATOR SPINE (GREEN INJECTORS / VIOLET COILS) ---
   addEmsWire(
     'ems-w-finj-rail',
-    [fInj, new THREE.Vector3(-4.6, 0.5, 0.9), new THREE.Vector3(-4.65, 0.95, -2.0), pRailVbat],
-    0xef4444,
-    0.04,
+    orthoPts(fInj, pRailVbat, 'ACTUATOR_SPINE', -1.6, -4.65),
+    cKl15Sw,
+    0.038,
     'INJ_COILS',
     'switched_rail',
-    'ecu-pin-10'
+    'ecu-pin-10',
+    'ACTUATOR_SPINE'
   );
   addEmsWire(
     'ems-w-fcoil-coils',
-    [pMain87, new THREE.Vector3(1.15, 0.45, -1.6), new THREE.Vector3(1.4, 1.35, -2.85), new THREE.Vector3(4.5, 1.52, -3.55)],
-    0xef4444,
-    0.04,
+    orthoPts(pMain87, new THREE.Vector3(4.5, 1.52, -3.55), 'ACTUATOR_SPINE', -1.0, 0.85),
+    cKl15Sw,
+    0.038,
     'INJ_COILS',
     'switched_rail',
-    'ecu-pin-11'
+    'ecu-pin-11',
+    'ACTUATOR_SPINE'
   );
 
-  // 4x Sequential Injector Control Lines (ECU -> INJ 1..4)
+  // 4x Sequential Injector Control Lines (ECU -> Orthogonal Actuator Spine -> INJ 1..4 GREEN)
   injectors.forEach((inj, idx) => {
     const startPt = pEcuInj.clone().add(new THREE.Vector3(idx * 0.08, 0, 0));
     addEmsWire(
       `ems-w-inj-ctrl-${inj.cylinder}`,
-      [
-        startPt,
-        new THREE.Vector3(-3.3 + idx * 0.18, 0.24, 1.9),
-        new THREE.Vector3(-3.8 + idx * 0.85, 0.45, -1.9),
-        inj.terminalAnchor.clone(),
-      ],
-      idx === 0 ? 0x38bdf8 : 0xfbbf24,
+      orthoPts(startPt, inj.terminalAnchor, 'ACTUATOR_SPINE', idx * 0.55 - 0.5, -3.95 - idx * 0.06),
+      cInj,
       0.026,
       'INJ_COILS',
       'inj',
-      'ecu-pin-10'
+      'ecu-pin-10',
+      'ACTUATOR_SPINE'
     );
   });
 
-  // 4x Ignition Coil Control Lines (ECU -> COIL 1..4)
+  // 4x Ignition Coil Control Lines (ECU -> Orthogonal Actuator Spine -> COIL 1..4 VIOLET)
   ignitionCoils.forEach((coil, idx) => {
     const startPt = pEcuIgn.clone().add(new THREE.Vector3(idx * 0.08, 0, 0));
     addEmsWire(
       `ems-w-coil-ctrl-${coil.cylinder}`,
-      [
-        startPt,
-        new THREE.Vector3(0.55 + idx * 0.12, 0.28, 1.85),
-        new THREE.Vector3(0.85 + idx * 0.22, 0.42, -1.8),
-        new THREE.Vector3(1.4 + idx * 1.04, 1.28, -2.7),
-        coil.terminalAnchor.clone(),
-      ],
-      0xf97316,
+      orthoPts(startPt, coil.terminalAnchor, 'ACTUATOR_SPINE', idx * 0.55 + 0.8, 0.52 + idx * 0.06),
+      cCoil,
       0.026,
       'INJ_COILS',
       'coil',
-      'ecu-pin-11'
+      'ecu-pin-11',
+      'ACTUATOR_SPINE'
     );
   });
 
-  // --- E. DEDICATED ISOLATED SENSOR GROUND (SGND) & SYSTEM CHASSIS GROUNDS (G1 / G2) ---
+  // --- E. STAR-TOPOLOGY CHASSIS GROUNDS (BLACK PGND) & ISOLATED SENSOR GROUND (BROWN SGND) ---
   addEmsWire(
     'ems-w-sgnd-ecu',
-    [pEcuSgnd, new THREE.Vector3(-0.35, 0.16, 3.65), pSgndBus],
-    0x78716c,
+    orthoPts(pEcuSgnd, pSgndBus, 'GROUND_BUS', -1.4),
+    cSgnd,
     0.032,
     'GROUNDS',
     'sgnd',
-    'ecu-pin-6'
+    'ecu-pin-6',
+    'GROUND_BUS'
   );
   addEmsWire(
     'ems-w-batt-g1',
-    [pBattNeg, new THREE.Vector3(-5.4, 0.28, 4.4), new THREE.Vector3(-3.8, 0.16, 4.65), pG1],
-    0x1f2937,
-    0.052,
+    orthoPts(pBattNeg, pG1, 'GROUND_BUS', -0.6),
+    cGnd,
+    0.05,
     'GROUNDS',
     'chassis_gnd',
-    'chassis-gnd'
+    'chassis-gnd',
+    'GROUND_BUS'
   );
   addEmsWire(
     'ems-w-ecu-g1',
-    [pEcuGnd1, new THREE.Vector3(-2.6, 0.18, 3.65), pG1],
-    0x1f2937,
-    0.044,
+    orthoPts(pEcuGnd1, pG1, 'GROUND_BUS', 0.2),
+    cGnd,
+    0.042,
     'GROUNDS',
     'chassis_gnd',
-    'ecu-pin-1'
+    'ecu-pin-1',
+    'GROUND_BUS'
   );
   addEmsWire(
     'ems-w-ecu-g2',
-    [pEcuGnd2, new THREE.Vector3(0.8, 0.16, 3.9), pG2],
-    0x1f2937,
-    0.044,
+    orthoPts(pEcuGnd2, pG2, 'GROUND_BUS', 0.9),
+    cGnd,
+    0.042,
     'GROUNDS',
     'chassis_gnd',
-    'ecu-pin-2'
+    'ecu-pin-2',
+    'GROUND_BUS'
   );
   addEmsWire(
     'ems-w-g1-g2-bond',
-    [pG1, new THREE.Vector3(0, 0.12, 5.15), pG2],
+    [pG1, new THREE.Vector3(pG1.x, 0.14, 5.05), new THREE.Vector3(pG2.x, 0.14, 5.05), pG2],
     0x111827,
     0.042,
     'GROUNDS',
     'chassis_gnd',
-    'chassis-gnd'
+    'chassis-gnd',
+    'GROUND_BUS'
   );
   addEmsWire(
     'ems-w-fuelpump-g2',
-    [pFuelGnd, new THREE.Vector3(6.85, 0.35, 3.35), new THREE.Vector3(4.6, 0.16, 4.65), pG2],
-    0x1f2937,
-    0.042,
+    orthoPts(pFuelGnd, pG2, 'GROUND_BUS', 1.5),
+    cGnd,
+    0.04,
     'GROUNDS',
     'chassis_gnd',
-    'chassis-gnd'
+    'chassis-gnd',
+    'GROUND_BUS'
   );
+
+  // =========================================================================
+  // 13B. INSTANCED LIVE CURRENT-FLOW ENERGY PULSE BEADS & FUEL TANK BUBBLES
+  // =========================================================================
+  const pulseCount = Math.max(48, emsHarnessWires.length * 3);
+  const pulseBeadGeo = reg.trackGeo(new THREE.SphereGeometry(0.055, 8, 8));
+  const pulseBeadMat = reg.trackMat(
+    new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.92,
+    })
+  );
+  const currentFlowPulsesInstanced = new THREE.InstancedMesh(
+    pulseBeadGeo,
+    pulseBeadMat,
+    pulseCount
+  );
+  currentFlowPulsesInstanced.frustumCulled = false;
+  const _zeroScaleDummy = new THREE.Object3D();
+  _zeroScaleDummy.scale.set(0.0001, 0.0001, 0.0001);
+  _zeroScaleDummy.updateMatrix();
+  for (let i = 0; i < pulseCount; i++) {
+    currentFlowPulsesInstanced.setMatrixAt(i, _zeroScaleDummy.matrix);
+    currentFlowPulsesInstanced.setColorAt(i, new THREE.Color(0x38bdf8));
+  }
+  currentFlowPulsesInstanced.instanceMatrix.needsUpdate = true;
+  if (currentFlowPulsesInstanced.instanceColor) {
+    currentFlowPulsesInstanced.instanceColor.needsUpdate = true;
+  }
+  root.add(currentFlowPulsesInstanced);
+
+  const fuelBubbleCount = 18;
+  const fuelBubbleGeo = reg.trackGeo(new THREE.SphereGeometry(0.05, 8, 8));
+  const fuelBubbleMat = reg.trackMat(
+    new THREE.MeshBasicMaterial({
+      color: 0x7dd3fc,
+      transparent: true,
+      opacity: 0.65,
+    })
+  );
+  const fuelBubblesInstanced = new THREE.InstancedMesh(
+    fuelBubbleGeo,
+    fuelBubbleMat,
+    fuelBubbleCount
+  );
+  fuelBubblesInstanced.frustumCulled = false;
+  for (let i = 0; i < fuelBubbleCount; i++) {
+    fuelBubblesInstanced.setMatrixAt(i, _zeroScaleDummy.matrix);
+  }
+  fuelBubblesInstanced.instanceMatrix.needsUpdate = true;
+  root.add(fuelBubblesInstanced);
 
   // =========================================================================
   // 14. 3D DMM PROBE MARKERS (RED + AND BLACK -)
@@ -2390,6 +2719,7 @@ export function buildEcuBenchRig(
     crankWheelGroup,
     standaloneCrankBase,
     engineBlockGroup,
+    engineBlockFaultOverlay,
     engineCrankPulley,
     engineCamPulley,
     engineAltPulley,
@@ -2402,6 +2732,8 @@ export function buildEcuBenchRig(
     pinAnchors,
     mosfets,
     emsHarnessWires,
+    currentFlowPulsesInstanced,
+    fuelBubblesInstanced,
     pickables,
   };
 }

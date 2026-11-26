@@ -22,6 +22,10 @@ import {
   Cpu,
   Power,
   Filter,
+  Grid3X3,
+  Headphones,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import {
   BenchComponent,
@@ -35,7 +39,6 @@ import {
 import {
   BenchOverlayMode,
   BenchSceneManager,
-  BenchTelemetrySnapshot,
   CameraPresetKey,
   ProjectedCallout,
 } from './three/BenchSceneManager';
@@ -49,16 +52,17 @@ import {
   DEFAULT_GAUGE_MONITOR_STATE,
   GaugeMonitorState,
 } from '../simulation/telemetry/telemetryTypes';
-import { evaluateGaugeTelemetry } from '../simulation/telemetry/gaugeTelemetryEngine';
-import {
-  EmsCircuitLayer,
-  evaluateEmsDigitalTwinState,
-  resolveEmsEcuSyncProfile,
-} from '../simulation/telemetry/emsDigitalTwinSync';
+import type { EmsCircuitLayer } from '../simulation/telemetry/emsDigitalTwinSync';
+import { useEmsTelemetrySync } from '../hooks/useEmsTelemetrySync';
 import {
   buildClockwiseArcPath,
   useDampedGaugeMotion,
 } from './gauges/useDampedGaugeMotion';
+import {
+  formatStandardConnectionTag,
+  type BenchVoiceSimulationAction,
+} from '../simulation/telemetry/efiHarnessStandard';
+import { EmsAudioSynthesizer } from '../utils/emsAudioSynthesizer';
 
 interface ThreeBenchTwinProps {
   pins: EcuPin[];
@@ -89,6 +93,8 @@ interface ThreeBenchTwinProps {
   onToggleIgnition?: () => void;
   onOpenOfflineBot?: (prompt?: string) => void;
   onOpenGroundedSearch?: (query?: string, dtc?: string) => void;
+  onOpenVoiceGuide?: () => void;
+  voiceActionRequest?: { action: BenchVoiceSimulationAction; nonce: number } | null;
 }
 
 const FALLBACK_RPM_EMULATOR: RpmEmulatorState = {
@@ -268,15 +274,21 @@ const ThreeBenchTwinComponent: React.FC<ThreeBenchTwinProps> = ({
   onToggleIgnition,
   onOpenOfflineBot,
   onOpenGroundedSearch,
+  onOpenVoiceGuide,
+  voiceActionRequest = null,
 }) => {
   const mountRef = useRef<HTMLDivElement | null>(null);
   const managerRef = useRef<BenchSceneManager | null>(null);
+  const audioSynthRef = useRef<EmsAudioSynthesizer | null>(null);
+  const lastVoiceNonceRef = useRef<number>(0);
 
   const [dockCollapsed, setDockCollapsed] = useState(false);
   const [topHudCollapsed, setTopHudCollapsed] = useState(false);
   const [hudOpacityMode, setHudOpacityMode] = useState<'GLASS' | 'CLEAR' | 'SOLID'>('GLASS');
   const [showSyncedGauges, setShowSyncedGauges] = useState(false);
   const [showEngineBlock, setShowEngineBlock] = useState(false);
+  const [showFaultWireOverlay, setShowFaultWireOverlay] = useState(true);
+  const [audioEnabled, setAudioEnabled] = useState(false);
   const [circuitLayerFilter, setCircuitLayerFilter] = useState<EmsCircuitLayer>('ALL');
   const [activePreset, setActivePreset] = useState<CameraPresetKey>('OVERVIEW');
   const [overlayMode, setOverlayMode] = useState<BenchOverlayMode>('WIRE_ID');
@@ -330,167 +342,41 @@ const ThreeBenchTwinComponent: React.FC<ThreeBenchTwinProps> = ({
   const onToggleIgnitionRef = useRef(onToggleIgnition);
   onToggleIgnitionRef.current = onToggleIgnition;
 
-  // Auto-sync EMS digital twin hardware profile with selected physical ECU
-  const emsProfile = useMemo(
-    () => resolveEmsEcuSyncProfile(vehicleContext, selectedEcuProfileId, pins),
-    [vehicleContext, selectedEcuProfileId, pins]
-  );
-
-  const syncedTelemetry = useMemo(
-    () =>
-      evaluateGaugeTelemetry({
-        powerSupply,
-        circuitSolution: {
-          nodeVoltages,
-          nodeResistances: {},
-          wireCurrentsMa,
-          activeDTCs,
-          supplyCurrentDrawAmps,
-          isSupplyCurrentTripped,
-          multimeterReading: {
-            display: '0.00 V',
-            value: 0,
-            unit: 'V',
-            isOverLimit: false,
-            isWarning: false,
-            shouldBeep: false,
-          },
-        },
-        components,
-        faults,
-        wires,
-        rpmEmulator,
-        gaugeMonitor,
-      }),
-    [
-      powerSupply,
-      nodeVoltages,
-      wireCurrentsMa,
-      activeDTCs,
-      supplyCurrentDrawAmps,
-      isSupplyCurrentTripped,
-      components,
-      faults,
-      wires,
-      rpmEmulator,
-      gaugeMonitor,
-    ]
-  );
-
-  // Full live EMS telemetry snapshot (fuses, dual relays, 4-cyl injectors/coils, fuel pump, grounds)
-  const emsState = useMemo(
-    () =>
-      evaluateEmsDigitalTwinState({
-        profile: emsProfile,
-        powerSupply,
-        nodeVoltages,
-        wireCurrentsMa,
-        components,
-        faults,
-        wires,
-        rpm: syncedTelemetry.rpm,
-        isRpmRunning: syncedTelemetry.statusCode === 'LIVE_SIMULATED',
-        ckpSignalLost: Boolean(rpmEmulator.ckpSignalLost),
-        supplyCurrentDrawAmps,
-        isSupplyCurrentTripped,
-      }),
-    [
-      emsProfile,
-      powerSupply,
-      nodeVoltages,
-      wireCurrentsMa,
-      components,
-      faults,
-      wires,
-      syncedTelemetry.rpm,
-      syncedTelemetry.statusCode,
-      rpmEmulator.ckpSignalLost,
-      supplyCurrentDrawAmps,
-      isSupplyCurrentTripped,
-    ]
-  );
-
-  const liveTelemetry = useMemo<BenchTelemetrySnapshot>(
-    () => ({
-      pins,
-      wires,
-      components,
-      faults,
-      activeDTCs,
-      nodeVoltages,
-      wireCurrentsMa,
-      multimeter,
-      powerSupply,
-      selectedPinId,
-      simulationSpeed,
-      overlayMode,
-      explodeAmount,
-      rpm: emsState.rpm,
-      isRpmRunning: emsState.isEngineRunning,
-      ckpSignalLost: Boolean(rpmEmulator.ckpSignalLost),
-      showEngineBlock,
-      circuitLayerFilter,
-      emsProfile,
-      emsState,
-    }),
-    [
-      pins,
-      wires,
-      components,
-      faults,
-      activeDTCs,
-      nodeVoltages,
-      wireCurrentsMa,
-      multimeter,
-      powerSupply,
-      selectedPinId,
-      simulationSpeed,
-      overlayMode,
-      explodeAmount,
-      emsState,
-      rpmEmulator.ckpSignalLost,
-      showEngineBlock,
-      circuitLayerFilter,
-      emsProfile,
-    ]
-  );
-
-  // Freeze MNA electrical snapshot when Manual Review mode is active while preserving 3D view & inspection controls
-  const frozenSnapshotRef = useRef<BenchTelemetrySnapshot | null>(null);
-  if (twinSyncMode === 'LIVE_DATA') {
-    frozenSnapshotRef.current = null;
-  } else if (!frozenSnapshotRef.current) {
-    frozenSnapshotRef.current = liveTelemetry;
-  }
-
-  const latestTelemetry = useMemo<BenchTelemetrySnapshot>(() => {
-    if (twinSyncMode === 'MANUAL_REVIEW' && frozenSnapshotRef.current) {
-      return {
-        ...frozenSnapshotRef.current,
-        selectedPinId,
-        overlayMode,
-        explodeAmount,
-        showEngineBlock,
-        circuitLayerFilter,
-        simulationSpeed: 0,
-        isRpmRunning: false,
-      };
-    }
-    return liveTelemetry;
-  }, [
-    twinSyncMode,
-    liveTelemetry,
+  const {
+    emsProfile,
+    gaugeTelemetry: syncedTelemetry,
+    emsState,
+    displayedEmsState,
+    engineBlockFaultOverlay,
+    telemetrySnapshot: latestTelemetry,
+    displayedNodeVoltages,
+    displayedFaults,
+    displayedActiveDtcs,
+  } = useEmsTelemetrySync({
+    pins,
+    wires,
+    components,
+    faults,
+    activeDTCs,
+    nodeVoltages,
+    wireCurrentsMa,
+    supplyCurrentDrawAmps,
+    isSupplyCurrentTripped,
+    multimeter,
+    powerSupply,
     selectedPinId,
+    simulationSpeed,
     overlayMode,
     explodeAmount,
     showEngineBlock,
+    showFaultWireOverlay,
     circuitLayerFilter,
-  ]);
-
-  const displayedEmsState = latestTelemetry.emsState ?? emsState;
-  const displayedNodeVoltages = latestTelemetry.nodeVoltages;
-  const displayedFaults = latestTelemetry.faults;
-  const displayedActiveDtcs = latestTelemetry.activeDTCs;
+    rpmEmulator,
+    gaugeMonitor,
+    vehicleContext,
+    selectedEcuProfileId,
+    twinSyncMode,
+  });
 
   const initialTelemetryRef = useRef(latestTelemetry);
   initialTelemetryRef.current = latestTelemetry;
@@ -535,6 +421,84 @@ const ThreeBenchTwinComponent: React.FC<ThreeBenchTwinProps> = ({
   useEffect(() => {
     managerRef.current?.updateTelemetry(latestTelemetry);
   }, [latestTelemetry]);
+
+  // Procedural Web Audio EMS Acoustic Engine
+  useEffect(() => {
+    return () => {
+      audioSynthRef.current?.dispose();
+      audioSynthRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    audioSynthRef.current?.update(displayedEmsState);
+  }, [displayedEmsState]);
+
+  const handleToggleAudio = useCallback(() => {
+    setAudioEnabled((prev) => {
+      const next = !prev;
+      if (!audioSynthRef.current) {
+        audioSynthRef.current = new EmsAudioSynthesizer();
+      }
+      audioSynthRef.current.setEnabled(next);
+      audioSynthRef.current.update(displayedEmsState);
+      return next;
+    });
+  }, [displayedEmsState]);
+
+  useEffect(() => {
+    if (!voiceActionRequest || voiceActionRequest.nonce === lastVoiceNonceRef.current) {
+      return;
+    }
+    lastVoiceNonceRef.current = voiceActionRequest.nonce;
+    const { action } = voiceActionRequest;
+    switch (action.type) {
+      case 'SHOW_ENGINE_BLOCK':
+        setShowEngineBlock(action.enabled);
+        setActivePreset(action.enabled ? 'ENGINE_BAY' : 'OVERVIEW');
+        managerRef.current?.flyToPreset(action.enabled ? 'ENGINE_BAY' : 'OVERVIEW');
+        break;
+      case 'TOGGLE_FAULT_MESH':
+        setShowFaultWireOverlay(action.enabled);
+        if (action.enabled) {
+          setShowEngineBlock(true);
+          setActivePreset('ENGINE_BAY');
+          managerRef.current?.flyToPreset('ENGINE_BAY');
+        }
+        break;
+      case 'SET_CAMERA_PRESET':
+        setActivePreset(action.preset);
+        if (action.preset === 'ENGINE_BAY') setShowEngineBlock(true);
+        managerRef.current?.flyToPreset(action.preset);
+        break;
+      case 'SET_EXPLODE':
+        setExplodeAmount(action.exploded ? 0.85 : 0);
+        setActivePreset(action.exploded ? 'ECU_EXPLODED' : 'OVERVIEW');
+        managerRef.current?.flyToPreset(action.exploded ? 'ECU_EXPLODED' : 'OVERVIEW');
+        break;
+      case 'SET_AUDIO':
+        if (!audioSynthRef.current) {
+          audioSynthRef.current = new EmsAudioSynthesizer();
+        }
+        audioSynthRef.current.setEnabled(action.enabled);
+        audioSynthRef.current.update(displayedEmsState);
+        setAudioEnabled(action.enabled);
+        break;
+      case 'SET_CIRCUIT_LAYER':
+        setCircuitLayerFilter(action.layer);
+        break;
+      case 'START_GUIDED_TOUR':
+        setShowEngineBlock(true);
+        setShowFaultWireOverlay(true);
+        setCircuitLayerFilter('ALL');
+        setOverlayMode('WIRE_ID');
+        setActivePreset('ENGINE_BAY');
+        managerRef.current?.flyToPreset('ENGINE_BAY');
+        break;
+      default:
+        break;
+    }
+  }, [voiceActionRequest, displayedEmsState]);
 
   // Keyboard shortcut 'H' to toggle HUD dock
   useEffect(() => {
@@ -586,7 +550,13 @@ const ThreeBenchTwinComponent: React.FC<ThreeBenchTwinProps> = ({
     [activeMeta, displayedEmsState.fuses]
   );
 
+  const inspectedStandardTag = useMemo(() => {
+    if (!inspectedPinId) return null;
+    return formatStandardConnectionTag(inspectedPinId, pins, emsProfile).formattedTag;
+  }, [inspectedPinId, pins, emsProfile]);
+
   const inspectedLabel = useMemo(() => {
+    if (inspectedStandardTag) return inspectedStandardTag;
     if (activeMeta) return activeMeta.label;
     if (inspectedEcuPin) return `Pin ${inspectedEcuPin.pinNumber}: ${inspectedEcuPin.label}`;
     for (const c of components) {
@@ -597,7 +567,7 @@ const ThreeBenchTwinComponent: React.FC<ThreeBenchTwinProps> = ({
     if (inspectedPinId === 'ems-sgnd-bus') return 'SENSOR GND BUS (SGND)';
     if (inspectedPinId === 'ems-gnd-g2') return 'ENGINE GND G2 (KL31)';
     return 'Click any 3D Pin, Fuse, Relay, Coil or Key';
-  }, [activeMeta, inspectedEcuPin, components, inspectedPinId]);
+  }, [inspectedStandardTag, activeMeta, inspectedEcuPin, components, inspectedPinId]);
 
   const inspectedOemMapNote = useMemo(() => {
     const m = emsProfile.oemPinMapping;
@@ -1083,6 +1053,35 @@ const ThreeBenchTwinComponent: React.FC<ThreeBenchTwinProps> = ({
                 <span>{showEngineBlock ? '4-Cyl Block: ON' : '+ 4-Cyl Block'}</span>
               </button>
 
+              {/* 3D Engine Block Wire-Mesh Electrical Fault Overlay Toggle */}
+              <button
+                type="button"
+                onClick={() => {
+                  setShowFaultWireOverlay((prev) => {
+                    const next = !prev;
+                    if (next && !showEngineBlock) {
+                      setShowEngineBlock(true);
+                      setActivePreset('ENGINE_BAY');
+                    }
+                    return next;
+                  });
+                }}
+                aria-pressed={showFaultWireOverlay && showEngineBlock}
+                className={`hw-btn px-2.5 py-1.5 rounded-[2px] text-[10px] flex items-center gap-1.5 transition cursor-pointer whitespace-nowrap ${
+                  showFaultWireOverlay && showEngineBlock
+                    ? engineBlockFaultOverlay.hasActiveFault
+                      ? 'border-rose-500 bg-rose-950/90 text-rose-200 font-bold'
+                      : 'hw-btn-amber font-bold'
+                    : 'text-slate-200 hover:text-white'
+                }`}
+                title="Toggle 3D Engine Block Wire-Mesh Fault Overlay"
+              >
+                <Grid3X3 className="w-3.5 h-3.5" />
+                <span>
+                  {showFaultWireOverlay && showEngineBlock ? 'Fault Mesh: ON' : 'Fault Mesh'}
+                </span>
+              </button>
+
               {/* Direct Ignition Switch (KL15 / PSU) Quick Sync */}
               {onToggleIgnition && (
                 <button
@@ -1097,6 +1096,32 @@ const ThreeBenchTwinComponent: React.FC<ThreeBenchTwinProps> = ({
                 >
                   <Power className="w-3.5 h-3.5" />
                   <span>{emsState.isPowerActive ? 'IGN ON' : 'IGN OFF'}</span>
+                </button>
+              )}
+
+              {/* Procedural EMS Audio FX Toggle */}
+              <button
+                type="button"
+                onClick={handleToggleAudio}
+                aria-pressed={audioEnabled}
+                className={`hw-btn px-2.5 py-1.5 rounded-[2px] text-[10px] flex items-center gap-1.5 transition cursor-pointer whitespace-nowrap ${
+                  audioEnabled ? 'hw-btn-green font-bold' : 'text-slate-300 hover:text-white'
+                }`}
+                title="Toggle Realistic EMS Procedural Sound Effects"
+              >
+                {audioEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+                <span>{audioEnabled ? 'SFX ON' : 'SFX OFF'}</span>
+              </button>
+
+              {onOpenVoiceGuide && (
+                <button
+                  type="button"
+                  onClick={onOpenVoiceGuide}
+                  className="hw-btn px-2.5 py-1.5 rounded-[2px] text-[10px] text-cyan-200 border-cyan-600/60 hover:text-white flex items-center gap-1.5 transition cursor-pointer whitespace-nowrap"
+                  title="Open Hands-Free AI Voice Guide"
+                >
+                  <Headphones className="w-3.5 h-3.5 text-cyan-300" />
+                  <span>Voice AI</span>
                 </button>
               )}
 

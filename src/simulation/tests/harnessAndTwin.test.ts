@@ -40,6 +40,19 @@ import {
   resolveEmsEcuSyncProfile,
 } from '../telemetry/emsDigitalTwinSync';
 import { describeTwinSyncStatus } from '../../components/LabStatusFooter';
+import {
+  deriveEngineBlockFaultOverlay,
+  extractEmsSensorSignals,
+} from '../../hooks/useEmsTelemetrySync';
+import {
+  buildOrthogonalTrunkWaypoints,
+  classifyPinCircuitGroup,
+  EFI_FUNCTIONAL_COLOR_STANDARD,
+  EFI_TRUNK_CORRIDORS,
+  formatStandardConnectionTag,
+  parseThreeDVoiceCommand,
+} from '../telemetry/efiHarnessStandard';
+import { deriveEmsAcousticParams } from '../../utils/emsAudioSynthesizer';
 
 let passed = 0;
 let failed = 0;
@@ -755,6 +768,244 @@ function main() {
     assert.equal(manualWithCommFault.isReceivingLiveData, false);
     assert.equal(manualWithCommFault.hasCommFault, true);
     assert.equal(manualWithCommFault.label, '3D Sync: MANUAL (COMM!)');
+  });
+
+  // 14. 3D Engine Block Wire-Mesh Fault Overlay classifies healthy, injector open/cut, coil short, sensor bus & ground lift
+  runTest('14. deriveEngineBlockFaultOverlay maps MNA injector open, coil short, sensor, ground lift & OCP faults', () => {
+    const profile = resolveEmsEcuSyncProfile(null, null, DEFAULT_ECU_PINS);
+    const solOk = solveCircuit(
+      PSU_ON,
+      DEFAULT_ECU_PINS,
+      [],
+      DEFAULT_WIRES,
+      DEFAULT_BENCH_COMPONENTS,
+      DEFAULT_DMM
+    );
+    const emsOk = evaluateEmsDigitalTwinState({
+      profile,
+      powerSupply: PSU_ON,
+      nodeVoltages: solOk.nodeVoltages,
+      wireCurrentsMa: solOk.wireCurrentsMa,
+      components: DEFAULT_BENCH_COMPONENTS,
+      faults: [],
+      wires: DEFAULT_WIRES,
+      rpm: 1600,
+      isRpmRunning: true,
+      ckpSignalLost: false,
+    });
+
+    const normalOverlay = deriveEngineBlockFaultOverlay({
+      faults: [],
+      wires: DEFAULT_WIRES,
+      emsState: emsOk,
+    });
+    assert.equal(normalOverlay.overallSeverity, 'NORMAL');
+    assert.equal(normalOverlay.hasActiveFault, false);
+    assert.equal(normalOverlay.injectors[0].status, 'OK');
+    assert.equal(normalOverlay.coils[0].status, 'OK');
+    assert.equal(normalOverlay.sensorBus.status, 'OK');
+    assert.equal(normalOverlay.groundStrap.status, 'OK');
+
+    // Injector #1 Open Circuit + Cut wire -> WARNING severity, Cylinder 1 injector OPEN
+    const injOpenFaults: InjectedFault[] = [
+      { pinId: 'ecu-pin-10', faultType: 'OPEN_CIRCUIT', description: 'INJ #1 open circuit', timestamp: 10 },
+    ];
+    const injOpenOverlay = deriveEngineBlockFaultOverlay({
+      faults: injOpenFaults,
+      wires: DEFAULT_WIRES,
+      emsState: emsOk,
+    });
+    assert.equal(injOpenOverlay.overallSeverity, 'WARNING');
+    assert.equal(injOpenOverlay.hasActiveFault, true);
+    assert.equal(injOpenOverlay.injectors[0].status, 'OPEN');
+    assert.equal(injOpenOverlay.injectors[1].status, 'OK');
+    assert.ok(injOpenOverlay.activeFaultLabels.some((l) => l.includes('INJ #1')));
+
+    // Ignition Coil #1 Short-to-Ground -> CRITICAL severity, Cyl 1 SHORT, Cyl 2-4 FAULT (15A COIL fuse blown)
+    const coilShortFaults: InjectedFault[] = [
+      { pinId: 'ecu-pin-11', faultType: 'SHORT_TO_GND', description: 'COIL #1 short to ground', timestamp: 11 },
+    ];
+    const coilShortOverlay = deriveEngineBlockFaultOverlay({
+      faults: coilShortFaults,
+      wires: DEFAULT_WIRES,
+      emsState: emsOk,
+    });
+    assert.equal(coilShortOverlay.overallSeverity, 'CRITICAL');
+    assert.equal(coilShortOverlay.coils[0].status, 'SHORT');
+    assert.equal(coilShortOverlay.coils[1].status, 'FAULT');
+    assert.ok(coilShortOverlay.activeFaultLabels.includes('15A COIL FUSE BLOWN'));
+
+    // Sensor bus CKP dropout + SGND lift -> flags sensorBus and groundStrap cleanly
+    const emsGndLift = evaluateEmsDigitalTwinState({
+      profile,
+      powerSupply: PSU_ON,
+      nodeVoltages: { ...solOk.nodeVoltages, 'ecu-pin-6': 0.52 },
+      wireCurrentsMa: solOk.wireCurrentsMa,
+      components: DEFAULT_BENCH_COMPONENTS,
+      faults: [],
+      wires: DEFAULT_WIRES,
+      rpm: 0,
+      isRpmRunning: false,
+      ckpSignalLost: true,
+    });
+    const sensorGndOverlay = deriveEngineBlockFaultOverlay({
+      faults: [],
+      wires: DEFAULT_WIRES,
+      emsState: emsGndLift,
+      ckpSignalLost: true,
+    });
+    assert.equal(sensorGndOverlay.sensorBus.status, 'OPEN');
+    assert.equal(sensorGndOverlay.groundStrap.status, 'HIGH_R');
+    assert.ok(sensorGndOverlay.activeFaultLabels.includes('CKP NO SIGNAL'));
+
+    // Sensor signals helper extracts live voltages when PSU ON and zeros cleanly when PSU OFF
+    const liveSensors = extractEmsSensorSignals({
+      nodeVoltages: solOk.nodeVoltages,
+      components: DEFAULT_BENCH_COMPONENTS,
+      emsState: emsOk,
+    });
+    assert.ok(liveSensors.vrefVoltageV >= 4.5);
+    assert.ok(liveSensors.tpsVoltageV > 0.2);
+    assert.equal(liveSensors.ckpActive, true);
+
+    const emsOff = evaluateEmsDigitalTwinState({
+      profile,
+      powerSupply: PSU_OFF,
+      nodeVoltages: {},
+      wireCurrentsMa: {},
+      components: DEFAULT_BENCH_COMPONENTS,
+      faults: [],
+      wires: DEFAULT_WIRES,
+      rpm: 0,
+      isRpmRunning: false,
+      ckpSignalLost: false,
+    });
+    const offSensors = extractEmsSensorSignals({
+      nodeVoltages: solOk.nodeVoltages,
+      components: DEFAULT_BENCH_COMPONENTS,
+      emsState: emsOff,
+    });
+    assert.equal(offSensors.tpsVoltageV, 0);
+    assert.equal(offSensors.vrefVoltageV, 0);
+    assert.equal(offSensors.ckpActive, false);
+  });
+
+  // 16. CHK-01 & CHK-02 Functional Color-Coding Standard, EMI Corridor Separation & Orthogonal Trunk Routing
+  runTest('16. EFI Functional Color Standard, EMI trunk corridors & orthogonal 90-degree routing', () => {
+    assert.equal(EFI_FUNCTIONAL_COLOR_STANDARD.CONSTANT_POWER_KL30.standardColorName, 'Red');
+    assert.equal(EFI_FUNCTIONAL_COLOR_STANDARD.SWITCHED_IGNITION_KL15.standardColorName, 'Yellow / Orange');
+    assert.equal(EFI_FUNCTIONAL_COLOR_STANDARD.CHASSIS_ECU_GROUND.standardColorName, 'Black / Brown');
+    assert.equal(EFI_FUNCTIONAL_COLOR_STANDARD.SENSOR_VREF_5V.standardColorName, 'Gray / Blue');
+    assert.equal(EFI_FUNCTIONAL_COLOR_STANDARD.ACTUATOR_DRIVERS.standardColorName, 'Green / Violet');
+    assert.equal(EFI_FUNCTIONAL_COLOR_STANDARD.CAN_BUS_COMMS.standardColorName, 'Twisted Pair (Tan/Wht)');
+
+    // Verify EMI physical Z-corridor separation between Power, Actuator, Ground, and Sensor/CAN spines
+    const powerZ = EFI_TRUNK_CORRIDORS.POWER_TRUNK.spineZ;
+    const sensorZ = EFI_TRUNK_CORRIDORS.SENSOR_CAN_SPINE.spineZ;
+    const actuatorZ = EFI_TRUNK_CORRIDORS.ACTUATOR_SPINE.spineZ;
+    const groundZ = EFI_TRUNK_CORRIDORS.GROUND_BUS.spineZ;
+    assert.ok(Math.abs(powerZ - sensorZ) >= 2.0, 'Power trunk must stay physically separated from low-noise sensor spine');
+    assert.ok(Math.abs(actuatorZ - sensorZ) >= 2.0, 'High-noise actuator spine must stay separated from sensor/CAN spine');
+    assert.ok(Math.abs(groundZ - powerZ) >= 0.8, 'Ground bus has its own dedicated corridor');
+
+    assert.equal(classifyPinCircuitGroup('ecu-pin-3', 'VBAT'), 'CONSTANT_POWER_KL30');
+    assert.equal(classifyPinCircuitGroup('ecu-pin-4', 'IGN_SW'), 'SWITCHED_IGNITION_KL15');
+    assert.equal(classifyPinCircuitGroup('ecu-pin-6', 'SGND'), 'CHASSIS_ECU_GROUND');
+    assert.equal(classifyPinCircuitGroup('ecu-pin-7', 'TPS_SIG'), 'SENSOR_VREF_5V');
+    assert.equal(classifyPinCircuitGroup('ecu-pin-10', 'INJ_1'), 'ACTUATOR_DRIVERS');
+    assert.equal(classifyPinCircuitGroup('ecu-pin-13', 'CAN_H'), 'CAN_BUS_COMMS');
+
+    // Orthogonal trunk routing produces structured trunk waypoints sharing exact trunkZ without direct diagonal jump
+    const pts = buildOrthogonalTrunkWaypoints(
+      { x: -1.4, y: 0.7, z: 1.9 },
+      { x: 2.2, y: 0.9, z: -2.6 },
+      'ACTUATOR_SPINE',
+      0
+    );
+    assert.ok(pts.length >= 5);
+    const trunkPts = pts.filter((p) => Math.abs(p.z - actuatorZ) < 0.01);
+    assert.ok(trunkPts.length >= 2, 'Route must run parallel along orthogonal trunk spine');
+  });
+
+  // 17. CHK-02/CHK-03 Standardized Connection Point Tags synchronized with Universal & OEM ECU Pinouts
+  runTest('17. formatStandardConnectionTag generates [CONN-ID]:[PIN] | [SIGNAL] | [COLOR/GAUGE] with OEM sync', () => {
+    const universalProfile = resolveEmsEcuSyncProfile(null, null, DEFAULT_ECU_PINS);
+    const tpsTag = formatStandardConnectionTag('ecu-pin-7', DEFAULT_ECU_PINS, universalProfile);
+    assert.match(tpsTag.formattedTag, /^ECU-A:07 \| .+ \| (GRY|BLU) 0\.5mm²$/);
+
+    const kl30Tag = formatStandardConnectionTag('ecu-pin-3', DEFAULT_ECU_PINS, universalProfile);
+    assert.match(kl30Tag.formattedTag, /^ECU-A:03 \| .+ \| RED 2\.5mm²$/);
+
+    const canTag = formatStandardConnectionTag('ecu-pin-13', DEFAULT_ECU_PINS, universalProfile);
+    assert.match(canTag.formattedTag, /^ECU-B:13 \| .+ \| TAN 0\.35mm²$/);
+
+    // OEM Mitsubishi Denso sync overrides pin code dynamically
+    const mitsCtx = getSelectedVehicleContext(
+      'mitsubishi',
+      'Montero Sport (4N15 2.4L MIVEC)',
+      'mitsubishi-denso-diesel'
+    );
+    const mitsProfile = resolveEmsEcuSyncProfile(mitsCtx, 'mitsubishi-denso-diesel', DEFAULT_ECU_PINS);
+    const oemKl30Tag = formatStandardConnectionTag('ecu-pin-3', DEFAULT_ECU_PINS, mitsProfile);
+    assert.ok(oemKl30Tag.formattedTag.includes('101'), `Expected OEM pin 101 in ${oemKl30Tag.formattedTag}`);
+    assert.ok(oemKl30Tag.formattedTag.includes('RED 2.5mm²'));
+  });
+
+  // 18. Procedural EMS Acoustic Physics & Bilingual Hands-Free 3D/Audio/Tour Voice Command Parser
+  runTest('18. deriveEmsAcousticParams & parseThreeDVoiceCommand handle RPM acoustics, misfire & bilingual control', () => {
+    const profile = resolveEmsEcuSyncProfile(null, null, DEFAULT_ECU_PINS);
+    const sol = solveCircuit(
+      PSU_ON,
+      DEFAULT_ECU_PINS,
+      [],
+      DEFAULT_WIRES,
+      DEFAULT_BENCH_COMPONENTS,
+      DEFAULT_DMM
+    );
+    const runningState = evaluateEmsDigitalTwinState({
+      profile,
+      powerSupply: PSU_ON,
+      nodeVoltages: sol.nodeVoltages,
+      wireCurrentsMa: sol.wireCurrentsMa,
+      components: DEFAULT_BENCH_COMPONENTS,
+      faults: [],
+      wires: DEFAULT_WIRES,
+      rpm: 2400,
+      isRpmRunning: true,
+      ckpSignalLost: false,
+    });
+    const acoustics = deriveEmsAcousticParams(runningState);
+    assert.equal(acoustics.isEngineRunning, true);
+    assert.equal(acoustics.firingHz, 80); // 2400 RPM / 30 = 80 Hz for 4-cyl 4-stroke
+    assert.equal(acoustics.misfireSeverity, 0);
+    assert.equal(acoustics.fuelPumpRunning, true);
+    assert.ok(acoustics.fuelPumpGain > 0);
+
+    // Short-to-ground on injector triggers misfire & short-circuit arc flag
+    const faultedState = evaluateEmsDigitalTwinState({
+      profile,
+      powerSupply: PSU_ON,
+      nodeVoltages: sol.nodeVoltages,
+      wireCurrentsMa: sol.wireCurrentsMa,
+      components: DEFAULT_BENCH_COMPONENTS,
+      faults: [{ pinId: 'ecu-pin-10', faultType: 'SHORT_TO_GND', description: 'INJ short', timestamp: 1 }],
+      wires: DEFAULT_WIRES,
+      rpm: 1200,
+      isRpmRunning: true,
+      ckpSignalLost: false,
+    });
+    const faultAcoustics = deriveEmsAcousticParams(faultedState);
+    assert.ok(faultAcoustics.misfireSeverity > 0);
+    assert.equal(faultAcoustics.hasShortOrOcpFault, true);
+
+    // Bilingual EN & TL hands-free 3D/Audio/Tour command parsing
+    assert.equal(parseThreeDVoiceCommand('Start guided tour')?.action.type, 'START_GUIDED_TOUR');
+    assert.equal(parseThreeDVoiceCommand('Ipakita ang engine block')?.action.type, 'SHOW_ENGINE_BLOCK');
+    assert.equal(parseThreeDVoiceCommand('Buksan ang tunog')?.action.type, 'SET_AUDIO');
+    assert.equal(parseThreeDVoiceCommand('Turn ignition on')?.action.type, 'SET_IGNITION');
+    assert.equal(parseThreeDVoiceCommand('Explode ECU')?.action.type, 'SET_EXPLODE');
+    assert.equal(parseThreeDVoiceCommand('Filter grounds')?.action.type, 'SET_CIRCUIT_LAYER');
+    assert.equal(parseThreeDVoiceCommand('What causes high fuel trim on P0171?'), null);
   });
 
   console.log(`\nHarness & 3D Twin Suite: ${passed} passed, ${failed} failed.`);
