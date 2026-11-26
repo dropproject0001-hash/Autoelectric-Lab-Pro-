@@ -51,6 +51,7 @@ export interface FloatingVoiceKnowledgeFabProps {
   lang: BilingualLang;
   onOpenDrawer: (subTab: UnifiedAiSubTab) => void;
   onVoiceTranscript: (transcript: string) => void;
+  isTelemetryStreaming?: boolean;
 }
 
 export const FloatingVoiceKnowledgeFab: React.FC<FloatingVoiceKnowledgeFabProps> = ({
@@ -58,6 +59,7 @@ export const FloatingVoiceKnowledgeFab: React.FC<FloatingVoiceKnowledgeFabProps>
   lang,
   onOpenDrawer,
   onVoiceTranscript,
+  isTelemetryStreaming = true,
 }) => {
   const [knowledgeCount, setKnowledgeCount] = useState(0);
   const [isListening, setIsListening] = useState(false);
@@ -205,7 +207,23 @@ export const FloatingVoiceKnowledgeFab: React.FC<FloatingVoiceKnowledgeFabProps>
           title="Open Unified Voice Coach, Diagnostic AI & Knowledge DB"
           className="min-h-[44px] px-3 sm:px-3.5 flex items-center gap-2 bg-[#070E1B] hover:bg-[#0D1A30] text-slate-100 transition-colors cursor-pointer whitespace-nowrap"
         >
-          <Headphones className="w-4 h-4 text-cyan-400 shrink-0" />
+          <div className="relative flex items-center justify-center shrink-0">
+            <Headphones className="w-4 h-4 text-cyan-400 shrink-0" />
+            {isTelemetryStreaming && (
+              <span
+                data-testid="fab-telemetry-streaming-indicator"
+                className="absolute -top-1 -right-1 flex h-2 w-2"
+                title={
+                  lang === 'TL'
+                    ? 'Live Telemetry: Aktibong streaming papuntang AI'
+                    : 'Live Telemetry: Actively streaming to AI'
+                }
+              >
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+              </span>
+            )}
+          </div>
           <span className="font-mono text-[11px] font-semibold tracking-tight">
             {lang === 'TL' ? 'Voice & AI' : 'Voice & AI'}
           </span>

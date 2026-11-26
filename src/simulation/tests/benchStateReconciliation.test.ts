@@ -22,6 +22,7 @@ import {
   isLiveTelemetryTurnIntent,
 } from '../../utils/benchStateReconciliation';
 import { buildBenchTelemetry } from '../../hooks/useBenchContext';
+import { areUnifiedAiDrawerPropsEqual, type UnifiedAiAssistantDrawerProps } from '../../components/ai/UnifiedAiAssistantDrawer';
 import {
   clearVoiceInteractionCache,
   isLiveTelemetryQuery,
@@ -489,3 +490,122 @@ test('UI wiring maintains render-synced refs, persistent sub-tabs, and live reco
 
   assert.ok(layoutSrc.includes('formatPinScopeSummary'));
 });
+
+test('UnifiedAiAssistantDrawer memoization layer triggers only when relevant telemetry (voltage, current, faults) changes', () => {
+  const root = process.cwd();
+  const drawerSrc = fs.readFileSync(path.join(root, 'src/components/ai/UnifiedAiAssistantDrawer.tsx'), 'utf8');
+  const fabSrc = fs.readFileSync(path.join(root, 'src/components/ai/FloatingVoiceKnowledgeFab.tsx'), 'utf8');
+  const contextHookSrc = fs.readFileSync(path.join(root, 'src/hooks/useBenchContext.ts'), 'utf8');
+
+  // Verify visual indicators and debug logging hooks exist
+  assert.ok(drawerSrc.includes('drawer-telemetry-streaming-indicator'));
+  assert.ok(fabSrc.includes('fab-telemetry-streaming-indicator'));
+  assert.ok(contextHookSrc.includes('[useBenchContext] Reconciled live circuitSolution into BenchTelemetry:'));
+  assert.ok(drawerSrc.includes('[UnifiedAiAssistantDrawer] Received live telemetry update:'));
+
+  const basePsu = makeBasePsu({ isOutputEnabled: true, voltageSetting: 13.8, currentLimit: 5.0 });
+  const baseDmm = makeBaseDmm();
+  const baseSolution = makeBaseSolution({
+    supplyCurrentDrawAmps: 1.25,
+    isSupplyCurrentTripped: false,
+    activeDTCs: [],
+    nodeVoltages: { 'ecu-pin-3': 13.8 },
+  });
+
+  const baseTelemetry = buildBenchTelemetry({
+    powerSupply: basePsu,
+    circuitSolution: baseSolution,
+    multimeter: baseDmm,
+    multimeterDisplay: '13.80',
+    multimeterUnit: 'V',
+    pins: DEFAULT_ECU_PINS,
+    faults: [],
+    selectedPinId: 'ecu-pin-3',
+  });
+
+  const baseProps: UnifiedAiAssistantDrawerProps = {
+    isOpen: true,
+    onClose: () => {},
+    activeSubTab: 'VOICE',
+    onChangeSubTab: () => {},
+    lang: 'TL',
+    onChangeLang: () => {},
+    telemetry: baseTelemetry,
+    benchSummaryText: 'PSU: 13.8V ON',
+    quickFillPrompt: 'Test Pin 3',
+    activeTab: 'BENCH_LAB',
+    pins: DEFAULT_ECU_PINS,
+    nodeVoltages: { 'ecu-pin-3': 13.8 },
+  };
+
+  // 1. Identical props should be equal (no re-render)
+  assert.equal(areUnifiedAiDrawerPropsEqual(baseProps, { ...baseProps }), true);
+
+  // 2. Closed drawer in both renders should be equal (skip re-render)
+  assert.equal(
+    areUnifiedAiDrawerPropsEqual(
+      { ...baseProps, isOpen: false },
+      { ...baseProps, isOpen: false, benchSummaryText: 'Changed summary while closed' }
+    ),
+    true
+  );
+
+  // 3. Opening/closing drawer must trigger re-render
+  assert.equal(areUnifiedAiDrawerPropsEqual(baseProps, { ...baseProps, isOpen: false }), false);
+
+  // 4. Sub-tab or language switch must trigger re-render
+  assert.equal(areUnifiedAiDrawerPropsEqual(baseProps, { ...baseProps, activeSubTab: 'DIAGNOSTIC' }), false);
+  assert.equal(areUnifiedAiDrawerPropsEqual(baseProps, { ...baseProps, lang: 'EN' }), false);
+
+  // 5. Voltage change (PSU setting or pin measured voltage) must trigger re-render
+  const voltageChangedTel = {
+    ...baseTelemetry,
+    psuVoltageSetting: 12.0,
+  };
+  assert.equal(areUnifiedAiDrawerPropsEqual(baseProps, { ...baseProps, telemetry: voltageChangedTel }), false);
+
+  const pinVoltageChangedTel = {
+    ...baseTelemetry,
+    selectedPin: {
+      ...baseTelemetry.selectedPin!,
+      measuredVoltage: 5.0,
+    },
+  };
+  assert.equal(areUnifiedAiDrawerPropsEqual(baseProps, { ...baseProps, telemetry: pinVoltageChangedTel }), false);
+
+  // 6. Current draw change or OCP trip must trigger re-render
+  const currentChangedTel = {
+    ...baseTelemetry,
+    psuCurrentDrawAmps: 4.80,
+  };
+  assert.equal(areUnifiedAiDrawerPropsEqual(baseProps, { ...baseProps, telemetry: currentChangedTel }), false);
+
+  const ocpTrippedTel = {
+    ...baseTelemetry,
+    isOcpTripped: true,
+  };
+  assert.equal(areUnifiedAiDrawerPropsEqual(baseProps, { ...baseProps, telemetry: ocpTrippedTel }), false);
+
+  // 7. Fault injection or new DTC must trigger re-render
+  const faultInjectedTel = {
+    ...baseTelemetry,
+    activeFaults: [{ pinId: 'ecu-pin-7', faultType: 'SHORT_TO_GND' as const, description: 'Short' }],
+  };
+  assert.equal(areUnifiedAiDrawerPropsEqual(baseProps, { ...baseProps, telemetry: faultInjectedTel }), false);
+
+  const dtcAddedTel = {
+    ...baseTelemetry,
+    activeDtcs: [{ code: 'P0122', severity: 'CRITICAL' as const, description: 'TPS Low' }],
+  };
+  assert.equal(areUnifiedAiDrawerPropsEqual(baseProps, { ...baseProps, telemetry: dtcAddedTel }), false);
+
+  // 8. Node voltages dictionary changes must trigger re-render
+  assert.equal(
+    areUnifiedAiDrawerPropsEqual(baseProps, {
+      ...baseProps,
+      nodeVoltages: { 'ecu-pin-3': 13.8, 'ecu-pin-7': 0.05 },
+    }),
+    false
+  );
+});
+

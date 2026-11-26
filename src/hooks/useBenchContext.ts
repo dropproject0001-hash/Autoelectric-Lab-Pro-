@@ -122,36 +122,76 @@ export function buildQuickFillPrompt(
 }
 
 export function useBenchContext(input: UseBenchContextInput, lang: BilingualLang) {
-  const telemetry = useMemo(
-    () => buildBenchTelemetry(input),
-    [
-      input.vehicleLabel,
-      input.ecuProfileLabel,
-      input.powerSupply.isOutputEnabled,
-      input.powerSupply.voltageSetting,
-      input.powerSupply.currentLimit,
-      input.circuitSolution.supplyCurrentDrawAmps,
-      input.circuitSolution.isSupplyCurrentTripped,
-      input.circuitSolution.activeDTCs,
-      input.circuitSolution.nodeVoltages,
-      input.circuitSolution.validatedNodeVoltages,
-      input.circuitSolution.unresolvedNodes,
-      input.circuitSolution.solverStatus,
-      input.circuitSolution.multimeterReading.evidenceStatus,
-      input.multimeter.isPowered,
-      input.multimeter.mode,
-      input.multimeter.redProbe.attachedLabel,
-      input.multimeter.blackProbe.attachedLabel,
-      input.multimeterDisplay,
-      input.multimeterUnit,
-      input.multimeterWarning,
-      input.pins,
-      input.faults,
-      input.selectedPinId,
-      input.multimeterToleranceHook,
-      input.pcbOverlayHook,
-    ]
-  );
+  const telemetry = useMemo(() => {
+    const nextTelemetry = buildBenchTelemetry(input);
+
+    // Diagnostic debugging log: verify live data flow from circuitSolution into BenchTelemetry
+    if (typeof console !== 'undefined' && console.debug) {
+      console.debug('[useBenchContext] Reconciled live circuitSolution into BenchTelemetry:', {
+        solverStatus: nextTelemetry.solverStatus,
+        psu: {
+          enabled: nextTelemetry.psuEnabled,
+          voltageSetting: nextTelemetry.psuVoltageSetting,
+          currentDrawAmps: nextTelemetry.psuCurrentDrawAmps,
+          isOcpTripped: nextTelemetry.isOcpTripped,
+        },
+        dmm: {
+          isPowered: nextTelemetry.dmm.isPowered,
+          reading: `${nextTelemetry.dmm.displayReading} ${nextTelemetry.dmm.unit}`,
+          mode: nextTelemetry.dmm.mode,
+          evidenceStatus: nextTelemetry.dmm.evidenceStatus,
+        },
+        selectedPin: nextTelemetry.selectedPin
+          ? {
+              id: nextTelemetry.selectedPin.id,
+              pinNumber: nextTelemetry.selectedPin.pinNumber,
+              label: nextTelemetry.selectedPin.label,
+              measuredVoltage: nextTelemetry.selectedPin.measuredVoltage,
+            }
+          : null,
+        activeDtcsCount: nextTelemetry.activeDtcs.length,
+        activeFaultsCount: nextTelemetry.activeFaults.length,
+      });
+    }
+
+    return nextTelemetry;
+  }, [
+    input.circuitSolution,
+    input.circuitSolution.supplyCurrentDrawAmps,
+    input.circuitSolution.isSupplyCurrentTripped,
+    input.circuitSolution.activeDTCs,
+    input.circuitSolution.nodeVoltages,
+    input.circuitSolution.validatedNodeVoltages,
+    input.circuitSolution.unresolvedNodes,
+    input.circuitSolution.nodeMeasurementStatuses,
+    input.circuitSolution.solverStatus,
+    input.circuitSolution.multimeterReading.value,
+    input.circuitSolution.multimeterReading.display,
+    input.circuitSolution.multimeterReading.unit,
+    input.circuitSolution.multimeterReading.warningMessage,
+    input.circuitSolution.multimeterReading.evidenceStatus,
+    input.powerSupply,
+    input.powerSupply.isOutputEnabled,
+    input.powerSupply.voltageSetting,
+    input.powerSupply.currentLimit,
+    input.multimeter,
+    input.multimeter.isPowered,
+    input.multimeter.mode,
+    input.multimeter.redProbe.attachedLabel,
+    input.multimeter.redProbe.attachedToPinId,
+    input.multimeter.blackProbe.attachedLabel,
+    input.multimeter.blackProbe.attachedToPinId,
+    input.multimeterDisplay,
+    input.multimeterUnit,
+    input.multimeterWarning,
+    input.pins,
+    input.faults,
+    input.selectedPinId,
+    input.vehicleLabel,
+    input.ecuProfileLabel,
+    input.multimeterToleranceHook,
+    input.pcbOverlayHook,
+  ]);
 
   const summaryText = useMemo(
     () => formatBenchSnapshotSummary(telemetry, lang),

@@ -104,6 +104,96 @@ function getTierBadgeStyle(tier: AiTierId, isOfflineFallback: boolean): string {
   return 'border-indigo-500/60 bg-indigo-950/60 text-indigo-200';
 }
 
+function areTelemetryPropsEqual(prev: BenchTelemetry, next: BenchTelemetry): boolean {
+  if (prev === next) return true;
+  if (!prev || !next) return false;
+
+  // 1. Voltage metrics & DMM readings
+  if (prev.psuEnabled !== next.psuEnabled) return false;
+  if (prev.psuVoltageSetting !== next.psuVoltageSetting) return false;
+  if (prev.selectedPin?.id !== next.selectedPin?.id) return false;
+  if (prev.selectedPin?.measuredVoltage !== next.selectedPin?.measuredVoltage) return false;
+  if (prev.dmm.isPowered !== next.dmm.isPowered) return false;
+  if (prev.dmm.mode !== next.dmm.mode) return false;
+  if (prev.dmm.displayReading !== next.dmm.displayReading) return false;
+  if (prev.dmm.unit !== next.dmm.unit) return false;
+  if (prev.dmm.redProbeLabel !== next.dmm.redProbeLabel) return false;
+  if (prev.dmm.blackProbeLabel !== next.dmm.blackProbeLabel) return false;
+  if (prev.dmm.evidenceStatus !== next.dmm.evidenceStatus) return false;
+
+  // 2. Current metrics, OCP & solver status
+  if (prev.psuCurrentDrawAmps !== next.psuCurrentDrawAmps) return false;
+  if (prev.psuCurrentLimitAmps !== next.psuCurrentLimitAmps) return false;
+  if (prev.isOcpTripped !== next.isOcpTripped) return false;
+  if (prev.solverStatus !== next.solverStatus) return false;
+
+  // 3. Faults & DTCs
+  if (prev.activeFaults.length !== next.activeFaults.length) return false;
+  for (let i = 0; i < prev.activeFaults.length; i++) {
+    const pf = prev.activeFaults[i];
+    const nf = next.activeFaults[i];
+    if (pf.pinId !== nf.pinId || pf.faultType !== nf.faultType) return false;
+  }
+  if (prev.activeDtcs.length !== next.activeDtcs.length) return false;
+  for (let i = 0; i < prev.activeDtcs.length; i++) {
+    const pd = prev.activeDtcs[i];
+    const nd = next.activeDtcs[i];
+    if (pd.code !== nd.code || pd.severity !== nd.severity) return false;
+  }
+
+  return true;
+}
+
+function areNodeVoltagesEqual(
+  prev: Record<string, number>,
+  next: Record<string, number>
+): boolean {
+  if (prev === next) return true;
+  if (!prev || !next) return false;
+  const prevKeys = Object.keys(prev);
+  const nextKeys = Object.keys(next);
+  if (prevKeys.length !== nextKeys.length) return false;
+  for (const k of prevKeys) {
+    if (prev[k] !== next[k]) return false;
+  }
+  return true;
+}
+
+export function areUnifiedAiDrawerPropsEqual(
+  prev: UnifiedAiAssistantDrawerProps,
+  next: UnifiedAiAssistantDrawerProps
+): boolean {
+  // If drawer is closed in both renders, completely skip re-rendering
+  if (!prev.isOpen && !next.isOpen) return true;
+  // If open state toggled, must re-render
+  if (prev.isOpen !== next.isOpen) return false;
+
+  // Drawer UI state changes must trigger re-render
+  if (prev.activeSubTab !== next.activeSubTab) return false;
+  if (prev.lang !== next.lang) return false;
+  if (prev.activeTab !== next.activeTab) return false;
+  if (prev.activeModuleId !== next.activeModuleId) return false;
+  if (prev.incomingVoiceCommand !== next.incomingVoiceCommand) return false;
+  if (prev.incomingDiagnosticTranscript !== next.incomingDiagnosticTranscript) return false;
+  if (prev.quickFillPrompt !== next.quickFillPrompt) return false;
+  if (prev.benchSummaryText !== next.benchSummaryText) return false;
+
+  // Pin structure changes (count / ids)
+  if (prev.pins.length !== next.pins.length) return false;
+
+  // Core bench telemetry equality (voltage, current, faults)
+  if (!areTelemetryPropsEqual(prev.telemetry, next.telemetry)) {
+    return false;
+  }
+
+  // Node voltages equality
+  if (!areNodeVoltagesEqual(prev.nodeVoltages, next.nodeVoltages)) {
+    return false;
+  }
+
+  return true;
+}
+
 export interface UnifiedAiAssistantDrawerProps {
   isOpen: boolean;
   onClose: () => void;
@@ -128,7 +218,7 @@ export interface UnifiedAiAssistantDrawerProps {
   onBenchVoiceAction?: (action: BenchVoiceSimulationAction) => void;
 }
 
-export const UnifiedAiAssistantDrawer: React.FC<UnifiedAiAssistantDrawerProps> = ({
+const UnifiedAiAssistantDrawerComponent: React.FC<UnifiedAiAssistantDrawerProps> = ({
   isOpen,
   onClose,
   activeSubTab,
@@ -191,6 +281,23 @@ export const UnifiedAiAssistantDrawer: React.FC<UnifiedAiAssistantDrawerProps> =
       }
     };
   }, []);
+
+  // Diagnostic debugging log: verify live telemetry reception inside UnifiedAiAssistantDrawer
+  useEffect(() => {
+    if (isOpen && typeof console !== 'undefined' && console.debug) {
+      console.debug('[UnifiedAiAssistantDrawer] Received live telemetry update:', {
+        activeSubTab,
+        psuVoltageSetting: telemetry.psuVoltageSetting,
+        psuEnabled: telemetry.psuEnabled,
+        psuCurrentDrawAmps: telemetry.psuCurrentDrawAmps,
+        isOcpTripped: telemetry.isOcpTripped,
+        dmmReading: `${telemetry.dmm.displayReading} ${telemetry.dmm.unit}`,
+        selectedPinVoltage: telemetry.selectedPin?.measuredVoltage ?? null,
+        activeDtcs: telemetry.activeDtcs.map((d) => d.code),
+        activeFaults: telemetry.activeFaults.map((f) => `${f.pinId}:${f.faultType}`),
+      });
+    }
+  }, [isOpen, activeSubTab, telemetry]);
 
   const handleToggleLang = useCallback(
     (next: BilingualLang) => {
@@ -293,9 +400,29 @@ export const UnifiedAiAssistantDrawer: React.FC<UnifiedAiAssistantDrawerProps> =
               )}
             </div>
             <div className="min-w-0">
-              <h2 className="font-hud text-[13px] font-bold tracking-wide text-slate-100 truncate">
-                {lang === 'TL' ? 'AutoElectric AI Coach' : 'AutoElectric AI Coach'}
-              </h2>
+              <div className="flex items-center gap-2">
+                <h2 className="font-hud text-[13px] font-bold tracking-wide text-slate-100 truncate">
+                  {lang === 'TL' ? 'AutoElectric AI Coach' : 'AutoElectric AI Coach'}
+                </h2>
+                {/* Visual Indicator: Real-time bench data actively streaming to AI */}
+                <div
+                  data-testid="drawer-telemetry-streaming-indicator"
+                  className="inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded border border-cyan-500/40 bg-cyan-950/60 font-mono text-[9.5px] text-cyan-300 shrink-0"
+                  title={
+                    lang === 'TL'
+                      ? 'Live Telemetry: Patuloy na nagsi-stream mula sa bench circuit solver'
+                      : 'Live Telemetry: Actively streaming from bench circuit solver'
+                  }
+                >
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                  </span>
+                  <span className="uppercase tracking-wider font-semibold text-[9px] text-emerald-300">
+                    Live Stream
+                  </span>
+                </div>
+              </div>
               <div className="flex items-center gap-1.5 font-mono text-[10px] text-slate-400 truncate">
                 <span>{lang === 'TL' ? 'Buong System DB' : 'Full System DB'}</span>
                 <span aria-hidden="true">·</span>
@@ -467,6 +594,10 @@ export const UnifiedAiAssistantDrawer: React.FC<UnifiedAiAssistantDrawerProps> =
       >
         <div className="flex items-center justify-between gap-2 font-mono text-[10px]">
           <span className="inline-flex items-center gap-1.5 uppercase tracking-wider text-cyan-300 font-semibold">
+            <span className="relative flex h-2 w-2 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+            </span>
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
             Simulated Bench Telemetry (Live)
           </span>
@@ -564,3 +695,8 @@ export const UnifiedAiAssistantDrawer: React.FC<UnifiedAiAssistantDrawerProps> =
     </aside>
   );
 };
+
+export const UnifiedAiAssistantDrawer: React.FC<UnifiedAiAssistantDrawerProps> = React.memo(
+  UnifiedAiAssistantDrawerComponent,
+  areUnifiedAiDrawerPropsEqual
+);

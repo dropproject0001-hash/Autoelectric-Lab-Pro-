@@ -1080,6 +1080,23 @@ function AuthorizedBenchLabWorkspace({
     setShowUnifiedAiDrawer(true);
   }, []);
 
+  const handleCloseUnifiedAiDrawer = useCallback(() => {
+    setShowUnifiedAiDrawer(false);
+  }, []);
+
+  const handleConsumedIncomingVoiceCommand = useCallback(() => {
+    setHandsFreeIncomingCommand(null);
+  }, []);
+
+  const handleConsumedDiagnosticTranscript = useCallback(() => {
+    setAiVoiceTranscript(null);
+  }, []);
+
+  const handleOpenDrawerFromFab = useCallback((subTab: UnifiedAiSubTab) => {
+    setUnifiedAiSubTab(subTab);
+    setShowUnifiedAiDrawer(true);
+  }, []);
+
   // Fault management handlers
   const handleAddFault = useCallback(
     (pinId: string, faultType: FaultType, description: string, customSeriesOhms?: number) => {
@@ -2224,17 +2241,15 @@ function AuthorizedBenchLabWorkspace({
       <FloatingVoiceKnowledgeFab
         isDrawerOpen={showUnifiedAiDrawer}
         lang={bilingualLang}
-        onOpenDrawer={(subTab) => {
-          setUnifiedAiSubTab(subTab);
-          setShowUnifiedAiDrawer(true);
-        }}
+        isTelemetryStreaming={Boolean(circuitSolution && circuitSolution.solverStatus !== 'NON_FINITE')}
+        onOpenDrawer={handleOpenDrawerFromFab}
         onVoiceTranscript={handleTopBarVoiceTranscript}
       />
 
       {/* Unified AI Assistant Drawer (Voice Coach · Diagnostic Assistant · Knowledge DB) */}
       <UnifiedAiAssistantDrawer
         isOpen={showUnifiedAiDrawer}
-        onClose={() => setShowUnifiedAiDrawer(false)}
+        onClose={handleCloseUnifiedAiDrawer}
         activeSubTab={unifiedAiSubTab}
         onChangeSubTab={setUnifiedAiSubTab}
         lang={bilingualLang}
@@ -2247,9 +2262,9 @@ function AuthorizedBenchLabWorkspace({
         pins={pins}
         nodeVoltages={circuitSolution.nodeVoltages}
         incomingVoiceCommand={handsFreeIncomingCommand}
-        onConsumedIncomingVoiceCommand={() => setHandsFreeIncomingCommand(null)}
+        onConsumedIncomingVoiceCommand={handleConsumedIncomingVoiceCommand}
         incomingDiagnosticTranscript={aiVoiceTranscript}
-        onConsumedDiagnosticTranscript={() => setAiVoiceTranscript(null)}
+        onConsumedDiagnosticTranscript={handleConsumedDiagnosticTranscript}
         onNavigateTab={setActiveTab}
         onOpenModal={handleHandsFreeModalAction}
         onVoiceTranscript={handleTopBarVoiceTranscript}

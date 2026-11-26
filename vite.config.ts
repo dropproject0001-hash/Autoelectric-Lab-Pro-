@@ -91,6 +91,7 @@ export default defineConfig(({command}) => {
         'three/addons/environments/RoomEnvironment.js',
         'd3',
         'recharts',
+        'react-is',
       ],
       exclude: ['html2canvas', 'canvg', 'dompurify'],
     },
@@ -102,7 +103,11 @@ export default defineConfig(({command}) => {
             if (id.includes('node_modules/three')) {
               return 'vendor-three';
             }
-            if (id.includes('node_modules/recharts') || id.includes('node_modules/d3')) {
+            if (
+              id.includes('node_modules/recharts') ||
+              id.includes('node_modules/d3') ||
+              id.includes('node_modules/react-is')
+            ) {
               return 'vendor-charts';
             }
             if (id.includes('node_modules/firebase') || id.includes('node_modules/@firebase')) {
