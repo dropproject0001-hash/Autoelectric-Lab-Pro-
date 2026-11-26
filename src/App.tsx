@@ -537,6 +537,10 @@ function AuthorizedBenchLabWorkspace() {
   const [rackFilter, setRackFilter] = useState<RackFilter>('ALL');
   const [mobileBenchPane, setMobileBenchPane] = useState<MobileBenchPane>('INSTRUMENTS');
   const [simulationSpeed, setSimulationSpeed] = useState<number>(1.0);
+  const [twinSyncMode, setTwinSyncMode] = useState<'LIVE_DATA' | 'MANUAL_REVIEW'>('LIVE_DATA');
+  const handleToggleTwinSyncMode = useCallback(() => {
+    setTwinSyncMode((prev) => (prev === 'LIVE_DATA' ? 'MANUAL_REVIEW' : 'LIVE_DATA'));
+  }, []);
 
   // Selected Vehicle Car / Model / ECU Profile & Automotive Safety Gate State
   const [selectedBrandKey, setSelectedBrandKey] = useState<string>(UNIVERSAL_BRAND_KEY);
@@ -1731,6 +1735,8 @@ function AuthorizedBenchLabWorkspace() {
         onOpenVoiceMacroLibrary={() => setShowVoiceMacroLibrary(true)}
         manualRangeLabel={manualRangeLabel}
         onSetManualRangeLabel={setManualRangeLabel}
+        twinSyncMode={twinSyncMode}
+        onToggleTwinSyncMode={handleToggleTwinSyncMode}
       />
 
       <LabStatusFooter
@@ -1738,6 +1744,11 @@ function AuthorizedBenchLabWorkspace() {
         selectedPin={selectedPin}
         circuitSolution={circuitSolution}
         wires={wires}
+        powerSupply={powerSupply}
+        faults={faults}
+        hasCanFault={hasCanFault}
+        twinSyncMode={twinSyncMode}
+        onToggleTwinSyncMode={handleToggleTwinSyncMode}
         showDiagnosticGuide={showDiagnosticGuide}
         diagnosticPanelMode={diagnosticPanelMode}
         onSelectDiagnosticPanel={handleSelectDiagnosticPanel}
@@ -1751,6 +1762,7 @@ function AuthorizedBenchLabWorkspace() {
         voiceLogCount={voiceLogCount}
         onQuickAttachRedProbe={handleQuickAttachRedProbe}
         onQuickAttachBlackProbe={handleQuickAttachBlackProbe}
+        onOpenTwinView={() => setActiveTab('THREE_D_TWIN')}
         onRetryCloudSync={() => {
           setCloudSyncNotice(null);
           if (user?.uid) {

@@ -30,7 +30,16 @@ import {
   formatProbeMoveBadge,
 } from '../../components/harness/useProbeTransitionMotion';
 import type { InjectedFault, MultimeterState, PowerSupplyState } from '../../types/ecu';
-import type { RpmEmulatorState } from '../../utils/vehicleEcuRegistry';
+import {
+  getSelectedVehicleContext,
+  type RpmEmulatorState,
+} from '../../utils/vehicleEcuRegistry';
+import {
+  evaluateEmsDigitalTwinState,
+  evaluateSequentialFiringPhase,
+  resolveEmsEcuSyncProfile,
+} from '../telemetry/emsDigitalTwinSync';
+import { describeTwinSyncStatus } from '../../components/LabStatusFooter';
 
 let passed = 0;
 let failed = 0;
@@ -505,6 +514,247 @@ function main() {
       sortMode: 'RESISTANCE_DESC',
     });
     assert.equal(sortedByRDesc[0]?.wireId, 'wire-2');
+  });
+
+  // 10. EMS Digital Twin Profile Sync defaults to 4-Cyl Gasoline EFI and adapts to selected OEM ECU models
+  runTest('10. resolveEmsEcuSyncProfile defaults to EMS-32-801 4-Cyl EFI and syncs OEM Diesel CRDi ECU', () => {
+    const defaultProfile = resolveEmsEcuSyncProfile(null, null, DEFAULT_ECU_PINS);
+    assert.equal(defaultProfile.modelCode, 'EMS-32-801');
+    assert.equal(defaultProfile.powertrainMode, 'GASOLINE_EFI');
+    assert.deepEqual([...defaultProfile.firingOrder], [1, 3, 4, 2]);
+    assert.equal(defaultProfile.isDefaultUniversalEfi, true);
+
+    const mitsCtx = getSelectedVehicleContext(
+      'mitsubishi',
+      'Montero Sport (4N15 2.4L MIVEC)',
+      'mitsubishi-denso-diesel'
+    );
+    const mitsProfile = resolveEmsEcuSyncProfile(mitsCtx, 'mitsubishi-denso-diesel', DEFAULT_ECU_PINS);
+    assert.equal(mitsProfile.isDefaultUniversalEfi, false);
+    assert.equal(mitsProfile.powertrainMode, 'DIESEL_CRDI');
+    assert.ok(mitsProfile.oemPinMapping.kl30.includes('101'));
+    assert.ok(mitsProfile.oemPinMapping.mainRelayCtrl.includes('118'));
+  });
+
+  // 11. EMS Digital Twin Telemetry reflects live MNA voltages, 5 blade fuses, dual relays, fuel pressure & ground offset
+  runTest('11. evaluateEmsDigitalTwinState tracks fuses, Main/FP relays, fuel pump, OCP trip & SGND fault', () => {
+    const profile = resolveEmsEcuSyncProfile(null, null, DEFAULT_ECU_PINS);
+    const sol = solveCircuit(
+      PSU_ON,
+      DEFAULT_ECU_PINS,
+      [],
+      DEFAULT_WIRES,
+      DEFAULT_BENCH_COMPONENTS,
+      DEFAULT_DMM
+    );
+    const runningState = evaluateEmsDigitalTwinState({
+      profile,
+      powerSupply: PSU_ON,
+      nodeVoltages: sol.nodeVoltages,
+      wireCurrentsMa: sol.wireCurrentsMa,
+      components: DEFAULT_BENCH_COMPONENTS,
+      faults: [],
+      wires: DEFAULT_WIRES,
+      rpm: 2200,
+      isRpmRunning: true,
+      ckpSignalLost: false,
+      supplyCurrentDrawAmps: sol.supplyCurrentDrawAmps,
+      isSupplyCurrentTripped: sol.isSupplyCurrentTripped,
+    });
+
+    assert.equal(runningState.isPowerActive, true);
+    assert.equal(runningState.mainRelay.isLatched, true);
+    assert.equal(runningState.fuelPumpRelay.isLatched, true);
+    assert.equal(runningState.fuelSystem.isPumpRunning, true);
+    assert.ok(runningState.fuelSystem.railPressureBar >= 3.0);
+    assert.equal(runningState.fuses.length, 5);
+    assert.ok(runningState.fuses.every((f) => f.isEnergized && !f.isBlown));
+    assert.equal(runningState.grounds.hasGroundFault, false);
+
+    // Inject short-to-ground on injector pin 10 & SGND lift fault -> 20A INJ fuse blows and ground fault flags
+    const shortFaults: InjectedFault[] = [
+      { pinId: 'ecu-pin-10', faultType: 'SHORT_TO_GND', description: 'INJ short to GND', timestamp: 1 },
+      { pinId: 'ecu-pin-6', faultType: 'HIGH_RESISTANCE_1K', description: 'SGND ground lift', timestamp: 2 },
+    ];
+    const faultedState = evaluateEmsDigitalTwinState({
+      profile,
+      powerSupply: PSU_ON,
+      nodeVoltages: { ...sol.nodeVoltages, 'ecu-pin-6': 0.45 },
+      wireCurrentsMa: sol.wireCurrentsMa,
+      components: DEFAULT_BENCH_COMPONENTS,
+      faults: shortFaults,
+      wires: DEFAULT_WIRES,
+      rpm: 2200,
+      isRpmRunning: true,
+      ckpSignalLost: false,
+    });
+
+    const injFuse = faultedState.fuses.find((f) => f.id === 'fuse-inj-20a');
+    assert.equal(injFuse?.isBlown, true);
+    assert.equal(faultedState.grounds.hasGroundFault, true);
+    assert.ok(faultedState.grounds.groundOffsetMv >= 400);
+  });
+
+  // 12. Sequential 1-3-4-2 Firing Phase pulses injectors & spark arcs in Gasoline EFI and suppresses spark in Diesel CRDi
+  runTest('12. evaluateSequentialFiringPhase sequences 1-3-4-2 and halts cleanly when engine stopped', () => {
+    const profile = resolveEmsEcuSyncProfile(null, null, DEFAULT_ECU_PINS);
+    const sol = solveCircuit(
+      PSU_ON,
+      DEFAULT_ECU_PINS,
+      [],
+      DEFAULT_WIRES,
+      DEFAULT_BENCH_COMPONENTS,
+      DEFAULT_DMM
+    );
+    const ems = evaluateEmsDigitalTwinState({
+      profile,
+      powerSupply: PSU_ON,
+      nodeVoltages: sol.nodeVoltages,
+      wireCurrentsMa: sol.wireCurrentsMa,
+      components: DEFAULT_BENCH_COMPONENTS,
+      faults: [],
+      wires: DEFAULT_WIRES,
+      rpm: 1500,
+      isRpmRunning: true,
+      ckpSignalLost: false,
+    });
+
+    const stopped = evaluateSequentialFiringPhase({
+      elapsedSec: 0.2,
+      rpm: 0,
+      isEngineRunning: false,
+      powertrainMode: 'GASOLINE_EFI',
+      cylinders: ems.cylinders,
+    });
+    assert.ok(stopped.every((p) => p.injectorPulse === 0 && p.sparkArc === 0));
+
+    let sawCyl1Inj = false;
+    let sawCyl3Spark = false;
+    let sawDieselSpark = false;
+    for (let step = 0; step < 40; step++) {
+      const t = step * 0.025;
+      const gas = evaluateSequentialFiringPhase({
+        elapsedSec: t,
+        rpm: 1800,
+        isEngineRunning: true,
+        powertrainMode: 'GASOLINE_EFI',
+        cylinders: ems.cylinders,
+      });
+      if (gas[0].injectorPulse > 0.2) sawCyl1Inj = true;
+      if (gas[2].sparkArc > 0.1) sawCyl3Spark = true;
+
+      const diesel = evaluateSequentialFiringPhase({
+        elapsedSec: t,
+        rpm: 1800,
+        isEngineRunning: true,
+        powertrainMode: 'DIESEL_CRDI',
+        cylinders: ems.cylinders,
+      });
+      if (diesel.some((d) => d.sparkArc > 0)) sawDieselSpark = true;
+    }
+    assert.equal(sawCyl1Inj, true);
+    assert.equal(sawCyl3Spark, true);
+    assert.equal(sawDieselSpark, false);
+  });
+
+  // 13. LabStatusFooter Twin Sync Status accurately reports LIVE, STANDBY, CAN DEGRADED, COMM FAULT, and OCP TRIP
+  runTest('13. describeTwinSyncStatus reflects live MNA streaming, standby, OCP trip, and CAN comm faults', () => {
+    const solOn = solveCircuit(
+      PSU_ON,
+      DEFAULT_ECU_PINS,
+      [],
+      DEFAULT_WIRES,
+      DEFAULT_BENCH_COMPONENTS,
+      DEFAULT_DMM
+    );
+    const live = describeTwinSyncStatus({
+      powerSupply: PSU_ON,
+      circuitSolution: solOn,
+      wires: DEFAULT_WIRES,
+      faults: [],
+      hasCanFault: false,
+    });
+    assert.equal(live.tone, 'LIVE_SYNC');
+    assert.equal(live.isReceivingLiveData, true);
+    assert.equal(live.hasCommFault, false);
+
+    const solOff = solveCircuit(
+      PSU_OFF,
+      DEFAULT_ECU_PINS,
+      [],
+      DEFAULT_WIRES,
+      DEFAULT_BENCH_COMPONENTS,
+      DEFAULT_DMM
+    );
+    const standby = describeTwinSyncStatus({
+      powerSupply: PSU_OFF,
+      circuitSolution: solOff,
+      wires: DEFAULT_WIRES,
+      faults: [],
+      hasCanFault: false,
+    });
+    assert.equal(standby.tone, 'STANDBY');
+    assert.equal(standby.isReceivingLiveData, false);
+    assert.equal(standby.hasCommFault, false);
+
+    const degraded = describeTwinSyncStatus({
+      powerSupply: PSU_ON,
+      circuitSolution: solOn,
+      wires: DEFAULT_WIRES,
+      faults: [
+        { pinId: 'ecu-pin-13', faultType: 'HIGH_RESISTANCE_1K', description: 'CAN_H high-R', timestamp: 1 },
+      ],
+      hasCanFault: true,
+    });
+    assert.equal(degraded.tone, 'COMM_DEGRADED');
+    assert.equal(degraded.hasCommFault, true);
+    assert.equal(degraded.isReceivingLiveData, true);
+
+    const busOff = describeTwinSyncStatus({
+      powerSupply: PSU_ON,
+      circuitSolution: solOn,
+      wires: DEFAULT_WIRES.map((w) => (w.id === 'wire-10' ? { ...w, isCut: true } : w)),
+      faults: [],
+      hasCanFault: true,
+    });
+    assert.equal(busOff.tone, 'COMM_FAULT');
+    assert.equal(busOff.hasCommFault, true);
+
+    const ocp = describeTwinSyncStatus({
+      powerSupply: PSU_ON,
+      circuitSolution: { ...solOn, isSupplyCurrentTripped: true },
+      wires: DEFAULT_WIRES,
+      faults: [],
+      hasCanFault: false,
+    });
+    assert.equal(ocp.tone, 'OCP_TRIPPED');
+    assert.equal(ocp.isReceivingLiveData, false);
+
+    const manualClean = describeTwinSyncStatus({
+      powerSupply: PSU_ON,
+      circuitSolution: solOn,
+      wires: DEFAULT_WIRES,
+      faults: [],
+      hasCanFault: false,
+      syncMode: 'MANUAL_REVIEW',
+    });
+    assert.equal(manualClean.tone, 'MANUAL_REVIEW');
+    assert.equal(manualClean.isReceivingLiveData, false);
+    assert.equal(manualClean.hasCommFault, false);
+    assert.equal(manualClean.label, '3D Sync: MANUAL');
+
+    const manualWithCommFault = describeTwinSyncStatus({
+      powerSupply: PSU_ON,
+      circuitSolution: solOn,
+      wires: DEFAULT_WIRES.map((w) => (w.id === 'wire-10' ? { ...w, isCut: true } : w)),
+      faults: [],
+      hasCanFault: true,
+      syncMode: 'MANUAL_REVIEW',
+    });
+    assert.equal(manualWithCommFault.tone, 'MANUAL_REVIEW');
+    assert.equal(manualWithCommFault.isReceivingLiveData, false);
+    assert.equal(manualWithCommFault.hasCommFault, true);
+    assert.equal(manualWithCommFault.label, '3D Sync: MANUAL (COMM!)');
   });
 
   console.log(`\nHarness & 3D Twin Suite: ${passed} passed, ${failed} failed.`);

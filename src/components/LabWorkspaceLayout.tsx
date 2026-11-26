@@ -241,6 +241,8 @@ export interface LabSimulationProps {
   onChangeRpmEmulator?: React.Dispatch<React.SetStateAction<RpmEmulatorState>>;
   gaugeMonitor?: GaugeMonitorState;
   onChangeGaugeMonitor?: React.Dispatch<React.SetStateAction<GaugeMonitorState>>;
+  twinSyncMode?: "LIVE_DATA" | "MANUAL_REVIEW";
+  onToggleTwinSyncMode?: () => void;
 }
 export interface LabFaultCallbacks {
   onAddFault: (
@@ -777,6 +779,8 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
     onAddComponent,
     onDeleteComponent,
     onUpdateComponentPosition,
+    twinSyncMode,
+    onToggleTwinSyncMode,
   } = props;
   const activeTab = VALID_LAB_TABS.includes(props.activeTab)
     ? props.activeTab
@@ -2508,15 +2512,27 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
                 activeDTCs={circuitSolution.activeDTCs}
                 nodeVoltages={circuitSolution.nodeVoltages}
                 wireCurrentsMa={circuitSolution.wireCurrentsMa}
+                supplyCurrentDrawAmps={circuitSolution.supplyCurrentDrawAmps}
+                isSupplyCurrentTripped={circuitSolution.isSupplyCurrentTripped}
                 multimeter={multimeter}
                 powerSupply={powerSupply}
                 selectedPinId={selectedPinId}
                 simulationSpeed={simulationSpeed}
                 rpmEmulator={rpmEmulator}
                 gaugeMonitor={gaugeMonitor}
+                vehicleContext={vehicleContext}
+                selectedEcuProfileId={selectedEcuProfileId}
+                twinSyncMode={twinSyncMode}
+                onToggleTwinSyncMode={onToggleTwinSyncMode}
                 onSelectPin={onSelectPin}
                 onAttachProbe={onAttachProbe}
                 onUpdateComponentState={onUpdateComponentState}
+                onToggleIgnition={() =>
+                  onChangePowerSupply((prev) => ({
+                    ...prev,
+                    isOutputEnabled: !prev.isOutputEnabled,
+                  }))
+                }
                 onOpenOfflineBot={onOpenOfflineBot}
                 onOpenGroundedSearch={onOpenGroundedSearch}
               />,

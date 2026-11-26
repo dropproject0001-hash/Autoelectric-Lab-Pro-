@@ -4,9 +4,9 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { Clock, CloudOff, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Clock, CloudOff, Pause, Play, Radio, RefreshCw } from 'lucide-react';
 import { formatTrialCountdown, useTrialAccess } from '../context/TrialAccessContext';
-import { EcuPin, WireConnection } from '../types/ecu';
+import { EcuPin, InjectedFault, PowerSupplyState, WireConnection } from '../types/ecu';
 import { CircuitSolution } from '../utils/circuitSolver';
 import type { DiagnosticPanelMode } from '../utils/diagnosticWorkflow';
 import { LabTab } from './LabTopNav';
@@ -77,11 +77,187 @@ export function describeFooterSyncIndicator(
   return { visible, tone: 'QUEUED', label, tooltip, ariaLabel: tooltip };
 }
 
+export type TwinSyncMode = 'LIVE_DATA' | 'MANUAL_REVIEW';
+export type TwinSyncTone =
+  | 'LIVE_SYNC'
+  | 'MANUAL_REVIEW'
+  | 'COMM_FAULT'
+  | 'COMM_DEGRADED'
+  | 'OCP_TRIPPED'
+  | 'STANDBY';
+
+export interface TwinSyncStatusDescriptor {
+  tone: TwinSyncTone;
+  isReceivingLiveData: boolean;
+  hasCommFault: boolean;
+  label: string;
+  shortLabel: string;
+  tooltip: string;
+  ariaLabel: string;
+}
+
+export function describeTwinSyncStatus(params: {
+  powerSupply?: PowerSupplyState;
+  circuitSolution: CircuitSolution;
+  wires: WireConnection[];
+  faults?: InjectedFault[];
+  hasCanFault?: boolean;
+  syncMode?: TwinSyncMode;
+}): TwinSyncStatusDescriptor {
+  const {
+    powerSupply,
+    circuitSolution,
+    wires,
+    faults = [],
+    hasCanFault = false,
+    syncMode = 'LIVE_DATA',
+  } = params;
+
+  const activeCommFaults = faults.filter(
+    (f) =>
+      f.faultType !== 'NONE' &&
+      (f.pinId === 'ecu-pin-13' || f.pinId === 'ecu-pin-14')
+  );
+  const cutCanWires = wires.filter(
+    (w) =>
+      w.isCut &&
+      (w.sourcePinId === 'ecu-pin-13' ||
+        w.sourcePinId === 'ecu-pin-14' ||
+        w.targetPinId === 'can-term-h' ||
+        w.targetPinId === 'can-term-l')
+  );
+  const commDtcs = circuitSolution.activeDTCs.filter((d) => /^U0/i.test(d.code));
+
+  const hasBusOffFault =
+    cutCanWires.length > 0 ||
+    activeCommFaults.some(
+      (f) =>
+        f.faultType === 'SHORT_TO_GND' ||
+        f.faultType === 'SHORT_TO_VBAT' ||
+        f.faultType === 'OPEN_CIRCUIT'
+    ) ||
+    commDtcs.length > 0;
+
+  const hasDegradedCommFault =
+    !hasBusOffFault &&
+    (activeCommFaults.some((f) => f.faultType === 'HIGH_RESISTANCE_1K') || hasCanFault);
+
+  const hasAnyCommFault = hasBusOffFault || hasDegradedCommFault;
+
+  const nodeCount = Object.keys(circuitSolution.nodeVoltages || {}).length;
+  const kl30Voltage = circuitSolution.nodeVoltages['ecu-pin-3'] ?? 0;
+  const isPowered =
+    powerSupply !== undefined ? Boolean(powerSupply.isOutputEnabled) : kl30Voltage >= 6.0;
+  const isReceivingLiveData =
+    syncMode === 'LIVE_DATA' &&
+    isPowered &&
+    nodeCount > 0 &&
+    !circuitSolution.isSupplyCurrentTripped;
+
+  if (syncMode === 'MANUAL_REVIEW') {
+    const faultSuffix = hasAnyCommFault
+      ? ' Active CAN/communication fault present on bench.'
+      : ' 0 communication faults.';
+    const tooltip = `3D EMS Digital Twin paused in Manual Review mode (frozen snapshot for inspection — switch to Live Data to resume MNA streaming).${faultSuffix}`;
+    return {
+      tone: 'MANUAL_REVIEW',
+      isReceivingLiveData: false,
+      hasCommFault: hasAnyCommFault,
+      label: hasAnyCommFault ? '3D Sync: MANUAL (COMM!)' : '3D Sync: MANUAL',
+      shortLabel: hasAnyCommFault ? 'MANUAL!' : 'MANUAL',
+      tooltip,
+      ariaLabel: tooltip,
+    };
+  }
+
+  if (circuitSolution.isSupplyCurrentTripped) {
+    const tooltip =
+      '3D Digital Twin MNA stream paused: Bench Power Supply OCP protection tripped. Clear the short circuit and reset PSU to resume live sync.';
+    return {
+      tone: 'OCP_TRIPPED',
+      isReceivingLiveData: false,
+      hasCommFault: hasAnyCommFault,
+      label: '3D Sync: OCP TRIP',
+      shortLabel: 'Sync: OCP',
+      tooltip,
+      ariaLabel: tooltip,
+    };
+  }
+
+  if (hasBusOffFault) {
+    const dtcSummary =
+      commDtcs.length > 0 ? ` (${commDtcs.map((d) => d.code).join(', ')})` : '';
+    const detail =
+      cutCanWires.length > 0
+        ? 'CAN bus wire open/cut'
+        : activeCommFaults[0]
+          ? `${activeCommFaults[0].pinId.toUpperCase()} ${activeCommFaults[0].faultType.replace(/_/g, ' ')}`
+          : 'CAN communication fault';
+    const streamNote = isReceivingLiveData
+      ? '3D Twin receiving live MNA bench data with active communication fault'
+      : '3D Twin linked (Bench PSU standby) with communication fault detected';
+    const tooltip = `${streamNote}: ${detail}${dtcSummary}. Click to inspect in 3D Bench Twin.`;
+    return {
+      tone: 'COMM_FAULT',
+      isReceivingLiveData,
+      hasCommFault: true,
+      label: '3D Sync: COMM FAULT',
+      shortLabel: 'COMM FAULT',
+      tooltip,
+      ariaLabel: tooltip,
+    };
+  }
+
+  if (hasDegradedCommFault) {
+    const tooltip =
+      '3D Digital Twin receiving live MNA bench data with degraded CAN bus communication (high resistance detected). Click to inspect in 3D Bench Twin.';
+    return {
+      tone: 'COMM_DEGRADED',
+      isReceivingLiveData,
+      hasCommFault: true,
+      label: '3D Sync: CAN DEGRADED',
+      shortLabel: 'CAN DEG',
+      tooltip,
+      ariaLabel: tooltip,
+    };
+  }
+
+  if (isReceivingLiveData) {
+    const tooltip = `3D Digital Twin synchronized — receiving live MNA bench telemetry (${kl30Voltage.toFixed(1)}V KL30 · ${nodeCount} live nodes · CAN 500 kbps OK · 0 comm faults). Click to open 3D Bench Twin.`;
+    return {
+      tone: 'LIVE_SYNC',
+      isReceivingLiveData: true,
+      hasCommFault: false,
+      label: '3D Sync: LIVE',
+      shortLabel: 'Sync: LIVE',
+      tooltip,
+      ariaLabel: tooltip,
+    };
+  }
+
+  const tooltip =
+    '3D Digital Twin linked to MNA bench (Standby — Bench PSU OFF, no communication faults). Turn on Bench Power Supply to stream live telemetry.';
+  return {
+    tone: 'STANDBY',
+    isReceivingLiveData: false,
+    hasCommFault: false,
+    label: '3D Sync: STANDBY',
+    shortLabel: 'Sync: IDLE',
+    tooltip,
+    ariaLabel: tooltip,
+  };
+}
+
 interface LabStatusFooterProps {
   activeTab: LabTab;
   selectedPin: EcuPin | undefined;
   circuitSolution: CircuitSolution;
   wires: WireConnection[];
+  powerSupply?: PowerSupplyState;
+  faults?: InjectedFault[];
+  hasCanFault?: boolean;
+  twinSyncMode?: TwinSyncMode;
+  onToggleTwinSyncMode?: () => void;
   showDiagnosticGuide: boolean;
   diagnosticPanelMode?: DiagnosticPanelMode;
   onSelectDiagnosticPanel?: (mode: DiagnosticPanelMode) => void;
@@ -95,6 +271,7 @@ interface LabStatusFooterProps {
   voiceLogCount?: number;
   onQuickAttachRedProbe: () => void;
   onQuickAttachBlackProbe: () => void;
+  onOpenTwinView?: () => void;
   onRetryCloudSync?: () => void;
 }
 
@@ -103,6 +280,11 @@ export const LabStatusFooter: React.FC<LabStatusFooterProps> = ({
   selectedPin,
   circuitSolution,
   wires,
+  powerSupply,
+  faults,
+  hasCanFault,
+  twinSyncMode = 'LIVE_DATA',
+  onToggleTwinSyncMode,
   showDiagnosticGuide,
   diagnosticPanelMode = 'WORKFLOW',
   onSelectDiagnosticPanel,
@@ -116,6 +298,7 @@ export const LabStatusFooter: React.FC<LabStatusFooterProps> = ({
   voiceLogCount = 0,
   onQuickAttachRedProbe,
   onQuickAttachBlackProbe,
+  onOpenTwinView,
   onRetryCloudSync,
 }) => {
   const [syncStatus, setSyncStatus] = useState<CloudSyncStatusSnapshot>(() => getSyncStatusSnapshot());
@@ -133,6 +316,14 @@ export const LabStatusFooter: React.FC<LabStatusFooterProps> = ({
 
   const syncIndicator = describeFooterSyncIndicator(syncStatus);
   const showSyncBadge = syncIndicator.visible;
+  const twinSync = describeTwinSyncStatus({
+    powerSupply,
+    circuitSolution,
+    wires,
+    faults,
+    hasCanFault,
+    syncMode: twinSyncMode,
+  });
 
   const isCriticalLowTime =
     isLowTimeWarning && remainingSeconds !== null && remainingSeconds > 0 && remainingSeconds <= 300;
@@ -177,6 +368,80 @@ export const LabStatusFooter: React.FC<LabStatusFooterProps> = ({
             {wires.filter((w) => !w.isCut).length}/{wires.length}
           </strong>
         </span>
+
+        <span className="text-[#203653] hidden sm:inline">|</span>
+
+        <button
+          type="button"
+          data-testid="footer-twin-sync-status"
+          role="status"
+          aria-live="polite"
+          aria-label={twinSync.ariaLabel}
+          title={twinSync.tooltip}
+          onClick={onOpenTwinView}
+          className={`hw-btn text-[10px] inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md whitespace-nowrap tabular-nums transition-colors ${
+            onOpenTwinView ? 'cursor-pointer' : 'cursor-default'
+          } ${
+            twinSync.tone === 'COMM_FAULT' || twinSync.tone === 'OCP_TRIPPED'
+              ? 'bg-rose-950/80 border-[#ff4d62]/75 text-rose-200 font-semibold'
+              : twinSync.tone === 'COMM_DEGRADED' || twinSync.tone === 'MANUAL_REVIEW'
+                ? 'hw-btn-amber font-semibold'
+                : twinSync.tone === 'LIVE_SYNC'
+                  ? 'border-[#20d889]/55 bg-[#08241d]/80 text-[#6ee7b7] font-semibold'
+                  : 'border-[#2b3f5e] bg-[#0c1627]/80 text-[#91a4bd]'
+          }`}
+        >
+          <span
+            aria-hidden="true"
+            className={`h-2 w-2 rounded-full shrink-0 ${
+              twinSync.tone === 'COMM_FAULT' || twinSync.tone === 'OCP_TRIPPED'
+                ? 'bg-[#ff4d62] shadow-[0_0_7px_rgba(255,77,98,0.8)]'
+                : twinSync.tone === 'COMM_DEGRADED' || twinSync.tone === 'MANUAL_REVIEW'
+                  ? 'bg-[#ffb020] shadow-[0_0_7px_rgba(255,176,32,0.8)]'
+                  : twinSync.tone === 'LIVE_SYNC'
+                    ? 'bg-[#20d889] shadow-[0_0_7px_rgba(32,216,137,0.8)]'
+                    : 'bg-slate-500'
+            }`}
+          />
+          {twinSync.hasCommFault || twinSync.tone === 'OCP_TRIPPED' ? (
+            <AlertTriangle className="w-3 h-3 shrink-0" aria-hidden="true" />
+          ) : (
+            <Radio className="w-3 h-3 shrink-0" aria-hidden="true" />
+          )}
+          <span className="hidden md:inline">{twinSync.label}</span>
+          <span className="md:hidden">{twinSync.shortLabel}</span>
+        </button>
+
+        {onToggleTwinSyncMode && (
+          <button
+            type="button"
+            data-testid="footer-twin-sync-mode-btn"
+            onClick={onToggleTwinSyncMode}
+            aria-pressed={twinSyncMode === 'MANUAL_REVIEW'}
+            aria-label={
+              twinSyncMode === 'LIVE_DATA'
+                ? '3D EMS sync mode: Live Data. Click to switch to Manual Review.'
+                : '3D EMS sync mode: Manual Review. Click to resume Live Data.'
+            }
+            title={
+              twinSyncMode === 'LIVE_DATA'
+                ? 'Streaming Live Data to 3D EMS Twin — Click to freeze snapshot for Manual Review'
+                : '3D EMS Twin paused in Manual Review — Click to resume Live Data sync'
+            }
+            className={`hw-btn text-[10px] inline-flex items-center gap-1 px-2 py-0.5 rounded-md whitespace-nowrap cursor-pointer transition-colors ${
+              twinSyncMode === 'MANUAL_REVIEW'
+                ? 'hw-btn-amber font-semibold'
+                : 'hw-btn-blue text-[#d9e8fa]'
+            }`}
+          >
+            {twinSyncMode === 'MANUAL_REVIEW' ? (
+              <Pause className="w-3 h-3 shrink-0" aria-hidden="true" />
+            ) : (
+              <Play className="w-3 h-3 shrink-0" aria-hidden="true" />
+            )}
+            <span>{twinSyncMode === 'MANUAL_REVIEW' ? 'Manual Review' : 'Live Data'}</span>
+          </button>
+        )}
 
         {showSyncBadge && (
           <button
