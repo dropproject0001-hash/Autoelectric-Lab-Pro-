@@ -14,6 +14,7 @@ import {
 } from '../../services/googleWorkspaceAuth';
 import { resolveGooglePickerOrigin } from '../../services/googlePickerService';
 import { buildClassroomLabSummary } from '../../services/googleClassroomService';
+import { buildBenchInspectionFormTemplate } from '../../services/googleFormsService';
 import { describePendingWorkspaceAction } from '../../components/workspace/WorkspaceAuthBanner';
 import type { PendingWorkspaceAction } from '../../components/workspace/workspaceTypes';
 import type { EcuPin, WireConnection } from '../../types/ecu';
@@ -54,10 +55,10 @@ async function runTest(name: string, fn: () => void | Promise<void>) {
 }
 
 async function main() {
-  await runTest('1. GOOGLE_WORKSPACE_SCOPES includes all 6 Google Workspace product scopes without duplicates', () => {
+  await runTest('1. GOOGLE_WORKSPACE_SCOPES includes all 7 Google Workspace product scopes without duplicates', () => {
     const unique = new Set(GOOGLE_WORKSPACE_SCOPES);
     assert.equal(unique.size, GOOGLE_WORKSPACE_SCOPES.length, 'Scopes must be deduplicated');
-    assert.equal(GOOGLE_WORKSPACE_SCOPES.length, 55, 'Expected all 55 provisioned scopes');
+    assert.equal(GOOGLE_WORKSPACE_SCOPES.length, 58, 'Expected all 58 provisioned scopes');
 
     const requiredScopes = [
       'https://mail.google.com/',
@@ -66,9 +67,13 @@ async function main() {
       'https://www.googleapis.com/auth/tasks',
       'https://www.googleapis.com/auth/drive',
       'https://www.googleapis.com/auth/drive.file',
+      'https://www.googleapis.com/auth/drive.readonly',
       'https://www.googleapis.com/auth/classroom.courses',
       'https://www.googleapis.com/auth/classroom.announcements',
       'https://www.googleapis.com/auth/classroom.coursework.students',
+      'https://www.googleapis.com/auth/forms.body',
+      'https://www.googleapis.com/auth/forms.body.readonly',
+      'https://www.googleapis.com/auth/forms.responses.readonly',
     ];
     for (const scope of requiredScopes) {
       assert.ok(unique.has(scope), `Missing required scope: ${scope}`);
@@ -176,6 +181,20 @@ async function main() {
       { kind: 'DELETE_TASK_ITEM', taskListId: 'tl1', taskId: 't1', taskTitle: 'Check KL30' },
       { kind: 'POST_CLASSROOM_ANNOUNCEMENT', courseId: 'c1', courseName: 'EFI 101', text: 'Lab ready' },
       { kind: 'CREATE_CLASSROOM_ASSIGNMENT', courseId: 'c1', courseName: 'EFI 101', title: 'Lab 1', description: 'Probe pin 3', maxPoints: 100 },
+      {
+        kind: 'CREATE_GOOGLE_FORM',
+        title: 'ECU Bench Form',
+        description: 'Bench test',
+        questions: [{ title: 'KL30 Voltage', kind: 'SHORT_TEXT', required: true }],
+      },
+      {
+        kind: 'ADD_FORM_QUESTION',
+        formId: 'form-1',
+        formTitle: 'ECU Bench Form',
+        insertIndex: 0,
+        question: { title: 'Injector Resistance', kind: 'SHORT_TEXT', required: true },
+      },
+      { kind: 'TRASH_GOOGLE_FORM', formId: 'form-1', title: 'ECU Bench Form' },
     ];
 
     for (const action of sampleActions) {
@@ -189,6 +208,7 @@ async function main() {
     assert.equal(describePendingWorkspaceAction(sampleActions[3]).isDestructive, true);
     assert.equal(describePendingWorkspaceAction(sampleActions[5]).isDestructive, true);
     assert.equal(describePendingWorkspaceAction(sampleActions[7]).isDestructive, true);
+    assert.equal(describePendingWorkspaceAction(sampleActions[12]).isDestructive, true);
   });
 
   await runTest('6. Firebase project configuration and Firestore database ID are synchronized across config files', () => {
@@ -210,7 +230,63 @@ async function main() {
     assert.ok(appletConfig.oAuthClientId && appletConfig.oAuthClientId.includes('.apps.googleusercontent.com'));
   });
 
-  console.log('\nAll 6 Google Workspace & Firebase integration tests PASSED.');
+  await runTest('7. Google Forms service encodes formId safely and builds MNA inspection templates', () => {
+    const formsSrc = fs.readFileSync(path.resolve('src/services/googleFormsService.ts'), 'utf8');
+    assert.equal(formsSrc.includes('encodeURIComponent'), true, 'Google Forms service must URL-encode formId');
+
+    const formTemplate = buildBenchInspectionFormTemplate({
+      ecuProfileLabel: 'Bosch MED17.5 4-Cyl EFI',
+      powerSupply: {
+        preset: '12V_BENCH',
+        voltageSetting: 12.6,
+        currentLimit: 3.0,
+        isOutputEnabled: true,
+      },
+      pins: TEST_PINS,
+      wires: TEST_WIRES,
+      faults: [],
+      multimeter: {
+        isPowered: true,
+        mode: 'V_DC',
+        redProbe: { attachedToPinId: 'pin-3', attachedLabel: 'Pin 3 (KL30)' },
+        blackProbe: { attachedToPinId: 'bench-gnd', attachedLabel: 'GND' },
+        rangeAuto: true,
+        holdValue: false,
+      },
+      circuitSolution: {
+        nodeVoltages: { 'pin-3': 12.6 },
+        nodeResistances: { 'pin-3': 0.2 },
+        wireCurrentsMa: { 'w-1': 420 },
+        supplyCurrentDrawAmps: 0.42,
+        isSupplyCurrentTripped: false,
+        multimeterReading: {
+          value: 12.6,
+          display: '12.60',
+          unit: 'V',
+          isOverLimit: false,
+          isWarning: false,
+          shouldBeep: false,
+        },
+        activeDTCs: [
+          {
+            code: 'P0201',
+            system: 'Fuel',
+            severity: 'CRITICAL',
+            status: 'ACTIVE',
+            associatedPinIds: ['ecu-pin-10'],
+            description: 'Injector Circuit/Open - Cylinder 1',
+          },
+        ],
+      },
+    });
+
+    assert.ok(formTemplate.title.includes('Bosch MED17.5 4-Cyl EFI'));
+    assert.ok(formTemplate.description.includes('12.60 V'));
+    assert.ok(formTemplate.description.includes('P0201'));
+    assert.ok(formTemplate.questions.length >= 4);
+  });
+
+  console.log('\nAll 7 Google Workspace & Firebase integration tests PASSED.');
 }
 
 main().catch((err) => {

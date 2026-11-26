@@ -1384,6 +1384,7 @@ Execute Google Search Grounding to retrieve ${
             'You are a High-Speed Automotive Bench Assistant. Give concise, direct, rapid diagnostic checks, general sensor test methods, and safety precautions with zero fluff. Never invent OEM pin numbers.';
         } else {
           targetModel = 'gemini-4-hydrogen';
+          thinkingLevel = ThinkingLevel.LOW;
           roleInstruction =
             'You are a Master Automotive Electronics Engineer and ECU Bench Testing Instructor. Provide professional, physically accurate automotive diagnostics. Specify DC volts, Ohms, and waveform signatures. Never invent fake pin numbers.';
         }
@@ -1416,9 +1417,14 @@ Execute Google Search Grounding to retrieve ${
         const attemptedModels: string[] = [];
         const attemptedKeyIds: string[] = [];
         let observedRetryAfterSec = 0;
+        let clientDisconnected = false;
 
         for (let i = 0; i < plan.candidates.length; i++) {
+          if (clientDisconnected || res.writableEnded) {
+            break;
+          }
           const currentRoute = plan.candidates[i];
+          const remainingCandidates = plan.candidates.length - 1 - i;
           usedRoute = currentRoute;
           if (!attemptedModels.includes(currentRoute.model)) {
             attemptedModels.push(currentRoute.model);
@@ -1430,7 +1436,25 @@ Execute Google Search Grounding to retrieve ${
 
           const ai = getGeminiClientForApiKey(currentRoute.apiKey);
           const controller = new AbortController();
-          const timeoutHandle = setTimeout(() => controller.abort(), 45_000);
+          const candidateTimeoutMs =
+            remainingCandidates > 0
+              ? role === 'DEEP_REASONING'
+                ? 16_000
+                : 12_000
+              : 24_000;
+          let timedOut = false;
+          const timeoutHandle = setTimeout(() => {
+            timedOut = true;
+            controller.abort();
+          }, candidateTimeoutMs);
+          const onReqClose = () => {
+            if (!res.writableEnded) {
+              clientDisconnected = true;
+              controller.abort();
+            }
+          };
+          req.on('close', onReqClose);
+
           try {
             appliedThinkingLevel = resolveAdjustedThinkingLevel(currentRoute.model, thinkingLevel);
             const requestConfig: {
@@ -1454,7 +1478,14 @@ Execute Google Search Grounding to retrieve ${
               new Promise<never>((_resolve, reject) => {
                 controller.signal.addEventListener(
                   'abort',
-                  () => reject(new Error(`Gemini chat timed out on ${currentRoute.model}`)),
+                  () =>
+                    reject(
+                      new Error(
+                        clientDisconnected
+                          ? `Client disconnected during Gemini chat on ${currentRoute.model}`
+                          : `Gemini chat timed out on ${currentRoute.model} after ${candidateTimeoutMs}ms`
+                      )
+                    ),
                   { once: true }
                 );
               }),
@@ -1464,26 +1495,38 @@ Execute Google Search Grounding to retrieve ${
               break;
             }
           } catch (modelErr: unknown) {
-            const classified = classifyGeminiError(modelErr, controller.signal.aborted);
+            if (clientDisconnected) {
+              break;
+            }
+            const classified = classifyGeminiError(modelErr, timedOut || controller.signal.aborted);
             const failureResult = recordRouteFailure(
               currentRoute,
               classified,
               Date.now(),
-              plan.candidates.length - 1 - i
+              remainingCandidates
             );
             if (failureResult.cooldownSec > observedRetryAfterSec) {
               observedRetryAfterSec = failureResult.cooldownSec;
             }
             lastClassified = classified;
-            console.warn(
-              `[GeminiChat] ${currentRoute.keyId}/${currentRoute.model} failed (${classified.category} ${classified.statusCode}): ${classified.rawMessage}`
-            );
-            if (!failureResult.shouldTryNextRoute) {
+            if (failureResult.shouldTryNextRoute) {
+              console.info(
+                `[GeminiChat] Failover from ${currentRoute.keyId}/${currentRoute.model} (${classified.category} ${classified.statusCode}) to next healthy route.`
+              );
+            } else {
+              console.warn(
+                `[GeminiChat] ${currentRoute.keyId}/${currentRoute.model} failed (${classified.category} ${classified.statusCode}): ${classified.rawMessage}`
+              );
               break;
             }
           } finally {
             clearTimeout(timeoutHandle);
+            req.off('close', onReqClose);
           }
+        }
+
+        if (clientDisconnected || res.writableEnded) {
+          return;
         }
 
         if (!response || !response.text) {

@@ -23,10 +23,6 @@ import {
   Zap,
   ShieldCheck,
   ShieldAlert,
-  CheckCircle2,
-  AlertTriangle,
-  RefreshCw,
-  Search,
 } from 'lucide-react';
 import {
   AssistantCitation,
@@ -42,18 +38,9 @@ import {
   VoiceCommandLogSource,
   VoiceResultMetadata,
 } from '../services/offlineVoiceService';
-import {
-  getBenchAuthorizationAuditLog,
-  type BenchAuthorizationAuditEntry,
-} from '../services/benchActionAuthorizationSystem';
-import {
-  approveKnowledgeEntry,
-  getAllVerifiedKnowledgeEntries,
-  getKnowledgeCenterStats,
-  rejectKnowledgeEntry,
-  synchronizeKnowledgeEntries,
-} from '../services/ai/localKnowledgeDB';
-import type { VerifiedKnowledgeRecord } from '../types/aiAssistant';
+import { getBenchAuthorizationAuditLog } from '../services/benchActionAuthorizationSystem';
+import { getKnowledgeCenterStats, subscribeVerifiedKnowledgeUpdates } from '../services/ai/localKnowledgeDB';
+import { KnowledgeCenterPanel } from './ai/KnowledgeCenterPanel';
 import { EcuPin, FaultType, MultimeterState } from '../types/ecu';
 import {
   executeMacroSequence,
@@ -73,7 +60,6 @@ interface ChatMessage {
 }
 
 type ModalActiveSection = 'ASSISTANT_BRIDGE' | 'KNOWLEDGE_CENTER' | 'SAFETY_AUDIT';
-type KnowledgeFilterTab = 'ALL' | 'APPROVED' | 'AWAITING_REVIEW' | 'CONFLICT_FLAGGED';
 
 interface OfflineAssistantModalProps {
   isOpen: boolean;
@@ -133,9 +119,6 @@ export const OfflineAssistantModal: React.FC<OfflineAssistantModalProps> = ({
 }) => {
   const [input, setInput] = useState('');
   const [activeSection, setActiveSection] = useState<ModalActiveSection>('ASSISTANT_BRIDGE');
-  const [knowledgeRecords, setKnowledgeRecords] = useState<VerifiedKnowledgeRecord[]>([]);
-  const [knowledgeSearch, setKnowledgeSearch] = useState('');
-  const [knowledgeFilter, setKnowledgeFilter] = useState<KnowledgeFilterTab>('ALL');
   const [knowledgeStats, setKnowledgeStats] = useState({
     totalRecords: 0,
     approvedCount: 0,
@@ -145,8 +128,7 @@ export const OfflineAssistantModal: React.FC<OfflineAssistantModalProps> = ({
     syncedCloudCount: 0,
     totalReuseHits: 0,
   });
-  const [syncNotice, setSyncNotice] = useState<string | null>(null);
-  const [auditEntries, setAuditEntries] = useState<BenchAuthorizationAuditEntry[]>([]);
+  const [auditCount, setAuditCount] = useState(0);
 
   const scrollEndRef = useRef<HTMLDivElement>(null);
 
@@ -160,23 +142,23 @@ export const OfflineAssistantModal: React.FC<OfflineAssistantModalProps> = ({
   );
 
   const refreshKnowledgeAndAudit = useCallback(async () => {
-    const [records, stats] = await Promise.all([
-      getAllVerifiedKnowledgeEntries(),
-      getKnowledgeCenterStats(),
-    ]);
-    setKnowledgeRecords(records);
+    const stats = await getKnowledgeCenterStats();
     setKnowledgeStats(stats);
-    setAuditEntries([...getBenchAuthorizationAuditLog()]);
+    setAuditCount(getBenchAuthorizationAuditLog().length);
   }, []);
 
   useEffect(() => {
     const unsub = offlineVoiceAssistant.subscribe((s) => setVoiceState(s));
+    const unsubDb = subscribeVerifiedKnowledgeUpdates(() => {
+      void refreshKnowledgeAndAudit();
+    });
     return () => {
       unsub();
+      unsubDb();
       offlineVoiceAssistant.stopSpeaking();
       offlineVoiceAssistant.stopListening();
     };
-  }, []);
+  }, [refreshKnowledgeAndAudit]);
 
   useEffect(() => {
     if (isOpen) {
@@ -618,48 +600,6 @@ export const OfflineAssistantModal: React.FC<OfflineAssistantModalProps> = ({
     ]);
   };
 
-  const handleApproveRecord = async (id: string) => {
-    await approveKnowledgeEntry(id);
-    await refreshKnowledgeAndAudit();
-  };
-
-  const handleRejectRecord = async (id: string) => {
-    await rejectKnowledgeEntry(id);
-    await refreshKnowledgeAndAudit();
-  };
-
-  const handleSyncKnowledge = async () => {
-    const res = await synchronizeKnowledgeEntries();
-    setSyncNotice(
-      `Synchronized ${res.syncedCount} local entries (${res.totalApproved} approved records ready for offline & cloud use).`
-    );
-    await refreshKnowledgeAndAudit();
-  };
-
-  const filteredKnowledgeRecords = knowledgeRecords.filter((rec) => {
-    if (knowledgeFilter === 'APPROVED' && (rec.reviewStatus || 'APPROVED') !== 'APPROVED') {
-      return false;
-    }
-    if (knowledgeFilter === 'AWAITING_REVIEW' && rec.reviewStatus !== 'AWAITING_REVIEW') {
-      return false;
-    }
-    if (
-      knowledgeFilter === 'CONFLICT_FLAGGED' &&
-      rec.reviewStatus !== 'CONFLICT_FLAGGED' &&
-      rec.classification !== 'CONFLICTING_INFORMATION'
-    ) {
-      return false;
-    }
-    if (!knowledgeSearch.trim()) return true;
-    const q = knowledgeSearch.trim().toLowerCase();
-    return (
-      rec.subject.toLowerCase().includes(q) ||
-      rec.rootCauseSummary.toLowerCase().includes(q) ||
-      rec.tokens.some((t) => t.toLowerCase().includes(q)) ||
-      (rec.originalQuestion && rec.originalQuestion.toLowerCase().includes(q))
-    );
-  });
-
   const renderBadgeIcon = (kind: AssistantCitation['kind']) => {
     switch (kind) {
       case 'OEM_MANUAL':
@@ -790,7 +730,7 @@ export const OfflineAssistantModal: React.FC<OfflineAssistantModalProps> = ({
               }`}
             >
               <ShieldCheck className="w-3 h-3" />
-              <span>Safety Audit ({auditEntries.length})</span>
+              <span>Safety Audit ({auditCount})</span>
             </button>
           </div>
 
@@ -961,228 +901,16 @@ export const OfflineAssistantModal: React.FC<OfflineAssistantModalProps> = ({
           </>
         )}
 
-        {/* TAB 2: KNOWLEDGE CENTER (SECTION 10) */}
-        {activeSection === 'KNOWLEDGE_CENTER' && (
-          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-[#0a0c10]">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <div className="hw-lcd-well p-2.5 rounded-[2px] border border-emerald-800/50">
-                <div className="text-[9px] text-slate-400 uppercase">Approved Local DB</div>
-                <div className="text-lg font-bold text-emerald-400 tabular-nums">
-                  {knowledgeStats.approvedCount}
-                </div>
-                <div className="text-[9px] text-slate-500">Served before online AI</div>
-              </div>
-              <div className="hw-lcd-well p-2.5 rounded-[2px] border border-amber-800/50">
-                <div className="text-[9px] text-slate-400 uppercase">Awaiting Review</div>
-                <div className="text-lg font-bold text-amber-300 tabular-nums">
-                  {knowledgeStats.awaitingReviewCount}
-                </div>
-                <div className="text-[9px] text-slate-500">Technician verification queue</div>
-              </div>
-              <div className="hw-lcd-well p-2.5 rounded-[2px] border border-rose-800/50">
-                <div className="text-[9px] text-slate-400 uppercase">Conflicts Flagged</div>
-                <div className="text-lg font-bold text-rose-400 tabular-nums">
-                  {knowledgeStats.conflictCount}
-                </div>
-                <div className="text-[9px] text-slate-500">Protected from overwrite</div>
-              </div>
-              <div className="hw-lcd-well p-2.5 rounded-[2px] border border-cyan-800/50">
-                <div className="text-[9px] text-slate-400 uppercase">Offline Reuse Hits</div>
-                <div className="text-lg font-bold text-cyan-300 tabular-nums">
-                  {knowledgeStats.totalReuseHits}
-                </div>
-                <div className="text-[9px] text-slate-500">
-                  {knowledgeStats.syncedCloudCount} Cloud-Synced
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center justify-between gap-2 bg-[#12161e] p-2.5 rounded-[2px] border border-[#2b313c]">
-              <div className="flex items-center gap-1.5 flex-1 min-w-[200px]">
-                <Search className="w-3.5 h-3.5 text-slate-400" />
-                <input
-                  type="text"
-                  value={knowledgeSearch}
-                  onChange={(e) => setKnowledgeSearch(e.target.value)}
-                  placeholder="Search saved technical answers, DTCs, pinouts, or symptoms..."
-                  className="bg-transparent text-xs text-slate-100 placeholder-slate-500 focus:outline-none w-full font-sans"
-                />
-              </div>
-              <div className="flex items-center gap-1 flex-wrap">
-                {(['ALL', 'APPROVED', 'AWAITING_REVIEW', 'CONFLICT_FLAGGED'] as KnowledgeFilterTab[]).map(
-                  (tab) => (
-                    <button
-                      key={tab}
-                      type="button"
-                      onClick={() => setKnowledgeFilter(tab)}
-                      className={`px-2 py-0.5 rounded-[2px] text-[9px] font-bold uppercase ${
-                        knowledgeFilter === tab
-                          ? 'bg-emerald-600/30 border border-emerald-500 text-emerald-200'
-                          : 'bg-[#181d26] border border-[#2b313c] text-slate-400'
-                      }`}
-                    >
-                      {tab.replace(/_/g, ' ')}
-                    </button>
-                  )
-                )}
-                <button
-                  type="button"
-                  onClick={handleSyncKnowledge}
-                  className="hw-btn hw-btn-green px-2.5 py-0.5 rounded-[2px] text-[9px] font-bold flex items-center gap-1"
-                >
-                  <RefreshCw className="w-2.5 h-2.5" />
-                  <span>Sync DB</span>
-                </button>
-              </div>
-            </div>
-
-            {syncNotice && (
-              <div className="px-3 py-1.5 rounded-[2px] bg-[#0c1e14] border border-emerald-700/70 text-emerald-200 text-[10px] flex items-center justify-between">
-                <span>{syncNotice}</span>
-                <button
-                  type="button"
-                  onClick={() => setSyncNotice(null)}
-                  className="text-emerald-400 hover:text-white"
-                >
-                  Dismiss
-                </button>
-              </div>
-            )}
-
-            {filteredKnowledgeRecords.length === 0 ? (
-              <div className="hw-lcd-well p-6 rounded-[2px] text-center text-xs text-slate-400">
-                No learned knowledge records match the current filter. When online AI answers a new technical question, it is automatically validated, classified, versioned, and stored here for permanent offline reuse.
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2.5">
-                {filteredKnowledgeRecords.map((rec) => (
-                  <div
-                    key={rec.id}
-                    className="hw-lcd-well p-3 rounded-[2px] border border-[#2b313c] flex flex-col gap-2"
-                  >
-                    <div className="flex items-start justify-between gap-2 flex-wrap">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs font-bold text-amber-300 uppercase">
-                          {rec.subject}
-                        </span>
-                        <span className="px-1.5 py-0.5 rounded-[2px] text-[9px] font-bold bg-[#141b26] border border-cyan-700/60 text-cyan-300">
-                          {rec.classification || 'UNIVERSAL_TRAINER_KNOWLEDGE'}
-                        </span>
-                        <span className="px-1.5 py-0.5 rounded-[2px] text-[9px] bg-[#161b22] border border-slate-700 text-slate-300">
-                          v{rec.version || 1} · {rec.technicalCategory || 'GENERAL_BENCH'}
-                        </span>
-                        <span className="px-1.5 py-0.5 rounded-[2px] text-[9px] bg-[#161b22] border border-slate-700 text-slate-400">
-                          Evidence: {rec.evidenceSource || 'LOCAL_TECHNICAL_KNOWLEDGE'} ({rec.evidenceStatus || 'VALID'})
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-1.5">
-                        {rec.reviewStatus !== 'APPROVED' && (
-                          <button
-                            type="button"
-                            onClick={() => handleApproveRecord(rec.id)}
-                            className="hw-btn hw-btn-green px-2 py-0.5 rounded-[2px] text-[9px] font-bold flex items-center gap-1"
-                          >
-                            <CheckCircle2 className="w-2.5 h-2.5" />
-                            <span>Approve</span>
-                          </button>
-                        )}
-                        {rec.reviewStatus !== 'REJECTED' && (
-                          <button
-                            type="button"
-                            onClick={() => handleRejectRecord(rec.id)}
-                            className="hw-btn px-2 py-0.5 rounded-[2px] text-[9px] text-rose-300 border-rose-700/70"
-                          >
-                            Reject
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    {rec.conflictReason && (
-                      <div className="p-2 rounded-[2px] bg-rose-950/50 border border-rose-600/60 text-rose-200 text-[10px] flex items-center gap-1.5">
-                        <AlertTriangle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                        <span>{rec.conflictReason}</span>
-                      </div>
-                    )}
-
-                    <div className="text-[11px] text-slate-200 font-sans leading-relaxed">
-                      <strong>Root Cause:</strong> {rec.rootCauseSummary}
-                    </div>
-                    <div className="text-[10px] text-amber-200/90 font-sans">
-                      <strong>Safety Warning:</strong> {rec.safetyWarning}
-                    </div>
-                    <div className="text-[10px] text-emerald-300/90 font-sans">
-                      <strong>Verification Step:</strong> {rec.verificationStep}
-                    </div>
-
-                    <div className="flex items-center justify-between text-[9px] text-slate-500 pt-1 border-t border-[#222834] flex-wrap gap-2">
-                      <span>
-                        ECU Applicability:{' '}
-                        {rec.ecuApplicability?.isUniversalTrainer !== false
-                          ? 'UNIVERSAL TRAINER'
-                          : `${rec.ecuApplicability?.brandKey || 'OEM'} ${rec.ecuApplicability?.modelName || ''}`}
-                      </span>
-                      <span>
-                        Reuse Hits: {rec.hitCount || 0} · Sync: {rec.syncStatus || 'LOCAL_ONLY'}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* TAB 3: CENTRALIZED SAFETY AUTHORIZATION AUDIT LOG (SECTION 2) */}
-        {activeSection === 'SAFETY_AUDIT' && (
-          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2.5 bg-[#0a0c10]">
-            <div className="text-xs text-slate-300 font-sans">
-              Every AI, voice command, macro step, and bench state operation passes through the centralized{' '}
-              <strong>Bench Action Authorization System</strong> (<code className="text-amber-300">ALLOW | CONFIRM | BLOCK</code>).
-            </div>
-            {auditEntries.length === 0 ? (
-              <div className="hw-lcd-well p-6 rounded-[2px] text-center text-xs text-slate-400">
-                No bench authorization events recorded in this session yet.
-              </div>
-            ) : (
-              auditEntries.map((entry) => (
-                <div
-                  key={entry.id}
-                  className="hw-lcd-well p-2.5 rounded-[2px] border border-[#2b313c] flex flex-col gap-1"
-                >
-                  <div className="flex items-center justify-between gap-2 flex-wrap">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`px-1.5 py-0.5 rounded-[2px] text-[9px] font-bold uppercase ${
-                          entry.decision === 'ALLOW'
-                            ? 'bg-emerald-950 border border-emerald-600 text-emerald-300'
-                            : entry.decision === 'CONFIRM'
-                              ? 'bg-amber-950 border border-amber-600 text-amber-300'
-                              : 'bg-rose-950 border border-rose-600 text-rose-300'
-                        }`}
-                      >
-                        {entry.decision}
-                      </span>
-                      <span className="text-[10px] font-bold text-slate-200">
-                        {entry.actionType}
-                      </span>
-                      <span className="text-[9px] text-slate-400">
-                        [{entry.environmentMode} · {entry.eventKind}]
-                      </span>
-                    </div>
-                    <span className="text-[9px] text-slate-500 tabular-nums">
-                      {new Date(entry.timestampMs).toLocaleTimeString()}
-                    </span>
-                  </div>
-                  <div className="text-[11px] text-slate-300 font-sans">
-                    Command: <code className="text-amber-200">{entry.commandText}</code>
-                  </div>
-                  <div className="text-[10px] text-slate-400 font-sans">{entry.details}</div>
-                </div>
-              ))
-            )}
-          </div>
+        {/* TAB 2 & TAB 3: SHARED KNOWLEDGE CENTER & SAFETY AUDIT */}
+        {(activeSection === 'KNOWLEDGE_CENTER' || activeSection === 'SAFETY_AUDIT') && (
+          <KnowledgeCenterPanel
+            initialSection={activeSection}
+            hideSectionSwitcher={true}
+            onStatsChange={(next) => {
+              setKnowledgeStats(next);
+              setAuditCount(next.auditCount);
+            }}
+          />
         )}
 
         {/* Voice Listening Wave & Live Interim Transcript Indicator */}

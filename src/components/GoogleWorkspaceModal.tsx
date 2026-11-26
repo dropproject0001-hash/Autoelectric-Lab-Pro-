@@ -8,6 +8,7 @@ import {
   AlertTriangle,
   CheckCircle2,
   CheckSquare,
+  ClipboardList,
   Cloud,
   Copy,
   Download,
@@ -91,6 +92,18 @@ import {
   listClassroomCourseWork,
   listClassroomMaterials,
 } from '../services/googleClassroomService';
+import {
+  addGoogleFormQuestion,
+  buildBenchInspectionFormTemplate,
+  createDiagnosticGoogleForm,
+  getGoogleForm,
+  GoogleFormDetail,
+  GoogleFormDriveItem,
+  GoogleFormResponseSummary,
+  listGoogleFormResponses,
+  listGoogleForms,
+  trashGoogleForm,
+} from '../services/googleFormsService';
 import type { VoiceMacro } from '../services/voiceMacroService';
 import {
   BenchComponent,
@@ -109,6 +122,7 @@ import { GmailDispatchTab } from './workspace/GmailDispatchTab';
 import { GoogleDocsTab } from './workspace/GoogleDocsTab';
 import { GoogleTasksTab } from './workspace/WorkspaceSuiteTabs';
 import { GoogleClassroomTab } from './workspace/GoogleClassroomTab';
+import { GoogleFormsTab } from './workspace/GoogleFormsTab';
 import {
   GoogleSignInButton,
   WorkspaceActionConfirmDialog,
@@ -122,7 +136,7 @@ import type {
 
 export type { WorkspaceTab } from './workspace/workspaceTypes';
 
-type ActiveHubTab = 'DRIVE' | 'GMAIL' | 'DOCS' | 'TASKS' | 'CLASSROOM' | 'LOCAL';
+type ActiveHubTab = 'DRIVE' | 'GMAIL' | 'DOCS' | 'TASKS' | 'CLASSROOM' | 'FORMS' | 'LOCAL';
 type LocalExportSubTab = 'SNAPSHOT' | 'PINOUT_CSV' | 'REPORT_TXT' | 'CHECKLIST_MD';
 
 interface GoogleWorkspaceModalProps {
@@ -160,6 +174,8 @@ function normalizeInitialTab(tab?: WorkspaceTab): {
       return { hubTab: 'TASKS', localSubTab: 'CHECKLIST_MD' };
     case 'CLASSROOM':
       return { hubTab: 'CLASSROOM', localSubTab: 'REPORT_TXT' };
+    case 'FORMS':
+      return { hubTab: 'FORMS', localSubTab: 'REPORT_TXT' };
     case 'SHEETS':
       return { hubTab: 'LOCAL', localSubTab: 'PINOUT_CSV' };
     case 'LOCAL':
@@ -320,6 +336,14 @@ export const GoogleWorkspaceModal: React.FC<GoogleWorkspaceModalProps> = ({
   const [materials, setMaterials] = useState<ClassroomMaterial[]>([]);
   const [classroomDetailsLoading, setClassroomDetailsLoading] = useState(false);
 
+  // Google Forms state
+  const [formsList, setFormsList] = useState<GoogleFormDriveItem[]>([]);
+  const [formsLoading, setFormsLoading] = useState(false);
+  const [formSearch, setFormSearch] = useState('');
+  const [selectedForm, setSelectedForm] = useState<GoogleFormDetail | null>(null);
+  const [formResponses, setFormResponses] = useState<GoogleFormResponseSummary[]>([]);
+  const [formDetailLoading, setFormDetailLoading] = useState(false);
+
   const currentFolderId = folderTrail[folderTrail.length - 1]?.id || 'root';
 
   useEffect(() => {
@@ -418,6 +442,21 @@ export const GoogleWorkspaceModal: React.FC<GoogleWorkspaceModalProps> = ({
   const classroomLabSummary = useMemo(
     () =>
       buildClassroomLabSummary({
+        ecuProfileLabel,
+        powerSupply,
+        pins,
+        wires,
+        faults,
+        multimeter,
+        circuitSolution,
+        technicianNotes: techNotes,
+      }),
+    [ecuProfileLabel, powerSupply, pins, wires, faults, multimeter, circuitSolution, techNotes]
+  );
+
+  const formsInspectionTemplate = useMemo(
+    () =>
+      buildBenchInspectionFormTemplate({
         ecuProfileLabel,
         powerSupply,
         pins,
@@ -749,6 +788,72 @@ export const GoogleWorkspaceModal: React.FC<GoogleWorkspaceModalProps> = ({
     [workspaceToken, selectedCourse, loadCourseDetails, reportApiError]
   );
 
+  // ---- Google Forms loaders ----
+  const refreshGoogleForms = useCallback(
+    async (qOverride?: string, tokenOverride?: string) => {
+      const token = tokenOverride ?? workspaceToken;
+      if (!token) return;
+      setFormsLoading(true);
+      try {
+        const items = await listGoogleForms(token, qOverride ?? formSearch);
+        setFormsList(items);
+      } catch (err) {
+        reportApiError(err);
+      } finally {
+        setFormsLoading(false);
+      }
+    },
+    [workspaceToken, formSearch, reportApiError]
+  );
+
+  const loadGoogleFormDetails = useCallback(
+    async (formId: string, tokenOverride?: string) => {
+      const token = tokenOverride ?? workspaceToken;
+      if (!token) return;
+      setFormDetailLoading(true);
+      try {
+        const detail = await getGoogleForm(token, formId);
+        setSelectedForm(detail);
+        const titleMap: Record<string, string> = {};
+        for (const item of detail.items) {
+          if (item.questionId) {
+            titleMap[item.questionId] = item.title;
+          }
+        }
+        const responses = await listGoogleFormResponses(token, formId, titleMap);
+        setFormResponses(responses);
+      } catch (err) {
+        reportApiError(err);
+      } finally {
+        setFormDetailLoading(false);
+      }
+    },
+    [workspaceToken, reportApiError]
+  );
+
+  const refreshFormResponsesOnly = useCallback(
+    async (formId: string, tokenOverride?: string) => {
+      const token = tokenOverride ?? workspaceToken;
+      if (!token) return;
+      setFormDetailLoading(true);
+      try {
+        const titleMap: Record<string, string> = {};
+        for (const item of selectedForm?.items || []) {
+          if (item.questionId) {
+            titleMap[item.questionId] = item.title;
+          }
+        }
+        const responses = await listGoogleFormResponses(token, formId, titleMap);
+        setFormResponses(responses);
+      } catch (err) {
+        reportApiError(err);
+      } finally {
+        setFormDetailLoading(false);
+      }
+    },
+    [workspaceToken, selectedForm?.items, reportApiError]
+  );
+
   // Load active tab data when authorized
   useEffect(() => {
     if (!isOpen || !workspaceToken) return;
@@ -762,6 +867,8 @@ export const GoogleWorkspaceModal: React.FC<GoogleWorkspaceModalProps> = ({
       void refreshTasks(workspaceToken);
     } else if (activeTab === 'CLASSROOM') {
       void refreshClassroomCourses(workspaceToken);
+    } else if (activeTab === 'FORMS') {
+      void refreshGoogleForms(undefined, workspaceToken);
     }
   }, [
     isOpen,
@@ -772,6 +879,7 @@ export const GoogleWorkspaceModal: React.FC<GoogleWorkspaceModalProps> = ({
     refreshGoogleDocs,
     refreshTasks,
     refreshClassroomCourses,
+    refreshGoogleForms,
   ]);
 
   const handleConnectWorkspace = useCallback(async () => {
@@ -780,7 +888,7 @@ export const GoogleWorkspaceModal: React.FC<GoogleWorkspaceModalProps> = ({
     if (token) {
       setStatusBanner({
         type: 'success',
-        text: 'Connected to Google Workspace (Drive, Picker, Gmail, Docs, Tasks & Classroom).',
+        text: 'Connected to Google Workspace (Drive, Picker, Gmail, Docs, Tasks, Classroom & Forms).',
       });
     }
   }, [connectGoogleWorkspace]);
@@ -1057,6 +1165,50 @@ export const GoogleWorkspaceModal: React.FC<GoogleWorkspaceModalProps> = ({
           }
           break;
         }
+        case 'CREATE_GOOGLE_FORM': {
+          const createdForm = await createDiagnosticGoogleForm(workspaceToken, {
+            title: pendingAction.title,
+            description: pendingAction.description,
+            questions: pendingAction.questions,
+          });
+          setSelectedForm(createdForm);
+          setFormResponses([]);
+          setStatusBanner({
+            type: 'success',
+            text: `Created Google Form "${createdForm.title}".`,
+            linkUrl: createdForm.responderUri,
+            linkLabel: 'Open Form',
+          });
+          await refreshGoogleForms(undefined, workspaceToken);
+          break;
+        }
+        case 'ADD_FORM_QUESTION': {
+          const updatedForm = await addGoogleFormQuestion(
+            workspaceToken,
+            pendingAction.formId,
+            pendingAction.question,
+            pendingAction.insertIndex
+          );
+          setSelectedForm(updatedForm);
+          setStatusBanner({
+            type: 'success',
+            text: `Added question "${pendingAction.question.title}" to "${updatedForm.title}".`,
+          });
+          break;
+        }
+        case 'TRASH_GOOGLE_FORM': {
+          await trashGoogleForm(workspaceToken, pendingAction.formId);
+          if (selectedForm?.formId === pendingAction.formId) {
+            setSelectedForm(null);
+            setFormResponses([]);
+          }
+          setStatusBanner({
+            type: 'success',
+            text: `Moved Google Form "${pendingAction.title}" to Trash.`,
+          });
+          await refreshGoogleForms(undefined, workspaceToken);
+          break;
+        }
         default:
           break;
       }
@@ -1073,11 +1225,13 @@ export const GoogleWorkspaceModal: React.FC<GoogleWorkspaceModalProps> = ({
     selectedDriveFile?.id,
     selectedDoc?.documentId,
     selectedCourse,
+    selectedForm?.formId,
     refreshGmailMessages,
     refreshDriveFiles,
     refreshGoogleDocs,
     refreshTasks,
     loadCourseDetails,
+    refreshGoogleForms,
     reportApiError,
   ]);
 
@@ -1096,6 +1250,7 @@ export const GoogleWorkspaceModal: React.FC<GoogleWorkspaceModalProps> = ({
     { id: 'DOCS', label: 'Google Docs', icon: FileText },
     { id: 'TASKS', label: 'Google Tasks', icon: CheckSquare },
     { id: 'CLASSROOM', label: 'Classroom', icon: GraduationCap },
+    { id: 'FORMS', label: 'Google Forms', icon: ClipboardList },
     { id: 'LOCAL', label: 'Local Exports', icon: FolderDown },
   ];
 
@@ -1156,7 +1311,7 @@ export const GoogleWorkspaceModal: React.FC<GoogleWorkspaceModalProps> = ({
                 Google Workspace Hub
               </h2>
               <p className="text-[11px] text-slate-400 truncate">
-                Google Drive, Picker, Gmail, Docs, Tasks &amp; Classroom synced with live ECU telemetry
+                Google Drive, Picker, Gmail, Docs, Tasks, Classroom &amp; Forms synced with live ECU telemetry
               </p>
             </div>
           </div>
@@ -1289,7 +1444,7 @@ export const GoogleWorkspaceModal: React.FC<GoogleWorkspaceModalProps> = ({
                     Connect Google Workspace to AutoElectric Lab Pro
                   </h3>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Sign in with Google to authorize live access to Google Drive, Google Picker, Gmail, Google Docs, Google Tasks, and Google Classroom. Your OAuth token is kept in memory only and cleared automatically when you sign out.
+                    Sign in with Google to authorize live access to Google Drive, Google Picker, Gmail, Google Docs, Google Tasks, Google Classroom, and Google Forms. Your OAuth token is kept in memory only and cleared automatically when you sign out.
                   </p>
                 </div>
                 <GoogleSignInButton
@@ -1536,6 +1691,22 @@ export const GoogleWorkspaceModal: React.FC<GoogleWorkspaceModalProps> = ({
                 defaultLabSummary={classroomLabSummary}
                 onRefreshCourses={() => void refreshClassroomCourses()}
                 onSelectCourse={(course) => void loadCourseDetails(course)}
+                onSetPendingAction={setPendingAction}
+              />
+            ) : activeTab === 'FORMS' ? (
+              <GoogleFormsTab
+                formsList={formsList}
+                formsLoading={formsLoading}
+                formSearch={formSearch}
+                onChangeFormSearch={setFormSearch}
+                selectedForm={selectedForm}
+                formResponses={formResponses}
+                formDetailLoading={formDetailLoading}
+                isExecuting={isExecuting}
+                defaultInspectionTemplate={formsInspectionTemplate}
+                onRefreshForms={(qOverride) => void refreshGoogleForms(qOverride)}
+                onOpenForm={(item) => void loadGoogleFormDetails(item.id)}
+                onRefreshResponses={(formId) => void refreshFormResponsesOnly(formId)}
                 onSetPendingAction={setPendingAction}
               />
             ) : (

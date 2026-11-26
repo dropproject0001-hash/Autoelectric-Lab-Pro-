@@ -94,7 +94,7 @@ export type OnlineTierTransportFn = (
   req: OnlineTierTransportRequest
 ) => Promise<OnlineTierTransportResponse>;
 
-const DEFAULT_TIER_TIMEOUT_MS = 12_000;
+const DEFAULT_TIER_TIMEOUT_MS = 22_000;
 const ROLLING_WINDOW_MS = 60_000;
 const DEFAULT_COOLDOWN_MS = 60_000;
 const DEFAULT_PER_TIER_SOFT_RPM = 4;
@@ -474,9 +474,11 @@ async function defaultOnlineTransport(
   const role: GeminiChatRole = req.tier.geminiRole || 'GENERAL';
   const prompt = buildSystemInstructionPrompt(req.query, req.lang, req.benchContextText);
 
+  const controller = new AbortController();
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeoutPromise = new Promise<never>((_, reject) => {
     timer = setTimeout(() => {
+      controller.abort();
       reject(new Error(`Tier ${req.tier.label} timed out after ${req.timeoutMs}ms`));
     }, req.timeoutMs);
   });
@@ -487,6 +489,7 @@ async function defaultOnlineTransport(
         messages: [{ role: 'user', text: prompt, timestamp: Date.now() }],
         role,
         benchContext: req.benchContextText,
+        signal: controller.signal,
       }),
       timeoutPromise,
     ]);
@@ -770,18 +773,24 @@ export async function queryAiDiagnosticRouter(params: {
         const confidence = Math.max(0.82, Math.min(0.98, res.confidence ?? 0.9));
         const subject = extractedTokens.slice(0, 4).join(' ').toUpperCase() || 'ECU Bench Query';
 
-        const cacheOutcome = await saveVerifiedKnowledgeEntry({
-          subject,
-          tokens: extractedTokens,
-          lang,
-          sourceTier: effectiveTier.id,
-          confidence,
-          safetyWarning: parsed.safetyWarning,
-          rootCauseSummary: parsed.rootCause,
-          verificationStep: parsed.verificationAction,
-          rawAnswer: res.reply,
-          originalQuestion: trimmedQuery,
-        });
+        const cacheOutcome = liveTelemetryQuery
+          ? {
+              saved: false as const,
+              classification: 'GENERAL_DIAGNOSTIC_GUIDANCE' as const,
+              record: undefined,
+            }
+          : await saveVerifiedKnowledgeEntry({
+              subject,
+              tokens: extractedTokens,
+              lang,
+              sourceTier: effectiveTier.id,
+              confidence,
+              safetyWarning: parsed.safetyWarning,
+              rootCauseSummary: parsed.rootCause,
+              verificationStep: parsed.verificationAction,
+              rawAnswer: res.reply,
+              originalQuestion: trimmedQuery,
+            });
 
         // If online AI returned unsafe advice that was classified as REJECTED_INFORMATION,
         // refuse to serve it and fall back to the deterministic safety-verified offline engine.
@@ -869,9 +878,15 @@ export async function queryAiDiagnosticRouter(params: {
           reason: classified.reason,
         });
 
-        // Cooldown the failed tier on 429 or auth/blocking errors
+        // Cooldown the failed tier on 429 or real-mode TIMEOUT errors
         if (classified.outcome === 'QUOTA_429') {
           setCooldownUntil(tierCooldownUntilMs, tier.id, failNow + classified.retryAfterMs);
+        } else if (useModelPoolTracking && classified.outcome === 'TIMEOUT') {
+          setCooldownUntil(tierCooldownUntilMs, tier.id, failNow + 20_000);
+          const serverModel = mapTierToServerModel(tier.id);
+          if (serverModel) {
+            setCooldownUntil(modelPoolCooldownUntilMs, serverModel, failNow + 20_000);
+          }
         }
 
         // For real server responses, apply server-reported model cooldowns & short-circuit terminal cascades
@@ -879,6 +894,8 @@ export async function queryAiDiagnosticRouter(params: {
           for (const attemptedModel of classified.attemptedModels) {
             if (classified.outcome === 'QUOTA_429') {
               setCooldownUntil(modelPoolCooldownUntilMs, attemptedModel, failNow + classified.retryAfterMs);
+            } else if (classified.outcome === 'TIMEOUT') {
+              setCooldownUntil(modelPoolCooldownUntilMs, attemptedModel, failNow + 20_000);
             }
           }
 

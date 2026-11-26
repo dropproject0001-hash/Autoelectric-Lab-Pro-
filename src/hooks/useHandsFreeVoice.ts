@@ -3,9 +3,13 @@
  * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { LabTab } from '../components/LabTopNav';
-import { getAllVerifiedKnowledgeEntries } from '../services/ai/localKnowledgeDB';
+import { isLiveTelemetryTurnIntent } from '../utils/benchStateReconciliation';
+import {
+  getAllVerifiedKnowledgeEntries,
+  subscribeVerifiedKnowledgeUpdates,
+} from '../services/ai/localKnowledgeDB';
 import {
   classifyVoiceIntent,
   createInitialVoiceSessionMemory,
@@ -205,47 +209,34 @@ export function useHandsFreeVoice(params: {
   const onNavigateTabRef = useRef(onNavigateTab);
   const onOpenModalRef = useRef(onOpenModal);
   const onBenchVoiceActionRef = useRef(onBenchVoiceAction);
+  const lastTurnRef = useRef<VoiceCoachTurnResult | null>(lastTurn);
+  const lastLiveTurnSourceRef = useRef<{
+    transcript: string;
+    intent: VoiceCoachTurnResult['intent'];
+  } | null>(null);
   const aiRequestSeqRef = useRef(0);
 
+  // Synchronize latest bench props during render so voice/text execution never sees stale closures
+  memoryRef.current = memory;
+  telemetryRef.current = telemetry;
+  activeTabRef.current = activeTab;
+  langRef.current = lang;
+  pinsRef.current = pins;
+  nodeVoltagesRef.current = nodeVoltages;
+  onNavigateTabRef.current = onNavigateTab;
+  onOpenModalRef.current = onOpenModal;
+  onBenchVoiceActionRef.current = onBenchVoiceAction;
+  lastTurnRef.current = lastTurn;
+
   useEffect(() => {
-    memoryRef.current = memory;
     offlineVoiceAssistant.setSessionMemory(memory);
   }, [memory]);
 
   useEffect(() => {
-    telemetryRef.current = telemetry;
-  }, [telemetry]);
-
-  useEffect(() => {
-    activeTabRef.current = activeTab;
-  }, [activeTab]);
-
-  useEffect(() => {
-    langRef.current = lang;
     if (offlineVoiceAssistant.getLanguage() !== lang) {
       offlineVoiceAssistant.setLanguage(lang);
     }
   }, [lang]);
-
-  useEffect(() => {
-    pinsRef.current = pins;
-  }, [pins]);
-
-  useEffect(() => {
-    nodeVoltagesRef.current = nodeVoltages;
-  }, [nodeVoltages]);
-
-  useEffect(() => {
-    onNavigateTabRef.current = onNavigateTab;
-  }, [onNavigateTab]);
-
-  useEffect(() => {
-    onOpenModalRef.current = onOpenModal;
-  }, [onOpenModal]);
-
-  useEffect(() => {
-    onBenchVoiceActionRef.current = onBenchVoiceAction;
-  }, [onBenchVoiceAction]);
 
   // Hydrate browser TTS voices asynchronously (Chrome loads voices on `voiceschanged`)
   useEffect(() => {
@@ -264,18 +255,23 @@ export function useHandsFreeVoice(params: {
     };
   }, []);
 
-  // Load verified local IndexedDB knowledge cache once on mount so offline voice stays fully informed
+  // Load and stay subscribed to verified local IndexedDB knowledge cache so offline voice stays fully informed
   useEffect(() => {
     let active = true;
-    void getAllVerifiedKnowledgeEntries()
-      .then((rows) => {
-        if (active) cachedKnowledgeRef.current = rows;
-      })
-      .catch(() => {
-        // Non-blocking fallback
-      });
+    const refreshKnowledge = () => {
+      void getAllVerifiedKnowledgeEntries()
+        .then((rows) => {
+          if (active) cachedKnowledgeRef.current = rows;
+        })
+        .catch(() => {
+          // Non-blocking fallback
+        });
+    };
+    refreshKnowledge();
+    const unsub = subscribeVerifiedKnowledgeUpdates(refreshKnowledge);
     return () => {
       active = false;
+      unsub();
     };
   }, []);
 
@@ -512,6 +508,7 @@ export function useHandsFreeVoice(params: {
                   'Bakit hiwalay ang SGND?',
                 ],
         };
+        lastLiveTurnSourceRef.current = null;
         memoryRef.current = updatedMemory;
         setMemory(updatedMemory);
         setLastTurn(benchTurn);
@@ -575,6 +572,7 @@ export function useHandsFreeVoice(params: {
             followUpChips: cachedEntry.followUpChips,
           };
 
+          lastLiveTurnSourceRef.current = null;
           memoryRef.current = updatedMemory;
           setMemory(updatedMemory);
           setLastTurn(cachedTurn);
@@ -702,6 +700,9 @@ export function useHandsFreeVoice(params: {
                     ],
             };
 
+            lastLiveTurnSourceRef.current = isLiveBypass
+              ? { transcript: cleaned, intent: aiTurn.intent }
+              : null;
             memoryRef.current = updatedMemory;
             setMemory(updatedMemory);
             setLastTurn(aiTurn);
@@ -737,6 +738,9 @@ export function useHandsFreeVoice(params: {
           })
           .catch(() => {
             if (reqSeq !== aiRequestSeqRef.current) return;
+            lastLiveTurnSourceRef.current = isLiveTelemetryTurnIntent(result.intent, cleaned)
+              ? { transcript: cleaned, intent: result.intent }
+              : null;
             memoryRef.current = result.updatedMemory;
             setMemory(result.updatedMemory);
             setLastTurn(result);
@@ -749,6 +753,9 @@ export function useHandsFreeVoice(params: {
         return;
       }
 
+      lastLiveTurnSourceRef.current = isLiveTelemetryTurnIntent(result.intent, cleaned)
+        ? { transcript: cleaned, intent: result.intent }
+        : null;
       memoryRef.current = result.updatedMemory;
       setMemory(result.updatedMemory);
       setLastTurn(result);
@@ -827,6 +834,7 @@ export function useHandsFreeVoice(params: {
         followUpChips: entry.followUpChips,
       };
 
+      lastLiveTurnSourceRef.current = null;
       setLastTranscript(entry.query);
       setInterimTranscript('');
       memoryRef.current = updatedMemory;
@@ -998,6 +1006,88 @@ export function useHandsFreeVoice(params: {
     playReadyChime();
     startListeningLoop();
   }, [cancelSpeechStrict, startListeningLoop]);
+
+  const telemetryReconcileKey = useMemo(() => {
+    const nvKey = nodeVoltages
+      ? Object.keys(nodeVoltages)
+          .sort()
+          .map((k) => `${k}:${Number(nodeVoltages[k]).toFixed(2)}`)
+          .join(',')
+      : '';
+    const selPinKey = telemetry?.selectedPin
+      ? `${telemetry.selectedPin.id}:${
+          telemetry.selectedPin.measuredVoltage === null
+            ? 'NULL'
+            : telemetry.selectedPin.measuredVoltage.toFixed(2)
+        }`
+      : 'none';
+    const faultsKey = (telemetry?.activeFaults ?? [])
+      .map((f) => `${f.pinId}:${f.faultType}`)
+      .sort()
+      .join(',');
+    const dtcsKey = (telemetry?.activeDtcs ?? [])
+      .map((d) => d.code)
+      .sort()
+      .join(',');
+    return [
+      lang,
+      activeTab,
+      telemetry?.psuEnabled ? '1' : '0',
+      telemetry?.psuVoltageSetting?.toFixed(2) ?? '',
+      telemetry?.psuCurrentDrawAmps?.toFixed(2) ?? '',
+      telemetry?.isOcpTripped ? '1' : '0',
+      telemetry?.solverStatus ?? 'VALID',
+      (telemetry?.unresolvedNodes ?? []).join(','),
+      telemetry?.dmm?.isPowered ? '1' : '0',
+      telemetry?.dmm?.mode ?? '',
+      telemetry?.dmm?.displayReading ?? '',
+      telemetry?.dmm?.unit ?? '',
+      telemetry?.dmm?.evidenceStatus ?? 'VALID',
+      telemetry?.dmm?.redProbeLabel ?? '',
+      telemetry?.dmm?.blackProbeLabel ?? '',
+      selPinKey,
+      faultsKey,
+      dtcsKey,
+      nvKey,
+    ].join('|');
+  }, [lang, activeTab, telemetry, nodeVoltages]);
+
+  // Automatically reconcile the currently displayed live-telemetry turn whenever MNA circuitSolver/telemetry mutates
+  useEffect(() => {
+    const activeLiveSource = lastLiveTurnSourceRef.current;
+    if (!activeLiveSource) return;
+
+    const reconciled = processVoiceCoachTurn({
+      transcript: activeLiveSource.transcript,
+      memory: memoryRef.current,
+      telemetry: telemetryRef.current,
+      activeTab: activeTabRef.current,
+      lang: langRef.current,
+      pins: pinsRef.current,
+      nodeVoltages: nodeVoltagesRef.current,
+      cachedKnowledge: cachedKnowledgeRef.current,
+    });
+
+    if (
+      reconciled.usedClarificationFallback ||
+      !isLiveTelemetryTurnIntent(reconciled.intent, activeLiveSource.transcript)
+    ) {
+      return;
+    }
+
+    const prevTurn = lastTurnRef.current;
+    if (
+      prevTurn &&
+      prevTurn.displayText === reconciled.displayText &&
+      prevTurn.spokenText === reconciled.spokenText
+    ) {
+      return;
+    }
+
+    memoryRef.current = reconciled.updatedMemory;
+    setMemory(reconciled.updatedMemory);
+    setLastTurn(reconciled);
+  }, [telemetryReconcileKey]);
 
   useEffect(() => {
     return () => {

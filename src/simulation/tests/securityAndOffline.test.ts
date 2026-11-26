@@ -2897,6 +2897,24 @@ async function main() {
     assert.equal(snapJson.includes('rot-key-two-bbbb'), false);
     assert.equal(snapJson.includes('rot-key-three-cccc'), false);
 
+    // TIMEOUT on a (key, gemini-4-hydrogen) pair immediately cools down that pair so the next acquirePlan skips it
+    const timeoutPlanBefore = qm.acquirePlan('gemini-4-hydrogen', ['gemini-3.1-flash-lite'], t0 + 900);
+    assert.ok(timeoutPlanBefore.selected);
+    const timedOutPair = timeoutPlanBefore.selected;
+    const timeoutCooldownSec = qm.recordFailure(
+      { keyId: timedOutPair.keyId, endpointId: timedOutPair.endpointId },
+      { category: 'TIMEOUT', statusCode: 504 },
+      t0 + 950
+    );
+    assert.ok(timeoutCooldownSec >= 10, 'TIMEOUT must apply an immediate brief cooldown');
+    const timeoutPlanAfter = qm.acquirePlan('gemini-4-hydrogen', ['gemini-3.1-flash-lite'], t0 + 1000);
+    assert.ok(timeoutPlanAfter.selected);
+    assert.ok(
+      timeoutPlanAfter.selected.keyId !== timedOutPair.keyId ||
+        timeoutPlanAfter.selected.endpointId !== timedOutPair.endpointId,
+      'Next acquirePlan must skip the timed-out (key, model) pair and route to a healthy candidate'
+    );
+
     const sharedStatus = getSanitizedQuotaStatus(t0 + 800);
     assert.equal(typeof sharedStatus.switchThresholdRatio, 'number');
   });

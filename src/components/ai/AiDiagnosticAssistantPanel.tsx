@@ -3,13 +3,14 @@
  * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
  */
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   AlertTriangle,
   Bot,
   CheckCircle2,
   Cpu,
   Database,
+  RefreshCw,
   Send,
   ShieldAlert,
   Sparkles,
@@ -25,6 +26,8 @@ import type {
   DiagnosticStepCard,
 } from '../../types/aiAssistant';
 import { queryAiDiagnosticRouter } from '../../services/ai/aiRouter';
+import { runOfflineDiagnosticEngine } from '../../services/ai/offlineEngine';
+import { isLiveTelemetryQuery } from '../../services/ai/voiceInteractionCache';
 
 interface AiDiagnosticAssistantPanelProps {
   isOpen: boolean;
@@ -79,11 +82,14 @@ export const AiDiagnosticAssistantPanel: React.FC<AiDiagnosticAssistantPanelProp
   const [preferOfflineMode, setPreferOfflineMode] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState<AiDiagnosticResult | null>(null);
+  const lastAnalyzedQueryRef = useRef('');
+  const autoSyncSeqRef = useRef(0);
 
   const runDiagnosis = useCallback(
     async (textToRun: string) => {
       const cleaned = textToRun.trim();
       if (!cleaned) return;
+      lastAnalyzedQueryRef.current = cleaned;
       setIsRunning(true);
       try {
         const res = await queryAiDiagnosticRouter({
@@ -108,6 +114,37 @@ export const AiDiagnosticAssistantPanel: React.FC<AiDiagnosticAssistantPanelProp
       void runDiagnosis(spoken);
     }
   }, [isOpen, incomingVoiceTranscript, onConsumedVoiceTranscript, runDiagnosis]);
+
+  // Automatically reconcile offline live-telemetry diagnoses when bench state changes while open
+  useEffect(() => {
+    if (!isOpen || !result || isRunning) return;
+    if (result.benchSnapshotSummary === benchSummaryText) return;
+    if (result.tierUsed !== 'OFFLINE_AI') return;
+
+    const lastQuery = lastAnalyzedQueryRef.current.trim();
+    if (!lastQuery || !isLiveTelemetryQuery(lastQuery)) return;
+
+    const seq = ++autoSyncSeqRef.current;
+    void runOfflineDiagnosticEngine({
+      query: lastQuery,
+      lang,
+      telemetry,
+    })
+      .then((refreshed) => {
+        if (seq !== autoSyncSeqRef.current) return;
+        setResult((prev) =>
+          prev && prev.id === result.id
+            ? {
+                ...refreshed,
+                attemptTrail: prev.attemptTrail,
+              }
+            : refreshed
+        );
+      })
+      .catch(() => {
+        // Non-blocking fallback: live drift banner remains visible for manual re-sync
+      });
+  }, [isOpen, result, isRunning, benchSummaryText, lang, telemetry]);
 
   if (!isOpen) return null;
 
@@ -330,6 +367,40 @@ export const AiDiagnosticAssistantPanel: React.FC<AiDiagnosticAssistantPanelProp
                 </span>
               )}
             </div>
+
+            {/* Live Telemetry Drift Sync Bar when bench changed after last AI run */}
+            {result.benchSnapshotSummary !== benchSummaryText && (
+              <div
+                data-testid="diagnostic-live-drift-banner"
+                className="flex items-center justify-between gap-2 rounded-[3px] border border-amber-500/50 bg-amber-950/35 px-3 py-2 font-mono text-[10.5px] text-amber-200"
+              >
+                <div className="min-w-0 space-y-0.5">
+                  <div className="font-semibold uppercase tracking-wider text-[9.5px] text-amber-300">
+                    {lang === 'TL'
+                      ? 'Nagbago ang Live Bench Mula sa Huling Pagsusuri'
+                      : 'Live Bench Changed Since Last Analysis'}
+                  </div>
+                  <div className="text-[10px] text-slate-300 truncate" title={benchSummaryText}>
+                    {benchSummaryText}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const targetQuery = (lastAnalyzedQueryRef.current || query).trim();
+                    if (targetQuery) {
+                      void runDiagnosis(targetQuery);
+                    }
+                  }}
+                  disabled={isRunning || !(lastAnalyzedQueryRef.current || query).trim()}
+                  data-testid="diagnostic-resync-live-btn"
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded-[3px] border border-amber-400/60 bg-amber-500/20 hover:bg-amber-500/30 disabled:opacity-50 text-[10px] font-semibold text-amber-100 shrink-0 cursor-pointer"
+                >
+                  <RefreshCw className={`w-3 h-3 ${isRunning ? 'animate-spin' : ''}`} />
+                  <span>{lang === 'TL' ? 'I-sync Live' : 'Sync Live'}</span>
+                </button>
+              </div>
+            )}
 
             {/* Conversational Summary */}
             <div className="ai-drawer-cascade-item ai-drawer-stagger-2 rounded-[4px] border border-slate-700/80 bg-slate-900/60 p-3 text-xs leading-relaxed text-slate-200">

@@ -310,6 +310,41 @@ export function describePendingWorkspaceAction(
         isDestructive: true,
         details: [{ label: 'Note', value: action.noteTitle }],
       };
+    case 'CREATE_GOOGLE_FORM':
+      return {
+        title: 'Confirm Create Google Form',
+        description:
+          'This will create a new Google Form in your Google Drive with the listed questions.',
+        confirmLabel: 'Create Google Form',
+        isDestructive: false,
+        details: [
+          { label: 'Form Title', value: action.title },
+          { label: 'Questions', value: `${action.questions.length} question item(s)` },
+          ...(action.description
+            ? [{ label: 'Description', value: action.description.slice(0, 220) }]
+            : []),
+        ],
+      };
+    case 'ADD_FORM_QUESTION':
+      return {
+        title: 'Confirm Add Question to Google Form',
+        description: 'This will append a new question item to the selected Google Form.',
+        confirmLabel: 'Add Question',
+        isDestructive: false,
+        details: [
+          { label: 'Target Form', value: action.formTitle },
+          { label: 'Question Title', value: action.question.title },
+          { label: 'Type', value: action.question.kind },
+        ],
+      };
+    case 'TRASH_GOOGLE_FORM':
+      return {
+        title: 'Confirm Move Google Form to Trash',
+        description: 'This will move the selected Google Form into your Google Drive Trash.',
+        confirmLabel: 'Move to Trash',
+        isDestructive: true,
+        details: [{ label: 'Google Form', value: action.title }],
+      };
   }
 }
 

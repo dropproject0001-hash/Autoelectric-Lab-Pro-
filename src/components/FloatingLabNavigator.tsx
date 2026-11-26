@@ -26,6 +26,7 @@ import {
 import { SavedBenchSession, SavedDiagnosticLog } from '../services/benchStorageService';
 import { LiveBenchContext, OfflineDiagnosticChatbot } from '../services/offlineChatbotEngine';
 import {
+  authorizeVoiceMacroSteps,
   evaluateVoiceCommandSafetyAndRisk,
   offlineVoiceAssistant,
   VoiceAssistantState,
@@ -55,6 +56,12 @@ import {
   VoiceCommandActions,
 } from '../utils/voiceCommandParser';
 import { evaluateWorkflowSteps } from '../utils/diagnosticWorkflow';
+import { buildBenchTelemetry } from '../hooks/useBenchContext';
+import {
+  BenchReconciliationSnapshot,
+  createBenchReconciliationSnapshot,
+  diffBenchReconciliationSnapshots,
+} from '../utils/benchStateReconciliation';
 import { voiceMacroService } from '../services/voiceMacroService';
 import { LabTab, MobileBenchPane } from './LabTopNav';
 import { LabDrawerIcon } from './icons/LabDrawerIcons';
@@ -276,193 +283,137 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
     [powerSupply, pins, wires, faults, circuitSolution, multimeter, selectedPinId]
   );
 
-  const benchTelemetryForCoach = useMemo<Partial<BenchTelemetry>>(() => {
-    const selectedPinObj = pins.find((p) => p.id === selectedPinId);
-    return {
-      vehicleLabel: vehicleContext
-        ? `${vehicleContext.brandLabel} ${vehicleContext.modelName}`
-        : 'Universal 4-Cyl EFI',
-      ecuProfileLabel: vehicleContext?.modelName ?? 'Universal 16-Pin EFI ECU',
-      psuEnabled: powerSupply.isOutputEnabled,
-      psuVoltageSetting: powerSupply.voltageSetting,
-      psuCurrentLimitAmps: powerSupply.currentLimit,
-      psuCurrentDrawAmps: circuitSolution.supplyCurrentDrawAmps,
-      isOcpTripped: circuitSolution.isSupplyCurrentTripped,
-      activeDtcs: circuitSolution.activeDTCs.map((d) => ({
-        code: d.code,
-        description: d.description,
-        severity: d.severity === 'CRITICAL' ? 'CRITICAL' : 'WARNING',
-      })),
-      activeFaults: faults.map((f) => ({
-        pinId: f.pinId,
-        faultType: f.faultType,
-        description: f.description,
-      })),
-      selectedPin: selectedPinObj
-        ? {
-            id: selectedPinObj.id,
-            pinNumber: selectedPinObj.pinNumber,
-            label: selectedPinObj.label,
-            name: selectedPinObj.name,
-            measuredVoltage: circuitSolution.nodeVoltages[selectedPinObj.id] ?? 0,
-            nominalVoltage: selectedPinObj.nominalVoltage,
-          }
-        : undefined,
-      dmm: {
-        isPowered: multimeter.isPowered,
-        mode: multimeter.mode,
-        displayReading: circuitSolution.multimeterReading.display,
-        unit: circuitSolution.multimeterReading.unit,
-        redProbeLabel: multimeter.redProbe.attachedLabel,
-        blackProbeLabel: multimeter.blackProbe.attachedLabel,
-      },
-    };
-  }, [
+  const benchTelemetryForCoach = useMemo<BenchTelemetry>(
+    () =>
+      buildBenchTelemetry({
+        vehicleLabel: vehicleContext
+          ? `${vehicleContext.brandLabel} ${vehicleContext.modelName}`
+          : 'Universal 4-Cyl EFI',
+        ecuProfileLabel: vehicleContext?.modelName ?? 'Universal 16-Pin EFI ECU',
+        powerSupply,
+        circuitSolution,
+        multimeter,
+        multimeterDisplay: circuitSolution.multimeterReading.display,
+        multimeterUnit: circuitSolution.multimeterReading.unit,
+        multimeterWarning: circuitSolution.multimeterReading.warningMessage,
+        pins,
+        faults,
+        selectedPinId,
+      }),
+    [
+      pins,
+      selectedPinId,
+      vehicleContext,
+      powerSupply,
+      circuitSolution,
+      faults,
+      multimeter,
+    ]
+  );
+
+  // Synchronous render-time snapshot ref prevents stale closures during deferred confirmations,
+  // multi-step voice macros, and cross-render commandExecutorRef invocations.
+  const latestBenchRef = useRef({
     pins,
+    wires,
+    faults,
+    powerSupply,
+    multimeter,
+    circuitSolution,
     selectedPinId,
     vehicleContext,
-    powerSupply,
-    circuitSolution,
+    activeTab,
+    mobileBenchPane,
+    checkedWorkflowIds,
+    savedLogs,
+    savedSessions,
+    botEngine,
+    voiceNavEnabled,
+    voiceState,
+    liveContext,
+    benchTelemetryForCoach,
+  });
+  latestBenchRef.current = {
+    pins,
+    wires,
     faults,
+    powerSupply,
     multimeter,
-  ]);
+    circuitSolution,
+    selectedPinId,
+    vehicleContext,
+    activeTab,
+    mobileBenchPane,
+    checkedWorkflowIds,
+    savedLogs,
+    savedSessions,
+    botEngine,
+    voiceNavEnabled,
+    voiceState,
+    liveContext,
+    benchTelemetryForCoach,
+  };
 
   const announceVoiceResult = useCallback(
     (title: string, detail: string, speakText?: string) => {
       setVoiceResult({ title, detail, timestamp: Date.now() });
-      if (voiceNavEnabled) {
+      if (latestBenchRef.current.voiceNavEnabled) {
         offlineVoiceAssistant.speak(speakText ?? detail, true);
       }
     },
-    [voiceNavEnabled]
+    []
   );
 
-  const prevLabSignatureRef = useRef<string | null>(null);
+  const prevLabSnapshotRef = useRef<BenchReconciliationSnapshot | null>(null);
   useEffect(() => {
-    const dtcCodes = circuitSolution.activeDTCs.map((d) => d.code).join(',');
-    const signature = [
+    const nextSnapshot = createBenchReconciliationSnapshot({
       activeTab,
       mobileBenchPane,
-      powerSupply.isOutputEnabled ? '1' : '0',
-      powerSupply.voltageSetting.toFixed(1),
-      multimeter.mode,
-      multimeter.redProbe.attachedToPinId || 'none',
-      multimeter.blackProbe.attachedToPinId || 'none',
-      faults.length,
-      dtcCodes,
-    ].join('|');
+      powerSupply,
+      multimeter,
+      faults,
+      wires,
+      selectedPinId,
+      circuitSolution,
+    });
 
-    if (!voiceNavEnabled) {
-      prevLabSignatureRef.current = signature;
+    if (!voiceNavEnabled && !isExpanded) {
+      prevLabSnapshotRef.current = nextSnapshot;
       return;
     }
 
-    const prev = prevLabSignatureRef.current;
-    prevLabSignatureRef.current = signature;
-    if (!prev || prev === signature) return;
+    const prevSnapshot = prevLabSnapshotRef.current;
+    prevLabSnapshotRef.current = nextSnapshot;
+    if (!prevSnapshot) return;
 
-    const prevParts = prev.split('|');
-    const [
-      prevTab,
-      prevPane,
-      prevPwrOn,
-      prevVolts,
-      prevMode,
-      prevRed,
-      prevBlack,
-      prevFaultCount,
-      prevDtcs,
-    ] = prevParts;
+    const diff = diffBenchReconciliationSnapshots(prevSnapshot, nextSnapshot);
+    if (!diff.changed) return;
 
-    if (dtcCodes !== prevDtcs || String(faults.length) !== prevFaultCount) {
-      if (circuitSolution.activeDTCs.length > 0) {
-        const dtcMsg = `${circuitSolution.activeDTCs.length} Active DTC: ${circuitSolution.activeDTCs
-          .map((d) => `${d.code} ${d.description}`)
-          .join('; ')}`;
-        announceVoiceResult(
-          'Fault / DTC Alert',
-          dtcMsg,
-          `Fault detected. Active D T C ${circuitSolution.activeDTCs.map((d) => d.code).join(' and ')}.`
-        );
-      } else if (faults.length > 0) {
-        const latestFault = faults[faults.length - 1];
-        const msg = `${latestFault.description} (${latestFault.faultType}) · DMM ${circuitSolution.multimeterReading.display} ${circuitSolution.multimeterReading.unit} · 0 DTC`;
-        announceVoiceResult(
-          'Fault Injected',
-          msg,
-          `Fault injected: ${latestFault.description}. Multimeter reads ${circuitSolution.multimeterReading.display} ${circuitSolution.multimeterReading.unit}.`
-        );
-      } else {
-        const msg = `Nominal recovery · 0 active DTCs · PSU drawing ${circuitSolution.supplyCurrentDrawAmps.toFixed(2)}A`;
-        announceVoiceResult(
-          'Nominal Recovery',
-          msg,
-          'All faults cleared. Nominal bench state restored.'
-        );
+    if (diff.isSafetyAlert) {
+      setVoiceResult({
+        title: diff.title,
+        detail: diff.detail,
+        timestamp: Date.now(),
+        provenance: 'SIMULATED_MNA_TELEMETRY',
+        isSafetyAlert: true,
+      });
+      if (voiceNavEnabled) {
+        offlineVoiceAssistant.speak(diff.spokenText, true);
       }
-      return;
-    }
-
-    if (
-      multimeter.redProbe.attachedToPinId !== prevRed ||
-      multimeter.blackProbe.attachedToPinId !== prevBlack ||
-      multimeter.mode !== prevMode
-    ) {
-      const targetLabel = multimeter.redProbe.attachedLabel || 'probe';
-      const warning = circuitSolution.multimeterReading.warningMessage;
-      const readingText = warning
-        ? warning
-        : `${targetLabel} (${multimeter.mode}): ${circuitSolution.multimeterReading.display} ${circuitSolution.multimeterReading.unit}`;
-      announceVoiceResult(
-        `DMM · ${multimeter.mode}`,
-        readingText,
-        warning
-          ? `Multimeter warning. ${warning}`
-          : `Probe on ${targetLabel}. Reading ${circuitSolution.multimeterReading.display} ${circuitSolution.multimeterReading.unit}.`
-      );
-      return;
-    }
-
-    if (
-      (powerSupply.isOutputEnabled ? '1' : '0') !== prevPwrOn ||
-      powerSupply.voltageSetting.toFixed(1) !== prevVolts
-    ) {
-      const msg = powerSupply.isOutputEnabled
-        ? `PSU ON · ${powerSupply.voltageSetting.toFixed(1)}V · ${circuitSolution.supplyCurrentDrawAmps.toFixed(2)}A`
-        : 'PSU Output OFF (Key-OFF)';
-      announceVoiceResult(
-        'Power Supply Updated',
-        msg,
-        powerSupply.isOutputEnabled
-          ? `Power supply on at ${powerSupply.voltageSetting.toFixed(1)} volts, drawing ${circuitSolution.supplyCurrentDrawAmps.toFixed(2)} amps.`
-          : 'Power supply output switched off.'
-      );
-      return;
-    }
-
-    if (activeTab !== prevTab || mobileBenchPane !== prevPane) {
-      const viewLabel =
-        activeTab === 'BENCH_LAB'
-          ? `Bench Lab · ${PANE_LABELS[mobileBenchPane]}`
-          : activeTab.replace(/_/g, ' ');
-      announceVoiceResult('Workspace Navigation', viewLabel, `Focused ${viewLabel}.`);
+    } else {
+      announceVoiceResult(diff.title, diff.detail, diff.spokenText);
     }
   }, [
     voiceNavEnabled,
+    isExpanded,
     activeTab,
     mobileBenchPane,
-    powerSupply.isOutputEnabled,
-    powerSupply.voltageSetting,
-    multimeter.mode,
-    multimeter.redProbe.attachedToPinId,
-    multimeter.redProbe.attachedLabel,
-    multimeter.blackProbe.attachedToPinId,
+    powerSupply,
+    multimeter,
     faults,
-    circuitSolution.activeDTCs,
-    circuitSolution.supplyCurrentDrawAmps,
-    circuitSolution.multimeterReading.display,
-    circuitSolution.multimeterReading.unit,
-    circuitSolution.multimeterReading.warningMessage,
+    wires,
+    selectedPinId,
+    circuitSolution,
     announceVoiceResult,
   ]);
 
@@ -495,7 +446,7 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
       const trimmed = rawQuery.trim();
       if (!trimmed) return;
 
-      const voiceActions: VoiceCommandActions = {
+      const buildLiveVoiceActions = (): VoiceCommandActions => ({
         setVoltage: (volts) =>
           onChangePowerSupply((prev) => ({
             ...prev,
@@ -554,7 +505,8 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
           : undefined,
         disconnectWireByPin: onDeleteWire
           ? (pinId) => {
-              const matching = wires.filter(
+              const liveWires = latestBenchRef.current.wires;
+              const matching = liveWires.filter(
                 (w) => w.sourcePinId === pinId || w.targetPinId === pinId
               );
               matching.forEach((w) => onDeleteWire(w.id));
@@ -563,7 +515,8 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
           : undefined,
         toggleCutWireByPin: onToggleCutWire
           ? (pinId, cut) => {
-              const matching = wires.filter((w) => {
+              const liveWires = latestBenchRef.current.wires;
+              const matching = liveWires.filter((w) => {
                 const touchesPin = w.sourcePinId === pinId || w.targetPinId === pinId;
                 if (!touchesPin) return false;
                 if (typeof cut === 'boolean') return w.isCut !== cut;
@@ -577,7 +530,7 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
         toggleFault:
           onAddFault && onRemoveFault
             ? (pinId, faultType, description) => {
-                const existing = faults.find((f) => f.pinId === pinId);
+                const existing = latestBenchRef.current.faults.find((f) => f.pinId === pinId);
                 if (existing && (faultType === 'NONE' || existing.faultType === faultType)) {
                   onRemoveFault(pinId);
                   return false;
@@ -593,7 +546,7 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
             : undefined,
         removeFault: onRemoveFault
           ? (pinId) => {
-              const existed = faults.some((f) => f.pinId === pinId);
+              const existed = latestBenchRef.current.faults.some((f) => f.pinId === pinId);
               onRemoveFault(pinId);
               return existed;
             }
@@ -628,20 +581,21 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
         checkPassingWorkflow: onChangeCheckedWorkflowIds
           ? () => {
               onOpenDiagnosticWorkflow?.();
-              const currentSet = new Set(checkedWorkflowIds ?? []);
+              const snap = latestBenchRef.current;
+              const currentSet = new Set(snap.checkedWorkflowIds ?? []);
               const evaluated = evaluateWorkflowSteps(
                 {
-                  powerSupply,
-                  pins,
-                  wires,
-                  faults,
-                  activeDTCs: circuitSolution.activeDTCs,
-                  nodeVoltages: circuitSolution.nodeVoltages,
-                  supplyCurrentDrawAmps: circuitSolution.supplyCurrentDrawAmps,
-                  isSupplyCurrentTripped: circuitSolution.isSupplyCurrentTripped,
-                  multimeter,
-                  multimeterReading: circuitSolution.multimeterReading,
-                  ecuProfileLabel: vehicleContext?.modelName,
+                  powerSupply: snap.powerSupply,
+                  pins: snap.pins,
+                  wires: snap.wires,
+                  faults: snap.faults,
+                  activeDTCs: snap.circuitSolution.activeDTCs,
+                  nodeVoltages: snap.circuitSolution.nodeVoltages,
+                  supplyCurrentDrawAmps: snap.circuitSolution.supplyCurrentDrawAmps,
+                  isSupplyCurrentTripped: snap.circuitSolution.isSupplyCurrentTripped,
+                  multimeter: snap.multimeter,
+                  multimeterReading: snap.circuitSolution.multimeterReading,
+                  ecuProfileLabel: snap.vehicleContext?.modelName,
                 },
                 currentSet
               );
@@ -671,26 +625,31 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
         verifyScenarioStep: onVerifyScenarioStep,
         completeScenarioStep: onCompleteScenarioStep,
         probeScenarioFocusPin: onProbeScenarioFocusPin,
-        readMeter: () => ({
-          display: circuitSolution.multimeterReading.display,
-          unit: circuitSolution.multimeterReading.unit,
-          dtcCount: circuitSolution.activeDTCs.length,
-          supplyVolts: powerSupply.voltageSetting,
-          isPowerOn: powerSupply.isOutputEnabled,
-          supplyAmps: circuitSolution.supplyCurrentDrawAmps,
-        }),
-      };
+        readMeter: () => {
+          const snap = latestBenchRef.current;
+          return {
+            display: snap.circuitSolution.multimeterReading.display,
+            unit: snap.circuitSolution.multimeterReading.unit,
+            dtcCount: snap.circuitSolution.activeDTCs.length,
+            supplyVolts: snap.powerSupply.voltageSetting,
+            isPowerOn: snap.powerSupply.isOutputEnabled,
+            supplyAmps: snap.circuitSolution.supplyCurrentDrawAmps,
+          };
+        },
+      });
 
-      const currentLang: BilingualLang = voiceState.language || 'TL';
+      const voiceActions = buildLiveVoiceActions();
+      const snapNow = latestBenchRef.current;
+      const currentLang: BilingualLang = snapNow.voiceState.language || 'TL';
 
       const safetyEval = evaluateVoiceCommandSafetyAndRisk({
         rawCommand: trimmed,
         lang: currentLang,
-        powerSupply,
-        multimeter,
-        isSupplyCurrentTripped: circuitSolution.isSupplyCurrentTripped,
-        vehicleStatus: vehicleContext?.status,
-        pins,
+        powerSupply: snapNow.powerSupply,
+        multimeter: snapNow.multimeter,
+        isSupplyCurrentTripped: snapNow.circuitSolution.isSupplyCurrentTripped,
+        vehicleStatus: snapNow.vehicleContext?.status,
+        pins: snapNow.pins,
         hasPendingConfirmation: Boolean(offlineVoiceAssistant.getPendingAction()),
       });
 
@@ -766,8 +725,60 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
 
       const matchedMacro = voiceMacroService.findMatchingMacro(trimmed);
       if (matchedMacro) {
+        const macroAuth = authorizeVoiceMacroSteps({
+          macroName: matchedMacro.name,
+          steps: matchedMacro.steps,
+          snapshot: {
+            environmentMode: 'SIMULATION_MODE',
+            psuOutputEnabled: snapNow.powerSupply.isOutputEnabled,
+            psuVoltageSetting: snapNow.powerSupply.voltageSetting,
+            psuCurrentLimitAmps: snapNow.powerSupply.currentLimit,
+            ocpTripped: snapNow.circuitSolution.isSupplyCurrentTripped,
+            dmmMode: snapNow.multimeter.mode,
+            brandKey: snapNow.vehicleContext?.brandKey || 'universal-bench',
+            modelName: snapNow.vehicleContext?.modelName || 'Universal Trainer',
+            ecuStatus: snapNow.vehicleContext?.status || 'VERIFIED',
+            hasVerifiedPinoutMap: !/UNVERIFIED|OCR_PENDING|PART_METADATA_ONLY|MECHANICAL_NO_ECU/i.test(
+              snapNow.vehicleContext?.status || ''
+            ),
+          },
+        });
+
+        if (macroAuth.overallDecision === 'BLOCK') {
+          const blockedMsg =
+            macroAuth.blockedReasonEN ||
+            `Macro "${matchedMacro.name}" blocked by centralized electrical safety interlock.`;
+          offlineVoiceAssistant.addCommandLog({
+            source,
+            rawTranscript: trimmed,
+            normalizedTranscript: trimmed.toLowerCase(),
+            confidence: meta?.confidence,
+            status: 'REJECTED_SAFETY',
+            category: 'SAFETY_INTERLOCK',
+            actionDescription: blockedMsg,
+            spokenReply: blockedMsg,
+            provenance: 'UNIVERSAL_BENCH_TRAINER',
+          });
+          setVoiceResult({
+            title: currentLang === 'EN' ? 'Macro Blocked by Safety' : 'Hinarang ang Macro',
+            detail: blockedMsg,
+            timestamp: Date.now(),
+            provenance: 'UNIVERSAL_BENCH_TRAINER',
+            isSafetyAlert: true,
+          });
+          if (voiceNavEnabled) {
+            offlineVoiceAssistant.speak(blockedMsg, true);
+          }
+          return;
+        }
+
         const runMacroNow = () => {
-          const macroResult = executeMacroSequence(matchedMacro, pins, voiceActions);
+          const liveSnap = latestBenchRef.current;
+          const macroResult = executeMacroSequence(
+            matchedMacro,
+            liveSnap.pins,
+            buildLiveVoiceActions()
+          );
           offlineVoiceAssistant.addCommandLog({
             source,
             rawTranscript: trimmed,
@@ -821,7 +832,12 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
 
       if (safetyEval.decision === 'REQUIRES_CONFIRMATION') {
         const executeConfirmedCommand = () => {
-          const cmd = parseAndExecuteVoiceCommand(trimmed, pins, voiceActions);
+          const liveSnap = latestBenchRef.current;
+          const cmd = parseAndExecuteVoiceCommand(
+            trimmed,
+            liveSnap.pins,
+            buildLiveVoiceActions()
+          );
           if (cmd.matched) {
             offlineVoiceAssistant.addCommandLog({
               source,
@@ -877,14 +893,14 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
         return;
       }
 
-      const cmd = parseAndExecuteVoiceCommand(trimmed, pins, voiceActions);
+      const cmd = parseAndExecuteVoiceCommand(trimmed, snapNow.pins, voiceActions);
 
       if (cmd.matched) {
         const currentMem = offlineVoiceAssistant.getSessionMemory();
         offlineVoiceAssistant.setSessionMemory({
           ...currentMem,
           lastExecutedCommand: trimmed,
-          activeTab,
+          activeTab: snapNow.activeTab,
           lang: currentLang,
         });
         offlineVoiceAssistant.addCommandLog({
@@ -923,11 +939,11 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
       const coachTurn = processVoiceCoachTurn({
         transcript: trimmed,
         memory: offlineVoiceAssistant.getSessionMemory(),
-        telemetry: benchTelemetryForCoach,
-        activeTab,
+        telemetry: snapNow.benchTelemetryForCoach,
+        activeTab: snapNow.activeTab,
         lang: currentLang,
-        pins,
-        nodeVoltages: circuitSolution.nodeVoltages,
+        pins: snapNow.pins,
+        nodeVoltages: snapNow.circuitSolution.nodeVoltages,
       });
 
       offlineVoiceAssistant.setSessionMemory(coachTurn.updatedMemory);
@@ -958,14 +974,15 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
           provenance: coachTurn.provenance,
           structuredDiagnostic: coachTurn.structuredDiagnostic,
         });
-        if (voiceNavEnabled) {
+        if (snapNow.voiceNavEnabled) {
           offlineVoiceAssistant.speak(coachTurn.spokenText, true);
         }
         return;
       }
 
-      const engine = botEngine ?? new OfflineDiagnosticChatbot(savedLogs, savedSessions);
-      const reply = engine.ask(trimmed, liveContext);
+      const engine =
+        snapNow.botEngine ?? new OfflineDiagnosticChatbot(snapNow.savedLogs, snapNow.savedSessions);
+      const reply = engine.ask(trimmed, snapNow.liveContext);
       const cleanSummary = reply.answer
         .replace(/\*\*([^*]+)\*\*/g, '$1')
         .replace(/•\s*/g, '')
@@ -995,7 +1012,7 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
         provenance: 'CURATED_DIAGNOSTIC_DATABASE',
         structuredDiagnostic: coachTurn.structuredDiagnostic,
       });
-      if (voiceNavEnabled) {
+      if (snapNow.voiceNavEnabled) {
         offlineVoiceAssistant.speak(reply.answer, true);
       }
     },
@@ -1111,17 +1128,18 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
   };
 
   const latestQueryExecutorRef = useRef(executeVoiceOrTextQuery);
+  latestQueryExecutorRef.current = executeVoiceOrTextQuery;
   useEffect(() => {
-    latestQueryExecutorRef.current = executeVoiceOrTextQuery;
     if (commandExecutorRef) {
-      commandExecutorRef.current = executeVoiceOrTextQuery;
+      commandExecutorRef.current = (rawQuery, source, meta) =>
+        latestQueryExecutorRef.current(rawQuery, source, meta);
     }
     return () => {
       if (commandExecutorRef) {
         commandExecutorRef.current = null;
       }
     };
-  }, [executeVoiceOrTextQuery, commandExecutorRef]);
+  }, [commandExecutorRef]);
 
   const handleToggleContinuousMode = () => {
     const nextContinuous = !voiceState.continuousMode;
@@ -1276,7 +1294,7 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
             </div>
           )}
 
-          {voiceNavEnabled && voiceResult && (
+          {(voiceNavEnabled || isExpanded) && voiceResult && (
             <div
               role="status"
               aria-live="polite"

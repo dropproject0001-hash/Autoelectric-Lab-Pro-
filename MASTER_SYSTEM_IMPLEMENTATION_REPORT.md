@@ -25,6 +25,7 @@
   - `src/services/offlineVoiceService.ts` — Delegated `evaluateVoiceCommandSafetyAndRisk` to `authorizeBenchAction`, added the 9-stage `executeUnifiedVoiceOrTextPipeline()`, and added step-by-step macro authorization (`authorizeVoiceMacroSteps()`).
   - `src/utils/diagnosticWorkflow.ts` — Added the 10-stage structured technician workflow evaluator (`evaluateStructuredTechnicianWorkflow`) with `PASS | FAIL | INCONCLUSIVE | NOT_TESTED` status and refusal to force a conclusion when critical evidence is incomplete.
   - `src/components/OfflineAssistantModal.tsx` — Added the **Knowledge Center** tab, **Safety Audit Log** tab, and centralized confirmation banner for single commands and multi-step macros.
+  - `src/components/FloatingLabNavigator.tsx` — Enforced `authorizeVoiceMacroSteps()` safety gating before queuing any voice macro confirmation.
 
 ## 3. Centralized Safety Implementation
 - Every bench action proposal (`VOLTAGE_ADJUSTMENT`, `CURRENT_LIMIT_ADJUSTMENT`, `POWER_OUTPUT_ACTIVATION`, `POWER_OUTPUT_DEACTIVATION`, `KL30_OPERATION`, `KL15_OPERATION`, `WIRING_CONNECTION_CHANGE`, `DMM_MODE_CHANGE`, `FAULT_INJECTION`, `FAULT_REMOVAL`, `BENCH_RESET`, `ECU_PROFILE_CHANGE`, `PHYSICAL_HARDWARE_OPERATION`, `READ_ONLY_QUERY`) is evaluated by `authorizeBenchAction()`.
@@ -78,6 +79,7 @@
 - `src/simulation/tests/securityAndOffline.test.ts`: **PASSED (45/45)**
 - `src/simulation/tests/cleanupAndBilingualAiProof.test.ts`: **PASSED (10/10)**
 - TypeScript build (`compile_applet`) & linter (`lint_applet`): **PASSED (0 errors)**
+- Headless Chromium browser verification (`http://localhost:3000`, `1440x900`): **PASSED (zero runtime/app console errors)**
 
 ## 10. Remaining Risks and Physical Hardware Requirements
 - **Completed**: Centralized electrical safety authorization, MatrixSolver floating-node & residual diagnostics, ECU provenance separation, 9-stage voice/text/macro execution pipeline, continuous local-first knowledge database with 7-tier validation and conflict protection, 10-stage structured technician workflows, Knowledge Center UI, and all 18 regression test suites.

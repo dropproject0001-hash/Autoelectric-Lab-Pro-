@@ -23,6 +23,24 @@ const LOCAL_STORAGE_MIRROR_KEY = 'autolab_pro_verified_knowledge_mirror_v1';
 
 const memoryFallbackStore = new Map<string, VerifiedKnowledgeRecord>();
 let localMirrorHydrated = false;
+const knowledgeUpdateListeners = new Set<() => void>();
+
+function notifyVerifiedKnowledgeListeners(): void {
+  for (const listener of knowledgeUpdateListeners) {
+    try {
+      listener();
+    } catch {
+      // Ignore subscriber errors
+    }
+  }
+}
+
+export function subscribeVerifiedKnowledgeUpdates(listener: () => void): () => void {
+  knowledgeUpdateListeners.add(listener);
+  return () => {
+    knowledgeUpdateListeners.delete(listener);
+  };
+}
 
 const CLASSIFICATION_AUTHORITY_RANK: Record<KnowledgeVerificationClassification, number> = {
   VERIFIED_TECHNICAL_KNOWLEDGE: 6,
@@ -431,6 +449,7 @@ export function validateAndClassifyOnlineAiAnswer(
 async function writeRecordToIndexedDb(entry: VerifiedKnowledgeRecord): Promise<void> {
   memoryFallbackStore.set(entry.id, entry);
   persistMemoryToLocalStorageMirror();
+  notifyVerifiedKnowledgeListeners();
 
   if (!hasIndexedDb()) return;
   try {
@@ -871,9 +890,9 @@ export async function searchLocalFirstKnowledge(
     const langBonus = !req.lang || entry.lang === req.lang ? 0.08 : -0.05;
 
     // 3b. Standalone numeric identifier consistency (e.g., Pin 5 vs Pin 7, check 1 vs check 3)
-    const queryNumbers = (queryTrimmed.match(/\b\d+\b/g) || []);
+    const queryNumbers: string[] = Array.from(queryTrimmed.match(/\b\d+\b/g) ?? []);
     const entryNumSource = entry.originalQuestion || entry.subject || '';
-    const entryNumbers = (entryNumSource.match(/\b\d+\b/g) || []);
+    const entryNumbers: string[] = Array.from(entryNumSource.match(/\b\d+\b/g) ?? []);
     if (
       queryNumbers.length > 0 &&
       entryNumbers.length > 0 &&
@@ -1113,6 +1132,7 @@ export async function clearVerifiedKnowledgeStoreForTests(): Promise<void> {
       // Ignore storage error
     }
   }
+  notifyVerifiedKnowledgeListeners();
   if (!hasIndexedDb()) {
     return;
   }

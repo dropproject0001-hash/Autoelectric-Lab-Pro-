@@ -237,7 +237,7 @@ async function runMasterSpecificationTests(): Promise<void> {
     blackProbe: { attachedToPinId: 'ecu-pin-1', attachedLabel: 'Pin #1 (KL31)' },
   };
   const benchSol = solveCircuit(
-    { preset: '12V', voltageSetting: 12.6, currentLimit: 2.5, isOutputEnabled: true },
+    { preset: '12V_BENCH', voltageSetting: 12.6, currentLimit: 2.5, isOutputEnabled: true },
     benchPins,
     [],
     benchWires,
@@ -497,7 +497,7 @@ async function runMasterSpecificationTests(): Promise<void> {
 
   // Structured 10-stage technician workflow verification (Section 9)
   const standbyWorkflow = evaluateStructuredTechnicianWorkflow({
-    powerSupply: { preset: '12V', voltageSetting: 12.6, currentLimit: 2.5, isOutputEnabled: false },
+    powerSupply: { preset: '12V_BENCH', voltageSetting: 12.6, currentLimit: 2.5, isOutputEnabled: false },
     pins: benchPins,
     wires: DEFAULT_WIRES,
     faults: [],

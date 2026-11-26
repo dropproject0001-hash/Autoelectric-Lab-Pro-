@@ -98,7 +98,11 @@ export interface BenchTelemetry {
     redProbeLabel: string;
     blackProbeLabel: string;
     warning?: string;
+    evidenceStatus?: 'VALID' | 'STALE' | 'UNAVAILABLE' | 'UNRESOLVED' | 'UNVERIFIED' | 'UNSTABLE' | 'NON_FINITE';
   };
+  solverStatus?: 'VALID' | 'UNRESOLVED' | 'UNSTABLE' | 'NON_FINITE';
+  unresolvedNodes?: string[];
+  validatedNodeVoltages?: Record<string, number | null>;
   /** Reserved Priority 2 extension hook for automated multimeter tolerance grading */
   multimeterToleranceHook?: MultimeterToleranceHook;
   /** Reserved Priority 2 extension hook for PCB visual overlay hotspot linking */

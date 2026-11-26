@@ -121,11 +121,13 @@ export async function sendGeminiChat(params: {
   messages: ChatMessageEntry[];
   role?: GeminiChatRole;
   benchContext?: string;
+  signal?: AbortSignal;
 }): Promise<ChatResponsePayload> {
   const headers = await buildAuthHeaders();
   const res = await fetch('/api/autoelectric/gemini-chat', {
     method: 'POST',
     headers,
+    signal: params.signal,
     body: JSON.stringify({
       messages: params.messages,
       role: params.role || 'GENERAL',

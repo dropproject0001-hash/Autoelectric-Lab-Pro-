@@ -92,6 +92,7 @@ import {
   loadPersistedBilingualLang,
   type UnifiedAiSubTab,
 } from './components/ai/UnifiedAiAssistantDrawer';
+import { FloatingVoiceKnowledgeFab } from './components/ai/FloatingVoiceKnowledgeFab';
 import { FloatingHelpDrawer } from './components/help/FloatingHelpDrawer';
 import { CurriculumSelectorDrawer } from './components/academy/CurriculumSelectorDrawer';
 import { InstructorVerifierView } from './components/academy/InstructorVerifierView';
@@ -2219,7 +2220,18 @@ function AuthorizedBenchLabWorkspace({
         onClose={() => setShowAdminBillingModal(false)}
       />
 
-      {/* Unified AI Assistant Drawer (Tab 1: Hands-Free Natural Taglish Voice Coach · Tab 2: Diagnostic Assistant) */}
+      {/* Global Floating Corner Button for Voice Interaction & End-to-End Knowledge DB */}
+      <FloatingVoiceKnowledgeFab
+        isDrawerOpen={showUnifiedAiDrawer}
+        lang={bilingualLang}
+        onOpenDrawer={(subTab) => {
+          setUnifiedAiSubTab(subTab);
+          setShowUnifiedAiDrawer(true);
+        }}
+        onVoiceTranscript={handleTopBarVoiceTranscript}
+      />
+
+      {/* Unified AI Assistant Drawer (Voice Coach · Diagnostic Assistant · Knowledge DB) */}
       <UnifiedAiAssistantDrawer
         isOpen={showUnifiedAiDrawer}
         onClose={() => setShowUnifiedAiDrawer(false)}

@@ -13,7 +13,7 @@ import { firebaseAuth, isFirebaseConfigured } from '../lib/firebase';
 
 /**
  * Full deduplicated Google Workspace OAuth scopes provisioned for AutoElectric Lab Pro:
- * Gmail, Google Docs, Google Tasks, Google Drive, Google Picker, and Google Classroom.
+ * Gmail, Google Docs, Google Tasks, Google Drive, Google Picker, Google Classroom, and Google Forms.
  */
 export const GOOGLE_WORKSPACE_SCOPES: readonly string[] = [
   // Gmail
@@ -76,6 +76,10 @@ export const GOOGLE_WORKSPACE_SCOPES: readonly string[] = [
   'https://www.googleapis.com/auth/classroom.student-submissions.students.readonly',
   'https://www.googleapis.com/auth/classroom.topics',
   'https://www.googleapis.com/auth/classroom.topics.readonly',
+  // Google Forms
+  'https://www.googleapis.com/auth/forms.body',
+  'https://www.googleapis.com/auth/forms.body.readonly',
+  'https://www.googleapis.com/auth/forms.responses.readonly',
 ];
 
 /**

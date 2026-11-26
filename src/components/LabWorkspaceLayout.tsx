@@ -89,6 +89,7 @@ import {
 import { splitDiagnosticSteps } from "../data/phTroubleScenarios520";
 import { evaluateScenarioVoiceCoach } from "../utils/troubleScenarioVoiceCoach";
 import { LabDrawerIcon } from "./icons/LabDrawerIcons";
+import { formatPinScopeSummary } from "../utils/benchStateReconciliation";
 
 const Oscilloscope = lazyWithRetry(() =>
   import("./Oscilloscope").then((m) => ({ default: m.Oscilloscope })),
@@ -2941,11 +2942,7 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
           onTogglePinScope={() =>
             setShowPinScopeOverlay((previous) => !previous)
           }
-          pinScopeSummary={
-            selectedPin
-              ? `#${selectedPin.pinNumber} · ${(circuitSolution.nodeVoltages[selectedPin.id] ?? 0).toFixed(2)}V`
-              : undefined
-          }
+          pinScopeSummary={formatPinScopeSummary(selectedPin, circuitSolution)}
           onOpenTroubleLookup={handleVoiceOpenTroubleLookup}
           onEmulateTroubleScenario={handleVoiceEmulateTroubleScenario}
           onNextScenarioStep={handleVoiceNextScenarioStep}

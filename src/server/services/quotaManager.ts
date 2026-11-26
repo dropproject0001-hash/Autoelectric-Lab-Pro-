@@ -913,15 +913,13 @@ export class QuotaManager {
       targetBucket.consecutiveFailures += 1;
       targetBucket.lastErrorCategory = failure.category;
 
-      if (targetBucket.consecutiveFailures >= 2) {
-        const briefMs = 15_000;
-        targetBucket.cooldownUntilMs = Math.max(targetBucket.cooldownUntilMs, nowMs + briefMs);
-        if (!keyId) {
-          const epBucket = this.getOrCreateBucket(this.endpointBuckets, endpointCfg.id);
-          epBucket.cooldownUntilMs = Math.max(epBucket.cooldownUntilMs, nowMs + briefMs);
-        }
-        return 15;
+      const briefMs = targetBucket.consecutiveFailures >= 2 ? 30_000 : 15_000;
+      targetBucket.cooldownUntilMs = Math.max(targetBucket.cooldownUntilMs, nowMs + briefMs);
+      if (!keyId || this.keys.length <= 1) {
+        const epBucket = this.getOrCreateBucket(this.endpointBuckets, endpointCfg.id);
+        epBucket.cooldownUntilMs = Math.max(epBucket.cooldownUntilMs, nowMs + briefMs);
       }
+      return Math.ceil(briefMs / 1000);
     }
 
     return 0;

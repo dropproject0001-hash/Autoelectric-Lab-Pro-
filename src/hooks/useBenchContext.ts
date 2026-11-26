@@ -17,6 +17,7 @@ import type {
   PowerSupplyState,
 } from '../types/ecu';
 import type { CircuitSolution } from '../utils/circuitSolver';
+import { getValidatedPinVoltage } from '../utils/benchStateReconciliation';
 import { formatBenchSnapshotSummary } from '../services/ai/offlineEngine';
 
 export interface UseBenchContextInput {
@@ -40,10 +41,10 @@ export function buildBenchTelemetry(input: UseBenchContextInput): BenchTelemetry
     ? input.pins.find((p) => p.id === input.selectedPinId)
     : undefined;
 
-  const measuredVoltage =
-    selectedPinObj && input.circuitSolution.nodeVoltages[selectedPinObj.id] !== undefined
-      ? input.circuitSolution.nodeVoltages[selectedPinObj.id]
-      : null;
+  const resolvedPin = selectedPinObj
+    ? getValidatedPinVoltage(input.circuitSolution, selectedPinObj.id)
+    : { voltage: null, status: 'UNAVAILABLE' as const };
+  const measuredVoltage = resolvedPin.voltage;
 
   return {
     vehicleLabel: input.vehicleLabel || 'Universal ECU Bench',
@@ -81,7 +82,11 @@ export function buildBenchTelemetry(input: UseBenchContextInput): BenchTelemetry
       redProbeLabel: input.multimeter.redProbe.attachedLabel,
       blackProbeLabel: input.multimeter.blackProbe.attachedLabel,
       warning: input.multimeterWarning,
+      evidenceStatus: input.circuitSolution.multimeterReading.evidenceStatus,
     },
+    solverStatus: input.circuitSolution.solverStatus,
+    unresolvedNodes: input.circuitSolution.unresolvedNodes,
+    validatedNodeVoltages: input.circuitSolution.validatedNodeVoltages,
     multimeterToleranceHook: input.multimeterToleranceHook,
     pcbOverlayHook: input.pcbOverlayHook,
   };
@@ -129,6 +134,10 @@ export function useBenchContext(input: UseBenchContextInput, lang: BilingualLang
       input.circuitSolution.isSupplyCurrentTripped,
       input.circuitSolution.activeDTCs,
       input.circuitSolution.nodeVoltages,
+      input.circuitSolution.validatedNodeVoltages,
+      input.circuitSolution.unresolvedNodes,
+      input.circuitSolution.solverStatus,
+      input.circuitSolution.multimeterReading.evidenceStatus,
       input.multimeter.isPowered,
       input.multimeter.mode,
       input.multimeter.redProbe.attachedLabel,

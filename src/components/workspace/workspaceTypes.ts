@@ -5,6 +5,7 @@
 
 import { DriveBenchSnapshot, DriveFileItem, DriveMimeFilter } from '../../services/googleDriveService';
 import { GmailMessageDetail, GmailMessageSummary } from '../../services/gmailService';
+import type { GoogleFormQuestionDraft } from '../../services/googleFormsService';
 
 export type WorkspaceTab =
   | 'DRIVE'
@@ -12,6 +13,7 @@ export type WorkspaceTab =
   | 'DOCS'
   | 'TASKS'
   | 'CLASSROOM'
+  | 'FORMS'
   | 'LOCAL'
   | 'SHEETS'
   | 'SLIDES'
@@ -172,6 +174,24 @@ export type PendingWorkspaceAction =
       kind: 'DELETE_KEEP_NOTE';
       noteName: string;
       noteTitle: string;
+    }
+  | {
+      kind: 'CREATE_GOOGLE_FORM';
+      title: string;
+      description: string;
+      questions: GoogleFormQuestionDraft[];
+    }
+  | {
+      kind: 'ADD_FORM_QUESTION';
+      formId: string;
+      formTitle: string;
+      question: GoogleFormQuestionDraft;
+      insertIndex: number;
+    }
+  | {
+      kind: 'TRASH_GOOGLE_FORM';
+      formId: string;
+      title: string;
     };
 
 export interface DriveTabState {

@@ -919,16 +919,34 @@ export function processVoiceCoachTurn(params: {
       );
 
     if (specificPin && /\b(check|sukatin|tingnan|basahin|read|voltage|yung voltage)\b/i.test(qLower)) {
-      const pinLiveV =
-        typeof nodeVoltages[specificPin.id] === 'number'
-          ? nodeVoltages[specificPin.id]
-          : psuEnabled
-            ? specificPin.nominalVoltage
-            : 0;
-      spokenText =
-        lang === 'EN'
-          ? `Simulated MNA reading on Pin ${specificPin.pinNumber} (${specificPin.label}) is ${pinLiveV.toFixed(2)}V (nominal spec: ${specificPin.nominalVoltage.toFixed(2)}V). ${psuSummaryEN}`
-          : `Sige po, sa Pin ${specificPin.pinNumber} (${specificPin.label}), ang live simulated MNA voltage ngayon ay ${pinLiveV.toFixed(2)}V (normal spec: ${specificPin.nominalVoltage.toFixed(2)}V). ${psuSummaryTL}`;
+      const isPinUnresolved =
+        telemetry?.solverStatus === 'NON_FINITE' ||
+        Boolean(telemetry?.unresolvedNodes?.includes(specificPin.id)) ||
+        telemetry?.validatedNodeVoltages?.[specificPin.id] === null;
+      const validatedV = telemetry?.validatedNodeVoltages?.[specificPin.id];
+      const rawPinV =
+        typeof validatedV === 'number'
+          ? validatedV
+          : typeof nodeVoltages[specificPin.id] === 'number'
+            ? nodeVoltages[specificPin.id]
+            : null;
+
+      if (isPinUnresolved) {
+        spokenText =
+          lang === 'EN'
+            ? `Pin ${specificPin.pinNumber} (${specificPin.label}) node is currently UNRESOLVED / FLOATING (no valid ground reference path in the MNA circuit solver). Nominal spec is ${specificPin.nominalVoltage.toFixed(2)}V. ${psuSummaryEN}`
+            : `Wait lang po — ang Pin ${specificPin.pinNumber} (${specificPin.label}) ay UNRESOLVED / FLOATING pa sa circuit solver (walang valid ground reference). Nominal spec: ${specificPin.nominalVoltage.toFixed(2)}V. ${psuSummaryTL}`;
+      } else if (rawPinV === null || !Number.isFinite(rawPinV)) {
+        spokenText =
+          lang === 'EN'
+            ? `Live simulated MNA voltage on Pin ${specificPin.pinNumber} (${specificPin.label}) is currently unavailable. Nominal spec is ${specificPin.nominalVoltage.toFixed(2)}V. ${psuSummaryEN}`
+            : `Hindi pa available ang live simulated voltage ng Pin ${specificPin.pinNumber} (${specificPin.label}) sa ngayon. Nominal spec: ${specificPin.nominalVoltage.toFixed(2)}V. ${psuSummaryTL}`;
+      } else {
+        spokenText =
+          lang === 'EN'
+            ? `Simulated MNA reading on Pin ${specificPin.pinNumber} (${specificPin.label}) is ${rawPinV.toFixed(2)}V (nominal spec: ${specificPin.nominalVoltage.toFixed(2)}V). ${psuSummaryEN}`
+            : `Sige po, sa Pin ${specificPin.pinNumber} (${specificPin.label}), ang live simulated MNA voltage ngayon ay ${rawPinV.toFixed(2)}V (normal spec: ${specificPin.nominalVoltage.toFixed(2)}V). ${psuSummaryTL}`;
+      }
     } else if (askingOvercurrentOrShort) {
       const shortFaults = faultList.filter((f) => /SHORT/i.test(f.faultType));
       const highCurrent = isOcp || psuAmps > Math.max(1.2, psuLimit * 0.85);
@@ -1069,13 +1087,26 @@ export function processVoiceCoachTurn(params: {
       nextTopicType = 'PIN';
       nextScenarioId = `pin-check-${specificPin.pinNumber}`;
       matchedSource = `BENCH_PINOUT:${specificPin.id}`;
-      const liveV = nodeVoltages[specificPin.id];
-      const liveTextTL =
-        typeof liveV === 'number'
+      const isPinUnresolved =
+        telemetry?.solverStatus === 'NON_FINITE' ||
+        Boolean(telemetry?.unresolvedNodes?.includes(specificPin.id)) ||
+        telemetry?.validatedNodeVoltages?.[specificPin.id] === null;
+      const validatedV = telemetry?.validatedNodeVoltages?.[specificPin.id];
+      const liveV = isPinUnresolved
+        ? null
+        : typeof validatedV === 'number'
+          ? validatedV
+          : typeof nodeVoltages[specificPin.id] === 'number' && Number.isFinite(nodeVoltages[specificPin.id])
+            ? nodeVoltages[specificPin.id]
+            : null;
+      const liveTextTL = isPinUnresolved
+        ? 'Ang live simulated node ay UNRESOLVED / FLOATING (walang valid ground path).'
+        : typeof liveV === 'number'
           ? `Ang live simulated voltage ngayon ay ${liveV.toFixed(2)} volts.`
           : '';
-      const liveTextEN =
-        typeof liveV === 'number'
+      const liveTextEN = isPinUnresolved
+        ? 'Current simulated node is UNRESOLVED / FLOATING (no ground reference path).'
+        : typeof liveV === 'number'
           ? `Current live simulated voltage is ${liveV.toFixed(2)}V.`
           : '';
 
@@ -1087,7 +1118,11 @@ export function processVoiceCoachTurn(params: {
       detailsBullets = [
         `Pin ${specificPin.pinNumber} · ${specificPin.label} (${specificPin.name})`,
         `Category: ${specificPin.category.toUpperCase()} · Nominal: ${specificPin.nominalVoltage.toFixed(2)}V`,
-        typeof liveV === 'number' ? `Live Simulated Voltage: ${liveV.toFixed(2)}V` : 'Live Simulated Voltage: PSU Standby',
+        isPinUnresolved
+          ? 'Live Simulated Voltage: UNRESOLVED / FLOATING'
+          : typeof liveV === 'number'
+            ? `Live Simulated Voltage: ${liveV.toFixed(2)}V`
+            : 'Live Simulated Voltage: Unavailable',
         `Description: ${specificPin.description}`,
       ];
       whyTip = sanitizeToNaturalTaglish(
