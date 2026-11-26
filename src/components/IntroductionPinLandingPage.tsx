@@ -14,6 +14,7 @@ import {
   Cpu,
   Delete,
   ExternalLink,
+  FileDown,
   KeyRound,
   Laptop,
   Lock,
@@ -23,7 +24,20 @@ import {
   RotateCcw,
   Unlock,
 } from 'lucide-react';
-import { APP_HERO_BANNER_SRC, APP_LOGO_SRC, CREATOR_CREDENTIALS } from '../constants/branding';
+import { generateSystemBlueprintPdf } from '../services/systemBlueprintPdfService';
+import {
+  APP_ACADEMY_BANNER_SRC,
+  APP_HERO_BANNER_SRC,
+  APP_LOGO_SRC,
+  CREATOR_CREDENTIALS,
+  RAMTI_SUBTITLE_INLINE,
+} from '../constants/branding';
+import {
+  RAMTI_CORE_AND_HARDWARE_ICONS,
+  RamtiModuleIcon,
+  RamtiStudioVisualCard,
+  RamtiVectorEmblem,
+} from './icons/RamtiBrandAssets';
 import {
   playAccessGrantedChime,
   playPinKeypadClick,
@@ -114,6 +128,7 @@ export const IntroductionPinLandingPage: React.FC = () => {
     trialRecord,
     lockNotice,
     isAdminUnlocked,
+    isMasterAdminOrOwner,
     clearLockNotice,
     redeemTrialPin,
     markAdminSessionActive,
@@ -386,7 +401,7 @@ export const IntroductionPinLandingPage: React.FC = () => {
 
   return (
     <div className="relative isolate min-h-[100dvh] w-full overflow-x-hidden bg-[#060B14] text-[#EAF3FF] font-body flex flex-col">
-      {/* Background cover blend with zero-broken-image fallback */}
+      {/* Background cover blend with dark industrial metallic/carbon-fiber RAMTi canvas */}
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         {!bgFailed && (
           <img
@@ -394,36 +409,46 @@ export const IntroductionPinLandingPage: React.FC = () => {
             alt=""
             referrerPolicy="no-referrer"
             onError={() => setBgFailed(true)}
-            className="hud-cover-backdrop-img opacity-15"
+            className="hud-cover-backdrop-img opacity-25"
           />
         )}
         <div className="hud-cover-backdrop-scrim" />
       </div>
 
       {/* Strict 3-Zone Top Bar */}
-      <header className="w-full border-b border-[#203653] bg-[#0A1220]/90 backdrop-blur-sm">
+      <header className="w-full border-b border-[#203653] bg-[#0A1220]/88 backdrop-blur-[20px]">
         <div className="mx-auto flex max-w-[1220px] items-center justify-between gap-8 px-4 sm:px-6 py-3.5">
-          {/* Zone 1: Clean single-line brand wordmark */}
+          {/* Zone 1: Clean single-line RAMTi brand wordmark */}
           <a
             href="#pin-verification-gate"
-            className="flex items-center gap-2.5 text-[#EAF3FF] whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-[#19C8F5]"
+            className="flex items-center gap-3 text-[#EAF3FF] whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-[#19C8F5]"
           >
-            {!logoFailed ? (
-              <img
-                src={APP_LOGO_SRC}
-                alt="AutoElectric Lab Pro emblem"
-                referrerPolicy="no-referrer"
-                onError={() => setLogoFailed(true)}
-                className="h-7 w-7 rounded object-cover border border-[#203653]"
-              />
-            ) : (
-              <span className="flex h-7 w-7 items-center justify-center rounded border border-[#203653] bg-[#0E192A] text-[#19C8F5]">
-                <Cpu className="h-4 w-4" aria-hidden="true" />
+            <div className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg border border-[#19C8F5]/55 bg-[#050A12]">
+              {!logoFailed && (
+                <img
+                  src={APP_LOGO_SRC}
+                  alt=""
+                  aria-hidden="true"
+                  referrerPolicy="no-referrer"
+                  onError={() => setLogoFailed(true)}
+                  className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-35"
+                />
+              )}
+              <RamtiVectorEmblem size={26} variant="flat-white" className="relative z-10" />
+            </div>
+            <div className="leading-none">
+              <div className="flex items-baseline gap-1.5">
+                <span className="font-hud text-sm font-extrabold tracking-[0.18em] text-[#19C8F5]">
+                  RAMTi
+                </span>
+                <span className="font-hud text-lg font-bold tracking-wide text-[#EAF3FF]">
+                  AutoElectric Lab PRO
+                </span>
+              </div>
+              <span className="hidden sm:block mt-0.5 font-body text-[10px] tracking-[0.12em] text-[#BCCDEF]">
+                {RAMTI_SUBTITLE_INLINE}
               </span>
-            )}
-            <span className="font-hud text-lg font-bold tracking-wide">
-              AutoElectric Lab Pro
-            </span>
+            </div>
           </a>
 
           {/* Zone 2: Concise single-line navigation links */}
@@ -444,7 +469,7 @@ export const IntroductionPinLandingPage: React.FC = () => {
               href="#bench-modules"
               className="whitespace-nowrap shrink-0 transition-colors hover:text-[#EAF3FF] hover:underline underline-offset-4"
             >
-              Bench Modules
+              Studios &amp; Modules
             </a>
             <button
               type="button"
@@ -474,19 +499,20 @@ export const IntroductionPinLandingPage: React.FC = () => {
 
       {/* Main Content */}
       <main className="mx-auto w-full max-w-[1220px] flex-1 px-4 sm:px-6 py-6 sm:py-8 space-y-8 sm:space-y-10">
-        {/* Featured Workshop Hero Banner */}
+        {/* Top Cover Banner #1 — Contained Without Cropping */}
         {!bannerFailed && (
           <motion.div
+            data-testid="landing-top-cover-banner"
             initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: shouldReduceMotion ? 0 : 0.2, ease: 'easeOut' }}
-            className="w-full overflow-hidden rounded-xl border border-[#203653] bg-[#0A1220] shadow-2xl"
+            className="overflow-hidden rounded-xl border border-[#203653] bg-[#060C16]/95 p-2 sm:p-3 shadow-2xl"
           >
             <img
               src={APP_HERO_BANNER_SRC}
               alt="Auto-Electronics Repair — Expert Diagnostics & Wiring, Module & Computer Repair"
               onError={() => setBannerFailed(true)}
-              className="w-full aspect-[21/7] sm:aspect-[24/7] object-cover object-center block"
+              className="w-full max-h-[260px] object-contain object-center block mx-auto"
             />
           </motion.div>
         )}
@@ -504,7 +530,7 @@ export const IntroductionPinLandingPage: React.FC = () => {
             className="lg:col-span-6 space-y-6 pt-1"
           >
             <p className="text-xs font-medium text-[#91A4BD] tracking-wide">
-              Virtual ECU Lab · Automotive Bench Simulation · PIN-Gated Workstation
+              RAMTi · Virtual ECU Lab · Automotive Bench Simulation · PIN-Gated Workstation
             </p>
 
             <h1
@@ -518,7 +544,7 @@ export const IntroductionPinLandingPage: React.FC = () => {
             </h1>
 
             <p className="max-w-[58ch] text-base text-[#91A4BD] leading-relaxed">
-              Entry into AutoElectric Lab Pro is restricted. Technicians require an 8-digit verification PIN issued by the Admin Master before accessing the programmable ECU power supply, Modified Nodal Analysis circuit solver, oscilloscope, 3D harness twin, PCB optical scanner, and diagnostic reports.
+              Entry into AutoElectric Lab PRO is restricted. Technicians require an 8-digit verification PIN issued by the Admin Master before accessing the programmable ECU power supply, Modified Nodal Analysis circuit solver, oscilloscope, 3D harness twin, PCB optical scanner, and diagnostic reports.
             </p>
 
             {/* Hairline Key-Value Policy Table (Zero Cards-Within-Cards) */}
@@ -542,9 +568,36 @@ export const IntroductionPinLandingPage: React.FC = () => {
                 </span>
               </div>
             </div>
+
+            {/* Direct Download for Principal System Architecture Blueprint PDF (Visible Exclusively to Owner / Master Admin) */}
+            {isMasterAdminOrOwner && (
+              <div
+                data-testid="master-admin-blueprint-download-zone"
+                className="pt-1 flex flex-wrap items-center gap-3"
+              >
+                <button
+                  type="button"
+                  data-testid="download-system-blueprint-pdf-btn"
+                  onClick={() => {
+                    void generateSystemBlueprintPdf();
+                  }}
+                  className="inline-flex min-h-[42px] items-center gap-2 rounded-lg border border-[#19C8F5]/55 bg-[#0E2238]/90 px-4 py-2 text-xs font-semibold text-[#EAF3FF] hover:border-[#19C8F5] hover:bg-[#14304E] transition-colors cursor-pointer whitespace-nowrap"
+                >
+                  <FileDown className="h-4 w-4 text-[#19C8F5]" aria-hidden="true" />
+                  <span>Download System Blueprint (PDF)</span>
+                </button>
+                <a
+                  href="/AutoElectric_Lab_PRO_System_Blueprint.pdf"
+                  download="AutoElectric_Lab_PRO_System_Blueprint.pdf"
+                  className="font-mono text-xs text-[#91A4BD] hover:text-[#19C8F5] underline underline-offset-4 whitespace-nowrap"
+                >
+                  Direct A4 PDF File
+                </a>
+              </div>
+            )}
           </motion.div>
 
-          {/* Right Column: Primary Focal Anchor — Futuristic Glassmorphic PIN Verification Gate Console */}
+          {/* Right Column: Primary Focal Anchor — 30px Glassmorphic RAMTi PIN Verification Gate Console */}
           <motion.div
             data-testid="landing-pin-glass-console"
             initial={shouldReduceMotion ? false : { opacity: 0, y: 18, scale: 0.985 }}
@@ -554,13 +607,114 @@ export const IntroductionPinLandingPage: React.FC = () => {
               delay: 0.06,
               ease: [0.16, 1, 0.3, 1],
             }}
-            className="relative overflow-hidden lg:col-span-6 rounded-2xl border border-[#19C8F5]/30 bg-[#0A1220]/78 p-5 sm:p-6 space-y-5 backdrop-blur-xl shadow-[0_24px_72px_rgba(2,10,24,0.85),0_0_42px_rgba(25,200,245,0.08)]"
+            className="relative overflow-hidden lg:col-span-6 rounded-2xl border border-[#BCCDEF]/30 bg-[#0A1220]/76 p-5 sm:p-6 space-y-5 backdrop-blur-[30px] shadow-[0_24px_72px_rgba(2,10,24,0.88),0_0_42px_rgba(25,200,245,0.1)]"
           >
             {/* Top futuristic laser hairline accent */}
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#19C8F5]/80 to-transparent"
+              className="pointer-events-none absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#19C8F5]/85 to-transparent"
             />
+
+            {/* Centered Primary RAMTi Trademark Emblem Flanked by Symmetrical Circuit Trace Wings & Telemetry Readouts */}
+            <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-[#203653]/75 pt-1 pb-2">
+              {/* Left Decorative Circuit Trace Wing */}
+              <div
+                data-testid="ramti-emblem-left-wing"
+                aria-hidden="true"
+                className="hidden sm:flex flex-col items-end justify-center gap-1.5 pr-1 select-none"
+              >
+                <div className="flex items-center gap-1.5 font-mono text-[9.5px] uppercase tracking-[0.14em] text-[#19C8F5]/90 tabular-nums">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#19C8F5] shadow-[0_0_8px_#19C8F5]" />
+                  <span>MNA · 16-BIT DSP</span>
+                </div>
+                <svg
+                  viewBox="0 0 140 44"
+                  className="w-full max-w-[145px] h-11 overflow-visible"
+                  fill="none"
+                >
+                  <path
+                    d="M4 10 H66 L84 22 H136"
+                    stroke="#19C8F5"
+                    strokeWidth="1.4"
+                    strokeOpacity="0.75"
+                  />
+                  <path
+                    d="M16 24 H54 L68 34 H126"
+                    stroke="#BCCDEF"
+                    strokeWidth="1.1"
+                    strokeOpacity="0.45"
+                  />
+                  <path
+                    d="M32 38 H92 L104 28 H136"
+                    stroke="#19C8F5"
+                    strokeWidth="1.1"
+                    strokeDasharray="3 3"
+                    strokeOpacity="0.55"
+                  />
+                  <circle cx="4" cy="10" r="2.6" fill="#19C8F5" />
+                  <circle cx="16" cy="24" r="2.2" fill="#BCCDEF" />
+                  <circle cx="32" cy="38" r="2.2" fill="#19C8F5" />
+                  <circle cx="136" cy="22" r="2.8" fill="#EAF3FF" />
+                </svg>
+                <div className="font-mono text-[9px] tracking-[0.12em] text-[#91A4BD] tabular-nums">
+                  VREF: 5.00V · LOCK
+                </div>
+              </div>
+
+              {/* Center Primary RAMTi Emblem */}
+              <div className="flex flex-col items-center justify-center shrink-0">
+                <RamtiVectorEmblem
+                  size={56}
+                  variant="flat-white"
+                  showWordmark
+                  showSubtitle
+                />
+              </div>
+
+              {/* Right Decorative Circuit Trace Wing */}
+              <div
+                data-testid="ramti-emblem-right-wing"
+                aria-hidden="true"
+                className="hidden sm:flex flex-col items-start justify-center gap-1.5 pl-1 select-none"
+              >
+                <div className="flex items-center gap-1.5 font-mono text-[9.5px] uppercase tracking-[0.14em] text-[#19C8F5]/90 tabular-nums">
+                  <span>ISO 11898 · CAN-FD</span>
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#19C8F5] shadow-[0_0_8px_#19C8F5]" />
+                </div>
+                <svg
+                  viewBox="0 0 140 44"
+                  className="w-full max-w-[145px] h-11 overflow-visible"
+                  fill="none"
+                >
+                  <path
+                    d="M136 10 H74 L56 22 H4"
+                    stroke="#19C8F5"
+                    strokeWidth="1.4"
+                    strokeOpacity="0.75"
+                  />
+                  <path
+                    d="M124 24 H86 L72 34 H14"
+                    stroke="#BCCDEF"
+                    strokeWidth="1.1"
+                    strokeOpacity="0.45"
+                  />
+                  <path
+                    d="M108 38 H48 L36 28 H4"
+                    stroke="#19C8F5"
+                    strokeWidth="1.1"
+                    strokeDasharray="3 3"
+                    strokeOpacity="0.55"
+                  />
+                  <circle cx="136" cy="10" r="2.6" fill="#19C8F5" />
+                  <circle cx="124" cy="24" r="2.2" fill="#BCCDEF" />
+                  <circle cx="108" cy="38" r="2.2" fill="#19C8F5" />
+                  <circle cx="4" cy="22" r="2.8" fill="#EAF3FF" />
+                </svg>
+                <div className="font-mono text-[9px] tracking-[0.12em] text-[#91A4BD] tabular-nums">
+                  SYNC: 500kbps · OK
+                </div>
+              </div>
+            </div>
 
             {/* Explicit Glowing Gate Status Badge (Text + Icon, never color alone) */}
             <div
@@ -1155,15 +1309,15 @@ export const IntroductionPinLandingPage: React.FC = () => {
           </motion.div>
         </section>
 
-        {/* Quiet Numbered Capabilities Overview */}
-        <section id="bench-modules" className="border-t border-[#203653] pt-8 space-y-6">
+        {/* Equal 50/50 Side-by-Side Split: RAMTi Specialized Studios + Core Navigation & Hardware Instrument Iconography */}
+        <section id="bench-modules" className="border-t border-[#203653] pt-8 space-y-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
             <div>
               <h2 className="font-hud text-xl font-bold text-[#EAF3FF]">
-                Inside the Bench Workstation
+                RAMTi Specialized Studios &amp; Hardware Instrument Suite
               </h2>
               <p className="text-sm text-[#91A4BD]">
-                Modules unlocked upon Admin PIN verification.
+                Side-by-side diagnostic studios and 15 flat-vector hardware modules unlocked upon Admin PIN verification.
               </p>
             </div>
             <div className="flex items-center gap-2 text-xs font-mono text-[#91A4BD]">
@@ -1172,11 +1326,89 @@ export const IntroductionPinLandingPage: React.FC = () => {
             </div>
           </div>
 
+          {/* 50/50 Desktop Two-Column Split */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+            {/* Left 50%: RAMTi Specialized Studios & Bench Workstation (6 Branded Studio Visual Cards) */}
+            <div className="lg:col-span-6 flex flex-col rounded-xl border border-[#203653] bg-[#0A1220]/85 p-4 backdrop-blur-md space-y-3.5">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#203653]/70 pb-2">
+                <span className="font-hud text-xs font-bold uppercase tracking-[0.16em] text-[#19C8F5]">
+                  RAMTi Specialized Studios &amp; Bench Workstation
+                </span>
+                <span className="font-mono text-[11px] text-[#91A4BD]">
+                  6 Specialized Studio Modules
+                </span>
+              </div>
+
+              <div
+                data-testid="landing-ramti-studios-grid"
+                className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 flex-1 content-between"
+              >
+                <RamtiStudioVisualCard
+                  studio="academy_lab"
+                  onClick={() => pinInputRef.current?.focus()}
+                />
+                <RamtiStudioVisualCard
+                  studio="scenario_lookup"
+                  onClick={() => pinInputRef.current?.focus()}
+                />
+                <RamtiStudioVisualCard
+                  studio="ai_diagnostic_studio"
+                  onClick={() => pinInputRef.current?.focus()}
+                />
+                <RamtiStudioVisualCard
+                  studio="bench_fault_isolation"
+                  onClick={() => pinInputRef.current?.focus()}
+                />
+                <RamtiStudioVisualCard
+                  studio="harness_ecu_pinouts"
+                  onClick={() => pinInputRef.current?.focus()}
+                />
+                <RamtiStudioVisualCard
+                  studio="pcb_scanners"
+                  onClick={() => pinInputRef.current?.focus()}
+                />
+              </div>
+            </div>
+
+            {/* Right 50%: Core Navigation & Hardware Instrument Iconography (15 Flat-Vector Modules) */}
+            <div
+              data-testid="landing-ramti-module-icons-grid"
+              className="lg:col-span-6 flex flex-col rounded-xl border border-[#203653] bg-[#0A1220]/85 p-4 backdrop-blur-md space-y-3.5"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#203653]/70 pb-2">
+                <span className="font-hud text-xs font-bold uppercase tracking-[0.16em] text-[#19C8F5]">
+                  Core Navigation &amp; Hardware Instrument Iconography
+                </span>
+                <span className="font-mono text-[11px] text-[#91A4BD]">
+                  15 Specialized Flat-Vector Modules
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 flex-1 content-between">
+                {RAMTI_CORE_AND_HARDWARE_ICONS.slice(0, 15).map((mod) => (
+                  <div
+                    key={mod.id}
+                    className="flex items-center gap-2.5 rounded-lg border border-[#203653]/80 bg-[#060C16]/90 px-2.5 py-2.5"
+                  >
+                    <RamtiModuleIcon name={mod.id} size={22} />
+                    <div className="min-w-0">
+                      <div className="truncate font-hud text-xs font-bold text-[#EAF3FF]">
+                        {mod.label}
+                      </div>
+                      <div className="truncate font-mono text-[9.5px] text-[#91A4BD]">
+                        {mod.subtitle}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {LAB_CAPABILITIES.map((item) => (
               <article
                 key={item.number}
-                className="rounded-lg border border-[#203653] bg-[#0A1220] p-4 space-y-2"
+                className="rounded-lg border border-[#203653] bg-[#0A1220]/90 p-4 space-y-2"
               >
                 <div className="font-mono text-xs font-semibold text-[#19C8F5] tabular-nums">
                   {item.number}.
@@ -1197,7 +1429,7 @@ export const IntroductionPinLandingPage: React.FC = () => {
       <footer className="border-t border-[#203653] bg-[#080F1B]/90 backdrop-blur-sm py-4 px-4 sm:px-6 text-xs text-[#91A4BD]">
         <div className="mx-auto flex max-w-[1220px] flex-col sm:flex-row items-center justify-between gap-2">
           <span>
-            AutoElectric Lab Pro · {CREATOR_CREDENTIALS.shortOrg} · Lead Architect:{' '}
+            RAMTi · AutoElectric Lab PRO · {CREATOR_CREDENTIALS.shortOrg} · Lead Architect:{' '}
             {CREATOR_CREDENTIALS.leaders[0]?.name}
           </span>
           <span className="font-mono text-[11px] tabular-nums">
@@ -1205,6 +1437,20 @@ export const IntroductionPinLandingPage: React.FC = () => {
           </span>
         </div>
       </footer>
+
+      {/* Bottom Cover Banner #2 — Placed at Very Bottom Below Footer & Contained Without Cropping */}
+      <div
+        data-testid="landing-bottom-cover-banner"
+        className="w-full border-t border-[#203653]/80 bg-[#050A12]/95 px-4 sm:px-6 py-5"
+      >
+        <div className="mx-auto max-w-[1220px] overflow-hidden rounded-xl border border-[#19C8F5]/40 bg-[#060C16]/95 p-2 sm:p-3 shadow-2xl">
+          <img
+            src={APP_ACADEMY_BANNER_SRC}
+            alt="AUTOELECTRIC LAB PRO | Academy Lab — Explore Course Modules, Interactive Simulations, Diagnostic Training, Certification"
+            className="w-full max-h-[260px] object-contain object-center block mx-auto"
+          />
+        </div>
+      </div>
     </div>
   );
 };

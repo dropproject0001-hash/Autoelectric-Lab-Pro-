@@ -9,7 +9,19 @@ import http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
 import { describe, it } from 'node:test';
-import { CREATOR_CREDENTIALS } from '../../constants/branding';
+import {
+  APP_ACADEMY_BANNER_SRC,
+  APP_BRANDING_GUIDE_SRC,
+  APP_LOGO_SRC,
+  APP_MODULE_ICONS_SHEET_SRC,
+  APP_STUDIO_CARDS_SHEET_SRC,
+  CREATOR_CREDENTIALS,
+  isVerifiedOwnerEmail,
+  RAMTI_SUBTITLE_LINES,
+  RAMTI_TRADEMARK_WORDMARK,
+} from '../../constants/branding';
+import { RAMTI_CORE_AND_HARDWARE_ICONS } from '../../components/icons/RamtiBrandAssets';
+import { buildTutorialStoryboardChapters } from '../../components/academy/StepTutorialVideoModal';
 import { UNIVERSITY_LAB_MODULES } from '../../data/universityLabCurriculum';
 import { DEFAULT_ECU_PINS } from '../../simulation/ecu/BenchCircuitSolver';
 import {
@@ -25,16 +37,53 @@ import {
   setTrialStoreFilePathForTests,
 } from '../../server/services/trialPinService';
 import { resetLicenseStoreForTests } from '../../server/services/licenseService';
+import {
+  AUTOELECTRIC_SYSTEM_BLUEPRINT_SECTIONS,
+  generateSystemBlueprintPdf,
+  SYSTEM_BLUEPRINT_PDF_FILENAME,
+} from '../../services/systemBlueprintPdfService';
 
 describe('Landing Credentials & Grounded Step Tutorial Pipeline', () => {
-  it('exposes complete creator credentials for WelcomeBenchOverlay and CredentialsModal', () => {
+  it('exposes complete creator credentials and RAMTi brand assets for WelcomeBenchOverlay and CredentialsModal', () => {
     assert.ok(CREATOR_CREDENTIALS.organization.includes('RMATi'));
+    assert.ok(CREATOR_CREDENTIALS.organization.includes('RAMTi'));
+    assert.equal(RAMTI_TRADEMARK_WORDMARK, 'RAMTi');
+    assert.deepEqual(RAMTI_SUBTITLE_LINES, [
+      'Ruben AutoMotive',
+      'Modern Technology',
+      'Innovation',
+    ]);
     assert.equal(CREATOR_CREDENTIALS.leaders.length, 2);
     const lead = CREATOR_CREDENTIALS.leaders[0];
     assert.equal(lead.name, 'Ruben Llego');
     assert.equal(lead.email, 'rubenllego12@gmail.com');
     const coOwner = CREATOR_CREDENTIALS.leaders[1];
     assert.equal(coOwner.name, 'Elnombre Danong');
+
+    // Verify all 5 uploaded RAMTi branding & iconography assets exist in public/
+    const assetPaths = [
+      APP_LOGO_SRC,
+      APP_BRANDING_GUIDE_SRC,
+      APP_MODULE_ICONS_SHEET_SRC,
+      APP_ACADEMY_BANNER_SRC,
+      APP_STUDIO_CARDS_SHEET_SRC,
+    ];
+    for (const rel of assetPaths) {
+      const fullPath = path.join(process.cwd(), 'public', rel);
+      assert.ok(fs.existsSync(fullPath), `Missing RAMTi asset: ${fullPath}`);
+    }
+
+    // Verify 15 Core/Hardware flat-vector modules + 6 Studio/Tool visual cards (21 total)
+    assert.equal(RAMTI_CORE_AND_HARDWARE_ICONS.length, 21);
+
+    // Verify 5-chapter storyboard builder
+    const firstMod = UNIVERSITY_LAB_MODULES[0];
+    const spec = buildGroundedStepSpec(firstMod, firstMod.steps[0], DEFAULT_ECU_PINS);
+    const chapters = buildTutorialStoryboardChapters(spec);
+    assert.equal(chapters.length, 5);
+    assert.equal(chapters[0].label, 'Chapter 1');
+    assert.equal(chapters[4].label, 'Chapter 5');
+    assert.ok(chapters[0].detail.includes(spec.focusPinLabel));
   });
 
   it('enforces Level 1 & Level 2 eligibility and deterministic cache keys', () => {
@@ -206,4 +255,96 @@ describe('Landing Credentials & Grounded Step Tutorial Pipeline', () => {
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }
   });
+
+  it('generates multi-page A4 vector PDF for AutoElectric Lab PRO System Blueprint and saves downloadable public file', async () => {
+    assert.equal(AUTOELECTRIC_SYSTEM_BLUEPRINT_SECTIONS.length, 4);
+    const result = await generateSystemBlueprintPdf({
+      generatedAtIso: '2026-11-26T06:00:00.000Z',
+      skipBrowserDownload: true,
+    });
+    assert.equal(result.fileName, SYSTEM_BLUEPRINT_PDF_FILENAME);
+    assert.match(result.sha256Hash, /^[a-f0-9]{64}$/);
+    assert.ok(result.pageCount >= 2);
+    assert.ok(result.pdfBytes.byteLength > 4000);
+
+    const headerAscii = Buffer.from(result.pdfBytes.slice(0, 5)).toString('ascii');
+    assert.equal(headerAscii, '%PDF-');
+
+    const publicPdfPath = path.resolve(process.cwd(), 'public', SYSTEM_BLUEPRINT_PDF_FILENAME);
+    fs.writeFileSync(publicPdfPath, Buffer.from(result.pdfBytes));
+    assert.ok(fs.existsSync(publicPdfPath));
+  });
+
+  it('restricts System Blueprint PDF download visibility exclusively to Owner account and Master Admin across Landing, Credentials Modal, and Admin Console', () => {
+    assert.equal(isVerifiedOwnerEmail('rubenllego12@gmail.com'), true);
+    assert.equal(isVerifiedOwnerEmail('  RUBENLLEGO12@GMAIL.COM '), true);
+    assert.equal(isVerifiedOwnerEmail('rubenlleg12@gmail.com'), true);
+    assert.equal(isVerifiedOwnerEmail('student@example.edu'), false);
+    assert.equal(isVerifiedOwnerEmail(null), false);
+    assert.equal(isVerifiedOwnerEmail(undefined), false);
+
+    const landingSource = fs.readFileSync(
+      path.resolve(process.cwd(), 'src/components/IntroductionPinLandingPage.tsx'),
+      'utf8'
+    );
+    assert.ok(
+      landingSource.includes('{isMasterAdminOrOwner && (') &&
+        landingSource.includes('data-testid="download-system-blueprint-pdf-btn"'),
+      'Landing page must gate download-system-blueprint-pdf-btn behind isMasterAdminOrOwner'
+    );
+
+    const credentialsSource = fs.readFileSync(
+      path.resolve(process.cwd(), 'src/components/CredentialsModal.tsx'),
+      'utf8'
+    );
+    assert.ok(
+      credentialsSource.includes('{canDownloadSystemBlueprint && (') &&
+        credentialsSource.includes('data-testid="credentials-download-blueprint-pdf-btn"'),
+      'CredentialsModal must gate credentials-download-blueprint-pdf-btn behind canDownloadSystemBlueprint'
+    );
+
+    const adminConsoleSource = fs.readFileSync(
+      path.resolve(process.cwd(), 'src/components/AdminLicenseModal.tsx'),
+      'utf8'
+    );
+    assert.ok(
+      adminConsoleSource.includes('{isMasterAdminOrOwner && (') &&
+        adminConsoleSource.includes('data-testid="admin-console-download-blueprint-pdf-btn"'),
+      'AdminLicenseModal must expose admin-console-download-blueprint-pdf-btn exclusively when isMasterAdminOrOwner is true'
+    );
+
+    // Verify landing page layout realignment:
+    // 1. Top cover banner and bottom post-footer cover banner both use object-contain
+    assert.ok(landingSource.includes('data-testid="landing-top-cover-banner"'));
+    assert.ok(landingSource.includes('data-testid="landing-bottom-cover-banner"'));
+    const footerCloseIdx = landingSource.indexOf('</footer>');
+    const bottomBannerIdx = landingSource.indexOf('data-testid="landing-bottom-cover-banner"');
+    assert.ok(
+      footerCloseIdx > 0 && bottomBannerIdx > footerCloseIdx,
+      'Second cover banner must be placed below the footer'
+    );
+    const topBannerBlock = landingSource.slice(
+      landingSource.indexOf('data-testid="landing-top-cover-banner"'),
+      landingSource.indexOf('id="pin-verification-gate"')
+    );
+    const bottomBannerBlock = landingSource.slice(bottomBannerIdx);
+    assert.ok(
+      topBannerBlock.includes('object-contain') && !topBannerBlock.includes('object-cover'),
+      'Top cover banner must use object-contain without object-cover cropping'
+    );
+    assert.ok(
+      bottomBannerBlock.includes('object-contain') && !bottomBannerBlock.includes('object-cover'),
+      'Bottom cover banner must use object-contain without object-cover cropping'
+    );
+
+    // 2. Central RAMTi emblem flanked by left and right circuit trace wings
+    assert.ok(landingSource.includes('data-testid="ramti-emblem-left-wing"'));
+    assert.ok(landingSource.includes('data-testid="ramti-emblem-right-wing"'));
+
+    // 3. Equal 50/50 side-by-side split (lg:col-span-6) for Studios and Hardware Iconography
+    assert.ok(landingSource.includes('data-testid="landing-ramti-studios-grid"'));
+    assert.ok(landingSource.includes('data-testid="landing-ramti-module-icons-grid"'));
+  });
 });
+
+

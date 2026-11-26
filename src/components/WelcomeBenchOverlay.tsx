@@ -8,6 +8,7 @@ import { createPortal } from 'react-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { ArrowRight, Cpu, ShieldCheck, Sparkles } from 'lucide-react';
 import { APP_ICON_SRC, CREATOR_CREDENTIALS } from '../constants/branding';
+import { RamtiVectorEmblem } from './icons/RamtiBrandAssets';
 import { playAccessGrantedChime } from '../utils/audioFeedback';
 
 export interface WelcomeBenchOverlayProps {
@@ -30,6 +31,8 @@ export const WelcomeBenchOverlay: React.FC<WelcomeBenchOverlayProps> = ({
   const shouldReduceMotion = useReducedMotion();
   const [stage, setStage] = useState<WelcomeStage>('BENCH_LAB');
   const [iconFailed, setIconFailed] = useState(false);
+  const onDismissRef = React.useRef(onDismiss);
+  onDismissRef.current = onDismiss;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -45,7 +48,7 @@ export const WelcomeBenchOverlay: React.FC<WelcomeBenchOverlayProps> = ({
 
     const autoCloseTimer = window.setTimeout(
       () => {
-        onDismiss();
+        onDismissRef.current();
       },
       shouldReduceMotion ? 2600 : 5600
     );
@@ -53,7 +56,7 @@ export const WelcomeBenchOverlay: React.FC<WelcomeBenchOverlayProps> = ({
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' || e.key === 'Enter') {
         e.preventDefault();
-        onDismiss();
+        onDismissRef.current();
       }
     };
     window.addEventListener('keydown', handleKey);
@@ -63,7 +66,7 @@ export const WelcomeBenchOverlay: React.FC<WelcomeBenchOverlayProps> = ({
       window.clearTimeout(autoCloseTimer);
       window.removeEventListener('keydown', handleKey);
     };
-  }, [isOpen, onDismiss, shouldReduceMotion]);
+  }, [isOpen, shouldReduceMotion]);
 
   if (typeof document === 'undefined') {
     return null;
@@ -83,7 +86,7 @@ export const WelcomeBenchOverlay: React.FC<WelcomeBenchOverlayProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={shouldReduceMotion ? { duration: 0.01 } : { duration: 0.28 }}
-          className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-[#03070E]/90 backdrop-blur-md"
+          className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-[#03070E]/90 backdrop-blur-[30px]"
         >
           {/* Subtle atmospheric radial sheen */}
           <div
@@ -100,7 +103,7 @@ export const WelcomeBenchOverlay: React.FC<WelcomeBenchOverlayProps> = ({
                 ? { duration: 0.01 }
                 : { duration: 0.35, ease: [0.16, 1, 0.3, 1] }
             }
-            className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-[#19C8F5]/40 bg-[#0A1220]/90 p-6 sm:p-8 text-[#EAF3FF] shadow-[0_28px_90px_rgba(2,8,20,0.92)] backdrop-blur-xl"
+            className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-[#19C8F5]/40 bg-[#0A1220]/88 p-6 sm:p-8 text-[#EAF3FF] shadow-[0_28px_90px_rgba(2,8,20,0.92)] backdrop-blur-[30px]"
           >
             {/* Top accent hairline */}
             <div
@@ -115,7 +118,7 @@ export const WelcomeBenchOverlay: React.FC<WelcomeBenchOverlayProps> = ({
                   {!iconFailed ? (
                     <img
                       src={APP_ICON_SRC}
-                      alt="AutoElectric Lab Pro emblem"
+                      alt="AutoElectric Lab PRO emblem"
                       referrerPolicy="no-referrer"
                       onError={() => setIconFailed(true)}
                       className="h-full w-full object-cover"
@@ -146,8 +149,18 @@ export const WelcomeBenchOverlay: React.FC<WelcomeBenchOverlayProps> = ({
               </button>
             </div>
 
+            {/* Centered Primary RAMTi Trademark Emblem & 3-Line Subtitle */}
+            <div className="pt-4 flex flex-col items-center justify-center">
+              <RamtiVectorEmblem
+                size={52}
+                variant="flat-white"
+                showWordmark
+                showSubtitle
+              />
+            </div>
+
             {/* Stage Transition Body */}
-            <div className="py-6 min-h-[230px] flex flex-col justify-center">
+            <div className="py-4 min-h-[210px] flex flex-col justify-center">
               <AnimatePresence mode="wait">
                 {stage === 'BENCH_LAB' ? (
                   <motion.div

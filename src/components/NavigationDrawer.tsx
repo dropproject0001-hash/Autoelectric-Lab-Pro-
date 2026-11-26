@@ -53,6 +53,12 @@ import { LicenseStatusBadge } from './billing/LicenseStatusBadge';
 import type { WorkspaceTab } from './workspace/workspaceTypes';
 import type { LabTab } from './LabTopNav';
 import type { LabDrawerIconName } from './icons/LabDrawerIcons';
+import {
+  RamtiModuleIcon,
+  RamtiStudioVisualCard,
+  RamtiVectorEmblem,
+  type RamtiModuleIconName,
+} from './icons/RamtiBrandAssets';
 
 export interface DrawerNavTabItem {
   id: LabTab;
@@ -66,6 +72,7 @@ export interface DrawerActionItem {
   description: string;
   icon: LucideIcon;
   drawerIcon?: LabDrawerIconName;
+  ramtiIcon?: RamtiModuleIconName;
   metaText?: string;
   tone?: 'default' | 'sky' | 'amber' | 'emerald' | 'rose';
   showChevron?: boolean;
@@ -137,6 +144,16 @@ const ICON_TONE_CLASSES: Record<NonNullable<DrawerActionItem['tone']>, string> =
 const FOCUS_RING =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#19C8F5] focus-visible:ring-offset-1 focus-visible:ring-offset-[#060B14]';
 
+const TAB_TO_RAMTI_ICON: Record<LabTab, RamtiModuleIconName> = {
+  BENCH_LAB: 'home',
+  WIRING_DIAGRAM: 'wiring_schematics',
+  THREE_D_TWIN: 'dashboard',
+  ECU_PINOUT: 'harness_ecu_pinouts',
+  OSCILLOSCOPE: 'oscilloscope',
+  PCB_SCANNER: 'pcb_scanners',
+  REPAIR_GUIDE: 'help_support',
+};
+
 function DrawerActionButton({
   tool,
   onSelect,
@@ -160,16 +177,25 @@ function DrawerActionButton({
       ].join(' ')}
     >
       <span className="flex min-w-0 items-center gap-3.5">
-        <Icon
-          aria-hidden="true"
-          size={24}
-          strokeWidth={1.75}
-          className={`h-6 w-6 shrink-0 transition-all duration-150 ${
-            tool.isActive
-              ? 'text-[#19C8F5] drop-shadow-[0_0_8px_rgba(25,200,245,0.5)]'
-              : toneClass
-          }`}
-        />
+        {tool.ramtiIcon ? (
+          <RamtiModuleIcon
+            name={tool.ramtiIcon}
+            size={24}
+            active={Boolean(tool.isActive)}
+            className="transition-transform duration-150 group-hover:scale-105"
+          />
+        ) : (
+          <Icon
+            aria-hidden="true"
+            size={24}
+            strokeWidth={1.75}
+            className={`h-6 w-6 shrink-0 transition-all duration-150 ${
+              tool.isActive
+                ? 'text-[#19C8F5] drop-shadow-[0_0_8px_rgba(25,200,245,0.5)]'
+                : toneClass
+            }`}
+          />
+        )}
         <span className="truncate">{tool.label}</span>
       </span>
       <span className="flex shrink-0 items-center gap-1.5">
@@ -267,6 +293,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
               description: 'Open 2,080 PH Trouble Scenarios Lookup & Diagnostic Dossier drawer',
               icon: Database,
               drawerIcon: 'server-drawer' as LabDrawerIconName,
+              ramtiIcon: 'scenario_lookup' as RamtiModuleIconName,
               metaText: '2,080',
               tone: 'sky' as const,
               isActive: isLookupDrawerOpen,
@@ -281,6 +308,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
               label: 'Academy Lab',
               description: 'University 3-Tier Curriculum Matrix & SHA-256 Exam PDF',
               icon: GraduationCap,
+              ramtiIcon: 'academy_lab' as RamtiModuleIconName,
               metaText: '3 Tiers',
               tone: 'sky' as const,
               showChevron: true,
@@ -295,6 +323,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
               label: 'AI Diagnostic Studio',
               description: 'Diagnostic Chat, Audio Transcribe, Maps, Video & Diagram Studio',
               icon: Sparkles,
+              ramtiIcon: 'ai_diagnostic_studio' as RamtiModuleIconName,
               tone: 'sky' as const,
               onClick: onOpenGeminiStudio,
             },
@@ -304,10 +333,11 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
         ? [
             {
               id: 'batch-pin-test',
-              label: 'Batch Pin Test',
+              label: 'Batch Pin Test (Multimeter)',
               description:
                 'Run bulk electrical continuity check on all selected ECU pins',
               icon: ListChecks,
+              ramtiIcon: 'multimeter' as RamtiModuleIconName,
               metaText:
                 batchSelectedPinCount !== undefined
                   ? `${batchSelectedPinCount} Pins`
@@ -326,6 +356,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
               description: 'Enter physical multimeter readings for evidence-ranked ECU fault isolation',
               icon: Cpu,
               drawerIcon: 'trouble-drawer' as LabDrawerIconName,
+              ramtiIcon: 'bench_fault_isolation' as RamtiModuleIconName,
               tone: 'amber' as const,
               onClick: onOpenPhysicalFaultModal,
             },
@@ -339,6 +370,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
               description: 'Record live bench actions and run sequential voice macros',
               icon: Layers,
               drawerIcon: 'tray-stack' as LabDrawerIconName,
+              ramtiIcon: 'ecu_flashing' as RamtiModuleIconName,
               tone: 'amber' as const,
               onClick: onOpenVoiceMacroLibrary,
             },
@@ -349,6 +381,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
         label: 'Offline Bot',
         description: 'Open the offline diagnostic assistant',
         icon: Bot,
+        ramtiIcon: 'diagnostics',
         tone: 'amber',
         onClick: onOpenOfflineBot,
       },
@@ -357,6 +390,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
         label: 'Live OEM Search',
         description: 'Search OEM bulletins, service information, and pinouts',
         icon: Globe,
+        ramtiIcon: 'power_supply',
         tone: 'emerald',
         onClick: onOpenGroundedSearch,
       },
@@ -383,6 +417,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
         description: 'Save or load Firebase Firestore & local IndexedDB bench sessions and logs',
         icon: Save,
         drawerIcon: 'archive',
+        ramtiIcon: 'cloud_sync',
         tone: 'emerald',
         showChevron: true,
         onClick: onOpenCloudModal,
@@ -392,6 +427,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
         label: 'Google Docs & PDF',
         description: 'Publish live MNA ECU bench reports to Google Docs or Signed A4 PDF',
         icon: FileText,
+        ramtiIcon: 'file_manager',
         tone: 'sky',
         showChevron: true,
         onClick: onOpenDocsModal,
@@ -401,6 +437,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
         label: 'Google Drive & Picker',
         description: 'Browse Drive, pick files with Google Picker, or sync bench JSON snapshots',
         icon: HardDrive,
+        ramtiIcon: 'file_manager',
         tone: 'sky',
         showChevron: true,
         onClick: () => onOpenWorkspaceModal('DRIVE'),
@@ -410,6 +447,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
         label: 'Gmail Dispatch',
         description: 'Read, compose, draft, or send live ECU diagnostic reports via Gmail',
         icon: Mail,
+        ramtiIcon: 'notifications',
         tone: 'amber',
         showChevron: true,
         onClick: () => onOpenWorkspaceModal('GMAIL'),
@@ -419,6 +457,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
         label: 'Google Tasks',
         description: 'Sync ECU DTC & fault isolation checklists directly with Google Tasks',
         icon: CheckSquare,
+        ramtiIcon: 'diagnostics',
         tone: 'emerald',
         showChevron: true,
         onClick: () => onOpenWorkspaceModal('TASKS'),
@@ -428,6 +467,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
         label: 'Google Classroom',
         description: 'Browse active courses and share ECU lab announcements or assignments',
         icon: GraduationCap,
+        ramtiIcon: 'academy_lab',
         tone: 'emerald',
         showChevron: true,
         onClick: () => onOpenWorkspaceModal('CLASSROOM'),
@@ -437,6 +477,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
         label: 'Local Exports (.CSV/.JSON)',
         description: 'Offline CSV pinout matrices, JSON snapshots, TXT reports, and checklists',
         icon: FileSpreadsheet,
+        ramtiIcon: 'file_manager',
         tone: 'default',
         showChevron: true,
         onClick: () => onOpenWorkspaceModal('LOCAL'),
@@ -454,6 +495,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
               label: 'Audio Alerts',
               description: 'Configure acoustic alerts for short circuits and voltage drops',
               icon: Volume2,
+              ramtiIcon: 'notifications' as RamtiModuleIconName,
               metaText: activeAudioAlertCount > 0 ? String(activeAudioAlertCount) : undefined,
               tone: (activeAudioAlertCount > 0 ? 'amber' : 'emerald') as 'amber' | 'emerald',
               onClick: onToggleAudioAlertsPanel,
@@ -467,6 +509,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
               label: 'Trial PIN Access',
               description: 'Enter 8-digit Trial PIN or manage 3–6h trial sessions via Master Admin PIN',
               icon: KeyRound,
+              ramtiIcon: 'security_settings' as RamtiModuleIconName,
               metaText:
                 accessMode === 'TRIAL_ACTIVE'
                   ? formatTrialCountdown(remainingSeconds)
@@ -490,6 +533,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
         label: 'Lock Bench Lab',
         description: 'Return to the Introduction Login PIN Verification Landing Page',
         icon: Lock,
+        ramtiIcon: 'security_settings' as RamtiModuleIconName,
         metaText: 'Exit',
         tone: 'rose' as const,
         onClick: lockBenchSession,
@@ -501,6 +545,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
               label: 'Update App',
               description: 'A new version of Virtual ECU Lab Pro is ready. Click to update now.',
               icon: RefreshCw,
+              ramtiIcon: 'settings' as RamtiModuleIconName,
               tone: 'emerald' as const,
               metaText: 'Ready',
               onClick: () => pwa.applyUpdate(),
@@ -515,6 +560,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
               description:
                 'Install Virtual ECU Lab Pro on your device for standalone offline-ready operation',
               icon: Download,
+              ramtiIcon: 'settings' as RamtiModuleIconName,
               tone: 'amber' as const,
               metaText: 'PWA',
               onClick: () => {
@@ -540,6 +586,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
                 ? 'Virtual ECU Lab Pro is running as an installed app. Open PWA status & update controls.'
                 : 'Install AutoElectric Lab Pro on Android, Desktop, or iOS',
               icon: pwa?.isInstalled ? CheckCircle2 : pwa?.isIOS ? Smartphone : Download,
+              ramtiIcon: 'settings' as RamtiModuleIconName,
               tone: 'emerald' as const,
               metaText: pwa?.isInstalled ? 'Installed' : undefined,
               showChevron: true,
@@ -554,6 +601,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
               label: 'Admin PIN / QR',
               description: 'Master Admin Offline PIN Generator & E-Wallet QR Uploader',
               icon: KeyRound,
+              ramtiIcon: 'user_profile' as RamtiModuleIconName,
               metaText: 'Admin',
               tone: 'amber' as const,
               showChevron: true,
@@ -568,6 +616,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
               label: bilingualLang === 'TL' ? 'Gabay at Tulong' : 'Help & Quick Guides',
               description: '5 interactive beginner-safe ECU bench guides (Taglish & English)',
               icon: BookOpen,
+              ramtiIcon: 'help_support' as RamtiModuleIconName,
               tone: 'sky' as const,
               showChevron: true,
               onClick: onOpenHelpDrawer,
@@ -579,6 +628,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
         label: 'Slide Walkthrough',
         description: 'Open technician visual slide walkthrough and credentials',
         icon: HelpCircle,
+        ramtiIcon: 'help_support',
         tone: 'default',
         showChevron: true,
         onClick: onOpenIntroModal,
@@ -588,6 +638,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
         label: 'Reset Bench',
         description: 'Reset the bench to factory defaults',
         icon: RotateCcw,
+        ramtiIcon: 'settings',
         tone: 'rose',
         onClick: onResetLab,
       },
@@ -745,7 +796,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
             className="fixed inset-0 bg-[#02050B]/82 backdrop-blur-[3px] will-change-[opacity]"
           />
 
-          {/* Left-Sliding Overlay Drawer Panel */}
+          {/* Left-Sliding Overlay Drawer Panel — 30px Glassmorphic Semi-Transparent Dark Motif */}
           <motion.aside
             key="navigation-drawer-panel"
             id={drawerId}
@@ -753,7 +804,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
             aria-modal="true"
             aria-labelledby={titleId}
             variants={panelVariants}
-            className="hud-drawer-surface relative z-10 flex h-[100dvh] w-[304px] sm:w-[324px] max-w-[88vw] flex-col pl-[env(safe-area-inset-left)] text-[#EAF3FF] will-change-transform"
+            className="hud-drawer-surface relative z-10 flex h-[100dvh] w-[316px] sm:w-[338px] max-w-[90vw] flex-col pl-[env(safe-area-inset-left)] text-[#EAF3FF] backdrop-blur-[30px] bg-[#060C16]/88 will-change-transform"
           >
             {/* Electric Cyan Top Edge Highlight */}
             <div
@@ -761,8 +812,8 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
               className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[1.5px] bg-gradient-to-r from-[#1677FF]/40 via-[#19C8F5]/85 to-transparent"
             />
 
-            {/* Branded AutoElectric Lab Pro Drawer Header */}
-            <div className="relative shrink-0 overflow-hidden border-b border-[#203653] bg-[#0A1220] px-4 pb-3.5 pt-[max(0.875rem,env(safe-area-inset-top))]">
+            {/* Branded RAMTi AutoElectric Lab PRO Drawer Header */}
+            <div className="relative shrink-0 overflow-hidden border-b border-[#203653] bg-[#0A1220]/90 px-4 pb-4 pt-[max(0.875rem,env(safe-area-inset-top))]">
               {!bannerFailed && (
                 <img
                   src={APP_LOGO_SRC}
@@ -775,38 +826,39 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
               )}
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#060B14]/95 via-[#0A1220]/82 to-[#060B14]/92"
+                className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#060B14]/80 via-[#0A1220]/86 to-[#060B14]/96"
               />
 
-              <div className="relative z-10 flex items-center justify-between gap-2.5">
-                <div className="flex min-w-0 items-center gap-2.5">
-                  <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#19C8F5]/55 bg-[#050A12] shadow-[0_0_16px_rgba(25,200,245,0.18)]">
+              {/* Top Bar with Close Action */}
+              <div className="relative z-10 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-[#19C8F5]/55 bg-[#050A12]">
                     {!emblemFailed ? (
                       <img
                         src={APP_ICON_SRC}
-                        alt="AutoElectric Lab Pro emblem"
+                        alt="RAMTi AutoElectric Lab PRO emblem"
                         referrerPolicy="no-referrer"
                         onError={() => setEmblemFailed(true)}
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <Cpu className="h-5 w-5 text-[#19C8F5]" aria-hidden="true" />
+                      <Cpu className="h-4 w-4 text-[#19C8F5]" aria-hidden="true" />
                     )}
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-baseline gap-1 whitespace-nowrap leading-none">
-                      <span className="font-body text-[15px] font-bold italic tracking-tight brand-wordmark-silver">
+                      <span className="font-body text-[14px] font-bold italic tracking-tight brand-wordmark-silver">
                         AutoElectric Lab
                       </span>
-                      <span className="font-body text-[15px] font-bold italic tracking-tight brand-wordmark-amber">
-                        Pro
+                      <span className="font-body text-[14px] font-bold italic tracking-tight brand-wordmark-amber">
+                        PRO
                       </span>
                     </div>
                     <h2
                       id={titleId}
-                      className="mt-1 font-hud text-[11px] font-bold uppercase tracking-[0.14em] text-[#19C8F5]"
+                      className="mt-0.5 font-hud text-[10.5px] font-bold uppercase tracking-[0.14em] text-[#19C8F5]"
                     >
-                      Modules &amp; Tools
+                      RAMTi Modules &amp; Studios
                     </h2>
                   </div>
                 </div>
@@ -821,6 +873,17 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
                   <X className="h-4 w-4" aria-hidden="true" />
                 </button>
               </div>
+
+              {/* Centered Flat-Vector RAMTi Trademark Emblem & 3-Line Geometric Subtitle with Breathing Room */}
+              <div className="relative z-10 mt-2.5 flex flex-col items-center justify-center border-t border-[#203653]/65 pt-2.5">
+                <RamtiVectorEmblem
+                  size={44}
+                  variant="flat-white"
+                  showWordmark
+                  showSubtitle
+                  compactSubtitle
+                />
+              </div>
             </div>
 
             {/* Scrollable Midnight-Navy & Electric-Cyan Section Cards */}
@@ -828,7 +891,58 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
               variants={drawerListVariants}
               className="flex-1 overflow-y-auto overscroll-contain px-3.5 py-3.5 space-y-3"
             >
-              {/* Section 1: DIAGNOSTIC TOOLS */}
+              {/* Section 0: SPECIALIZED STUDIOS (Visual Banner Cards) */}
+              {(onOpenAcademyCurriculum || onOpenLookupDrawer || onOpenGeminiStudio) && (
+                <motion.section
+                  variants={drawerSectionVariants}
+                  aria-label="Specialized Studios"
+                  className="hud-drawer-section"
+                >
+                  <div className="mb-2 flex items-center justify-between border-b border-[#203653]/75 px-2 pb-1.5 pt-0.5">
+                    <span className="font-hud text-[11.5px] font-bold uppercase tracking-[0.14em] text-[#19C8F5]">
+                      Specialized Studios
+                    </span>
+                    <span className="font-mono text-[10px] text-[#91A4BD] uppercase">
+                      RAMTi Suite
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {onOpenAcademyCurriculum && (
+                      <RamtiStudioVisualCard
+                        studio="academy_lab"
+                        compact
+                        onClick={() => {
+                          onClose(false);
+                          onOpenAcademyCurriculum();
+                        }}
+                      />
+                    )}
+                    {onOpenLookupDrawer && (
+                      <RamtiStudioVisualCard
+                        studio="scenario_lookup"
+                        compact
+                        isActive={isLookupDrawerOpen}
+                        onClick={() => {
+                          onClose(false);
+                          onOpenLookupDrawer();
+                        }}
+                      />
+                    )}
+                    {onOpenGeminiStudio && (
+                      <RamtiStudioVisualCard
+                        studio="ai_diagnostic_studio"
+                        compact
+                        onClick={() => {
+                          onClose(false);
+                          onOpenGeminiStudio();
+                        }}
+                      />
+                    )}
+                  </div>
+                </motion.section>
+              )}
+
+              {/* Section 1: DIAGNOSTIC TOOLS & HARDWARE LIBRARY */}
               {diagnosticTools.length > 0 && (
                 <motion.section
                   variants={drawerSectionVariants}
@@ -837,7 +951,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
                 >
                   <div className="mb-1.5 flex items-center justify-between border-b border-[#203653]/75 px-2 pb-1.5 pt-0.5">
                     <span className="font-hud text-[11.5px] font-bold uppercase tracking-[0.14em] text-[#91A4BD]">
-                      Diagnostic Tools
+                      Tool &amp; Hardware Library
                     </span>
                     <span className="font-mono text-[10px] text-[#91A4BD]/80 tabular-nums">
                       {diagnosticTools.length}
@@ -863,7 +977,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
                 </motion.section>
               )}
 
-              {/* Section 2: WORKSPACE VIEWS */}
+              {/* Section 2: CORE NAVIGATION & WORKSPACE VIEWS */}
               <motion.section
                 variants={drawerSectionVariants}
                 aria-label="Workspace Views"
@@ -871,7 +985,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
               >
                 <div className="mb-1.5 flex items-center justify-between border-b border-[#203653]/75 px-2 pb-1.5 pt-0.5">
                   <span className="font-hud text-[11.5px] font-bold uppercase tracking-[0.14em] text-[#91A4BD]">
-                    Workspace Views
+                    Core Navigation &amp; Views
                   </span>
                   <span className="font-mono text-[10.5px] font-semibold text-[#19C8F5]">
                     Local Mode
@@ -879,8 +993,8 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
                 </div>
                 <div className="flex flex-col gap-1">
                   {navTabs.map((tab) => {
-                    const Icon = tab.icon;
                     const isActive = activeTab === tab.id;
+                    const ramtiIconName = TAB_TO_RAMTI_ICON[tab.id];
                     return (
                       <motion.div
                         key={tab.id}
@@ -901,15 +1015,11 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
                           ].join(' ')}
                         >
                           <span className="flex min-w-0 items-center gap-3.5">
-                            <Icon
-                              aria-hidden="true"
+                            <RamtiModuleIcon
+                              name={ramtiIconName}
                               size={24}
-                              strokeWidth={1.75}
-                              className={`h-6 w-6 shrink-0 transition-all duration-150 ${
-                                isActive
-                                  ? 'text-[#19C8F5] drop-shadow-[0_0_8px_rgba(25,200,245,0.5)]'
-                                  : 'text-[#91A4BD] group-hover:text-[#19C8F5] group-hover:drop-shadow-[0_0_8px_rgba(25,200,245,0.45)]'
-                              }`}
+                              active={isActive}
+                              className="transition-transform duration-150 group-hover:scale-105"
                             />
                             <span className="truncate">{tab.label}</span>
                           </span>

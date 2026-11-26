@@ -25,6 +25,7 @@ import {
   subscribeTrialLockEvents,
 } from '../services/trialPinClientService';
 import { useAuth } from './AuthContext';
+import { isVerifiedOwnerEmail } from '../constants/branding';
 
 export type AccessCapabilityMode =
   | 'ADMIN'
@@ -50,6 +51,7 @@ interface TrialAccessContextValue {
   canUseAi: boolean;
   canUseExports: boolean;
   isAdminUnlocked: boolean;
+  isMasterAdminOrOwner: boolean;
   adminAuditTrials: ClientTrialPinRecord[];
   adminAuditLog: ClientTrialAuditEvent[];
   adminAuditSummary: AdminTrialAuditSummary | null;
@@ -88,6 +90,7 @@ const TrialAccessContext = createContext<TrialAccessContextValue>({
   canUseAi: false,
   canUseExports: false,
   isAdminUnlocked: false,
+  isMasterAdminOrOwner: false,
   adminAuditTrials: [],
   adminAuditLog: [],
   adminAuditSummary: null,
@@ -123,6 +126,9 @@ export function formatTrialCountdown(totalSeconds: number | null): string {
 export const TrialAccessProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user: googleUser, authReady: firebaseAuthReady } = useAuth();
   const isGoogleSignedIn = Boolean(googleUser && googleUser.emailVerified);
+  const isOwnerGoogleAccount = Boolean(
+    googleUser && googleUser.emailVerified && isVerifiedOwnerEmail(googleUser.email)
+  );
   const [accessReady, setAccessReady] = useState(false);
   const [accessMode, setAccessMode] = useState<AccessCapabilityMode>('UNLICENSED');
   const [trialRecord, setTrialRecord] = useState<ClientTrialPinRecord | null>(null);
@@ -370,6 +376,10 @@ export const TrialAccessProvider: React.FC<{ children: React.ReactNode }> = ({ c
       (accessMode === 'ADMIN' && adminEnteredBench) ||
       (accessMode === 'TRIAL_ACTIVE' && (remainingSeconds === null || remainingSeconds > 0)));
 
+  const isMasterAdminOrOwner = Boolean(
+    isAdminUnlocked || accessMode === 'ADMIN' || isOwnerGoogleAccount
+  );
+
   // Lock AI & Exports strictly when not holding active verified account or PIN access
   const canUseAi = hasActiveProAccess;
   const canUseExports = hasActiveProAccess;
@@ -391,6 +401,7 @@ export const TrialAccessProvider: React.FC<{ children: React.ReactNode }> = ({ c
       canUseAi,
       canUseExports,
       isAdminUnlocked,
+      isMasterAdminOrOwner,
       adminAuditTrials,
       adminAuditLog,
       adminAuditSummary,
@@ -425,6 +436,7 @@ export const TrialAccessProvider: React.FC<{ children: React.ReactNode }> = ({ c
       canUseAi,
       canUseExports,
       isAdminUnlocked,
+      isMasterAdminOrOwner,
       adminAuditTrials,
       adminAuditLog,
       adminAuditSummary,

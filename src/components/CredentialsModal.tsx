@@ -8,6 +8,7 @@ import { createPortal } from 'react-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import {
   Cpu,
+  FileDown,
   HelpCircle,
   KeyRound,
   Mail,
@@ -15,13 +16,23 @@ import {
   TrendingUp,
   X,
 } from 'lucide-react';
-import { APP_ICON_SRC, APP_LOGO_SRC, CREATOR_CREDENTIALS } from '../constants/branding';
+import {
+  APP_ICON_SRC,
+  APP_LOGO_SRC,
+  CREATOR_CREDENTIALS,
+  isVerifiedOwnerEmail,
+} from '../constants/branding';
+import { useAuth } from '../context/AuthContext';
+import { useTrialAccess } from '../context/TrialAccessContext';
+import { RamtiVectorEmblem } from './icons/RamtiBrandAssets';
+import { generateSystemBlueprintPdf } from '../services/systemBlueprintPdfService';
 
 export interface CredentialsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenLicenseModal?: () => void;
   onOpenWalkthroughModal?: () => void;
+  isMasterAdminOrOwner?: boolean;
 }
 
 const FOCUS_RING =
@@ -32,10 +43,20 @@ export const CredentialsModal: React.FC<CredentialsModalProps> = ({
   onClose,
   onOpenLicenseModal,
   onOpenWalkthroughModal,
+  isMasterAdminOrOwner: isMasterAdminOrOwnerProp,
 }) => {
   const titleId = useId();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const shouldReduceMotion = useReducedMotion();
+  const { user: googleUser } = useAuth();
+  const { isAdminUnlocked, isMasterAdminOrOwner } = useTrialAccess();
+  const canDownloadSystemBlueprint =
+    isMasterAdminOrOwnerProp ??
+    Boolean(
+      isMasterAdminOrOwner ||
+        isAdminUnlocked ||
+        (googleUser?.emailVerified && isVerifiedOwnerEmail(googleUser?.email))
+    );
   const [iconFailed, setIconFailed] = useState(false);
   const [bannerFailed, setBannerFailed] = useState(false);
 
@@ -83,7 +104,7 @@ export const CredentialsModal: React.FC<CredentialsModalProps> = ({
           <div
             aria-hidden="true"
             onClick={onClose}
-            className="fixed inset-0 bg-[#02050B]/84 backdrop-blur-[3px]"
+            className="fixed inset-0 bg-[#02050B]/84 backdrop-blur-[30px]"
           />
 
           {/* Modal Dialog */}
@@ -100,7 +121,7 @@ export const CredentialsModal: React.FC<CredentialsModalProps> = ({
                 ? { duration: 0.01 }
                 : { duration: 0.22, ease: [0.22, 1, 0.36, 1] }
             }
-            className="relative z-10 flex max-h-[90dvh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-[#203653] bg-gradient-to-b from-[#0E192A] via-[#0A1220] to-[#060B14] text-[#EAF3FF] shadow-[0_24px_72px_rgba(2,6,14,0.88)]"
+            className="relative z-10 flex max-h-[90dvh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-[#203653] bg-gradient-to-b from-[#0E192A]/95 via-[#0A1220]/95 to-[#060B14]/95 text-[#EAF3FF] backdrop-blur-[30px] shadow-[0_24px_72px_rgba(2,6,14,0.88)]"
           >
             {/* Electric Cyan Top Edge Highlight */}
             <div
@@ -131,7 +152,7 @@ export const CredentialsModal: React.FC<CredentialsModalProps> = ({
                     {!iconFailed ? (
                       <img
                         src={APP_ICON_SRC}
-                        alt="AutoElectric Lab Pro app icon"
+                        alt="AutoElectric Lab PRO app icon"
                         referrerPolicy="no-referrer"
                         onError={() => setIconFailed(true)}
                         className="h-full w-full object-cover"
@@ -146,7 +167,7 @@ export const CredentialsModal: React.FC<CredentialsModalProps> = ({
                         AutoElectric Lab
                       </span>
                       <span className="font-body text-[16px] sm:text-[18px] font-bold italic tracking-tight brand-wordmark-amber">
-                        Pro
+                        PRO
                       </span>
                     </div>
                     <h2
@@ -172,6 +193,16 @@ export const CredentialsModal: React.FC<CredentialsModalProps> = ({
 
             {/* Scrollable Body */}
             <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-5 space-y-4">
+              {/* Centered Primary RAMTi Trademark Emblem & 3-Line Subtitle */}
+              <div className="flex flex-col items-center justify-center border-b border-[#203653]/70 pb-2">
+                <RamtiVectorEmblem
+                  size={52}
+                  variant="flat-white"
+                  showWordmark
+                  showSubtitle
+                />
+              </div>
+
               <p className="text-[12.5px] leading-relaxed text-[#91A4BD]">
                 Deterministic Virtual ECU Workbench built for accountable workshop diagnostics,
                 Modified Nodal Analysis circuit simulation, and verified OEM reference governance.
@@ -285,6 +316,19 @@ export const CredentialsModal: React.FC<CredentialsModalProps> = ({
                   >
                     <HelpCircle className="h-3.5 w-3.5 text-[#19C8F5] shrink-0" aria-hidden="true" />
                     <span>Slide Walkthrough</span>
+                  </button>
+                )}
+                {canDownloadSystemBlueprint && (
+                  <button
+                    type="button"
+                    data-testid="credentials-download-blueprint-pdf-btn"
+                    onClick={() => {
+                      void generateSystemBlueprintPdf();
+                    }}
+                    className={`hw-btn inline-flex min-h-[38px] items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-semibold text-[#19C8F5] cursor-pointer whitespace-nowrap ${FOCUS_RING}`}
+                  >
+                    <FileDown className="h-3.5 w-3.5 text-[#19C8F5] shrink-0" aria-hidden="true" />
+                    <span>System Blueprint (PDF)</span>
                   </button>
                 )}
               </div>

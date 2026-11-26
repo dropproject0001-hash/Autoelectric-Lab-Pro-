@@ -90,7 +90,9 @@ async function main() {
     };
     walk(root);
 
-    const pdfs = assets.filter((a) => a.ext === '.pdf');
+    const pdfs = assets.filter(
+      (a) => a.ext === '.pdf' && a.rel !== 'public/AutoElectric_Lab_PRO_System_Blueprint.pdf'
+    );
     assert.equal(pdfs.length, 0, `Expected 0 residual PDFs, found: ${pdfs.map((p) => p.rel).join(', ')}`);
 
     const backups = assets.filter((a) => a.ext === '.bak' || a.ext === '.tmp' || /copy/i.test(a.name));

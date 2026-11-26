@@ -23,9 +23,10 @@ import type { PowerSupplyState } from '../types/ecu';
 import type { PwaStateAndActions } from '../hooks/usePWA';
 import type { BilingualLang } from '../types/aiAssistant';
 import type { WorkspaceTab } from './workspace/workspaceTypes';
-import { APP_ICON_SRC } from '../constants/branding';
+import { APP_ICON_SRC, RAMTI_SUBTITLE_INLINE } from '../constants/branding';
 import { CredentialsModal } from './CredentialsModal';
 import { NavigationDrawer, type DrawerNavTabItem } from './NavigationDrawer';
+import { RamtiVectorEmblem } from './icons/RamtiBrandAssets';
 import { formatTrialCountdown, useTrialAccess } from '../context/TrialAccessContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -100,18 +101,18 @@ function BrandAppIcon() {
   const [failed, setFailed] = useState(false);
 
   return (
-    <div className="relative flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#19C8F5]/55 bg-[#050A12] shadow-[0_0_14px_rgba(25,200,245,0.2)]">
-      {!failed ? (
+    <div className="relative flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#19C8F5]/55 bg-[#050A12] shadow-[0_0_14px_rgba(25,200,245,0.22)]">
+      {!failed && (
         <img
           src={APP_ICON_SRC}
-          alt="AutoElectric Lab Pro app icon"
+          alt=""
+          aria-hidden="true"
           referrerPolicy="no-referrer"
           onError={() => setFailed(true)}
-          className="h-full w-full object-cover"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-35"
         />
-      ) : (
-        <Cpu className="h-5 w-5 text-[#19C8F5]" aria-hidden="true" />
       )}
+      <RamtiVectorEmblem size={28} variant="flat-white" className="relative z-10" />
     </div>
   );
 }
@@ -273,15 +274,18 @@ export const LabTopNav: React.FC<LabTopNavProps> = ({
             <BrandAppIcon />
             <div className="min-w-0 leading-none">
               <div className="flex items-baseline gap-1 min-w-0">
+                <span className="font-hud text-[11px] sm:text-[12px] font-extrabold tracking-[0.16em] text-[#19C8F5] shrink-0">
+                  RAMTi
+                </span>
                 <span className="font-body text-[14px] sm:text-[18px] lg:text-[19px] font-bold italic tracking-tight brand-wordmark-silver truncate">
                   AutoElectric Lab
                 </span>
                 <span className="font-body text-[14px] sm:text-[18px] lg:text-[19px] font-bold italic tracking-tight brand-wordmark-amber shrink-0">
-                  Pro
+                  PRO
                 </span>
               </div>
-              <p className="mt-0.5 hidden sm:block font-mono text-[9px] font-medium tracking-[0.12em] text-[#91a4bd] truncate">
-                Bench Testing &amp; Repairs | Powered by AI
+              <p className="mt-0.5 hidden sm:block font-body text-[9.5px] font-medium tracking-[0.1em] text-[#BCCDEF] truncate">
+                {RAMTI_SUBTITLE_INLINE}
               </p>
             </div>
           </button>

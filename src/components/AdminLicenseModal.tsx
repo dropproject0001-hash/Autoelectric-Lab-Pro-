@@ -16,6 +16,7 @@ import {
   Copy,
   Delete,
   Download,
+  FileDown,
   History,
   KeyRound,
   Laptop,
@@ -63,6 +64,7 @@ import {
   computeRemainingPercentForTrial,
   triggerAuditCsvDownload,
 } from '../utils/auditCsvExport';
+import { generateSystemBlueprintPdf } from '../services/systemBlueprintPdfService';
 
 export interface AdminLicenseModalProps {
   isOpen: boolean;
@@ -106,6 +108,7 @@ export const AdminLicenseModal: React.FC<AdminLicenseModalProps> = ({
     canUseAi,
     canUseExports,
     isAdminUnlocked,
+    isMasterAdminOrOwner,
     adminAuditTrials,
     adminAuditLog,
     adminAuditSummary,
@@ -525,6 +528,20 @@ export const AdminLicenseModal: React.FC<AdminLicenseModalProps> = ({
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
+            {isMasterAdminOrOwner && (
+              <button
+                type="button"
+                data-testid="admin-console-download-blueprint-pdf-btn"
+                onClick={() => {
+                  void generateSystemBlueprintPdf();
+                }}
+                className="hw-btn inline-flex h-9 items-center gap-1.5 rounded-md border border-[#19C8F5]/55 bg-[#0E2238] px-2.5 font-mono text-[11px] font-semibold uppercase text-[#19C8F5] hover:border-[#19C8F5] hover:bg-[#14304E] cursor-pointer whitespace-nowrap"
+                title="Download Principal System Architecture Blueprint (A4 PDF) — Master Admin & Owner Only"
+              >
+                <FileDown className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                <span className="hidden sm:inline">System Blueprint (PDF)</span>
+              </button>
+            )}
             <button
               type="button"
               onClick={lockBenchSession}

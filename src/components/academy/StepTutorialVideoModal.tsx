@@ -9,10 +9,15 @@ import {
   AlertTriangle,
   Cpu,
   Film,
+  ListOrdered,
   Pause,
   Play,
   RefreshCw,
+  Repeat,
   RotateCcw,
+  Shuffle,
+  SkipBack,
+  SkipForward,
   Volume2,
   VolumeX,
   X,
@@ -31,7 +36,8 @@ import {
   loadOrGenerateStepTutorial,
   type CachedStepTutorialEntry,
 } from '../../services/stepTutorialCacheService';
-import { playTutorialCueTone } from '../../utils/audioFeedback';
+import { playPinKeypadClick, playTutorialCueTone } from '../../utils/audioFeedback';
+import { RamtiVectorEmblem } from '../icons/RamtiBrandAssets';
 
 export interface StepTutorialVideoModalProps {
   isOpen: boolean;
@@ -44,6 +50,56 @@ export interface StepTutorialVideoModalProps {
 }
 
 const SPEED_OPTIONS = [0.75, 1, 1.25] as const;
+
+export interface TutorialStoryboardChapter {
+  chapterNumber: 1 | 2 | 3 | 4 | 5;
+  label: string;
+  title: string;
+  detail: string;
+  startRatio: number;
+}
+
+export function buildTutorialStoryboardChapters(
+  spec: GroundedStepTutorialSpec
+): readonly TutorialStoryboardChapter[] {
+  return [
+    {
+      chapterNumber: 1,
+      label: 'Chapter 1',
+      title: 'Pin & Connector Identification',
+      detail: `Locate ${spec.focusPinLabel} (${spec.focusPinDetail})`,
+      startRatio: 0,
+    },
+    {
+      chapterNumber: 2,
+      label: 'Chapter 2',
+      title: 'Instrument & Power Setup',
+      detail: `Set DMM to ${spec.dmmModeDisplay} · PSU ${spec.requiredPsuState} (${spec.psuVoltageSetting.toFixed(1)}V)`,
+      startRatio: 0.25,
+    },
+    {
+      chapterNumber: 3,
+      label: 'Chapter 3',
+      title: 'Live Probe Placement',
+      detail: `Red (+) → ${spec.redProbeLabel} · Black (-) → ${spec.blackProbeLabel}`,
+      startRatio: 0.5,
+    },
+    {
+      chapterNumber: 4,
+      label: 'Chapter 4',
+      title: 'Signal & Threshold Verification',
+      detail: `Verify ${spec.expectedReadingLabel} (${spec.toleranceLabel})`,
+      startRatio: 0.75,
+    },
+    {
+      chapterNumber: 5,
+      label: 'Chapter 5',
+      title: 'Fault Isolation & Next Step',
+      detail: `Confirm ${spec.oscilloscopeSignal} integrity before advancing`,
+      startRatio: 0.9,
+    },
+  ];
+}
 
 interface InteractiveStepSchematicProps {
   spec: GroundedStepTutorialSpec;
@@ -110,7 +166,7 @@ const InteractiveStepSchematic: React.FC<InteractiveStepSchematicProps> = ({
           fontSize="13"
           fontFamily="JetBrains Mono, monospace"
         >
-          INTERACTIVE SCHEMATIC GUIDANCE
+          RAMTi INTERACTIVE SCHEMATIC GUIDANCE
         </text>
 
         {/* 1. Bench Power Supply (Top Left) */}
@@ -309,6 +365,8 @@ export const StepTutorialVideoModal: React.FC<StepTutorialVideoModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [preferSchematic, setPreferSchematic] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [isLooping, setIsLooping] = useState(false);
+  const [isChapterMenuOpen, setIsChapterMenuOpen] = useState(false);
   const [currentTimeSec, setCurrentTimeSec] = useState(0);
   const [playbackSpeed, setPlaybackSpeed] = useState<(typeof SPEED_OPTIONS)[number]>(1);
   const [voiceEnabled, setVoiceEnabled] = useState(settings.voiceGuidanceEnabled);
@@ -326,6 +384,22 @@ export const StepTutorialVideoModal: React.FC<StepTutorialVideoModalProps> = ({
       buildStepTutorialSubtitles(activeSpec, settings.narrationStyle, durationSec),
     [entry?.subtitles, activeSpec, settings.narrationStyle, durationSec]
   );
+
+  const chapters = useMemo(
+    () => buildTutorialStoryboardChapters(activeSpec),
+    [activeSpec]
+  );
+
+  const progressRatio = durationSec > 0 ? Math.min(1, Math.max(0, currentTimeSec / durationSec)) : 0;
+
+  const activeChapter = useMemo(() => {
+    for (let i = chapters.length - 1; i >= 0; i--) {
+      if (progressRatio >= chapters[i].startRatio - 0.01) {
+        return chapters[i];
+      }
+    }
+    return chapters[0];
+  }, [chapters, progressRatio]);
 
   const loadTutorial = useCallback(
     async (forceRegenerate = false, signal?: AbortSignal) => {
@@ -361,6 +435,7 @@ export const StepTutorialVideoModal: React.FC<StepTutorialVideoModalProps> = ({
   useEffect(() => {
     if (!isOpen) return;
     setVoiceEnabled(settings.voiceGuidanceEnabled);
+    setIsChapterMenuOpen(false);
     const controller = new AbortController();
     void loadTutorial(false, controller.signal);
     return () => {
@@ -380,12 +455,16 @@ export const StepTutorialVideoModal: React.FC<StepTutorialVideoModalProps> = ({
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
-        onClose();
+        if (isChapterMenuOpen) {
+          setIsChapterMenuOpen(false);
+        } else {
+          onClose();
+        }
       }
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [isOpen, onClose]);
+  }, [isOpen, isChapterMenuOpen, onClose]);
 
   const showingVideo =
     !preferSchematic && entry?.mode === 'AI_VIDEO' && Boolean(entry.videoUrl);
@@ -402,6 +481,11 @@ export const StepTutorialVideoModal: React.FC<StepTutorialVideoModalProps> = ({
       setCurrentTimeSec((prev) => {
         const next = prev + dt;
         if (next >= durationSec) {
+          if (isLooping) {
+            lastSpokenCueIdRef.current = null;
+            playTutorialCueTone('step');
+            return 0;
+          }
           setIsPlaying(false);
           playTutorialCueTone('complete');
           return durationSec;
@@ -413,13 +497,14 @@ export const StepTutorialVideoModal: React.FC<StepTutorialVideoModalProps> = ({
 
     rafId = window.requestAnimationFrame(tick);
     return () => window.cancelAnimationFrame(rafId);
-  }, [isOpen, showingVideo, isPlaying, playbackSpeed, durationSec]);
+  }, [isOpen, showingVideo, isPlaying, isLooping, playbackSpeed, durationSec]);
 
   // Sync HTML5 video element rate & play state
   useEffect(() => {
     const vid = videoRef.current;
     if (!vid || !showingVideo) return;
     vid.playbackRate = playbackSpeed;
+    vid.loop = isLooping;
     if (isPlaying) {
       vid.play().catch(() => {
         // Autoplay restriction handled cleanly via play button
@@ -427,7 +512,7 @@ export const StepTutorialVideoModal: React.FC<StepTutorialVideoModalProps> = ({
     } else {
       vid.pause();
     }
-  }, [showingVideo, isPlaying, playbackSpeed]);
+  }, [showingVideo, isPlaying, isLooping, playbackSpeed]);
 
   const activeCue = useMemo(() => {
     return (
@@ -466,6 +551,7 @@ export const StepTutorialVideoModal: React.FC<StepTutorialVideoModalProps> = ({
   ]);
 
   const handleTogglePlay = () => {
+    playPinKeypadClick('digit');
     if (currentTimeSec >= durationSec - 0.05) {
       setCurrentTimeSec(0);
       lastSpokenCueIdRef.current = null;
@@ -477,6 +563,7 @@ export const StepTutorialVideoModal: React.FC<StepTutorialVideoModalProps> = ({
   };
 
   const handleRestart = () => {
+    playPinKeypadClick('clear');
     setCurrentTimeSec(0);
     lastSpokenCueIdRef.current = null;
     if (videoRef.current) {
@@ -493,11 +580,30 @@ export const StepTutorialVideoModal: React.FC<StepTutorialVideoModalProps> = ({
     }
   };
 
+  const handleSelectChapter = (chapter: TutorialStoryboardChapter) => {
+    playTutorialCueTone(chapter.chapterNumber === 3 ? 'probe' : 'step');
+    const targetSec = Number((chapter.startRatio * durationSec).toFixed(2));
+    handleSeek(targetSec);
+    setIsPlaying(true);
+    setIsChapterMenuOpen(false);
+  };
+
+  const handlePrevChapter = () => {
+    const idx = chapters.findIndex((c) => c.chapterNumber === activeChapter.chapterNumber);
+    const prevChapter = chapters[Math.max(0, idx - 1)] ?? chapters[0];
+    handleSelectChapter(prevChapter);
+  };
+
+  const handleNextChapter = () => {
+    const idx = chapters.findIndex((c) => c.chapterNumber === activeChapter.chapterNumber);
+    const nextChapter =
+      chapters[Math.min(chapters.length - 1, idx + 1)] ?? chapters[chapters.length - 1];
+    handleSelectChapter(nextChapter);
+  };
+
   if (!isOpen || typeof document === 'undefined') {
     return null;
   }
-
-  const progressRatio = durationSec > 0 ? Math.min(1, Math.max(0, currentTimeSec / durationSec)) : 0;
 
   return createPortal(
     <div
@@ -505,36 +611,59 @@ export const StepTutorialVideoModal: React.FC<StepTutorialVideoModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
-      className="fixed inset-0 z-[105] flex items-center justify-center bg-[#02050B]/85 p-3 sm:p-5 backdrop-blur-sm"
+      className="fixed inset-0 z-[105] flex items-center justify-center bg-[#02050B]/85 p-3 sm:p-5 backdrop-blur-[30px]"
     >
-      <div className="flex max-h-[92dvh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-[#203653] bg-[#0A1220] text-[#EAF3FF] shadow-[0_24px_80px_rgba(2,6,14,0.92)]">
-        {/* Header */}
-        <header className="flex items-center justify-between gap-3 border-b border-[#203653] bg-[#0E192A] px-4 py-3">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] text-[#91A4BD]">
-              <span className="font-bold text-[#19C8F5]">{module.exerciseCode}</span>
-              <span aria-hidden="true">·</span>
-              <span>Step {step.stepNumber}</span>
-              <span aria-hidden="true">·</span>
-              <span>
-                {showingVideo
-                  ? `AI Video (${entry?.model || 'gemini-omni-1.2-flash'})`
-                  : 'Interactive Schematic + Voice Guidance'}
-              </span>
+      <div className="flex max-h-[92dvh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-[#BCCDEF]/30 bg-[#0A1220]/88 text-[#EAF3FF] backdrop-blur-[30px] shadow-[0_24px_80px_rgba(2,6,14,0.94)]">
+        {/* Header with RAMTi Emblem Badge */}
+        <header className="flex items-center justify-between gap-3 border-b border-[#203653] bg-[#0E192A]/95 px-4 py-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#19C8F5]/45 bg-[#050A12] shadow-[0_0_16px_rgba(25,200,245,0.2)]">
+              <RamtiVectorEmblem size={28} variant="flat-white" />
             </div>
-            <h2 id={titleId} className="truncate font-hud text-base sm:text-lg font-bold text-[#EAF3FF]">
-              {step.titleTaglish}
-            </h2>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] text-[#91A4BD]">
+                <span className="font-extrabold tracking-widest text-[#EAF3FF]">RAMTi</span>
+                <span aria-hidden="true">·</span>
+                <span className="font-bold text-[#19C8F5]">{module.exerciseCode}</span>
+                <span aria-hidden="true">·</span>
+                <span>Step {step.stepNumber}</span>
+                <span aria-hidden="true">·</span>
+                <span className="text-[#20D889]">{activeChapter.label}</span>
+              </div>
+              <h2 id={titleId} className="truncate font-hud text-base sm:text-lg font-bold text-[#EAF3FF]">
+                {step.titleTaglish}
+              </h2>
+            </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close step tutorial modal"
-            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#203653] bg-[#0A1220] text-[#91A4BD] hover:border-[#19C8F5] hover:text-white cursor-pointer"
-          >
-            <X className="h-4 w-4" aria-hidden="true" />
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              data-testid="step-tutorial-chapters-btn"
+              aria-expanded={isChapterMenuOpen}
+              onClick={() => {
+                playPinKeypadClick('digit');
+                setIsChapterMenuOpen((prev) => !prev);
+              }}
+              className={`inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border px-3 py-1.5 font-mono text-xs font-semibold transition cursor-pointer ${
+                isChapterMenuOpen
+                  ? 'border-[#19C8F5] bg-[#132944] text-white shadow-[0_0_14px_rgba(25,200,245,0.28)]'
+                  : 'border-[#203653] bg-[#0A1220] text-[#EAF3FF] hover:border-[#19C8F5]'
+              }`}
+            >
+              <ListOrdered className="h-3.5 w-3.5 text-[#19C8F5]" aria-hidden="true" />
+              <span>Chapters (1–5)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close step tutorial modal"
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#203653] bg-[#0A1220] text-[#91A4BD] hover:border-[#19C8F5] hover:text-white cursor-pointer"
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </div>
         </header>
 
         {/* Scrollable Content */}
@@ -563,13 +692,20 @@ export const StepTutorialVideoModal: React.FC<StepTutorialVideoModalProps> = ({
             </div>
           )}
 
-          {/* 16:9 Viewport Stage */}
+          {/* 16:9 Viewport Stage (Storyboards 1, 2 & 3) */}
           <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-[#203653] bg-[#040912]">
             {isLoading ? (
-              <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-center p-6">
-                <RefreshCw className="h-7 w-7 animate-spin text-[#19C8F5]" aria-hidden="true" />
-                <div className="font-hud text-base font-bold text-[#EAF3FF]">
-                  Constructing Grounded Step Tutorial ({durationSec}s · 16:9)...
+              /* Storyboard 1. Launching State with Centered RAMTi Crest */
+              <div
+                data-testid="step-tutorial-launching-stage"
+                className="flex h-full w-full flex-col items-center justify-center gap-3 text-center p-6 bg-[#060C16]/90 backdrop-blur-[30px]"
+              >
+                <div className="rounded-2xl border border-[#BCCDEF]/35 bg-[#0A1322]/90 px-5 py-4 shadow-[0_0_32px_rgba(25,200,245,0.2)]">
+                  <RamtiVectorEmblem size={54} variant="flat-white" showWordmark showSubtitle compactSubtitle />
+                </div>
+                <div className="flex items-center gap-2 font-hud text-base font-bold text-[#EAF3FF]">
+                  <RefreshCw className="h-4 w-4 animate-spin text-[#19C8F5]" aria-hidden="true" />
+                  <span>Constructing Grounded Step Tutorial ({durationSec}s · 16:9)...</span>
                 </div>
                 <p className="max-w-md font-mono text-xs text-[#91A4BD]">
                   Binding verified pin {activeSpec.focusPinLabel}, DMM mode {activeSpec.dmmModeDisplay}, and PSU {activeSpec.requiredPsuState}.
@@ -581,7 +717,9 @@ export const StepTutorialVideoModal: React.FC<StepTutorialVideoModalProps> = ({
                 src={entry.videoUrl}
                 playsInline
                 onTimeUpdate={(e) => setCurrentTimeSec(e.currentTarget.currentTime)}
-                onEnded={() => setIsPlaying(false)}
+                onEnded={() => {
+                  if (!isLooping) setIsPlaying(false);
+                }}
                 className="h-full w-full object-contain bg-black"
               />
             ) : (
@@ -591,6 +729,65 @@ export const StepTutorialVideoModal: React.FC<StepTutorialVideoModalProps> = ({
                 progressRatio={progressRatio}
                 isPlaying={isPlaying}
               />
+            )}
+
+            {/* Storyboard 3. Interactive Glassmorphic Chapter Selector Overlay (Chapter 1 – Chapter 5) */}
+            {isChapterMenuOpen && (
+              <div
+                data-testid="step-tutorial-chapter-selector"
+                role="region"
+                aria-label="Tutorial Chapter Selector"
+                className="absolute right-3 top-3 bottom-3 z-20 flex w-72 sm:w-80 flex-col overflow-hidden rounded-xl border border-[#BCCDEF]/35 bg-[#091220]/88 backdrop-blur-[30px] shadow-[0_18px_50px_rgba(2,6,14,0.92)]"
+              >
+                <div className="flex items-center justify-between border-b border-[#203653] px-3.5 py-2.5">
+                  <div className="flex items-center gap-2">
+                    <RamtiVectorEmblem size={20} variant="flat-white" />
+                    <span className="font-hud text-sm font-bold tracking-wide text-[#EAF3FF]">
+                      Chapter Selector
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsChapterMenuOpen(false)}
+                    aria-label="Close chapter selector"
+                    className="rounded-md p-1 text-[#91A4BD] hover:bg-[#13243B] hover:text-white cursor-pointer"
+                  >
+                    <X className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-2.5 space-y-1.5">
+                  {chapters.map((chapter) => {
+                    const isCurrent = activeChapter.chapterNumber === chapter.chapterNumber;
+                    return (
+                      <button
+                        key={chapter.chapterNumber}
+                        type="button"
+                        data-testid={`tutorial-chapter-option-${chapter.chapterNumber}`}
+                        onClick={() => handleSelectChapter(chapter)}
+                        className={`w-full rounded-lg border px-3 py-2 text-left transition cursor-pointer ${
+                          isCurrent
+                            ? 'border-[#19C8F5] bg-[#132944]/95 text-white shadow-[0_0_16px_rgba(25,200,245,0.2)]'
+                            : 'border-[#203653]/80 bg-[#060C16]/75 text-[#BCCDEF] hover:border-[#19C8F5]/60 hover:bg-[#0E1B2E]'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between font-mono text-[11px]">
+                          <span className="font-bold text-[#19C8F5]">{chapter.label}</span>
+                          <span className="text-[#91A4BD] tabular-nums">
+                            {(chapter.startRatio * durationSec).toFixed(1)}s
+                          </span>
+                        </div>
+                        <div className="mt-0.5 font-hud text-xs font-bold text-[#EAF3FF]">
+                          {chapter.title}
+                        </div>
+                        <div className="mt-0.5 truncate font-mono text-[10px] text-[#91A4BD]">
+                          {chapter.detail}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             )}
 
             {/* Synced Subtitle Scrim Overlay */}
@@ -606,9 +803,36 @@ export const StepTutorialVideoModal: React.FC<StepTutorialVideoModalProps> = ({
             )}
           </div>
 
-          {/* Playback Controls Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#203653] bg-[#0E192A] px-3 py-2">
+          {/* Storyboard 2. Glassmorphic Playback Transport Interface Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#203653] bg-[#0E192A]/90 px-3 py-2 backdrop-blur-md">
             <div className="flex items-center gap-1.5">
+              {/* Shuffle / Cue Jump */}
+              <button
+                type="button"
+                onClick={() => setIsChapterMenuOpen((p) => !p)}
+                title="Toggle Chapter 1–5 Selector"
+                aria-label="Toggle chapter selector"
+                className={`inline-flex h-9 w-9 items-center justify-center rounded-lg border transition cursor-pointer ${
+                  isChapterMenuOpen
+                    ? 'border-[#19C8F5] bg-[#132944] text-[#19C8F5]'
+                    : 'border-[#203653] bg-[#0A1220] text-[#91A4BD] hover:text-white'
+                }`}
+              >
+                <Shuffle className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+
+              {/* Previous Chapter */}
+              <button
+                type="button"
+                onClick={handlePrevChapter}
+                title="Previous Chapter"
+                aria-label="Previous tutorial chapter"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#203653] bg-[#0A1220] text-[#91A4BD] hover:border-[#19C8F5] hover:text-white cursor-pointer"
+              >
+                <SkipBack className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+
+              {/* Play / Pause */}
               <button
                 type="button"
                 onClick={handleTogglePlay}
@@ -628,6 +852,36 @@ export const StepTutorialVideoModal: React.FC<StepTutorialVideoModalProps> = ({
                 )}
               </button>
 
+              {/* Next Chapter */}
+              <button
+                type="button"
+                onClick={handleNextChapter}
+                title="Next Chapter"
+                aria-label="Next tutorial chapter"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#203653] bg-[#0A1220] text-[#91A4BD] hover:border-[#19C8F5] hover:text-white cursor-pointer"
+              >
+                <SkipForward className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+
+              {/* Loop Toggle */}
+              <button
+                type="button"
+                onClick={() => {
+                  playPinKeypadClick('digit');
+                  setIsLooping((l) => !l);
+                }}
+                title="Loop Tutorial"
+                aria-label="Toggle tutorial loop"
+                aria-pressed={isLooping}
+                className={`inline-flex h-9 w-9 items-center justify-center rounded-lg border transition cursor-pointer ${
+                  isLooping
+                    ? 'border-[#19C8F5] bg-[#132944] text-[#19C8F5]'
+                    : 'border-[#203653] bg-[#0A1220] text-[#91A4BD] hover:text-white'
+                }`}
+              >
+                <Repeat className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+
               <button
                 type="button"
                 onClick={handleRestart}
@@ -635,7 +889,7 @@ export const StepTutorialVideoModal: React.FC<StepTutorialVideoModalProps> = ({
                 className="inline-flex min-h-[36px] items-center gap-1 rounded-lg border border-[#203653] bg-[#0A1220] px-2.5 py-1.5 font-mono text-xs text-[#91A4BD] hover:text-white cursor-pointer whitespace-nowrap"
               >
                 <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
-                <span>Restart</span>
+                <span className="hidden sm:inline">Restart</span>
               </button>
 
               <button
@@ -665,7 +919,7 @@ export const StepTutorialVideoModal: React.FC<StepTutorialVideoModalProps> = ({
             </div>
 
             {/* Scrubber */}
-            <div className="flex min-w-[180px] flex-1 items-center gap-2 px-1">
+            <div className="flex min-w-[160px] flex-1 items-center gap-2 px-1">
               <span className="font-mono text-[11px] text-[#91A4BD] tabular-nums">
                 {currentTimeSec.toFixed(1)}s
               </span>
