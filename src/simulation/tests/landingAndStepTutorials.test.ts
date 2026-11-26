@@ -278,7 +278,7 @@ describe('Landing Credentials & Grounded Step Tutorial Pipeline', () => {
   it('restricts System Blueprint PDF download visibility exclusively to Owner account and Master Admin across Landing, Credentials Modal, and Admin Console', () => {
     assert.equal(isVerifiedOwnerEmail('rubenllego12@gmail.com'), true);
     assert.equal(isVerifiedOwnerEmail('  RUBENLLEGO12@GMAIL.COM '), true);
-    assert.equal(isVerifiedOwnerEmail('rubenlleg12@gmail.com'), true);
+    assert.equal(isVerifiedOwnerEmail('rubenlleg12@gmail.com'), false);
     assert.equal(isVerifiedOwnerEmail('student@example.edu'), false);
     assert.equal(isVerifiedOwnerEmail(null), false);
     assert.equal(isVerifiedOwnerEmail(undefined), false);

@@ -1,6 +1,6 @@
 # Autoelectric Lab Pro — Production Migration & Deployment Guide
 
-This guide provides end-to-end instructions and ready-to-run shell scripts (**Linux/macOS Bash**, **Windows PowerShell**, and **Windows Command Prompt / CMD**) to migrate the current development workspace into a production-ready Git repository, standardize `firebase-applet-config.json`, link the project to the production Firebase instance **`gen-lang-client-0822907731`**, and deploy the full-stack application safely.
+This guide provides end-to-end instructions and ready-to-run shell scripts (**Linux/macOS Bash**, **Windows PowerShell**, and **Windows Command Prompt / CMD**) to migrate the current development workspace into a production-ready Git repository, standardize `firebase-applet-config.json`, link the project to the production Firebase instance **`infra-firefly-1mln4`**, and deploy the full-stack application safely.
 
 ---
 
@@ -15,10 +15,10 @@ This guide provides end-to-end instructions and ready-to-run shell scripts (**Li
 |---|---|
 | **Package Name** | `autoelectric-lab-pro` |
 | **Firebase Project Name** | `Autoelectrical Lab Pro` |
-| **Firebase Project ID** | `gen-lang-client-0822907731` |
-| **Firebase Project Number / Sender ID** | `15974635019` |
-| **Firebase Web App ID** | `1:15974635019:web:d5768af0f01c6b07db590e` |
-| **Firestore Named Database ID** | `ai-studio-virtualeculaboem-a394a24c-3180-4bd9-8d2e-ad856ade7828` |
+| **Firebase Project ID** | `infra-firefly-1mln4` |
+| **Firebase Project Number / Sender ID** | `7481410566` |
+| **Firebase Web App ID** | `1:7481410566:web:7924ac419ec8615bb16f87` |
+| **Firestore Named Database ID** | `ai-studio-autoelectriclabp-25d98605-c678-411c-adce-09263788ae82` |
 | **Default Cloud Run Region** | `asia-southeast1` |
 | **Primary Git Publish Branch** | `main` |
 
@@ -43,7 +43,7 @@ npx --yes firebase-tools --version
 
 npx --yes firebase-tools login
 gcloud auth login
-gcloud config set project gen-lang-client-0822907731
+gcloud config set project infra-firefly-1mln4
 ```
 
 ### Windows PowerShell
@@ -53,7 +53,7 @@ npx --yes firebase-tools --version
 
 npx --yes firebase-tools login
 gcloud auth login
-gcloud config set project gen-lang-client-0822907731
+gcloud config set project infra-firefly-1mln4
 ```
 
 ### Windows Command Prompt (CMD)
@@ -63,7 +63,7 @@ npx --yes firebase-tools --version
 
 npx --yes firebase-tools login
 gcloud auth login
-gcloud config set project gen-lang-client-0822907731
+gcloud config set project infra-firefly-1mln4
 ```
 
 ---
@@ -177,11 +177,16 @@ Copy `.env.example` to `.env` for local development, and store real secrets in *
 | `IMAGE_ANALYSIS_PROVIDER` | Optional | Server only | `gemini` \| `openai` \| `manual` |
 | `OPENAI_API_KEY` | Optional | Server secret | Only needed if `IMAGE_ANALYSIS_PROVIDER="openai"` |
 | `VECL_ADMIN_MASTER_PIN` | Prod: Yes | Server secret | Server-side Master Admin PIN for the 3–6 hour Trial PIN Generator |
+| `VECL_ADMIN_UIDS` | Prod: Yes | Server only | Comma-separated verified Firebase Admin UIDs (replaces legacy email bootstrap) |
+| `VECL_DATA_DIR` | Prod: Yes | Server only | Mount path to persistent volume (e.g., `/var/lib/autoelectric`) so `.store.json`, revocation registry, and signing keys survive redeploys |
+| `VECL_LICENSE_HMAC_SECRET` | Prod: Yes | Server secret | 32+ character HMAC signing secret (`VECL_STRICT_PRODUCTION_SECRETS=true`) |
+| `AELP_LICENSE_SIGNING_PRIVATE_KEY_JWK` | Prod: Yes | Server secret | ECDSA P-256 JWK private key for offline signed activation keys |
+| `VECL_STRICT_PRODUCTION_SECRETS` | Prod: Yes | Server only | Set `true` in production to fail closed on missing secrets and block unauthenticated first-run PIN setup |
 | `VITE_FIREBASE_*` | Optional | Client build | Fallback overrides only; standard builds use `firebase-applet-config.json` |
 
 ### Run the Automated Environment Setup Scripts
 
-Each script checks Node/npm/Git, bootstraps `.env` from `.env.example` without overwriting existing values, installs dependencies, links the repo to `gen-lang-client-0822907731`, standardizes `firebase-applet-config.json`, and executes `npm run release:check:quick`.
+Each script checks Node/npm/Git, bootstraps `.env` from `.env.example` without overwriting existing values, installs dependencies, links the repo to `infra-firefly-1mln4`, standardizes `firebase-applet-config.json`, and executes `npm run release:check:quick`.
 
 #### Linux / macOS (Bash)
 ```bash
@@ -217,19 +222,19 @@ scripts\deploy\setup-production-env.cmd --from-cli --deploy-rules
 ## 5. Step 3 — Standardizing `firebase-applet-config.json`
 
 ### Why Standardization Matters
-1. `src/lib/firebase.ts` directly imports `../../firebase-applet-config.json` at Vite build time so the production client bundle always connects to **`gen-lang-client-0822907731`** and named database **`ai-studio-virtualeculaboem-a394a24c-3180-4bd9-8d2e-ad856ade7828`** (preventing silent fallback to `(default)` or stale `VITE_*` variables).
+1. `src/lib/firebase.ts` directly imports `../../firebase-applet-config.json` at Vite build time so the production client bundle always connects to **`infra-firefly-1mln4`** and named database **`ai-studio-autoelectriclabp-25d98605-c678-411c-adce-09263788ae82`** (preventing silent fallback to `(default)` or stale `VITE_*` variables).
 2. `.gitignore` intentionally ignores `firebase-applet-config.json` so environment-specific client configs are never accidentally committed across branches.
 
 ### Canonical `firebase-applet-config.json` Schema
 ```json
 {
-  "projectId": "gen-lang-client-0822907731",
-  "appId": "1:15974635019:web:d5768af0f01c6b07db590e",
+  "projectId": "infra-firefly-1mln4",
+  "appId": "1:7481410566:web:7924ac419ec8615bb16f87",
   "apiKey": "<FETCHED_FROM_FIREBASE_CONSOLE_OR_CLI>",
-  "authDomain": "gen-lang-client-0822907731.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-virtualeculaboem-a394a24c-3180-4bd9-8d2e-ad856ade7828",
-  "storageBucket": "gen-lang-client-0822907731.firebasestorage.app",
-  "messagingSenderId": "15974635019",
+  "authDomain": "infra-firefly-1mln4.firebaseapp.com",
+  "firestoreDatabaseId": "ai-studio-autoelectriclabp-25d98605-c678-411c-adce-09263788ae82",
+  "storageBucket": "infra-firefly-1mln4.firebasestorage.app",
+  "messagingSenderId": "7481410566",
   "measurementId": "",
   "oAuthClientId": "",
   "recaptchaSiteKey": ""
@@ -278,22 +283,22 @@ git check-ignore -v firebase-applet-config.json
 
 ---
 
-## 6. Step 4 — Link to Production Firebase Instance (`gen-lang-client-0822907731`)
+## 6. Step 4 — Link to Production Firebase Instance (`infra-firefly-1mln4`)
 
 ### 6.1 Verify `.firebaserc` and `firebase.json`
-Ensure `.firebaserc` maps `default` to `gen-lang-client-0822907731`:
+Ensure `.firebaserc` maps `default` to `infra-firefly-1mln4`:
 ```json
 {
   "projects": {
-    "default": "gen-lang-client-0822907731"
+    "default": "infra-firefly-1mln4"
   }
 }
 ```
-Ensure `firebase.json` targets the named database `ai-studio-virtualeculaboem-a394a24c-3180-4bd9-8d2e-ad856ade7828`:
+Ensure `firebase.json` targets the named database `ai-studio-autoelectriclabp-25d98605-c678-411c-adce-09263788ae82`:
 ```json
 {
   "firestore": {
-    "database": "ai-studio-virtualeculaboem-a394a24c-3180-4bd9-8d2e-ad856ade7828",
+    "database": "ai-studio-autoelectriclabp-25d98605-c678-411c-adce-09263788ae82",
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   }
@@ -304,36 +309,36 @@ Ensure `firebase.json` targets the named database `ai-studio-virtualeculaboem-a3
 
 #### Linux / macOS (Bash)
 ```bash
-npx --yes firebase-tools use gen-lang-client-0822907731
+npx --yes firebase-tools use infra-firefly-1mln4
 npm run rules:verify
 npx --yes firebase-tools deploy \
   --only firestore:rules,firestore:indexes \
-  --database ai-studio-virtualeculaboem-a394a24c-3180-4bd9-8d2e-ad856ade7828 \
-  --project gen-lang-client-0822907731
+  --database ai-studio-autoelectriclabp-25d98605-c678-411c-adce-09263788ae82 \
+  --project infra-firefly-1mln4
 ```
 
 #### Windows PowerShell
 ```powershell
-npx --yes firebase-tools use gen-lang-client-0822907731
+npx --yes firebase-tools use infra-firefly-1mln4
 npm run rules:verify
 npx --yes firebase-tools deploy `
   --only firestore:rules,firestore:indexes `
-  --database ai-studio-virtualeculaboem-a394a24c-3180-4bd9-8d2e-ad856ade7828 `
-  --project gen-lang-client-0822907731
+  --database ai-studio-autoelectriclabp-25d98605-c678-411c-adce-09263788ae82 `
+  --project infra-firefly-1mln4
 ```
 
 #### Windows Command Prompt (CMD)
 ```cmd
-npx --yes firebase-tools use gen-lang-client-0822907731
+npx --yes firebase-tools use infra-firefly-1mln4
 npm run rules:verify
 npx --yes firebase-tools deploy ^
   --only firestore:rules,firestore:indexes ^
-  --database ai-studio-virtualeculaboem-a394a24c-3180-4bd9-8d2e-ad856ade7828 ^
-  --project gen-lang-client-0822907731
+  --database ai-studio-autoelectriclabp-25d98605-c678-411c-adce-09263788ae82 ^
+  --project infra-firefly-1mln4
 ```
 
 ### 6.3 Authorize Your Production Hostname for Google Sign-In
-1. Open [Firebase Console](https://console.firebase.google.com/project/gen-lang-client-0822907731/authentication/settings).
+1. Open [Firebase Console](https://console.firebase.google.com/project/infra-firefly-1mln4/authentication/settings).
 2. Navigate to **Authentication → Settings → Authorized domains**.
 3. Click **Add domain** and add your published Cloud Run URL, Firebase App Hosting hostname, and any custom domain (without `https://`).
 
@@ -348,17 +353,17 @@ npm run release:check
 This validates:
 1. `.gitignore` rules & zero hardcoded secrets in `src/`, `scripts/`, and `server.ts`
 2. Zero tracked/staged secrets in Git
-3. `.firebaserc`, `firebase.json`, and `firebase-applet-config.json` alignment (`gen-lang-client-0822907731` + `ai-studio-virtualeculaboem-a394a24c-3180-4bd9-8d2e-ad856ade7828`)
+3. `.firebaserc`, `firebase.json`, and `firebase-applet-config.json` alignment (`infra-firefly-1mln4` + `ai-studio-autoelectriclabp-25d98605-c678-411c-adce-09263788ae82`)
 4. `npm run rules:verify` (`@firebase/eslint-plugin-security-rules` + blueprint match check)
 5. `npm run lint` (`tsc --noEmit`)
 6. `npm run build` (`vite build`)
-7. `npm test` (all 12 simulation, offline sync, calibration, and security suites)
+7. `npm test` (all 17 simulation, offline sync, calibration, and security suites)
 
 ### Commit, Push & Merge to `main`
 ```bash
 git add -A
 git diff --cached --name-only   # Confirm .env and firebase-applet-config.json are NOT listed
-git commit -m "chore(release): migrate workspace to production repository & link gen-lang-client-0822907731"
+git commit -m "chore(release): migrate workspace to production repository & link infra-firefly-1mln4"
 git push -u origin release/prod-migration
 ```
 Open a PR into `main` (or merge with `git checkout main && git merge --no-ff release/prod-migration && git tag -a v1.4.0 -m "Production release v1.4.0" && git push origin main --follow-tags`).
@@ -374,28 +379,28 @@ Open a PR into `main` (or merge with `git checkout main && git merge --no-ff rel
 **Bash:**
 ```bash
 gcloud services enable run.googleapis.com cloudbuild.googleapis.com secretmanager.googleapis.com \
-  --project=gen-lang-client-0822907731
+  --project=infra-firefly-1mln4
 
-printf "%s" "YOUR_GEMINI_API_KEY" | gcloud secrets create GEMINI_API_KEY --data-file=- --project=gen-lang-client-0822907731
-printf "%s" "YOUR_ADMIN_MASTER_PIN" | gcloud secrets create VECL_ADMIN_MASTER_PIN --data-file=- --project=gen-lang-client-0822907731
+printf "%s" "YOUR_GEMINI_API_KEY" | gcloud secrets create GEMINI_API_KEY --data-file=- --project=infra-firefly-1mln4
+printf "%s" "YOUR_ADMIN_MASTER_PIN" | gcloud secrets create VECL_ADMIN_MASTER_PIN --data-file=- --project=infra-firefly-1mln4
 ```
 
 **PowerShell:**
 ```powershell
 gcloud services enable run.googleapis.com cloudbuild.googleapis.com secretmanager.googleapis.com `
-  --project=gen-lang-client-0822907731
+  --project=infra-firefly-1mln4
 
-"YOUR_GEMINI_API_KEY" | gcloud secrets create GEMINI_API_KEY --data-file=- --project=gen-lang-client-0822907731
-"YOUR_ADMIN_MASTER_PIN" | gcloud secrets create VECL_ADMIN_MASTER_PIN --data-file=- --project=gen-lang-client-0822907731
+"YOUR_GEMINI_API_KEY" | gcloud secrets create GEMINI_API_KEY --data-file=- --project=infra-firefly-1mln4
+"YOUR_ADMIN_MASTER_PIN" | gcloud secrets create VECL_ADMIN_MASTER_PIN --data-file=- --project=infra-firefly-1mln4
 ```
 
 **CMD:**
 ```cmd
 gcloud services enable run.googleapis.com cloudbuild.googleapis.com secretmanager.googleapis.com ^
-  --project=gen-lang-client-0822907731
+  --project=infra-firefly-1mln4
 
-echo|set /p="YOUR_GEMINI_API_KEY" | gcloud secrets create GEMINI_API_KEY --data-file=- --project=gen-lang-client-0822907731
-echo|set /p="YOUR_ADMIN_MASTER_PIN" | gcloud secrets create VECL_ADMIN_MASTER_PIN --data-file=- --project=gen-lang-client-0822907731
+echo|set /p="YOUR_GEMINI_API_KEY" | gcloud secrets create GEMINI_API_KEY --data-file=- --project=infra-firefly-1mln4
+echo|set /p="YOUR_ADMIN_MASTER_PIN" | gcloud secrets create VECL_ADMIN_MASTER_PIN --data-file=- --project=infra-firefly-1mln4
 ```
 *(To rotate an existing secret later, use `gcloud secrets versions add <NAME> --data-file=-`.)*
 
@@ -441,7 +446,7 @@ public/assets/aistudio
 ```bash
 gcloud run deploy autoelectric-lab-pro \
   --source . \
-  --project gen-lang-client-0822907731 \
+  --project infra-firefly-1mln4 \
   --region asia-southeast1 \
   --platform managed \
   --allow-unauthenticated \
@@ -455,7 +460,7 @@ gcloud run deploy autoelectric-lab-pro \
 ```powershell
 gcloud run deploy autoelectric-lab-pro `
   --source . `
-  --project gen-lang-client-0822907731 `
+  --project infra-firefly-1mln4 `
   --region asia-southeast1 `
   --platform managed `
   --allow-unauthenticated `
@@ -469,7 +474,7 @@ gcloud run deploy autoelectric-lab-pro `
 ```cmd
 gcloud run deploy autoelectric-lab-pro ^
   --source . ^
-  --project gen-lang-client-0822907731 ^
+  --project infra-firefly-1mln4 ^
   --region asia-southeast1 ^
   --platform managed ^
   --allow-unauthenticated ^
@@ -482,7 +487,7 @@ gcloud run deploy autoelectric-lab-pro ^
 Bind `APP_URL` to the deployed Cloud Run URL:
 ```bash
 gcloud run services update autoelectric-lab-pro \
-  --project gen-lang-client-0822907731 \
+  --project infra-firefly-1mln4 \
   --region asia-southeast1 \
   --update-env-vars "APP_URL=https://YOUR-CLOUD-RUN-SERVICE-URL"
 ```
@@ -520,11 +525,11 @@ env:
 2. Add `"prebuild": "node scripts/standardize-firebase-config.mjs"` to your production repo's `package.json` so Cloud Build automatically materializes `firebase-applet-config.json` from `FIREBASE_APPLET_CONFIG_JSON` before `vite build`.
 3. Provision secrets and link the backend:
 ```bash
-npx --yes firebase-tools use gen-lang-client-0822907731
+npx --yes firebase-tools use infra-firefly-1mln4
 npx --yes firebase-tools apphosting:secrets:set GEMINI_API_KEY
 npx --yes firebase-tools apphosting:secrets:set VECL_ADMIN_MASTER_PIN
 npx --yes firebase-tools apphosting:secrets:set FIREBASE_APPLET_CONFIG_JSON
-npx --yes firebase-tools apphosting:backends:create --project gen-lang-client-0822907731 --location asia-east1
+npx --yes firebase-tools apphosting:backends:create --project infra-firefly-1mln4 --location asia-east1
 ```
 
 ---
@@ -542,7 +547,7 @@ npx --yes firebase-tools apphosting:backends:create --project gen-lang-client-08
 ### Common Migration Issues & Fixes
 | Symptom | Root Cause | Fix |
 |---|---|---|
-| `Missing or insufficient permissions` on Firestore | Rules not deployed to named DB `ai-studio-virtualeculaboem-...` or client connected to `(default)` | Run `npm run firebase:standardize:check` and `npm run rules:deploy` |
+| `Missing or insufficient permissions` on Firestore | Rules not deployed to named DB `ai-studio-autoelectriclabp-...` or client connected to `(default)` | Run `npm run firebase:standardize:check` and `npm run rules:deploy` |
 | `Vite build failed: Could not resolve "../../firebase-applet-config.json"` | File is gitignored and wasn't bootstrapped in CI/clone | Run `npm run firebase:standardize -- --from-cli` (or set `FIREBASE_APPLET_CONFIG_JSON`) before `npm run build` |
 | `auth/unauthorized-domain` on Google login | Live hostname missing from Firebase Auth allowlist | Add the Cloud Run / App Hosting domain in Firebase Console → Authentication → Settings → Authorized domains |
 | Container exits or 503 on Cloud Run | Missing `NODE_ENV=production` or `dist/` not built | Verify `Dockerfile` runs `npm run build` and sets `ENV NODE_ENV=production` |
@@ -550,9 +555,9 @@ npx --yes firebase-tools apphosting:backends:create --project gen-lang-client-08
 ### Instant Rollback Commands
 ```bash
 # 1. Roll back Cloud Run traffic to previous healthy revision
-gcloud run revisions list --service autoelectric-lab-pro --project gen-lang-client-0822907731 --region asia-southeast1
+gcloud run revisions list --service autoelectric-lab-pro --project infra-firefly-1mln4 --region asia-southeast1
 gcloud run services update-traffic autoelectric-lab-pro \
-  --project gen-lang-client-0822907731 --region asia-southeast1 --to-revisions=PREVIOUS_REVISION_NAME=100
+  --project infra-firefly-1mln4 --region asia-southeast1 --to-revisions=PREVIOUS_REVISION_NAME=100
 
 # 2. Revert merge commit safely on main
 git checkout main && git pull --ff-only origin main

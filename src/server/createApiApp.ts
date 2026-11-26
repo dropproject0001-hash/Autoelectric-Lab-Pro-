@@ -68,6 +68,8 @@ import {
   importHistoricalAuditCsv,
   redeemTrialPin,
   resetTrialPinDevice,
+  revokeAdminSessionToken,
+  revokeAllAdminSessionTokens,
   setTrialPinRevocation,
   setupFirstRunAdminPin,
   verifyAdminSessionToken,
@@ -97,7 +99,7 @@ export function createAutoelectricApiApp(): express.Express {
   app.disable('x-powered-by');
   app.set('trust proxy', 1);
 
-  // Hardened HTTP security headers middleware
+  // Hardened HTTP security headers middleware (CSP + HSTS + anti-sniffing)
   app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     // Avoid blocking cross-origin iframe preview when served behind the AI Studio nginx proxy
@@ -112,6 +114,31 @@ export function createAutoelectricApiApp(): express.Express {
       'Permissions-Policy',
       'camera=(self), microphone=(self), geolocation=(), usb=(), serial=(), payment=()'
     );
+    res.setHeader(
+      'Content-Security-Policy',
+      [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://apis.google.com https://accounts.google.com https://www.gstatic.com",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "font-src 'self' data: https://fonts.gstatic.com",
+        "img-src 'self' data: blob: https:",
+        "media-src 'self' data: blob:",
+        "connect-src 'self' ws: wss: https://*.googleapis.com https://*.google.com https://*.firebaseio.com https://*.gstatic.com https://vpic.nhtsa.dot.gov https://api.nhtsa.gov",
+        "worker-src 'self' blob:",
+        "frame-src 'self' https://*.firebaseapp.com https://accounts.google.com",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+      ].join('; ')
+    );
+    const forwardedProto = req.headers['x-forwarded-proto'];
+    const protoStr = Array.isArray(forwardedProto) ? forwardedProto[0] : forwardedProto;
+    const isHttps =
+      req.secure ||
+      (typeof protoStr === 'string' && protoStr.split(',')[0].trim().toLowerCase() === 'https');
+    if (isHttps || process.env.NODE_ENV === 'production') {
+      res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    }
     if (req.path.startsWith('/api/')) {
       res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     }
@@ -793,9 +820,13 @@ export function createAutoelectricApiApp(): express.Express {
   });
 
   app.get('/api/autoelectric/trial/admin/config', (_req, res) => {
+    const cfg = getAdminPinConfigStatus();
     return res.json({
       status: 'SUCCESS',
-      ...getAdminPinConfigStatus(),
+      masterEnvConfigured: cfg.masterEnvConfigured,
+      setupEnabled: cfg.setupEnabled,
+      // Never disclose unclaimed state to unauthenticated HTTP probes when first-run setup is disabled
+      adminClaimed: cfg.setupEnabled ? cfg.adminClaimed : true,
     });
   });
 
@@ -826,6 +857,11 @@ export function createAutoelectricApiApp(): express.Express {
     } catch (err: unknown) {
       const code = err instanceof Error ? err.message : 'ADMIN_SETUP_FAILED';
       const statusMap: Record<string, { http: number; message: string }> = {
+        ADMIN_SETUP_DISABLED: {
+          http: 403,
+          message:
+            'Unauthenticated first-run Admin PIN setup is disabled by default. Configure VECL_ADMIN_MASTER_PIN on the server environment.',
+        },
         ADMIN_ENV_MANAGED: {
           http: 409,
           message: 'Master Admin PIN is managed by server environment configuration (VECL_ADMIN_MASTER_PIN).',
@@ -873,7 +909,7 @@ export function createAutoelectricApiApp(): express.Express {
       const code = err instanceof Error ? err.message : 'INVALID_MASTER_PIN';
       if (code === 'ADMIN_PIN_NOT_INITIALIZED') {
         return res.status(409).json({
-          error: 'Master Admin PIN is not set up yet. Complete first-run setup or configure VECL_ADMIN_MASTER_PIN.',
+          error: 'Master Admin PIN is not set up yet. Configure VECL_ADMIN_MASTER_PIN on the server environment.',
           code,
         });
       }
@@ -883,6 +919,28 @@ export function createAutoelectricApiApp(): express.Express {
       });
     }
   });
+
+  app.post('/api/autoelectric/trial/admin/logout', requirePinOrFirebaseAdmin, (req, res) => {
+    const authHeader = req.headers.authorization || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice('Bearer '.length).trim() : '';
+    const result = revokeAdminSessionToken(token);
+    return res.json({
+      status: 'SUCCESS',
+      revoked: result.revoked,
+    });
+  });
+
+  app.post(
+    '/api/autoelectric/trial/admin/revoke-all-sessions',
+    requirePinOrFirebaseAdmin,
+    (_req, res) => {
+      const result = revokeAllAdminSessionTokens();
+      return res.json({
+        status: 'SUCCESS',
+        revokedBeforeMs: result.revokedBeforeMs,
+      });
+    }
+  );
 
   const resolveAdminActor = (req: AuthenticatedRequest): string => {
     if (req.isPinAdmin) return 'Master Admin';
@@ -2295,7 +2353,7 @@ Execute Google Search Grounding to retrieve ${
 
         const cleanBenchContext =
           typeof benchContext === 'string' ? benchContext.trim().slice(0, 4000) : '';
-        const systemInstruction = `You are the Hands-Free Voice Technician Assistant for Virtual ECU Lab Pro.
+        const systemInstruction = `You are the Hands-Free Voice Technician Assistant for AutoElectric Lab Pro.
 Provide brief, direct, hands-free automotive test instructions suitable for voice readout while the technician is operating test probes. Never invent OEM pin numbers or wiring specs.
 ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
 
@@ -2631,6 +2689,10 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
     res.json({
       status: 'ONLINE',
       uptimeSec: Math.floor(process.uptime()),
+      persistence: {
+        durableDataDirConfigured: Boolean(process.env.VECL_DATA_DIR?.trim()),
+        strictProductionSecrets: process.env.VECL_STRICT_PRODUCTION_SECRETS === 'true',
+      },
       timestamp: new Date().toISOString(),
     });
   });

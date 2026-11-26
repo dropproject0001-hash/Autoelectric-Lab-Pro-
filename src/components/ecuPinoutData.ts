@@ -111,7 +111,7 @@ export const ECU_BRAND_PROFILES: EcuBrandProfile[] = [
       '⚠️ WARNING: Pinout Verification & Polarity: Always cross-check the exact Denso/Fujitsu Ten part number on the ECU case and verify ground continuity with a multimeter before applying +12V bench power. Toyota connectors (A/B/C/D or E1–E6) vary slightly across model years and emissions tiers (Euro 2 vs. Euro 4). Covers all 10 PH-Market Toyota OEM ECM & 6AT TCM bench pinout sets.',
     imageSrc: '/assets/images/ecu_connector_socket.jpg',
     pcbImageSrc:
-      '/assets/images/Screenshot_20261112_145941_com_facebook_katana_ImmersiveActivity_0131e03d.jpg',
+      '/assets/images/IMG_20261031_100429_ce48661e.jpg',
     pcbComponents: [
       {
         id: 'pcb-toyota-cpu1',
@@ -180,13 +180,16 @@ export const ECU_BRAND_PROFILES: EcuBrandProfile[] = [
       },
     ],
     benchHardwareProfile: {
-      ecuFamily: 'Toyota Denso / Fujitsu Ten / Aisin Multi-Platform',
+      ecuFamily: 'Toyota Denso / Fujitsu Ten / Aisin Multi-Platform (Requires Exact P/N Selection)',
       mcuArchitecture: 'Renesas NEC 76F00xx / RH850 / Denso Gen 3-4',
-      hardwareVariant: 'OEM Standard Connectors A/B/C/D & E5-E6',
+      hardwareVariant: 'Multi-Platform Composite — Select Part-Number Variant Before Energizing',
       requiresMainRelayLoop: true,
       requiresCaseGround: false,
       canTerminationOhms: 120,
-      provenanceStatus: 'OEM_VERIFIED',
+      provenanceStatus: 'COMMUNITY_UNVERIFIED',
+      requiresOcrVerify: true,
+      conflictWarning:
+        'MULTI-PLATFORM SUITE: Covers 10 distinct Toyota PH ECU/TCM families whose connector cavity assignments vary by exact Denso/Fujitsu Ten part number (e.g. 89661-0K240 vs 89661-0KD20). Select the exact part-number hardware variant and verify ground continuity before applying +12V.',
       benchWakeupPins: {
         kl30: ['A1', 'A2', 'B2'],
         kl15: ['A28', 'A9', 'E5-9'],
@@ -201,12 +204,12 @@ export const ECU_BRAND_PROFILES: EcuBrandProfile[] = [
     hardwareVariants: [
       {
         id: 'toyota-1gd-oem-std',
-        label: 'OEM Verified: 1GD/2GD Hilux/Fortuner (A1/A2/A28/B14)',
+        label: 'OEM Verified P/N 89661-0K240 / 89661-0KD20: 1GD/2GD Hilux/Fortuner (A1/A2/A28/B14)',
         plugFilterId: 'PLUG_1GD_2GD_HILUX',
         benchHardwareProfile: {
-          ecuFamily: 'Toyota Denso 1GD-FTV / 2GD-FTV',
+          ecuFamily: 'Toyota Denso 1GD-FTV / 2GD-FTV (P/N 89661-0K240 / 89661-0KD20)',
           mcuArchitecture: 'Renesas RH850 / NEC 76F',
-          hardwareVariant: 'OEM Table #1 (Plugs A & B)',
+          hardwareVariant: 'OEM Table #1 (P/N 89661-0K240 · Plugs A & B)',
           requiresMainRelayLoop: true,
           requiresCaseGround: false,
           canTerminationOhms: 120,
@@ -1644,13 +1647,16 @@ export const ECU_BRAND_PROFILES: EcuBrandProfile[] = [
       'Philippine commercial diesel workhorse ECU. Note: 81+40 = Dual Chamber (121 pins total). Early 4JJ1 Euro-2/4 variants use an external ~120V EDU module to fire injectors.',
     imageSrc: '/assets/images/ecu_connector_socket.jpg',
     benchHardwareProfile: {
-      ecuFamily: 'Isuzu Transtron SH7058 / SH7059 / SH72533',
+      ecuFamily: 'Isuzu Transtron SH7058 / SH7059 / SH72533 (Multi-Variant — Verify P/N)',
       mcuArchitecture: 'Renesas SuperH SH7058 / SH72533',
-      hardwareVariant: 'OEM 121-Pin Dual Block (77/78 CAN)',
+      hardwareVariant: 'Multi-Platform 121-Pin Dual Block — Select Exact Transtron P/N Variant',
       requiresMainRelayLoop: true,
       requiresCaseGround: true,
       canTerminationOhms: 120,
-      provenanceStatus: 'OEM_VERIFIED',
+      provenanceStatus: 'COMMUNITY_UNVERIFIED',
+      requiresOcrVerify: true,
+      conflictWarning:
+        'PART-NUMBER & VOLTAGE VERIFICATION REQUIRED: Transtron 121-pin ECUs span 12V D-Max/mu-X and 24V N-Series trucks, and CAN-H moves between Pin 77 and Pin 58 across Euro tiers. Confirm exact Transtron P/N (e.g. 8980795131) before energizing.',
       benchWakeupPins: {
         kl30: ['2', '5'],
         kl15: ['24'],
@@ -1662,12 +1668,12 @@ export const ECU_BRAND_PROFILES: EcuBrandProfile[] = [
     hardwareVariants: [
       {
         id: 'isuzu-4jj1-base',
-        label: 'OEM Verified: Transtron 4JJ1 Standard (77/78 CAN)',
+        label: 'OEM Verified P/N 8980795131: Transtron 4JJ1 Standard 12V (77/78 CAN)',
         plugFilterId: 'ALL',
         benchHardwareProfile: {
-          ecuFamily: 'Isuzu Transtron SH7058',
+          ecuFamily: 'Isuzu Transtron SH7058 (P/N 8980795131)',
           mcuArchitecture: 'Renesas SH7058',
-          hardwareVariant: 'Standard PH 4JJ1 (Pins 77/78 CAN)',
+          hardwareVariant: 'Standard PH 4JJ1 P/N 8980795131 (Pins 77/78 CAN · 12V)',
           requiresMainRelayLoop: true,
           requiresCaseGround: true,
           canTerminationOhms: 120,
@@ -2171,13 +2177,16 @@ export const ECU_BRAND_PROFILES: EcuBrandProfile[] = [
       'IMPORTANT: Mitsubishi 4D56 DI-D, 4M41, 4N14 (L300 Euro-4), and 4N15 Diesel ECUs are manufactured by DENSO (Renesas SH7058/SH72543), NOT Melco E6T. Melco E6T is strictly for Mitsubishi Petrol models.',
     imageSrc: '/assets/images/ecu_connector_socket.jpg',
     benchHardwareProfile: {
-      ecuFamily: 'Mitsubishi Denso SH7058 / SH72543 Common Rail',
+      ecuFamily: 'Mitsubishi Denso SH7058 / SH72543 Common Rail (Multi-Engine Suite)',
       mcuArchitecture: 'Renesas SuperH SH7058 / SH72543R',
-      hardwareVariant: '4D56 / 4M41 / 4N14 (121-Pin A/B + Ep7)',
+      hardwareVariant: 'Multi-Platform 4D56 / 4M41 / 4N14 / 4N15 — Select Exact P/N Variant',
       requiresMainRelayLoop: true,
       requiresCaseGround: false,
       canTerminationOhms: 120,
-      provenanceStatus: 'OEM_VERIFIED',
+      provenanceStatus: 'COMMUNITY_UNVERIFIED',
+      requiresOcrVerify: true,
+      conflictWarning:
+        'ENGINE & P/N VARIANT GATE: 4D56/4M41/4N14 (SH7058) and 4N15 MIVEC (SH72543R) use completely different power and main-relay pins. Select the exact Denso part-number variant (e.g. 1860B062 / MA275800-9542 vs 1860C711 / 275700-7422) before applying +12V.',
       benchWakeupPins: {
         kl30: ['3 (VBAT)'],
         kl15: ['5 (IG_SW)'],
@@ -2189,12 +2198,12 @@ export const ECU_BRAND_PROFILES: EcuBrandProfile[] = [
     hardwareVariants: [
       {
         id: 'mitsu-4d56-std',
-        label: 'OEM Verified: 4D56 / 4M41 / 4N14 (Plug A/B)',
+        label: 'OEM Verified P/N 1860B062 (MA275800-9542): 4D56 / 4M41 / 4N14 (Plug A/B)',
         plugFilterId: 'ALL',
         benchHardwareProfile: {
-          ecuFamily: 'Mitsubishi Denso 4D56 / 4M41 / 4N14',
+          ecuFamily: 'Mitsubishi Denso 4D56 / 4M41 / 4N14 (P/N 1860B062 / MA275800-9542)',
           mcuArchitecture: 'Renesas SH7058 / SH72543',
-          hardwareVariant: 'Standard Table 13A-13B (Plug A/B)',
+          hardwareVariant: 'Standard Table 13A-13B (P/N 1860B062 · Plug A/B)',
           requiresMainRelayLoop: true,
           requiresCaseGround: false,
           canTerminationOhms: 120,
@@ -3082,13 +3091,16 @@ export const ECU_BRAND_PROFILES: EcuBrandProfile[] = [
       },
     ],
     benchHardwareProfile: {
-      ecuFamily: 'Nissan Hitachi MEC11/22 (QG16DE) & Denso D40 (YD25)',
+      ecuFamily: 'Nissan Hitachi MEC11/22 (QG16DE) & Denso D40 (YD25) Multi-Platform',
       mcuArchitecture: 'Hitachi SH7055 / Denso SH7058',
-      hardwareVariant: 'Sentra N16 QG16DE (K-Line 85/88)',
+      hardwareVariant: 'Multi-Platform Sentra N16 & Navara D40 — Select Exact P/N Variant',
       requiresMainRelayLoop: true,
       requiresCaseGround: false,
       canTerminationOhms: 120,
-      provenanceStatus: 'OEM_VERIFIED',
+      provenanceStatus: 'COMMUNITY_UNVERIFIED',
+      requiresOcrVerify: true,
+      conflictWarning:
+        'MULTI-PLATFORM SUITE: Combines Hitachi MEC11-251 (Sentra N16 QG16DE petrol) and Denso SH7058 (Navara D40 YD25 diesel). Select the exact part-number variant before applying +12V.',
       benchWakeupPins: {
         kl30: ['121 (BACKUP)'],
         kl15: ['36', '109'],
@@ -3101,12 +3113,12 @@ export const ECU_BRAND_PROFILES: EcuBrandProfile[] = [
     hardwareVariants: [
       {
         id: 'nissan-qg16-std',
-        label: 'OEM Verified: Sentra N16 QG16DE (Hitachi MEC11/22)',
+        label: 'OEM Verified P/N MEC11-251 / MEC22-251: Sentra N16 QG16DE',
         plugFilterId: 'ALL',
         benchHardwareProfile: {
           ecuFamily: 'Nissan Hitachi MEC11-251 / MEC22-251',
           mcuArchitecture: 'Hitachi SH7055',
-          hardwareVariant: 'Sentra N16 QG16DE (Pins 85/88 K-Line)',
+          hardwareVariant: 'Sentra N16 QG16DE (P/N MEC11-251 · Pins 85/88 K-Line)',
           requiresMainRelayLoop: true,
           requiresCaseGround: false,
           canTerminationOhms: 0,
@@ -3944,9 +3956,9 @@ export const ECU_BRAND_PROFILES: EcuBrandProfile[] = [
     description:
       'Hybrid ceramic/SMD ECU prone to thermal bond fractures. Drivers: VB025 (Coils), MC33186DH (Throttle), ST L9135PD (Injectors), UE06AB6 (5V Reg), TLE6230GP (Fans), ST95160 EEPROM. Note: Some Fiat manuals invert Connector A vs B labels.',
     imageSrc:
-      '/assets/images/Screenshot_20261112_170409_com_facebook_katana_FbMainTabActivity_af47a1b8.jpg',
+      '/assets/images/ecu_connector_socket.jpg',
     pcbImageSrc:
-      '/assets/images/Screenshot_20261112_170409_com_facebook_katana_FbMainTabActivity_af47a1b8.jpg',
+      '/assets/images/IMG_20261031_102222_185ec4db.jpg',
     pcbComponents: [
       {
         id: 'pcb-iaw-vb025-cyl14',

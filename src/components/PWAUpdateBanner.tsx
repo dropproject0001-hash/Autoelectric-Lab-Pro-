@@ -33,7 +33,7 @@ export const PWAUpdateBanner: React.FC<PWAUpdateBannerProps> = ({ pwa }) => {
           <div className="flex items-center gap-2">
             <RefreshCw className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
             <span>
-              <strong>New Version Available:</strong> An updated build of Virtual ECU Lab Pro has
+              <strong>New Version Available:</strong> An updated build of AutoElectric Lab Pro has
               been downloaded and is ready to activate.
             </span>
           </div>

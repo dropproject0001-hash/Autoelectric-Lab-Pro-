@@ -15,8 +15,8 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$ProjectId   = "gen-lang-client-0822907731"
-$FirestoreDb = "ai-studio-virtualeculaboem-a394a24c-3180-4bd9-8d2e-ad856ade7828"
+$ProjectId   = "infra-firefly-1mln4"
+$FirestoreDb = "ai-studio-autoelectriclabp-25d98605-c678-411c-adce-09263788ae82"
 
 Write-Host "==================================================================" -ForegroundColor Cyan
 Write-Host " Autoelectric Lab Pro — Production Environment Setup (PowerShell)" -ForegroundColor Cyan

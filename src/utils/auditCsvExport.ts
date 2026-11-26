@@ -137,7 +137,7 @@ export function buildTrialAuditCsv(params: {
   // Export Banner Metadata (Sanitized: user IDs, emails, and device IDs scrubbed)
   lines.push(
     formatCsvRow([
-      'Virtual ECU Lab - Sanitized Trial PIN Audit Export (PII & Device IDs Scrubbed)',
+      'AutoElectric Lab Pro - Sanitized Trial PIN Audit Export (PII & Device IDs Scrubbed)',
       new Date(exportedAtMs).toISOString(),
       `PIN Records: ${params.trials.length}`,
       `Audit Events: ${params.auditLog.length}`,

@@ -554,7 +554,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
             {
               id: 'pwa-apply-update',
               label: 'Update App',
-              description: 'A new version of Virtual ECU Lab Pro is ready. Click to update now.',
+              description: 'A new version of AutoElectric Lab Pro is ready. Click to update now.',
               icon: RefreshCw,
               ramtiIcon: 'settings' as RamtiModuleIconName,
               tone: 'emerald' as const,
@@ -569,7 +569,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
               id: 'pwa-install-app',
               label: 'Install App',
               description:
-                'Install Virtual ECU Lab Pro on your device for standalone offline-ready operation',
+                'Install AutoElectric Lab Pro on your device for standalone offline-ready operation',
               icon: Download,
               ramtiIcon: 'settings' as RamtiModuleIconName,
               tone: 'amber' as const,
@@ -594,7 +594,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
                   ? 'Install App (iOS)'
                   : 'PWA Install Guide',
               description: pwa?.isInstalled
-                ? 'Virtual ECU Lab Pro is running as an installed app. Open PWA status & update controls.'
+                ? 'AutoElectric Lab Pro is running as an installed app. Open PWA status & update controls.'
                 : 'Install AutoElectric Lab Pro on Android, Desktop, or iOS',
               icon: pwa?.isInstalled ? CheckCircle2 : pwa?.isIOS ? Smartphone : Download,
               ramtiIcon: 'settings' as RamtiModuleIconName,

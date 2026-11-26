@@ -91,9 +91,8 @@ const REDEEM_WINDOW_MS = 5 * 60 * 1000;
 const REDEEM_MAX_ATTEMPTS = 8;
 
 // Verified Admin UID registry:
-// Anchored strictly to verified Firebase UID via VECL_ADMIN_UIDS env var (no hardcoded UID literals).
+// Anchored strictly to verified Firebase UID via VECL_ADMIN_UIDS env var (no hardcoded UID or email bootstrap).
 const verifiedAdminUids = new Set<string>();
-const VERIFIED_OWNER_BOOTSTRAP_EMAIL = 'rubenlleg12@gmail.com';
 let requireLicenseForAllUsers = false;
 
 interface DurableLicenseStorePayload {
@@ -108,6 +107,14 @@ let customStoreFilePath: string | null = null;
 let cachedGeneratedHmacSecret: string | null = null;
 let isStoreLoaded = false;
 
+function resolveDurableDataDir(): string {
+  const envDir = (process.env.VECL_DATA_DIR || '').trim();
+  if (envDir) {
+    return path.resolve(envDir);
+  }
+  return path.resolve(process.cwd(), '.data');
+}
+
 function resolveLicenseStoreFilePath(): string {
   if (customStoreFilePath) {
     return customStoreFilePath;
@@ -115,7 +122,7 @@ function resolveLicenseStoreFilePath(): string {
   if (process.env.VECL_LICENSE_STORE_PATH && process.env.VECL_LICENSE_STORE_PATH.trim()) {
     return path.resolve(process.env.VECL_LICENSE_STORE_PATH.trim());
   }
-  return path.resolve(process.cwd(), '.data', 'vecl-licenses.store.json');
+  return path.join(resolveDurableDataDir(), 'vecl-licenses.store.json');
 }
 
 function resolveHmacKeyFilePath(): string {
@@ -295,20 +302,6 @@ export function isVerifiedAdminUser(user: VerifiedFirebaseUser | undefined | nul
   }
 
   if (verifiedAdminUids.has(user.uid)) {
-    return true;
-  }
-
-  // First-login UID pinning for the verified project owner if no Admin UID has been pinned yet
-  // (Can be disabled in strict production via VECL_DISABLE_EMAIL_ADMIN_BOOTSTRAP=true)
-  if (
-    process.env.VECL_DISABLE_EMAIL_ADMIN_BOOTSTRAP !== 'true' &&
-    verifiedAdminUids.size === 0 &&
-    user.email &&
-    user.email.toLowerCase() === VERIFIED_OWNER_BOOTSTRAP_EMAIL &&
-    user.emailVerified
-  ) {
-    verifiedAdminUids.add(user.uid);
-    persistLicenseStoreToDisk();
     return true;
   }
 
@@ -842,7 +835,7 @@ export function requireActiveLicense(
   if (!licenseId) {
     if (requireLicenseForAllUsers || enforceHeader || process.env.VECL_ENFORCE_LICENSES === 'true') {
       res.status(403).json({
-        error: 'An active Virtual ECU Lab license code is required to access this protected endpoint.',
+        error: 'An active AutoElectric Lab Pro license code is required to access this protected endpoint.',
         code: 'LICENSE_REQUIRED',
       });
       return;
@@ -868,7 +861,7 @@ export function requireActiveLicense(
 
   if (status === 'EXPIRED') {
     res.status(403).json({
-      error: 'Your Virtual ECU Lab license has expired. Please contact the administrator to extend or renew your access code.',
+      error: 'Your AutoElectric Lab Pro license has expired. Please contact the administrator to extend or renew your access code.',
       code: 'LICENSE_EXPIRED',
     });
     return;

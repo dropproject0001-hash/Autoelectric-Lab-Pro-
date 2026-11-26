@@ -112,7 +112,13 @@ export interface TrialTokenPayload {
 export interface AdminSessionTokenPayload {
   kind: 'admin_v1';
   adminId: string;
+  jti: string;
   issuedAtMs: number;
+  expiresAtMs: number;
+}
+
+interface RevokedAdminTokenEntry {
+  jti: string;
   expiresAtMs: number;
 }
 
@@ -122,6 +128,8 @@ interface DurableTrialStorePayload {
   trials: TrialPinRecord[];
   auditLog?: TrialAuditEvent[];
   adminCredential: AdminPinCredentialRecord | null;
+  revokedAdminTokens?: RevokedAdminTokenEntry[];
+  adminSessionMinIssuedAtMs?: number;
 }
 
 const VALID_TRIAL_DURATIONS = new Set<number>([3, 4, 5, 6, 720, 2160, 4320, 8760]);
@@ -143,7 +151,9 @@ const auditEvents: TrialAuditEvent[] = [];
 const trialRedemptionLocks = new Set<string>();
 const trialAttemptBuckets = new Map<string, number[]>();
 const adminAttemptBuckets = new Map<string, number[]>();
+const revokedAdminTokenExpiries = new Map<string, number>();
 
+let adminSessionMinIssuedAtMs = 0;
 let storedAdminCredential: AdminPinCredentialRecord | null = null;
 let customTrialStoreFilePath: string | null = null;
 let cachedHmacSecret: string | null = null;
@@ -231,6 +241,14 @@ function ensureBackfilledRecordHistory(rec: TrialPinRecord): TrialPinRecord {
   };
 }
 
+function resolveDurableDataDir(): string {
+  const envDir = (process.env.VECL_DATA_DIR || '').trim();
+  if (envDir) {
+    return path.resolve(envDir);
+  }
+  return path.resolve(process.cwd(), '.data');
+}
+
 function resolveTrialStoreFilePath(): string {
   if (customTrialStoreFilePath) {
     return customTrialStoreFilePath;
@@ -241,7 +259,7 @@ function resolveTrialStoreFilePath(): string {
   if (process.env.VECL_LICENSE_STORE_PATH && process.env.VECL_LICENSE_STORE_PATH.trim()) {
     return path.join(path.dirname(path.resolve(process.env.VECL_LICENSE_STORE_PATH.trim())), 'vecl-trials.store.json');
   }
-  return path.resolve(process.cwd(), '.data', 'vecl-trials.store.json');
+  return path.join(resolveDurableDataDir(), 'vecl-trials.store.json');
 }
 
 function resolveHmacKeyFilePath(): string {
@@ -289,18 +307,32 @@ function getHmacSecret(): string {
   }
 }
 
-function persistTrialStoreToDisk(): void {
+function pruneExpiredRevokedAdminTokens(nowMs = Date.now()): void {
+  for (const [jti, exp] of revokedAdminTokenExpiries.entries()) {
+    if (exp <= nowMs) {
+      revokedAdminTokenExpiries.delete(jti);
+    }
+  }
+}
+
+function persistTrialStoreToDisk(nowMs = Date.now()): void {
   try {
+    pruneExpiredRevokedAdminTokens(nowMs);
     const filePath = resolveTrialStoreFilePath();
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
     const payload: DurableTrialStorePayload = {
       schemaVersion: 2,
-      updatedAtMs: Date.now(),
+      updatedAtMs: nowMs,
       trials: Array.from(trialsById.values()),
       auditLog: auditEvents.slice(0, MAX_AUDIT_LOG_EVENTS),
       adminCredential: storedAdminCredential,
+      revokedAdminTokens: Array.from(revokedAdminTokenExpiries.entries()).map(([jti, expiresAtMs]) => ({
+        jti,
+        expiresAtMs,
+      })),
+      adminSessionMinIssuedAtMs,
     };
-    const tmpPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
+    const tmpPath = `${filePath}.${process.pid}.${nowMs}.tmp`;
     fs.writeFileSync(tmpPath, JSON.stringify(payload, null, 2), {
       encoding: 'utf8',
       mode: 0o600,
@@ -319,6 +351,8 @@ export function reloadTrialStoreFromDisk(): {
   trialsById.clear();
   trialIdByLookupHash.clear();
   auditEvents.length = 0;
+  revokedAdminTokenExpiries.clear();
+  adminSessionMinIssuedAtMs = 0;
   storedAdminCredential = null;
   isTrialStoreLoaded = true;
 
@@ -358,6 +392,17 @@ export function reloadTrialStoreFromDisk(): {
     ) {
       storedAdminCredential = { ...parsed.adminCredential };
     }
+    if (Array.isArray(parsed.revokedAdminTokens)) {
+      const nowMs = Date.now();
+      for (const item of parsed.revokedAdminTokens) {
+        if (item && typeof item.jti === 'string' && typeof item.expiresAtMs === 'number' && item.expiresAtMs > nowMs) {
+          revokedAdminTokenExpiries.set(item.jti, item.expiresAtMs);
+        }
+      }
+    }
+    if (typeof parsed.adminSessionMinIssuedAtMs === 'number' && Number.isFinite(parsed.adminSessionMinIssuedAtMs)) {
+      adminSessionMinIssuedAtMs = parsed.adminSessionMinIssuedAtMs;
+    }
   } catch (err) {
     console.warn('[TrialPinService] Failed to parse durable trial store:', err);
   }
@@ -384,6 +429,8 @@ export function resetTrialStoreForTests(): void {
   trialRedemptionLocks.clear();
   trialAttemptBuckets.clear();
   adminAttemptBuckets.clear();
+  revokedAdminTokenExpiries.clear();
+  adminSessionMinIssuedAtMs = 0;
   storedAdminCredential = null;
   isTrialStoreLoaded = true;
   try {
@@ -611,15 +658,24 @@ function verifyHmacToken<T>(token: string, expectedPrefix: string): { valid: boo
 // MASTER ADMIN PIN AUTHENTICATION & FIRST-RUN SETUP
 // ============================================================================
 
+export function isFirstRunAdminSetupEnabled(): boolean {
+  const envPin = (process.env.VECL_ADMIN_MASTER_PIN || '').trim();
+  if (envPin.length > 0) return false;
+  if (process.env.VECL_STRICT_PRODUCTION_SECRETS === 'true') return false;
+  return process.env.VECL_ALLOW_FIRST_RUN_ADMIN_SETUP === 'true';
+}
+
 export function getAdminPinConfigStatus(): {
   masterEnvConfigured: boolean;
   adminClaimed: boolean;
+  setupEnabled: boolean;
 } {
   ensureTrialStoreLoaded();
   const envPin = (process.env.VECL_ADMIN_MASTER_PIN || '').trim();
   return {
     masterEnvConfigured: envPin.length > 0,
     adminClaimed: storedAdminCredential !== null,
+    setupEnabled: isFirstRunAdminSetupEnabled(),
   };
 }
 
@@ -631,6 +687,9 @@ export function setupFirstRunAdminPin(
   const envPin = (process.env.VECL_ADMIN_MASTER_PIN || '').trim();
   if (envPin.length > 0) {
     throw new Error('ADMIN_ENV_MANAGED');
+  }
+  if (!isFirstRunAdminSetupEnabled()) {
+    throw new Error('ADMIN_SETUP_DISABLED');
   }
   if (storedAdminCredential !== null) {
     throw new Error('ADMIN_ALREADY_CLAIMED');
@@ -653,6 +712,7 @@ export function setupFirstRunAdminPin(
   const adminToken = signHmacToken('vecl_admin_v1', {
     kind: 'admin_v1',
     adminId: 'master_pin_admin',
+    jti: crypto.randomBytes(12).toString('hex'),
     issuedAtMs: nowMs,
     expiresAtMs,
   } satisfies AdminSessionTokenPayload);
@@ -696,6 +756,7 @@ export function verifyMasterAdminPinAndIssueToken(
   const adminToken = signHmacToken('vecl_admin_v1', {
     kind: 'admin_v1',
     adminId: 'master_pin_admin',
+    jti: crypto.randomBytes(12).toString('hex'),
     issuedAtMs: nowMs,
     expiresAtMs,
   } satisfies AdminSessionTokenPayload);
@@ -703,10 +764,37 @@ export function verifyMasterAdminPinAndIssueToken(
   return { adminToken, expiresAtMs };
 }
 
+export function revokeAdminSessionToken(
+  token: string,
+  nowMs = Date.now()
+): { revoked: boolean } {
+  ensureTrialStoreLoaded();
+  const verified = verifyHmacToken<AdminSessionTokenPayload>(token, 'vecl_admin_v1');
+  if (!verified.valid || !verified.payload || verified.payload.kind !== 'admin_v1') {
+    return { revoked: false };
+  }
+  const jti = typeof verified.payload.jti === 'string' ? verified.payload.jti : '';
+  const exp = typeof verified.payload.expiresAtMs === 'number' ? verified.payload.expiresAtMs : nowMs + ADMIN_SESSION_TTL_MS;
+  if (jti) {
+    revokedAdminTokenExpiries.set(jti, exp);
+    persistTrialStoreToDisk(nowMs);
+    return { revoked: true };
+  }
+  return { revoked: false };
+}
+
+export function revokeAllAdminSessionTokens(nowMs = Date.now()): { revokedBeforeMs: number } {
+  ensureTrialStoreLoaded();
+  adminSessionMinIssuedAtMs = Math.max(adminSessionMinIssuedAtMs, nowMs + 1);
+  persistTrialStoreToDisk(nowMs);
+  return { revokedBeforeMs: adminSessionMinIssuedAtMs };
+}
+
 export function verifyAdminSessionToken(
   token: string,
   nowMs = Date.now()
-): { valid: boolean; payload?: AdminSessionTokenPayload; code?: 'INVALID_TOKEN' | 'TOKEN_EXPIRED'; error?: string } {
+): { valid: boolean; payload?: AdminSessionTokenPayload; code?: 'INVALID_TOKEN' | 'TOKEN_EXPIRED' | 'TOKEN_REVOKED'; error?: string } {
+  ensureTrialStoreLoaded();
   const verified = verifyHmacToken<AdminSessionTokenPayload>(token, 'vecl_admin_v1');
   if (!verified.valid || !verified.payload || verified.payload.kind !== 'admin_v1') {
     return {
@@ -720,6 +808,16 @@ export function verifyAdminSessionToken(
       valid: false,
       code: 'TOKEN_EXPIRED',
       error: 'Admin session has expired. Re-enter the Master Admin PIN.',
+    };
+  }
+  if (
+    (typeof verified.payload.issuedAtMs === 'number' && verified.payload.issuedAtMs < adminSessionMinIssuedAtMs) ||
+    (typeof verified.payload.jti === 'string' && revokedAdminTokenExpiries.has(verified.payload.jti))
+  ) {
+    return {
+      valid: false,
+      code: 'TOKEN_REVOKED',
+      error: 'Admin session was revoked or signed out. Re-enter the Master Admin PIN.',
     };
   }
   return { valid: true, payload: verified.payload };
@@ -1670,7 +1768,7 @@ export function importHistoricalAuditCsv(params: {
 
   if (!recognizedAtLeastOneSection) {
     throw new Error(
-      'INVALID_CSV_FORMAT: Uploaded file does not contain Virtual ECU Lab Security Audit Log or Trial PIN Summary columns.'
+      'INVALID_CSV_FORMAT: Uploaded file does not contain AutoElectric Lab Pro Security Audit Log or Trial PIN Summary columns.'
     );
   }
 

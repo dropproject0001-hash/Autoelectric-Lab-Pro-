@@ -655,7 +655,7 @@ export function evaluatePhysicalBenchMeasurement(params: {
         verificationSteps: [
           'Inject a known simulated voltage/load using the Bench Vehicle Emulator and observe whether live ECU parameters respond.',
         ],
-        sourceReference: 'Virtual ECU Lab MNA Pin-Stage Diagnostic Model',
+        sourceReference: 'AutoElectric Lab Pro MNA Pin-Stage Diagnostic Model',
       }
     );
   }

@@ -1,6 +1,6 @@
 {
   "name": "Virtual ECU Lab OEM",
-  "description": "Professional Bench repairs manual and ADVANCE AI VOICES interactive guide and Voice navigator. 100% OEM informations and  Accurate Immulators OEM Base  of all the Bench Repairs OEM wiring diagram, Pin outs and more.. engine and virtual ECU bench testing laboratory for electrical diagnostics.",
+  "description": "Automotive ECU bench testing, Modified Nodal Analysis (MNA) circuit simulation, part-number cross-referenced pinout library, and AI diagnostic workstation.",
   "requestFramePermissions": [
     "microphone"
   ],

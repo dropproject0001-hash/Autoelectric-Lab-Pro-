@@ -78,6 +78,8 @@ import {
   reloadTrialStoreFromDisk,
   resetTrialPinDevice,
   resetTrialStoreForTests,
+  revokeAdminSessionToken,
+  revokeAllAdminSessionTokens,
   setTrialPinRevocation,
   setTrialStoreFilePathForTests,
   setupFirstRunAdminPin,
@@ -1217,18 +1219,34 @@ async function main() {
     const prevMasterPin = process.env.VECL_ADMIN_MASTER_PIN;
     delete process.env.VECL_ADMIN_MASTER_PIN;
 
+    const prevAllowFirstRun = process.env.VECL_ALLOW_FIRST_RUN_ADMIN_SETUP;
+    delete process.env.VECL_ALLOW_FIRST_RUN_ADMIN_SETUP;
+
     setTrialStoreFilePathForTests(storePath);
     resetTrialStoreForTests();
 
     try {
-      // First-run setup when VECL_ADMIN_MASTER_PIN is not configured
+      // First-run setup is DISABLED by default when VECL_ADMIN_MASTER_PIN is not configured
       const cfgBefore = getAdminPinConfigStatus();
       assert.equal(cfgBefore.masterEnvConfigured, false);
       assert.equal(cfgBefore.adminClaimed, false);
+      assert.equal(cfgBefore.setupEnabled, false);
+      assert.throws(() => setupFirstRunAdminPin('74920183'), /ADMIN_SETUP_DISABLED/);
+
+      // Explicit opt-in via VECL_ALLOW_FIRST_RUN_ADMIN_SETUP enables first-run setup
+      process.env.VECL_ALLOW_FIRST_RUN_ADMIN_SETUP = 'true';
+      assert.equal(getAdminPinConfigStatus().setupEnabled, true);
 
       const firstRun = setupFirstRunAdminPin('74920183', 1_700_000_000_000);
       assert.ok(firstRun.adminToken.startsWith('vecl_admin_v1.'));
       assert.equal(verifyAdminSessionToken(firstRun.adminToken, 1_700_000_005_000).valid, true);
+
+      // Single token revocation works cleanly
+      const revokeSingle = revokeAdminSessionToken(firstRun.adminToken, 1_700_000_006_000);
+      assert.equal(revokeSingle.revoked, true);
+      const verifyRevoked = verifyAdminSessionToken(firstRun.adminToken, 1_700_000_007_000);
+      assert.equal(verifyRevoked.valid, false);
+      assert.equal(verifyRevoked.code, 'TOKEN_REVOKED');
 
       // Second first-run claim must be rejected
       assert.throws(() => setupFirstRunAdminPin('11223344'), /ADMIN_ALREADY_CLAIMED/);
@@ -1239,6 +1257,13 @@ async function main() {
       assert.throws(() => setupFirstRunAdminPin('55667788'), /ADMIN_ENV_MANAGED/);
       const envLogin = verifyMasterAdminPinAndIssueToken('90817263', 1_700_000_000_000);
       assert.ok(envLogin.adminToken.startsWith('vecl_admin_v1.'));
+      assert.equal(verifyAdminSessionToken(envLogin.adminToken, 1_700_000_005_000).valid, true);
+
+      // Revoke all sessions invalidates all previous tokens
+      revokeAllAdminSessionTokens(1_700_000_010_000);
+      const verifyAllRevoked = verifyAdminSessionToken(envLogin.adminToken, 1_700_000_011_000);
+      assert.equal(verifyAllRevoked.valid, false);
+      assert.equal(verifyAllRevoked.code, 'TOKEN_REVOKED');
       assert.throws(() => verifyMasterAdminPinAndIssueToken('00000000'), /INVALID_MASTER_PIN/);
 
       // Duration bounds (only 3h, 4h, 5h, 6h, 30d=720h, 3m=2160h, 6m=4320h, 1y=8760h allowed)
@@ -1352,6 +1377,11 @@ async function main() {
         delete process.env.VECL_ADMIN_MASTER_PIN;
       } else {
         process.env.VECL_ADMIN_MASTER_PIN = prevMasterPin;
+      }
+      if (prevAllowFirstRun === undefined) {
+        delete process.env.VECL_ALLOW_FIRST_RUN_ADMIN_SETUP;
+      } else {
+        process.env.VECL_ALLOW_FIRST_RUN_ADMIN_SETUP = prevAllowFirstRun;
       }
       resetTrialStoreForTests();
       setTrialStoreFilePathForTests(null);
@@ -1501,6 +1531,30 @@ async function main() {
       });
       assert.equal(blockedTrialAiRes.status, 403);
       assert.equal(((await blockedTrialAiRes.json()) as { code?: string }).code, 'TRIAL_REVOKED');
+
+      // Admin logout revokes session token immediately
+      const logoutRes = await fetch(`${baseUrl}/api/autoelectric/trial/admin/logout`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${goodAdminBody.adminToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      assert.equal(logoutRes.status, 200);
+
+      const loggedOutListRes = await fetch(`${baseUrl}/api/autoelectric/trial/admin/list`, {
+        headers: { Authorization: `Bearer ${goodAdminBody.adminToken}` },
+      });
+      assert.equal(loggedOutListRes.status, 401);
+      assert.equal(((await loggedOutListRes.json()) as { code?: string }).code, 'TOKEN_REVOKED');
+
+      // Health endpoint returns security headers (CSP & HSTS) and durable data dir telemetry
+      const healthRes = await fetch(`${baseUrl}/api/health`);
+      assert.equal(healthRes.status, 200);
+      assert.ok(healthRes.headers.get('content-security-policy'));
+      const healthJson = (await healthRes.json()) as { status: string; persistence?: { durableDataDirConfigured: boolean } };
+      assert.equal(healthJson.status, 'ONLINE');
+      assert.equal(typeof healthJson.persistence?.durableDataDirConfigured, 'boolean');
     } finally {
       if (prevMasterPin === undefined) {
         delete process.env.VECL_ADMIN_MASTER_PIN;

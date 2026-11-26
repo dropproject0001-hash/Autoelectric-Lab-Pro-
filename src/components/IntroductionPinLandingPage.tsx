@@ -57,6 +57,7 @@ import {
   formatTrialDurationLabel,
   generateAdminTrialPinClient,
   loginAdminMasterPinClient,
+  logoutAdminSessionClient,
   resetAdminTrialDeviceClient,
   revokeAdminTrialPinClient,
   setAdminPinToken,
@@ -268,7 +269,7 @@ export const IntroductionPinLandingPage: React.FC = () => {
       playAccessGrantedChime();
       setMasterPinInput('');
       setSetupPinConfirm('');
-      setAdminConfig({ masterEnvConfigured: false, adminClaimed: true });
+      setAdminConfig({ masterEnvConfigured: false, adminClaimed: true, setupEnabled: false });
       markAdminSessionActive(true);
       const list = await fetchAdminTrialPinsList();
       setAdminTrials(list.trials);
@@ -373,11 +374,12 @@ export const IntroductionPinLandingPage: React.FC = () => {
 
   const handleLockAdmin = () => {
     playSystemLockSound('lock');
+    void logoutAdminSessionClient();
     setAdminPinToken(null);
     markAdminSessionActive(false);
     setAdminTrials([]);
     setGeneratedPinBanner(null);
-    setSuccessMsg('Admin Master session locked.');
+    setSuccessMsg('Admin Master session locked and token revoked.');
   };
 
   const handleCopyPin = async (value: string) => {
@@ -530,7 +532,7 @@ export const IntroductionPinLandingPage: React.FC = () => {
             className="lg:col-span-6 space-y-6 pt-1"
           >
             <p className="text-xs font-medium text-[#91A4BD] tracking-wide">
-              RAMTi · Virtual ECU Lab · Automotive Bench Simulation · PIN-Gated Workstation
+              RAMTi · AutoElectric Lab Pro · Automotive Bench Simulation · PIN-Gated Workstation
             </p>
 
             <h1
@@ -1042,7 +1044,7 @@ export const IntroductionPinLandingPage: React.FC = () => {
             {activeTab === 'ADMIN_MASTER' && (
               <div className="space-y-4">
                 {!isAdminUnlocked ? (
-                  adminConfig && !adminConfig.masterEnvConfigured && !adminConfig.adminClaimed ? (
+                  adminConfig && adminConfig.setupEnabled && !adminConfig.masterEnvConfigured && !adminConfig.adminClaimed ? (
                     <form onSubmit={handleFirstRunAdminSetup} className="space-y-3.5">
                       <div>
                         <h2 className="text-sm font-semibold text-[#FFB020]">

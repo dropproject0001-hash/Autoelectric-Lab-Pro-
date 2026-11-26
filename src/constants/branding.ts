@@ -74,7 +74,6 @@ export const CREATOR_CREDENTIALS = {
 
 export const VERIFIED_OWNER_EMAILS = [
   'rubenllego12@gmail.com',
-  'rubenlleg12@gmail.com',
 ] as const;
 
 export function isVerifiedOwnerEmail(email: string | null | undefined): boolean {

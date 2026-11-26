@@ -30,12 +30,12 @@ export default defineConfig(({command}) => {
                 'pwa-maskable-192x192.png',
                 'pwa-maskable-512x512.png',
                 'offline.html',
-                'assets/aistudio/file_0000000098d48211abb177ce752b7b0e_62980da7.png',
+                'assets/images/file_0000000098d48211abb177ce752b7b0e_62980da7.png',
               ],
               manifest: {
                 id: '/',
-                name: 'Virtual ECU Lab Pro',
-                short_name: 'ECU Lab Pro',
+                name: 'AutoElectric Lab Pro',
+                short_name: 'AutoElec Lab',
                 description:
                   'Automotive Electronics Diagnostics, ECU Bench Testing and AI Repair Assistance.',
                 start_url: '/',
@@ -93,6 +93,31 @@ export default defineConfig(({command}) => {
         'recharts',
       ],
       exclude: ['html2canvas', 'canvg', 'dompurify'],
+    },
+    build: {
+      chunkSizeWarningLimit: 1200,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules/three')) {
+              return 'vendor-three';
+            }
+            if (id.includes('node_modules/recharts') || id.includes('node_modules/d3')) {
+              return 'vendor-charts';
+            }
+            if (id.includes('node_modules/firebase') || id.includes('node_modules/@firebase')) {
+              return 'vendor-firebase';
+            }
+            if (id.includes('node_modules/jspdf')) {
+              return 'vendor-pdf';
+            }
+            if (id.includes('phTroubleScenarios') && id.endsWith('.json')) {
+              return 'data-ph-scenarios';
+            }
+            return undefined;
+          },
+        },
+      },
     },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.

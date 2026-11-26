@@ -171,7 +171,7 @@ export function buildRegionalKnowledgeCatalog(): RegionalVehicleRecord[] {
       provenance: buildProvenanceRecord({
         origin: 'LOCAL_OEM_GUIDE',
         requestedStatus: guide.status === 'VERIFIED' ? 'OEM_VERIFIED' : 'UNKNOWN',
-        sourceName: `Virtual ECU Lab Knowledge Base (${guide.tableRef})`,
+        sourceName: `AutoElectric Lab Pro Knowledge Base (${guide.tableRef})`,
         sourceUrlOrRef: `internal://oemKnowledgeDatabase/${guide.id}`,
         manufacturer: guide.brandLabel,
         applicableVehicle: guide.models.join('; '),
@@ -209,7 +209,7 @@ export function buildRegionalKnowledgeCatalog(): RegionalVehicleRecord[] {
       regionalAliases,
       provenance: buildProvenanceRecord({
         origin: 'LOCAL_RESTRICTED_METADATA',
-        sourceName: 'Virtual ECU Lab Restricted Vehicle Metadata',
+        sourceName: 'AutoElectric Lab Pro Restricted Vehicle Metadata',
         sourceUrlOrRef: `internal://oemKnowledgeDatabase/${restricted.id}`,
         manufacturer: restricted.brandLabel,
         applicableVehicle: restricted.modelName,

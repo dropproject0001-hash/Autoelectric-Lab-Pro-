@@ -12,12 +12,12 @@
     "lint": "tsc --noEmit",
     "rules:lint": "eslint firestore.rules",
     "rules:verify": "node scripts/verify-firestore-rules.mjs",
-    "rules:deploy": "npm run rules:verify && npx --yes firebase-tools deploy --only firestore:rules --database ai-studio-virtualeculaboem-a394a24c-3180-4bd9-8d2e-ad856ade7828",
+    "rules:deploy": "npm run rules:verify && npx --yes firebase-tools deploy --only firestore:rules --database ai-studio-autoelectriclabp-25d98605-c678-411c-adce-09263788ae82",
     "release:check": "node scripts/preflight-release-check.mjs",
     "release:check:quick": "node scripts/preflight-release-check.mjs --quick",
     "firebase:standardize": "node scripts/standardize-firebase-config.mjs",
     "firebase:standardize:check": "node scripts/standardize-firebase-config.mjs --check",
-    "test": "tsx src/simulation/tests/circuitEngine.test.ts && tsx src/simulation/tests/pcbDiagnostic.test.ts && tsx src/simulation/tests/securityAndOffline.test.ts && tsx src/simulation/tests/automotiveIntegration.test.ts && tsx src/simulation/tests/gaugeTelemetry.test.ts && tsx src/simulation/tests/harnessAndTwin.test.ts && tsx src/simulation/tests/cleanupAndBilingualAiProof.test.ts && tsx src/simulation/tests/connectionHealth.test.ts && tsx src/simulation/tests/blueprintMasterSuite.test.ts && tsx src/simulation/tests/clientDiagnosticPdf.test.ts && tsx src/simulation/tests/systemVoiceCoach.test.ts && tsx src/simulation/tests/calibrationAudit.test.ts && tsx src/simulation/tests/landingAndStepTutorials.test.ts",
+    "test": "tsx src/simulation/tests/circuitEngine.test.ts && tsx src/simulation/tests/pcbDiagnostic.test.ts && tsx src/simulation/tests/securityAndOffline.test.ts && tsx src/simulation/tests/automotiveIntegration.test.ts && tsx src/simulation/tests/gaugeTelemetry.test.ts && tsx src/simulation/tests/harnessAndTwin.test.ts && tsx src/simulation/tests/cleanupAndBilingualAiProof.test.ts && tsx src/simulation/tests/connectionHealth.test.ts && tsx src/simulation/tests/blueprintMasterSuite.test.ts && tsx src/simulation/tests/clientDiagnosticPdf.test.ts && tsx src/simulation/tests/systemVoiceCoach.test.ts && tsx src/simulation/tests/calibrationAudit.test.ts && tsx src/simulation/tests/landingAndStepTutorials.test.ts && tsx src/simulation/tests/benchStateReconciliation.test.ts && tsx src/simulation/tests/floatingVoiceKnowledgeFab.test.ts && tsx src/simulation/tests/googleWorkspaceIntegration.test.ts && tsx src/simulation/tests/masterSystemSpecification.test.ts",
     "start": "tsx server.ts"
   },
   "dependencies": {

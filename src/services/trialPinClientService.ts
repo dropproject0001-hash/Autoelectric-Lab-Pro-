@@ -116,6 +116,7 @@ export interface TrialDeviceStatusResponse {
 export interface AdminPinConfigStatus {
   masterEnvConfigured: boolean;
   adminClaimed: boolean;
+  setupEnabled: boolean;
 }
 
 // Keep signed trial & admin tokens strictly in JS memory (never localStorage/sessionStorage)
@@ -290,6 +291,7 @@ export async function fetchAdminPinConfigStatus(): Promise<AdminPinConfigStatus>
   return {
     masterEnvConfigured: Boolean(data.masterEnvConfigured),
     adminClaimed: Boolean(data.adminClaimed),
+    setupEnabled: Boolean(data.setupEnabled),
   };
 }
 
@@ -339,6 +341,23 @@ export async function loginAdminMasterPinClient(masterPin: string): Promise<{
     adminToken: data.adminToken,
     expiresAtMs: data.expiresAtMs ?? Date.now() + 12 * 3600_000,
   };
+}
+
+export async function logoutAdminSessionClient(): Promise<void> {
+  const token = inMemoryAdminToken;
+  setAdminPinToken(null);
+  if (!token) return;
+  try {
+    await fetch('/api/autoelectric/trial/admin/logout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  } catch {
+    // Token is already cleared in memory; ignore network offline error on logout
+  }
 }
 
 async function buildAdminAuthHeaders(): Promise<Record<string, string>> {

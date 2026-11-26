@@ -150,8 +150,8 @@ async function main() {
   await runTest('GET /api/autoelectric/diagnostics/connection-health enforces 401 auth and verifies RS256 Firebase ID tokens', async () => {
     const cfgPath = path.join(process.cwd(), 'firebase-applet-config.json');
     const projectId = fs.existsSync(cfgPath)
-      ? (JSON.parse(fs.readFileSync(cfgPath, 'utf8')).projectId as string) || 'gen-lang-client-0979131562'
-      : 'gen-lang-client-0979131562';
+      ? (JSON.parse(fs.readFileSync(cfgPath, 'utf8')).projectId as string) || 'infra-firefly-1mln4'
+      : 'infra-firefly-1mln4';
 
     const prevProjectId = process.env.FIREBASE_PROJECT_ID;
     process.env.FIREBASE_PROJECT_ID = projectId;
@@ -241,7 +241,7 @@ async function main() {
       },
       {
         configured: true,
-        databaseId: 'ai-studio-virtualeculaboem-a394a24c-3180-4bd9-8d2e-ad856ade7828',
+        databaseId: 'ai-studio-autoelectriclabp-25d98605-c678-411c-adce-09263788ae82',
         status: 'CONNECTED',
         profileReadVerified: true,
         latencyMs: 42,

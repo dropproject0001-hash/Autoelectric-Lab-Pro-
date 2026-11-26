@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "Virtual ECU Lab Pro",
-  "short_name": "ECU Lab Pro",
+  "name": "AutoElectric Lab Pro",
+  "short_name": "AutoElec Lab",
   "description": "Automotive Electronics Diagnostics, ECU Bench Testing and AI Repair Assistance.",
   "start_url": "/",
   "scope": "/",

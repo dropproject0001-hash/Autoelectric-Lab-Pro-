@@ -50,6 +50,7 @@ import {
   generateAdminTrialPinClient,
   importAdminTrialAuditCsv,
   loginAdminMasterPinClient,
+  logoutAdminSessionClient,
   resetAdminTrialDeviceClient,
   revokeAdminTrialPinClient,
   setAdminPinToken,
@@ -316,7 +317,7 @@ export const AdminLicenseModal: React.FC<AdminLicenseModalProps> = ({
       setMasterPinInput('');
       setSetupPinConfirm('');
       markAdminSessionActive(true);
-      setAdminConfig({ masterEnvConfigured: false, adminClaimed: true });
+      setAdminConfig({ masterEnvConfigured: false, adminClaimed: true, setupEnabled: false });
       await loadAdminTrialRegistry();
       setSuccessMsg('Master Admin PIN initialized and console unlocked.');
     } catch (err: unknown) {
@@ -349,11 +350,12 @@ export const AdminLicenseModal: React.FC<AdminLicenseModalProps> = ({
   };
 
   const handleLockAdminConsole = () => {
+    void logoutAdminSessionClient();
     setAdminPinToken(null);
     markAdminSessionActive(false);
     setNewlyGeneratedTrialPin(null);
     setExpandedTrialIds({});
-    setSuccessMsg('Administrator console locked.');
+    setSuccessMsg('Administrator console locked and session token revoked.');
   };
 
   const handleGenerateTrialPin = async (e: React.FormEvent) => {
@@ -855,7 +857,7 @@ export const AdminLicenseModal: React.FC<AdminLicenseModalProps> = ({
           {activeTab === 'ADMIN_GEN' && (
             <div className="space-y-4">
               {!hasAdminRights ? (
-                adminConfig && !adminConfig.masterEnvConfigured && !adminConfig.adminClaimed ? (
+                adminConfig && adminConfig.setupEnabled && !adminConfig.masterEnvConfigured && !adminConfig.adminClaimed ? (
                   <form
                     onSubmit={handleFirstRunAdminSetup}
                     className="mx-auto max-w-lg space-y-3 rounded-md border border-[#FFB020]/50 bg-[#0E192A] p-4"

@@ -4,6 +4,8 @@
  */
 
 import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
 
 export type SubscriptionDurationDays = 30 | 90 | 180 | 365 | 36500;
 
@@ -29,14 +31,96 @@ interface ServerSigningKeys {
   publicKeyJwk: JsonWebKey;
 }
 
+interface DurableOfflineLedgerPayload {
+  schemaVersion: 1;
+  updatedAtMs: number;
+  issuedLedger: IssuedOfflineLicenseRecord[];
+}
+
 let cachedServerKeys: ServerSigningKeys | null = null;
 const issuedLedger: IssuedOfflineLicenseRecord[] = [];
+let customOfflineDataDir: string | null = null;
+let isLedgerLoaded = false;
+
+function resolveOfflineDataDir(): string {
+  if (customOfflineDataDir) {
+    return customOfflineDataDir;
+  }
+  const envDir = (process.env.VECL_DATA_DIR || '').trim();
+  if (envDir) {
+    return path.resolve(envDir);
+  }
+  return path.resolve(process.cwd(), '.data');
+}
+
+function resolveSigningKeyFilePath(): string {
+  return path.join(resolveOfflineDataDir(), 'aelp-offline-signing-key.jwk');
+}
+
+function resolveOfflineLedgerFilePath(): string {
+  return path.join(resolveOfflineDataDir(), 'aelp-offline-licenses.store.json');
+}
+
+function ensureLedgerLoaded(): void {
+  if (isLedgerLoaded) return;
+  isLedgerLoaded = true;
+  issuedLedger.length = 0;
+  const ledgerPath = resolveOfflineLedgerFilePath();
+  if (!fs.existsSync(ledgerPath)) return;
+  try {
+    const raw = fs.readFileSync(ledgerPath, 'utf8');
+    const parsed = JSON.parse(raw) as Partial<DurableOfflineLedgerPayload>;
+    if (Array.isArray(parsed.issuedLedger)) {
+      for (const item of parsed.issuedLedger.slice(0, 200)) {
+        if (item && typeof item.licenseKey === 'string' && typeof item.signedActivationCode === 'string') {
+          issuedLedger.push(item);
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[OfflineLicenseCrypto] Failed to parse durable ledger:', err);
+  }
+}
+
+function persistLedgerToDisk(): void {
+  try {
+    const ledgerPath = resolveOfflineLedgerFilePath();
+    fs.mkdirSync(path.dirname(ledgerPath), { recursive: true });
+    const payload: DurableOfflineLedgerPayload = {
+      schemaVersion: 1,
+      updatedAtMs: Date.now(),
+      issuedLedger: issuedLedger.slice(0, 200),
+    };
+    const tmpPath = `${ledgerPath}.${process.pid}.${Date.now()}.tmp`;
+    fs.writeFileSync(tmpPath, JSON.stringify(payload, null, 2), {
+      encoding: 'utf8',
+      mode: 0o600,
+    });
+    fs.renameSync(tmpPath, ledgerPath);
+  } catch (err) {
+    console.warn('[OfflineLicenseCrypto] Durable ledger write warning:', err);
+  }
+}
 
 function getOrInitializeServerSigningKeys(): ServerSigningKeys {
   if (cachedServerKeys) return cachedServerKeys;
 
-  const envJwkRaw = process.env.AELP_LICENSE_SIGNING_PRIVATE_KEY_JWK;
-  if (envJwkRaw && envJwkRaw.trim()) {
+  const envJwkRaw = (process.env.AELP_LICENSE_SIGNING_PRIVATE_KEY_JWK || '').trim();
+  if (process.env.VECL_STRICT_PRODUCTION_SECRETS === 'true') {
+    if (!envJwkRaw) {
+      throw new Error(
+        'OFFLINE_LICENSE_JWK_MISSING: AELP_LICENSE_SIGNING_PRIVATE_KEY_JWK must be configured in strict production mode.'
+      );
+    }
+    const parsedPrivate = JSON.parse(envJwkRaw) as crypto.JsonWebKey;
+    const privateKey = crypto.createPrivateKey({ key: parsedPrivate, format: 'jwk' });
+    const publicKey = crypto.createPublicKey(privateKey);
+    const publicKeyJwk = publicKey.export({ format: 'jwk' }) as JsonWebKey;
+    cachedServerKeys = { privateKey, publicKeyJwk };
+    return cachedServerKeys;
+  }
+
+  if (envJwkRaw) {
     try {
       const parsedPrivate = JSON.parse(envJwkRaw) as crypto.JsonWebKey;
       const privateKey = crypto.createPrivateKey({ key: parsedPrivate, format: 'jwk' });
@@ -45,14 +129,40 @@ function getOrInitializeServerSigningKeys(): ServerSigningKeys {
       cachedServerKeys = { privateKey, publicKeyJwk };
       return cachedServerKeys;
     } catch {
-      // Fall back to fresh in-memory ECDSA P-256 keypair if env JWK is malformed
+      // Fall back to persisted or fresh ECDSA P-256 keypair if env JWK is malformed
     }
+  }
+
+  const keyFilePath = resolveSigningKeyFilePath();
+  try {
+    if (fs.existsSync(keyFilePath)) {
+      const storedJwk = JSON.parse(fs.readFileSync(keyFilePath, 'utf8')) as crypto.JsonWebKey;
+      const privateKey = crypto.createPrivateKey({ key: storedJwk, format: 'jwk' });
+      const publicKey = crypto.createPublicKey(privateKey);
+      const publicKeyJwk = publicKey.export({ format: 'jwk' }) as JsonWebKey;
+      cachedServerKeys = { privateKey, publicKeyJwk };
+      return cachedServerKeys;
+    }
+  } catch {
+    // Regenerate key if persisted key file is unreadable
   }
 
   const { privateKey, publicKey } = crypto.generateKeyPairSync('ec', {
     namedCurve: 'prime256v1',
   });
   const publicKeyJwk = publicKey.export({ format: 'jwk' }) as JsonWebKey;
+  try {
+    const privateKeyJwk = privateKey.export({ format: 'jwk' }) as JsonWebKey;
+    fs.mkdirSync(path.dirname(keyFilePath), { recursive: true });
+    const tmpKeyPath = `${keyFilePath}.${process.pid}.tmp`;
+    fs.writeFileSync(tmpKeyPath, JSON.stringify(privateKeyJwk), {
+      encoding: 'utf8',
+      mode: 0o600,
+    });
+    fs.renameSync(tmpKeyPath, keyFilePath);
+  } catch {
+    // Ignore disk write failure on read-only FS
+  }
   cachedServerKeys = { privateKey, publicKeyJwk };
   return cachedServerKeys;
 }
@@ -92,6 +202,7 @@ export function generateSignedOfflineLicense(params: {
   durationDays: SubscriptionDurationDays;
   technicianNote?: string;
 }): IssuedOfflineLicenseRecord {
+  ensureLedgerLoaded();
   const { privateKey } = getOrInitializeServerSigningKeys();
   const issuedAtMs = Date.now();
   const year = new Date(issuedAtMs).getUTCFullYear();
@@ -132,13 +243,30 @@ export function generateSignedOfflineLicense(params: {
   if (issuedLedger.length > 200) {
     issuedLedger.pop();
   }
+  persistLedgerToDisk();
   return record;
 }
 
 export function listIssuedOfflineLicenses(): IssuedOfflineLicenseRecord[] {
+  ensureLedgerLoaded();
   return issuedLedger.slice(0, 100);
+}
+
+export function setOfflineLicenseDataDirForTests(dirPath: string | null): void {
+  customOfflineDataDir = dirPath;
+  cachedServerKeys = null;
+  isLedgerLoaded = false;
 }
 
 export function clearIssuedOfflineLicensesForTests(): void {
   issuedLedger.length = 0;
+  isLedgerLoaded = true;
+  try {
+    const ledgerPath = resolveOfflineLedgerFilePath();
+    if (fs.existsSync(ledgerPath)) {
+      fs.unlinkSync(ledgerPath);
+    }
+  } catch {
+    // Ignore cleanup errors
+  }
 }

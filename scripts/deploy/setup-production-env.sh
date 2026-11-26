@@ -9,8 +9,8 @@
 
 set -euo pipefail
 
-PROJECT_ID="gen-lang-client-0822907731"
-FIRESTORE_DB="ai-studio-virtualeculaboem-a394a24c-3180-4bd9-8d2e-ad856ade7828"
+PROJECT_ID="infra-firefly-1mln4"
+FIRESTORE_DB="ai-studio-autoelectriclabp-25d98605-c678-411c-adce-09263788ae82"
 USE_CLI=false
 DEPLOY_RULES=false
 

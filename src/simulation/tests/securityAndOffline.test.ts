@@ -1331,12 +1331,12 @@ async function main() {
 
     const adminUser = {
       uid: 'uid_owner_admin_01',
-      email: 'rubenlleg12@gmail.com',
+      email: 'rubenllego12@gmail.com',
       emailVerified: true,
     };
     const spoofedEmailNonAdmin = {
       uid: 'uid_spoof_attacker_99',
-      email: 'rubenlleg12@gmail.com',
+      email: 'rubenllego12@gmail.com',
       emailVerified: true,
     };
     const techUserA = {
@@ -1569,8 +1569,8 @@ async function main() {
     };
 
     assert.equal(manifest.id, '/');
-    assert.equal(manifest.name, 'Virtual ECU Lab Pro');
-    assert.equal(manifest.short_name, 'ECU Lab Pro');
+    assert.equal(manifest.name, 'AutoElectric Lab Pro');
+    assert.equal(manifest.short_name, 'AutoElec Lab');
     assert.equal(manifest.short_name.length <= 12, true, 'short_name must be <= 12 characters');
     assert.equal(
       manifest.description,

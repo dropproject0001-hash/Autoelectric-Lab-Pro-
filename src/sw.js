@@ -1,5 +1,5 @@
 /*
- * Virtual ECU Lab Pro — Service Worker (src/sw.js)
+ * AutoElectric Lab Pro — Service Worker (src/sw.js)
  * Security-Hardened App Shell, Versioned Static Caching & Offline Fallback
  *
  * NON-NEGOTIABLE SECURITY CONSTRAINTS:
@@ -281,7 +281,7 @@ self.addEventListener('fetch', (event) => {
             return cachedOffline;
           }
 
-          return new Response('Virtual ECU Lab Pro is currently offline.', {
+          return new Response('AutoElectric Lab Pro is currently offline.', {
             status: 503,
             headers: { 'Content-Type': 'text/plain; charset=utf-8' },
           });

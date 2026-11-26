@@ -38,7 +38,7 @@ export const PWAInstallGuideModal: React.FC<PWAInstallGuideModalProps> = ({
     setStatusMessage(null);
     const outcome = await pwa.promptInstall();
     if (outcome === 'accepted') {
-      setStatusMessage('Virtual ECU Lab Pro installation accepted!');
+      setStatusMessage('AutoElectric Lab Pro installation accepted!');
     } else if (outcome === 'dismissed') {
       setStatusMessage('Installation prompt was dismissed. You can click Install App again anytime.');
     } else {
@@ -54,7 +54,7 @@ export const PWAInstallGuideModal: React.FC<PWAInstallGuideModalProps> = ({
     if (found) {
       setStatusMessage('A new version is ready! Click "Apply Update Now" to reload.');
     } else {
-      setStatusMessage('You are running the latest version of Virtual ECU Lab Pro.');
+      setStatusMessage('You are running the latest version of AutoElectric Lab Pro.');
     }
   };
 
@@ -63,7 +63,7 @@ export const PWAInstallGuideModal: React.FC<PWAInstallGuideModalProps> = ({
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3 sm:p-6 backdrop-blur-xs"
       role="dialog"
       aria-modal="true"
-      aria-label="Install Virtual ECU Lab Pro Progressive Web App Guide"
+      aria-label="Install AutoElectric Lab Pro Progressive Web App Guide"
     >
       <div className="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-[4px] border border-[#324158] bg-[#0b1320] text-slate-100 shadow-2xl">
         {/* Header */}
@@ -71,12 +71,12 @@ export const PWAInstallGuideModal: React.FC<PWAInstallGuideModalProps> = ({
           <div className="flex items-center gap-3">
             <img
               src={APP_LOGO_SRC}
-              alt="Virtual ECU Lab Pro"
+              alt="AutoElectric Lab Pro"
               className="h-8 w-8 rounded-[3px] border border-[#364863] bg-[#071426] object-contain p-0.5"
             />
             <div>
               <h2 className="font-mono text-sm font-bold uppercase tracking-wider text-slate-100">
-                Install Virtual ECU Lab Pro (PWA) &amp; Offline Workstation Guide
+                Install AutoElectric Lab Pro (PWA) &amp; Offline Workstation Guide
               </h2>
               <p className="font-mono text-[10px] text-slate-400">
                 Standalone App Mode · Android · Samsung Internet · Windows/Desktop · iPhone/iPad
@@ -125,7 +125,7 @@ export const PWAInstallGuideModal: React.FC<PWAInstallGuideModalProps> = ({
                 </span>
               </div>
               <p className="text-[11px] text-slate-400">
-                Short Name: <strong className="text-slate-200">ECU Lab Pro</strong> · Theme:{' '}
+                Short Name: <strong className="text-slate-200">AutoElec Lab</strong> · Theme:{' '}
                 <strong className="text-slate-200">#071426</strong> · Orientation:{' '}
                 <strong className="text-slate-200">Portrait &amp; Landscape</strong>
               </p>
@@ -190,7 +190,7 @@ export const PWAInstallGuideModal: React.FC<PWAInstallGuideModalProps> = ({
               </div>
               <ol className="mt-2 list-inside list-decimal space-y-1.5 text-[11px] text-slate-300">
                 <li>
-                  Tap the <strong>Install App</strong> button in the top Virtual ECU Lab Pro toolbar
+                  Tap the <strong>Install App</strong> button in the top AutoElectric Lab Pro toolbar
                   and confirm <strong>Install</strong> in the prompt.
                 </li>
                 <li>
@@ -201,7 +201,7 @@ export const PWAInstallGuideModal: React.FC<PWAInstallGuideModalProps> = ({
                   Select <strong>Install app</strong> or <strong>Add to Home screen</strong>.
                 </li>
                 <li>
-                  Launch <strong>ECU Lab Pro</strong> from your Android app drawer for full-screen
+                  Launch <strong>AutoElec Lab</strong> from your Android app drawer for full-screen
                   standalone bench operation.
                 </li>
               </ol>
@@ -221,7 +221,7 @@ export const PWAInstallGuideModal: React.FC<PWAInstallGuideModalProps> = ({
               </div>
               <ol className="mt-2 list-inside list-decimal space-y-1.5 text-[11px] text-slate-300">
                 <li>
-                  Open Virtual ECU Lab Pro in <strong>Samsung Internet</strong> on your Galaxy phone
+                  Open AutoElectric Lab Pro in <strong>Samsung Internet</strong> on your Galaxy phone
                   or tablet.
                 </li>
                 <li>
@@ -249,11 +249,11 @@ export const PWAInstallGuideModal: React.FC<PWAInstallGuideModalProps> = ({
               </div>
               <ol className="mt-2 list-inside list-decimal space-y-1.5 text-[11px] text-slate-300">
                 <li>
-                  Click the <strong>Install App</strong> button in the top right of the Virtual ECU
+                  Click the <strong>Install App</strong> button in the top right of the AutoElectric
                   Lab Pro navigation bar.
                 </li>
                 <li>
-                  Or click the <strong>Install Virtual ECU Lab Pro</strong> icon (monitor with
+                  Or click the <strong>Install AutoElectric Lab Pro</strong> icon (monitor with
                   downward arrow) on the right side of the browser address bar.
                 </li>
                 <li>
@@ -277,7 +277,7 @@ export const PWAInstallGuideModal: React.FC<PWAInstallGuideModalProps> = ({
               </div>
               <ol className="mt-2 list-inside list-decimal space-y-1.5 text-[11px] text-slate-300">
                 <li>
-                  Open Virtual ECU Lab Pro in <strong>Safari</strong> on iPhone or iPad (Apple iOS
+                  Open AutoElectric Lab Pro in <strong>Safari</strong> on iPhone or iPad (Apple iOS
                   does not support automatic <code>beforeinstallprompt</code> banners).
                 </li>
                 <li>
@@ -288,7 +288,7 @@ export const PWAInstallGuideModal: React.FC<PWAInstallGuideModalProps> = ({
                   Scroll down the share sheet and tap <strong>Add to Home Screen</strong>.
                 </li>
                 <li>
-                  Confirm the title <strong>ECU Lab Pro</strong> and tap <strong>Add</strong> in the
+                  Confirm the title <strong>AutoElec Lab</strong> and tap <strong>Add</strong> in the
                   top-right corner.
                 </li>
               </ol>
@@ -304,7 +304,7 @@ export const PWAInstallGuideModal: React.FC<PWAInstallGuideModalProps> = ({
               </div>
               <ul className="mt-2 list-inside list-disc space-y-1.5 text-[11px] text-slate-300">
                 <li>
-                  Whenever you open Virtual ECU Lab Pro online, the Service Worker automatically
+                  Whenever you open AutoElectric Lab Pro online, the Service Worker automatically
                   checks for new diagnostic engine or pinout releases in the background.
                 </li>
                 <li>

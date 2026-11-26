@@ -26,7 +26,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
       <button
         type="button"
         onClick={applyUpdate}
-        title="A new version of Virtual ECU Lab Pro is ready. Click to update now."
+        title="A new version of AutoElectric Lab Pro is ready. Click to update now."
         className={[
           'hw-btn inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-[2px] border border-emerald-400 bg-emerald-500/20',
           compact ? 'min-h-[32px] px-2 py-1 text-[10px]' : 'min-h-[34px] px-2.5 py-1 text-[11px]',
@@ -45,7 +45,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
       <button
         type="button"
         onClick={onOpenInstallGuide}
-        title="Virtual ECU Lab Pro is running as an installed application. Click for PWA status & update controls."
+        title="AutoElectric Lab Pro is running as an installed application. Click for PWA status & update controls."
         className={[
           'hw-btn inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-[2px] border border-emerald-500/40 bg-[#132019]',
           compact ? 'min-h-[32px] px-2 py-1 text-[10px]' : 'min-h-[34px] px-2.5 py-1 text-[11px]',
@@ -73,13 +73,13 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
     <button
       type="button"
       onClick={() => void handleInstallClick()}
-      aria-label={isIOS ? 'Install App on iPhone or iPad' : 'Install Virtual ECU Lab Pro App'}
+      aria-label={isIOS ? 'Install App on iPhone or iPad' : 'Install AutoElectric Lab Pro App'}
       title={
         isInstallable
-          ? 'Install Virtual ECU Lab Pro on your device for standalone offline-ready operation'
+          ? 'Install AutoElectric Lab Pro on your device for standalone offline-ready operation'
           : isIOS
             ? 'Install on iPhone/iPad via Safari Share -> Add to Home Screen'
-            : 'Install Virtual ECU Lab Pro App (Android, Desktop, iPhone/iPad)'
+            : 'Install AutoElectric Lab Pro App (Android, Desktop, iPhone/iPad)'
       }
       className={[
         'hw-btn inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-[2px] border',
