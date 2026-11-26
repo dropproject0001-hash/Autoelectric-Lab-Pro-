@@ -17,7 +17,7 @@
     "release:check:quick": "node scripts/preflight-release-check.mjs --quick",
     "firebase:standardize": "node scripts/standardize-firebase-config.mjs",
     "firebase:standardize:check": "node scripts/standardize-firebase-config.mjs --check",
-    "test": "tsx src/simulation/tests/circuitEngine.test.ts && tsx src/simulation/tests/pcbDiagnostic.test.ts && tsx src/simulation/tests/securityAndOffline.test.ts && tsx src/simulation/tests/automotiveIntegration.test.ts && tsx src/simulation/tests/gaugeTelemetry.test.ts && tsx src/simulation/tests/harnessAndTwin.test.ts && tsx src/simulation/tests/cleanupAndBilingualAiProof.test.ts && tsx src/simulation/tests/connectionHealth.test.ts && tsx src/simulation/tests/blueprintMasterSuite.test.ts && tsx src/simulation/tests/clientDiagnosticPdf.test.ts && tsx src/simulation/tests/systemVoiceCoach.test.ts && tsx src/simulation/tests/calibrationAudit.test.ts",
+    "test": "tsx src/simulation/tests/circuitEngine.test.ts && tsx src/simulation/tests/pcbDiagnostic.test.ts && tsx src/simulation/tests/securityAndOffline.test.ts && tsx src/simulation/tests/automotiveIntegration.test.ts && tsx src/simulation/tests/gaugeTelemetry.test.ts && tsx src/simulation/tests/harnessAndTwin.test.ts && tsx src/simulation/tests/cleanupAndBilingualAiProof.test.ts && tsx src/simulation/tests/connectionHealth.test.ts && tsx src/simulation/tests/blueprintMasterSuite.test.ts && tsx src/simulation/tests/clientDiagnosticPdf.test.ts && tsx src/simulation/tests/systemVoiceCoach.test.ts && tsx src/simulation/tests/calibrationAudit.test.ts && tsx src/simulation/tests/landingAndStepTutorials.test.ts",
     "start": "tsx server.ts"
   },
   "dependencies": {

@@ -3,7 +3,7 @@
  * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
  */
 
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -11,9 +11,15 @@ import {
   ChevronUp,
   Crosshair,
   FileCheck2,
+  Film,
   GraduationCap,
   Lock,
+  PlayCircle,
   ShieldCheck,
+  SlidersHorizontal,
+  Sparkles,
+  Trash2,
+  Volume2,
   X,
 } from 'lucide-react';
 import {
@@ -25,9 +31,27 @@ import {
   type LiveBenchEvaluationInput,
   type UniversityLabModule,
 } from '../data/universityLabCurriculum';
+import type { EcuPin } from '../types/ecu';
+import { DEFAULT_ECU_PINS } from '../utils/circuitSolver';
+import {
+  DEFAULT_INSTRUCTOR_TUTORIAL_SETTINGS,
+  isStepTutorialEligibleTier,
+  type InstructorTutorialSettings,
+  type TutorialDurationSec,
+  type TutorialNarrationStyle,
+} from '../utils/stepTutorialBuilder';
+import {
+  batchPregenerateModuleTutorials,
+  clearStepTutorialCacheForModule,
+  listCachedKeysForModule,
+  subscribeStepTutorialCache,
+  type CachedStepTutorialEntry,
+} from '../services/stepTutorialCacheService';
+import { StepTutorialVideoModal } from './academy/StepTutorialVideoModal';
 
 export interface UniversityLabGuidanceCardProps {
   module: UniversityLabModule;
+  ecuPins?: readonly EcuPin[];
   liveBench: LiveBenchEvaluationInput;
   capturedByStepId: Record<string, CapturedLabStepEvidence>;
   onCaptureStep: (step: LabGuidanceStep, evaluation: LabStepLiveEvaluation) => void;
@@ -36,8 +60,20 @@ export interface UniversityLabGuidanceCardProps {
   onExitModule: () => void;
 }
 
+const NARRATION_STYLE_OPTIONS: ReadonlyArray<{
+  value: TutorialNarrationStyle;
+  label: string;
+}> = [
+  { value: 'TAGLISH_COACH', label: 'Taglish Coach' },
+  { value: 'CONCISE_BENCH', label: 'Concise Bench' },
+  { value: 'INSTRUCTOR_DETAILED', label: 'Instructor Detailed' },
+];
+
+const DURATION_OPTIONS: readonly TutorialDurationSec[] = [5, 6, 8];
+
 export const UniversityLabGuidanceCard: React.FC<UniversityLabGuidanceCardProps> = ({
   module,
+  ecuPins = DEFAULT_ECU_PINS,
   liveBench,
   capturedByStepId,
   onCaptureStep,
@@ -46,6 +82,80 @@ export const UniversityLabGuidanceCard: React.FC<UniversityLabGuidanceCardProps>
   onExitModule,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [showInstructorPanel, setShowInstructorPanel] = useState(false);
+  const [tutorialSettings, setTutorialSettings] = useState<InstructorTutorialSettings>(
+    DEFAULT_INSTRUCTOR_TUTORIAL_SETTINGS
+  );
+  const [activeTutorialStep, setActiveTutorialStep] = useState<LabGuidanceStep | null>(null);
+  const [cachedByStepId, setCachedByStepId] = useState<Record<string, CachedStepTutorialEntry>>(
+    {}
+  );
+  const [batchProgress, setBatchProgress] = useState<{
+    running: boolean;
+    completed: number;
+    total: number;
+  }>({ running: false, completed: 0, total: 0 });
+  const batchAbortRef = useRef<AbortController | null>(null);
+
+  const tutorialEligible = isStepTutorialEligibleTier(module.tier);
+
+  const refreshCachedMap = useCallback(async () => {
+    if (!tutorialEligible) {
+      setCachedByStepId({});
+      return;
+    }
+    const map = await listCachedKeysForModule(
+      module.id,
+      tutorialSettings.narrationStyle,
+      tutorialSettings.durationSec
+    );
+    setCachedByStepId(map);
+  }, [
+    tutorialEligible,
+    module.id,
+    tutorialSettings.narrationStyle,
+    tutorialSettings.durationSec,
+  ]);
+
+  useEffect(() => {
+    void refreshCachedMap();
+    const unsub = subscribeStepTutorialCache(() => {
+      void refreshCachedMap();
+    });
+    return () => {
+      unsub();
+    };
+  }, [refreshCachedMap]);
+
+  useEffect(() => {
+    return () => {
+      batchAbortRef.current?.abort();
+    };
+  }, []);
+
+  const handleBatchPregenerate = async () => {
+    if (!tutorialEligible || batchProgress.running) return;
+    batchAbortRef.current?.abort();
+    const ctrl = new AbortController();
+    batchAbortRef.current = ctrl;
+    setBatchProgress({ running: true, completed: 0, total: module.steps.length });
+
+    try {
+      await batchPregenerateModuleTutorials({
+        module,
+        ecuPins,
+        narrationStyle: tutorialSettings.narrationStyle,
+        durationSec: tutorialSettings.durationSec,
+        signal: ctrl.signal,
+        onProgress: (completed, total) => {
+          setBatchProgress({ running: true, completed, total });
+        },
+      });
+    } finally {
+      setBatchProgress((prev) => ({ ...prev, running: false }));
+      void refreshCachedMap();
+    }
+  };
 
   const tierMeta = useMemo(() => getUniversityTierMeta(module.tier), [module.tier]);
   const evaluations = useMemo(
@@ -56,6 +166,11 @@ export const UniversityLabGuidanceCard: React.FC<UniversityLabGuidanceCardProps>
   const capturedCount = useMemo(
     () => module.steps.filter((s) => Boolean(capturedByStepId[s.id])).length,
     [module.steps, capturedByStepId]
+  );
+
+  const cachedTutorialCount = useMemo(
+    () => module.steps.filter((s) => Boolean(cachedByStepId[s.id])).length,
+    [module.steps, cachedByStepId]
   );
 
   const tierAccentClass =
@@ -95,6 +210,28 @@ export const UniversityLabGuidanceCard: React.FC<UniversityLabGuidanceCardProps>
         </div>
 
         <div className="flex shrink-0 flex-wrap items-center gap-1.5">
+          {tutorialEligible && (
+            <button
+              type="button"
+              data-testid="instructor-tutorial-panel-toggle"
+              aria-expanded={showInstructorPanel}
+              onClick={() => {
+                setIsCollapsed(false);
+                setShowInstructorPanel((prev) => !prev);
+              }}
+              className={`hw-btn inline-flex min-h-[34px] items-center gap-1.5 rounded-lg px-2.5 py-1.5 font-mono text-[11px] whitespace-nowrap shrink-0 cursor-pointer ${
+                showInstructorPanel
+                  ? 'border-[#19C8F5]/65 bg-[#0E2238] text-[#19C8F5]'
+                  : 'text-cyan-200 hover:text-white'
+              }`}
+            >
+              <SlidersHorizontal className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              <span>Tutorial Controls</span>
+              <span className="rounded bg-[#050A12] px-1.5 py-0.5 text-[10px] text-[#91a4bd] tabular-nums">
+                {cachedTutorialCount}/{module.steps.length}
+              </span>
+            </button>
+          )}
           <button
             type="button"
             onClick={() => onOpenVerifiedPdfExport('EXPORT')}
@@ -143,7 +280,132 @@ export const UniversityLabGuidanceCard: React.FC<UniversityLabGuidanceCardProps>
 
       {/* Collapsible Step-by-Step Interactive Guidance Body */}
       {!isCollapsed && (
-        <div className="max-h-[270px] overflow-y-auto p-3.5 space-y-2.5">
+        <div className="max-h-[320px] overflow-y-auto p-3.5 space-y-2.5">
+          {/* Collapsible Instructor Customization & Batch Pre-Generation Panel (Level 1 & Level 2) */}
+          {tutorialEligible && showInstructorPanel && (
+            <div
+              data-testid="instructor-tutorial-panel"
+              className="rounded-xl border border-[#19C8F5]/35 bg-[#060E1B] p-3 space-y-2.5"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#203653] pb-2">
+                <div className="flex items-center gap-2 font-mono text-[11px] font-bold text-[#19C8F5]">
+                  <Film className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                  <span>Instructor Step Video &amp; Schematic Customization</span>
+                </div>
+                <span className="font-mono text-[10.5px] text-[#91A4BD] tabular-nums">
+                  Step Cache: {cachedTutorialCount}/{module.steps.length} Ready
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
+                {/* Narration Style */}
+                <label className="space-y-1">
+                  <span className="block font-mono text-[10px] uppercase tracking-wider text-[#91A4BD]">
+                    Narration Style
+                  </span>
+                  <select
+                    aria-label="Narration style"
+                    value={tutorialSettings.narrationStyle}
+                    onChange={(e) =>
+                      setTutorialSettings((prev) => ({
+                        ...prev,
+                        narrationStyle: e.target.value as TutorialNarrationStyle,
+                      }))
+                    }
+                    className="w-full rounded-md border border-[#203653] bg-[#0A1220] px-2.5 py-1.5 font-mono text-[11px] text-[#EAF3FF] focus:border-[#19C8F5] focus:outline-none"
+                  >
+                    {NARRATION_STYLE_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                {/* Clip Duration (5s / 6s / 8s) */}
+                <div className="space-y-1">
+                  <span className="block font-mono text-[10px] uppercase tracking-wider text-[#91A4BD]">
+                    Clip Duration (16:9)
+                  </span>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {DURATION_OPTIONS.map((sec) => (
+                      <button
+                        key={sec}
+                        type="button"
+                        onClick={() =>
+                          setTutorialSettings((prev) => ({ ...prev, durationSec: sec }))
+                        }
+                        className={`min-h-[30px] rounded-md border font-mono text-[11px] tabular-nums cursor-pointer ${
+                          tutorialSettings.durationSec === sec
+                            ? 'border-[#19C8F5]/75 bg-[#0E2238] text-[#19C8F5] font-bold'
+                            : 'border-[#203653] bg-[#0A1220] text-[#91A4BD] hover:text-white'
+                        }`}
+                      >
+                        {sec}s
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Voice Default & Batch Actions */}
+                <div className="space-y-1">
+                  <span className="block font-mono text-[10px] uppercase tracking-wider text-[#91A4BD]">
+                    Voice &amp; Cache Actions
+                  </span>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setTutorialSettings((prev) => ({
+                          ...prev,
+                          voiceGuidanceEnabled: !prev.voiceGuidanceEnabled,
+                        }))
+                      }
+                      className={`inline-flex min-h-[30px] items-center gap-1 rounded-md border px-2 font-mono text-[11px] cursor-pointer ${
+                        tutorialSettings.voiceGuidanceEnabled
+                          ? 'border-[#20D889]/55 bg-[#0A261B] text-[#8DF0C1]'
+                          : 'border-[#203653] bg-[#0A1220] text-[#91A4BD]'
+                      }`}
+                    >
+                      <Volume2 className="h-3 w-3" aria-hidden="true" />
+                      <span>Voice {tutorialSettings.voiceGuidanceEnabled ? 'ON' : 'OFF'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      data-testid="batch-pregenerate-tutorials-btn"
+                      onClick={() => {
+                        if (batchProgress.running) {
+                          batchAbortRef.current?.abort();
+                        } else {
+                          void handleBatchPregenerate();
+                        }
+                      }}
+                      className="inline-flex min-h-[30px] items-center gap-1 rounded-md border border-[#19C8F5]/60 bg-[#0E2238] px-2.5 font-mono text-[11px] font-semibold text-[#EAF3FF] hover:bg-[#14304E] cursor-pointer"
+                    >
+                      <Sparkles className="h-3 w-3 text-[#19C8F5]" aria-hidden="true" />
+                      <span>
+                        {batchProgress.running
+                          ? `Cancel (${batchProgress.completed}/${batchProgress.total})`
+                          : 'Batch Pre-Generate'}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => void clearStepTutorialCacheForModule(module.id)}
+                      className="inline-flex min-h-[30px] items-center gap-1 rounded-md border border-[#203653] bg-[#0A1220] px-2 font-mono text-[11px] text-[#91A4BD] hover:border-rose-400/50 hover:text-rose-200 cursor-pointer"
+                      title="Clear cached tutorials for this module"
+                    >
+                      <Trash2 className="h-3 w-3" aria-hidden="true" />
+                      <span>Clear</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Target Unit & Taglish Objective */}
           <div className="flex flex-wrap items-baseline justify-between gap-2 text-xs text-[#91a4bd]">
             <div>
@@ -161,6 +423,7 @@ export const UniversityLabGuidanceCard: React.FC<UniversityLabGuidanceCardProps>
             {module.steps.map((step, idx) => {
               const evalResult = evaluations[idx];
               const captured = capturedByStepId[step.id];
+              const cachedTutorial = cachedByStepId[step.id];
 
               const statusVisual =
                 evalResult.status === 'PASSED'
@@ -257,14 +520,36 @@ export const UniversityLabGuidanceCard: React.FC<UniversityLabGuidanceCardProps>
 
                   {/* Step Actions */}
                   <div className="flex flex-wrap items-center justify-between gap-1.5 border-t border-white/10 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => onFocusProbePin(step.focusPinId, step.focusPinLabel, false)}
-                      className="hw-btn inline-flex min-h-[30px] items-center gap-1 rounded-md px-2 py-1 font-mono text-[10.5px] text-cyan-200 hover:text-white whitespace-nowrap cursor-pointer"
-                    >
-                      <Crosshair className="h-3 w-3 shrink-0" aria-hidden="true" />
-                      <span>Focus {step.focusPinLabel}</span>
-                    </button>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => onFocusProbePin(step.focusPinId, step.focusPinLabel, false)}
+                        className="hw-btn inline-flex min-h-[30px] items-center gap-1 rounded-md px-2 py-1 font-mono text-[10.5px] text-cyan-200 hover:text-white whitespace-nowrap cursor-pointer"
+                      >
+                        <Crosshair className="h-3 w-3 shrink-0" aria-hidden="true" />
+                        <span>Focus {step.focusPinLabel}</span>
+                      </button>
+
+                      {tutorialEligible && (
+                        <button
+                          type="button"
+                          data-testid={`watch-step-tutorial-${step.id}`}
+                          onClick={() => setActiveTutorialStep(step)}
+                          className="inline-flex min-h-[30px] items-center gap-1 rounded-md border border-[#19C8F5]/55 bg-[#0E2238] px-2 py-1 font-mono text-[10.5px] font-semibold text-[#EAF3FF] hover:bg-[#14304E] hover:border-[#19C8F5] whitespace-nowrap cursor-pointer transition-colors"
+                        >
+                          <PlayCircle className="h-3 w-3 shrink-0 text-[#19C8F5]" aria-hidden="true" />
+                          <span>Watch Step Tutorial</span>
+                          {cachedTutorial && (
+                            <span
+                              title="Cached locally"
+                              className="rounded bg-[#060E1B] px-1 py-0.2 text-[9px] text-[#20D889]"
+                            >
+                              {cachedTutorial.mode === 'AI_VIDEO' ? 'HD' : 'SIM'}
+                            </span>
+                          )}
+                        </button>
+                      )}
+                    </div>
 
                     <button
                       type="button"
@@ -292,6 +577,19 @@ export const UniversityLabGuidanceCard: React.FC<UniversityLabGuidanceCardProps>
           </div>
         </div>
       )}
+
+      {activeTutorialStep && (
+        <StepTutorialVideoModal
+          isOpen={Boolean(activeTutorialStep)}
+          onClose={() => setActiveTutorialStep(null)}
+          module={module}
+          step={activeTutorialStep}
+          ecuPins={ecuPins}
+          settings={tutorialSettings}
+          onFocusProbePin={onFocusProbePin}
+        />
+      )}
     </section>
   );
 };
+

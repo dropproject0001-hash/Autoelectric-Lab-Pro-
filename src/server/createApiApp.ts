@@ -79,6 +79,16 @@ import {
   listIssuedOfflineLicenses,
   type SubscriptionDurationDays,
 } from './services/offlineLicenseCrypto';
+import { UNIVERSITY_LAB_MODULES } from '../data/universityLabCurriculum';
+import type { EcuPin } from '../types/ecu';
+import {
+  buildGroundedStepSpec,
+  buildStepTutorialPrompt,
+  buildStepTutorialSubtitles,
+  isStepTutorialEligibleTier,
+  type TutorialDurationSec,
+  type TutorialNarrationStyle,
+} from '../utils/stepTutorialBuilder';
 
 export function createAutoelectricApiApp(): express.Express {
   const app = express();
@@ -1867,6 +1877,176 @@ Execute Google Search Grounding to retrieve ${
             error:
               'Video animation with gemini-omni-1.2-flash requires a billing-enabled Gemini API key. Add a paid key in AI Studio Settings > Secrets > GEMINI_API_KEY.',
             code: 'PAID_MODEL_REQUIRED',
+            model: 'gemini-omni-1.2-flash',
+          });
+        }
+        return res.status(classified.statusCode).json({
+          error: classified.userMessage,
+          code: classified.category,
+        });
+      }
+    }
+  );
+
+  // ==========================================================================
+  // GROUNDED LAB STEP VIDEO TUTORIALS (Level 1 & Level 2 · gemini-omni-1.2-flash)
+  // ==========================================================================
+  app.post(
+    '/api/autoelectric/step-tutorial-video',
+    requireAuthOrTrialSession,
+    requireActiveLicense,
+    aiRateAndConcurrencyGuard,
+    smallJsonParser,
+    async (req: AuthenticatedRequest, res) => {
+      try {
+        const body = (req.body || {}) as Record<string, unknown>;
+        const moduleId = typeof body.moduleId === 'string' ? body.moduleId.trim() : '';
+        const stepId = typeof body.stepId === 'string' ? body.stepId.trim() : '';
+        const rawStyle = typeof body.narrationStyle === 'string' ? body.narrationStyle : 'TAGLISH_COACH';
+        const rawDuration = Number(body.durationSec);
+
+        if (!moduleId || !stepId) {
+          return res.status(400).json({
+            error: 'Missing moduleId or stepId.',
+            code: 'INVALID_REQUEST',
+          });
+        }
+
+        const labModule = UNIVERSITY_LAB_MODULES.find((m) => m.id === moduleId);
+        if (!labModule) {
+          return res.status(404).json({
+            error: `Unknown lab module: ${moduleId}`,
+            code: 'MODULE_NOT_FOUND',
+          });
+        }
+
+        if (!isStepTutorialEligibleTier(labModule.tier)) {
+          return res.status(400).json({
+            error: 'Step tutorial videos are available exclusively for Level 1 and Level 2 lab exercises.',
+            code: 'TIER_NOT_ELIGIBLE',
+          });
+        }
+
+        const labStep = labModule.steps.find((s) => s.id === stepId);
+        if (!labStep) {
+          return res.status(404).json({
+            error: `Unknown lab step: ${stepId}`,
+            code: 'STEP_NOT_FOUND',
+          });
+        }
+
+        const narrationStyle: TutorialNarrationStyle =
+          rawStyle === 'CONCISE_BENCH' ||
+          rawStyle === 'INSTRUCTOR_DETAILED' ||
+          rawStyle === 'TAGLISH_COACH'
+            ? rawStyle
+            : 'TAGLISH_COACH';
+
+        const durationSec: TutorialDurationSec =
+          rawDuration === 5 || rawDuration === 6 || rawDuration === 8 ? rawDuration : 6;
+
+        const cleanPins: EcuPin[] = Array.isArray(body.ecuPins)
+          ? body.ecuPins
+              .slice(0, 32)
+              .filter((p): p is Record<string, unknown> => Boolean(p && typeof p === 'object'))
+              .map((p, idx) => ({
+                id: typeof p.id === 'string' ? p.id.slice(0, 48) : `pin-${idx + 1}`,
+                pinNumber: Number.isFinite(Number(p.pinNumber)) ? Number(p.pinNumber) : idx + 1,
+                label: typeof p.label === 'string' ? p.label.slice(0, 32) : `PIN_${idx + 1}`,
+                name: typeof p.name === 'string' ? p.name.slice(0, 64) : `Pin ${idx + 1}`,
+                category: 'sensor_in' as const,
+                nominalVoltage: Number.isFinite(Number(p.nominalVoltage))
+                  ? Number(p.nominalVoltage)
+                  : 0,
+                internalResistance: 1000,
+                description: '',
+              }))
+          : [];
+
+        const grounded = buildGroundedStepSpec(labModule, labStep, cleanPins);
+        const subtitles = buildStepTutorialSubtitles(grounded, narrationStyle, durationSec);
+        const prompt = buildStepTutorialPrompt(grounded, narrationStyle, durationSec);
+
+        if (!hasConfiguredGeminiKeys()) {
+          return res.status(503).json({
+            error: 'Gemini API Key is not configured. Using interactive animated schematic fallback.',
+            code: 'MISSING_API_KEY',
+            grounded,
+            subtitles,
+          });
+        }
+
+        const routePlan = selectFreeTierRoutes('gemini-omni-1.2-flash', []);
+        const selectedKey = routePlan.selected?.apiKey || process.env.GEMINI_API_KEY;
+        if (!selectedKey) {
+          return res.status(503).json({
+            error: 'Gemini API Key is not configured. Using interactive animated schematic fallback.',
+            code: 'MISSING_API_KEY',
+            grounded,
+            subtitles,
+          });
+        }
+
+        const ai = getGeminiClientForApiKey(selectedKey);
+        const interaction = await ai.interactions.create(
+          {
+            model: 'gemini-omni-1.2-flash',
+            input: [
+              {
+                type: 'text',
+                text: prompt,
+              },
+            ],
+            background: false,
+            store: false,
+            stream: false,
+            response_format: {
+              type: 'video',
+              aspect_ratio: '16:9',
+              duration: `${durationSec}s`,
+              resolution: '720p',
+            },
+          },
+          { timeout: 300_000 }
+        );
+
+        const videoPart = interaction.output_video;
+        if (videoPart && videoPart.data) {
+          const videoDataUrl = `data:${videoPart.mime_type || 'video/mp4'};base64,${videoPart.data}`;
+          return res.json({
+            status: 'SUCCESS',
+            videoUrl: videoDataUrl,
+            model: 'gemini-omni-1.2-flash',
+            aspectRatio: '16:9',
+            durationSec,
+            grounded,
+            subtitles,
+            timestamp: new Date().toISOString(),
+          });
+        }
+
+        return res.status(502).json({
+          error: 'Video generation returned no video payload. Switching to interactive schematic.',
+          code: 'VIDEO_GENERATION_FAILED',
+          grounded,
+          subtitles,
+        });
+      } catch (err: unknown) {
+        const classified = classifyGeminiError(err);
+        const raw = classified.rawMessage.toLowerCase();
+        if (
+          classified.statusCode === 403 ||
+          classified.statusCode === 429 ||
+          raw.includes('billing') ||
+          raw.includes('quota') ||
+          raw.includes('paid')
+        ) {
+          return res.status(classified.statusCode === 429 ? 429 : 403).json({
+            error:
+              classified.statusCode === 429
+                ? 'Gemini video quota exceeded. Interactive animated schematic with voice guidance is active.'
+                : 'AI video generation requires a billing-enabled Gemini API key. Interactive schematic fallback is active.',
+            code: classified.statusCode === 429 ? 'QUOTA_EXCEEDED' : 'PAID_MODEL_REQUIRED',
             model: 'gemini-omni-1.2-flash',
           });
         }

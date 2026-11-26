@@ -607,4 +607,204 @@ export function playStepCompletionTone(allCompleted = false) {
   }
 }
 
+export type PinKeypadClickKind = 'digit' | 'clear' | 'backspace';
+
+/**
+ * Dark-industrial mechanical keypad click synthesized via Web Audio API.
+ */
+export function playPinKeypadClick(kind: PinKeypadClickKind = 'digit') {
+  if (typeof window === 'undefined') return;
+  try {
+    const ctx = getOrCreateAudioContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const filter = ctx.createBiquadFilter();
+    const gain = ctx.createGain();
+
+    filter.type = 'bandpass';
+    filter.Q.setValueAtTime(2.4, now);
+
+    if (kind === 'clear') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(420, now);
+      osc.frequency.exponentialRampToValueAtTime(160, now + 0.045);
+      filter.frequency.setValueAtTime(750, now);
+      gain.gain.setValueAtTime(0.045, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.055);
+      return;
+    }
+
+    if (kind === 'backspace') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(640, now);
+      osc.frequency.exponentialRampToValueAtTime(240, now + 0.032);
+      filter.frequency.setValueAtTime(1050, now);
+      gain.gain.setValueAtTime(0.042, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.036);
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.04);
+      return;
+    }
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(1180, now);
+    osc.frequency.exponentialRampToValueAtTime(360, now + 0.024);
+    filter.frequency.setValueAtTime(1450, now);
+    gain.gain.setValueAtTime(0.048, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.028);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.032);
+  } catch {
+    // Audio policy ignore
+  }
+}
+
+/**
+ * Futuristic harmonic access-granted sequence played on PIN / Admin / Auth unlock.
+ */
+export function playAccessGrantedChime() {
+  if (typeof window === 'undefined') return;
+  try {
+    const ctx = getOrCreateAudioContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const notes = [
+      { freq: 587.33, offset: 0.0, duration: 0.11, gain: 0.06, type: 'triangle' as OscillatorType },
+      { freq: 739.99, offset: 0.07, duration: 0.11, gain: 0.06, type: 'triangle' as OscillatorType },
+      { freq: 880.0, offset: 0.14, duration: 0.13, gain: 0.065, type: 'sine' as OscillatorType },
+      { freq: 1174.66, offset: 0.22, duration: 0.26, gain: 0.07, type: 'sine' as OscillatorType },
+    ];
+
+    for (const note of notes) {
+      const osc = ctx.createOscillator();
+      const filter = ctx.createBiquadFilter();
+      const env = ctx.createGain();
+
+      osc.type = note.type;
+      osc.frequency.setValueAtTime(note.freq, now + note.offset);
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(3200, now + note.offset);
+
+      env.gain.setValueAtTime(0.0001, now + note.offset);
+      env.gain.linearRampToValueAtTime(note.gain, now + note.offset + 0.014);
+      env.gain.exponentialRampToValueAtTime(0.0001, now + note.offset + note.duration);
+
+      osc.connect(filter);
+      filter.connect(env);
+      env.connect(ctx.destination);
+
+      osc.start(now + note.offset);
+      osc.stop(now + note.offset + note.duration + 0.02);
+    }
+  } catch {
+    // Audio policy ignore
+  }
+}
+
+/**
+ * Authoritative dark-industrial lock or rejection audio cue.
+ */
+export function playSystemLockSound(kind: 'lock' | 'error' = 'lock') {
+  if (typeof window === 'undefined') return;
+  try {
+    const ctx = getOrCreateAudioContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const steps =
+      kind === 'error'
+        ? [
+            { startHz: 260, endHz: 175, offset: 0.0, dur: 0.09, gain: 0.065 },
+            { startHz: 195, endHz: 120, offset: 0.1, dur: 0.13, gain: 0.065 },
+          ]
+        : [
+            { startHz: 420, endHz: 210, offset: 0.0, dur: 0.09, gain: 0.055 },
+            { startHz: 220, endHz: 110, offset: 0.085, dur: 0.14, gain: 0.06 },
+          ];
+
+    for (const st of steps) {
+      const osc = ctx.createOscillator();
+      const filter = ctx.createBiquadFilter();
+      const env = ctx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(st.startHz, now + st.offset);
+      osc.frequency.exponentialRampToValueAtTime(st.endHz, now + st.offset + st.dur);
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(900, now + st.offset);
+
+      env.gain.setValueAtTime(0.0001, now + st.offset);
+      env.gain.linearRampToValueAtTime(st.gain, now + st.offset + 0.01);
+      env.gain.exponentialRampToValueAtTime(0.0001, now + st.offset + st.dur);
+
+      osc.connect(filter);
+      filter.connect(env);
+      env.connect(ctx.destination);
+
+      osc.start(now + st.offset);
+      osc.stop(now + st.offset + st.dur + 0.02);
+    }
+  } catch {
+    // Audio policy ignore
+  }
+}
+
+/**
+ * Subtle telemetry cue tone used during interactive schematic tutorial playback.
+ */
+export function playTutorialCueTone(kind: 'step' | 'probe' | 'complete' = 'step') {
+  if (typeof window === 'undefined') return;
+  try {
+    const ctx = getOrCreateAudioContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const env = ctx.createGain();
+
+    if (kind === 'complete') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(987.77, now);
+      osc.frequency.setValueAtTime(1318.51, now + 0.07);
+      env.gain.setValueAtTime(0.0001, now);
+      env.gain.linearRampToValueAtTime(0.045, now + 0.01);
+      env.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+      osc.connect(env);
+      env.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.2);
+      return;
+    }
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(kind === 'probe' ? 1480 : 880, now);
+    env.gain.setValueAtTime(0.0001, now);
+    env.gain.linearRampToValueAtTime(0.032, now + 0.008);
+    env.gain.exponentialRampToValueAtTime(0.0001, now + 0.075);
+    osc.connect(env);
+    env.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.085);
+  } catch {
+    // Audio policy ignore
+  }
+}
+
 

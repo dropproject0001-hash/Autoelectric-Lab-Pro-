@@ -23,7 +23,12 @@ import {
   RotateCcw,
   Unlock,
 } from 'lucide-react';
-import { APP_HERO_BANNER_SRC, APP_LOGO_SRC } from '../constants/branding';
+import { APP_HERO_BANNER_SRC, APP_LOGO_SRC, CREATOR_CREDENTIALS } from '../constants/branding';
+import {
+  playAccessGrantedChime,
+  playPinKeypadClick,
+  playSystemLockSound,
+} from '../utils/audioFeedback';
 import { useAuth } from '../context/AuthContext';
 import { useTrialAccess } from '../context/TrialAccessContext';
 import {
@@ -182,16 +187,19 @@ export const IntroductionPinLandingPage: React.FC = () => {
   const handleKeypadPress = (value: string) => {
     setErrorMsg(null);
     if (value === 'CLEAR') {
+      playPinKeypadClick('clear');
       setPinDigits('');
       pinInputRef.current?.focus();
       return;
     }
     if (value === 'BACKSPACE') {
+      playPinKeypadClick('backspace');
       setPinDigits((prev) => prev.slice(0, -1));
       pinInputRef.current?.focus();
       return;
     }
     if (/^\d$/.test(value)) {
+      playPinKeypadClick('digit');
       setPinDigits((prev) => (prev.length >= 8 ? prev : prev + value));
     }
   };
@@ -199,6 +207,7 @@ export const IntroductionPinLandingPage: React.FC = () => {
   const handleVerifyPinAndEnter = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (pinDigits.length !== 8) {
+      playSystemLockSound('error');
       setErrorMsg('Enter all 8 numeric digits issued by your Admin Master.');
       return;
     }
@@ -207,9 +216,11 @@ export const IntroductionPinLandingPage: React.FC = () => {
     setSuccessMsg(null);
     try {
       await redeemTrialPin(pinDigits, deviceLabel);
+      playAccessGrantedChime();
       clearLockNotice();
       setPinDigits('');
     } catch (err: unknown) {
+      playSystemLockSound('error');
       setErrorMsg(
         err instanceof Error
           ? err.message
@@ -227,16 +238,19 @@ export const IntroductionPinLandingPage: React.FC = () => {
     const cleaned = masterPinInput.replace(/\D/g, '');
     const confirmCleaned = setupPinConfirm.replace(/\D/g, '');
     if (cleaned.length < 6 || cleaned.length > 12) {
+      playSystemLockSound('error');
       setErrorMsg('Master Admin PIN must be 6 to 12 numeric digits.');
       return;
     }
     if (cleaned !== confirmCleaned) {
+      playSystemLockSound('error');
       setErrorMsg('Confirmation PIN does not match.');
       return;
     }
     setLoading(true);
     try {
       await setupFirstRunAdminPinClient(cleaned);
+      playAccessGrantedChime();
       setMasterPinInput('');
       setSetupPinConfirm('');
       setAdminConfig({ masterEnvConfigured: false, adminClaimed: true });
@@ -245,6 +259,7 @@ export const IntroductionPinLandingPage: React.FC = () => {
       setAdminTrials(list.trials);
       setSuccessMsg('Master Admin PIN configured. Generate an 8-digit trial PIN or enter the bench lab.');
     } catch (err: unknown) {
+      playSystemLockSound('error');
       setErrorMsg(err instanceof Error ? err.message : 'Unable to configure Master Admin PIN.');
     } finally {
       setLoading(false);
@@ -256,18 +271,21 @@ export const IntroductionPinLandingPage: React.FC = () => {
     setErrorMsg(null);
     setSuccessMsg(null);
     if (!masterPinInput.trim()) {
+      playSystemLockSound('error');
       setErrorMsg('Enter the Master Admin PIN.');
       return;
     }
     setLoading(true);
     try {
       await loginAdminMasterPinClient(masterPinInput.trim());
+      playAccessGrantedChime();
       setMasterPinInput('');
       markAdminSessionActive(true);
       const list = await fetchAdminTrialPinsList();
       setAdminTrials(list.trials);
       setSuccessMsg('Admin Master authenticated. Generate trial PINs below or enter the bench lab.');
     } catch (err: unknown) {
+      playSystemLockSound('error');
       setErrorMsg(err instanceof Error ? err.message : 'Incorrect Master Admin PIN.');
     } finally {
       setLoading(false);
@@ -339,6 +357,7 @@ export const IntroductionPinLandingPage: React.FC = () => {
   };
 
   const handleLockAdmin = () => {
+    playSystemLockSound('lock');
     setAdminPinToken(null);
     markAdminSessionActive(false);
     setAdminTrials([]);
@@ -525,24 +544,40 @@ export const IntroductionPinLandingPage: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Right Column: Primary Focal Anchor — PIN Verification Gate Console */}
+          {/* Right Column: Primary Focal Anchor — Futuristic Glassmorphic PIN Verification Gate Console */}
           <motion.div
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: shouldReduceMotion ? 0 : 0.18, delay: 0.04, ease: 'easeOut' }}
-            className="lg:col-span-6 rounded-xl border border-[#203653] bg-[#0A1220] p-5 sm:p-6 space-y-5"
+            data-testid="landing-pin-glass-console"
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 18, scale: 0.985 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{
+              duration: shouldReduceMotion ? 0 : 0.36,
+              delay: 0.06,
+              ease: [0.16, 1, 0.3, 1],
+            }}
+            className="relative overflow-hidden lg:col-span-6 rounded-2xl border border-[#19C8F5]/30 bg-[#0A1220]/78 p-5 sm:p-6 space-y-5 backdrop-blur-xl shadow-[0_24px_72px_rgba(2,10,24,0.85),0_0_42px_rgba(25,200,245,0.08)]"
           >
-            {/* Explicit Gate Status Banner (Text + Icon, never color alone) */}
+            {/* Top futuristic laser hairline accent */}
             <div
-              className={`flex items-center justify-between gap-3 rounded-lg border px-3.5 py-2.5 text-xs ${
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#19C8F5]/80 to-transparent"
+            />
+
+            {/* Explicit Glowing Gate Status Badge (Text + Icon, never color alone) */}
+            <div
+              data-testid="landing-status-badge"
+              className={`flex items-center justify-between gap-3 rounded-xl border px-3.5 py-2.5 text-xs backdrop-blur-md transition-colors ${
                 isExpiredOrRevoked
-                  ? 'border-[#FF4D62]/55 bg-[#2A0E15] text-[#FFC2CA]'
-                  : 'border-[#203653] bg-[#0E192A] text-[#91A4BD]'
+                  ? 'border-[#FF4D62]/60 bg-[#2A0E15]/85 text-[#FFC2CA] shadow-[0_0_24px_rgba(255,77,98,0.18)]'
+                  : isAdminUnlocked
+                    ? 'border-[#20D889]/55 bg-[#0A261B]/80 text-[#9BF3CB] shadow-[0_0_24px_rgba(32,216,137,0.15)]'
+                    : 'border-[#19C8F5]/35 bg-[#0E192A]/85 text-[#C7DCF5] shadow-[0_0_24px_rgba(25,200,245,0.14)]'
               }`}
             >
               <span className="flex items-center gap-2 font-medium">
                 {isExpiredOrRevoked ? (
                   <AlertTriangle className="h-4 w-4 text-[#FF4D62] shrink-0" aria-hidden="true" />
+                ) : isAdminUnlocked ? (
+                  <Unlock className="h-4 w-4 text-[#20D889] shrink-0" aria-hidden="true" />
                 ) : (
                   <Lock className="h-4 w-4 text-[#FFB020] shrink-0" aria-hidden="true" />
                 )}
@@ -551,14 +586,14 @@ export const IntroductionPinLandingPage: React.FC = () => {
                     ? 'Bench Lab Locked · Trial PIN Revoked'
                     : accessMode === 'TRIAL_EXPIRED'
                       ? 'Bench Lab Locked · Trial Session Expired'
-                      : 'Bench Lab Locked · Verification Required'}
+                      : isAdminUnlocked
+                        ? 'Admin Master Verified · Ready to Enter Bench Lab'
+                        : 'Bench Lab Locked · Verification Required'}
                 </span>
               </span>
-              {trialRecord?.maskedPin && (
-                <span className="font-mono text-[11px] tabular-nums text-[#91A4BD]">
-                  {trialRecord.maskedPin}
-                </span>
-              )}
+              <span className="font-mono text-[10.5px] uppercase tracking-wider text-[#19C8F5] tabular-nums">
+                {trialRecord?.maskedPin ? trialRecord.maskedPin : 'AES/SHA-256'}
+              </span>
             </div>
 
             {/* Instant Google Account Sign-In with Firestore Cloud Sync */}
@@ -722,37 +757,53 @@ export const IntroductionPinLandingPage: React.FC = () => {
                   </p>
                 </div>
 
-                {/* 8-Slot Segmented Readout */}
+                {/* 8-Slot Segmented Readout with glass glow */}
                 <div
                   className="grid grid-cols-9 items-center gap-1.5"
                   onClick={() => pinInputRef.current?.focus()}
                 >
                   {pinSlots.slice(0, 4).map((digit, i) => (
-                    <div
+                    <motion.div
                       key={i}
-                      className={`flex h-12 items-center justify-center rounded-md border font-mono text-xl font-bold tabular-nums transition-colors ${
+                      animate={
+                        shouldReduceMotion
+                          ? undefined
+                          : digit
+                            ? { scale: [1, 1.04, 1] }
+                            : undefined
+                      }
+                      transition={{ duration: 0.14 }}
+                      className={`flex h-12 items-center justify-center rounded-lg border font-mono text-xl font-bold tabular-nums transition-all backdrop-blur-sm ${
                         digit
-                          ? 'border-[#19C8F5]/75 bg-[#0E192A] text-[#EAF3FF]'
-                          : 'border-[#203653] bg-[#050A12] text-[#4E6480]'
+                          ? 'border-[#19C8F5]/85 bg-[#0E2238]/90 text-[#EAF3FF] shadow-[0_0_16px_rgba(25,200,245,0.22)]'
+                          : 'border-[#203653]/85 bg-[#050A12]/80 text-[#4E6480]'
                       }`}
                     >
                       {digit || '•'}
-                    </div>
+                    </motion.div>
                   ))}
                   <div className="flex items-center justify-center font-mono text-lg text-[#91A4BD]">
                     —
                   </div>
                   {pinSlots.slice(4, 8).map((digit, i) => (
-                    <div
+                    <motion.div
                       key={i + 4}
-                      className={`flex h-12 items-center justify-center rounded-md border font-mono text-xl font-bold tabular-nums transition-colors ${
+                      animate={
+                        shouldReduceMotion
+                          ? undefined
+                          : digit
+                            ? { scale: [1, 1.04, 1] }
+                            : undefined
+                      }
+                      transition={{ duration: 0.14 }}
+                      className={`flex h-12 items-center justify-center rounded-lg border font-mono text-xl font-bold tabular-nums transition-all backdrop-blur-sm ${
                         digit
-                          ? 'border-[#19C8F5]/75 bg-[#0E192A] text-[#EAF3FF]'
-                          : 'border-[#203653] bg-[#050A12] text-[#4E6480]'
+                          ? 'border-[#19C8F5]/85 bg-[#0E2238]/90 text-[#EAF3FF] shadow-[0_0_16px_rgba(25,200,245,0.22)]'
+                          : 'border-[#203653]/85 bg-[#050A12]/80 text-[#4E6480]'
                       }`}
                     >
                       {digit || '•'}
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
 
@@ -765,27 +816,33 @@ export const IntroductionPinLandingPage: React.FC = () => {
                   autoComplete="one-time-code"
                   value={pinDigits}
                   onChange={(e) => {
-                    setPinDigits(e.target.value.replace(/\D/g, '').slice(0, 8));
+                    const next = e.target.value.replace(/\D/g, '').slice(0, 8);
+                    if (next.length > pinDigits.length) {
+                      playPinKeypadClick('digit');
+                    } else if (next.length < pinDigits.length) {
+                      playPinKeypadClick('backspace');
+                    }
+                    setPinDigits(next);
                     setErrorMsg(null);
                   }}
                   placeholder="Enter or paste 8-digit PIN (e.g. 48291736)"
-                  className="w-full rounded-md border border-[#203653] bg-[#050A12] px-3.5 py-2.5 font-mono text-sm tabular-nums text-[#EAF3FF] placeholder:text-[#5F748E] focus:border-[#19C8F5] focus:outline-none"
+                  className="w-full rounded-lg border border-[#203653] bg-[#050A12]/85 px-3.5 py-2.5 font-mono text-sm tabular-nums text-[#EAF3FF] placeholder:text-[#5F748E] focus:border-[#19C8F5] focus:shadow-[0_0_18px_rgba(25,200,245,0.18)] focus:outline-none backdrop-blur-sm"
                 />
 
-                {/* Tactile 3x4 Keypad */}
+                {/* Tactile 3x4 Glass Keypad */}
                 <div className="grid grid-cols-3 gap-2">
                   {KEYPAD_KEYS.map((key) => (
                     <motion.button
                       key={key.value}
                       type="button"
                       aria-label={key.aria}
-                      whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
+                      whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
                       transition={{ duration: 0.08 }}
                       onClick={() => handleKeypadPress(key.value)}
-                      className={`min-h-[46px] rounded-md border font-mono text-sm font-semibold transition-colors cursor-pointer flex items-center justify-center ${
+                      className={`min-h-[46px] rounded-lg border font-mono text-sm font-semibold transition-all cursor-pointer flex items-center justify-center backdrop-blur-sm ${
                         key.value === 'CLEAR' || key.value === 'BACKSPACE'
-                          ? 'border-[#203653] bg-[#08101C] text-[#91A4BD] hover:border-[#FFB020]/60 hover:text-[#FFB020]'
-                          : 'border-[#203653] bg-[#0E192A] text-[#EAF3FF] hover:border-[#19C8F5]/70'
+                          ? 'border-[#203653]/85 bg-[#08101C]/85 text-[#91A4BD] hover:border-[#FFB020]/65 hover:text-[#FFB020]'
+                          : 'border-[#203653]/90 bg-[#0E192A]/85 text-[#EAF3FF] hover:border-[#19C8F5]/75 hover:bg-[#13243B]/90 hover:shadow-[0_0_14px_rgba(25,200,245,0.15)]'
                       }`}
                     >
                       {key.value === 'BACKSPACE' ? (
@@ -911,7 +968,10 @@ export const IntroductionPinLandingPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          onClick={enterBenchAsAdmin}
+                          onClick={() => {
+                            playAccessGrantedChime();
+                            enterBenchAsAdmin();
+                          }}
                           className="min-h-[38px] rounded-md bg-[#1677FF] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#3B8BFF] cursor-pointer flex items-center gap-1.5"
                         >
                           <span>Enter Bench Lab</span>
@@ -1134,9 +1194,12 @@ export const IntroductionPinLandingPage: React.FC = () => {
       </main>
 
       {/* Quiet Footer */}
-      <footer className="border-t border-[#203653] bg-[#080F1B] py-4 px-4 sm:px-6 text-xs text-[#91A4BD]">
+      <footer className="border-t border-[#203653] bg-[#080F1B]/90 backdrop-blur-sm py-4 px-4 sm:px-6 text-xs text-[#91A4BD]">
         <div className="mx-auto flex max-w-[1220px] flex-col sm:flex-row items-center justify-between gap-2">
-          <span>AutoElectric Lab Pro · Virtual ECU Bench Workstation</span>
+          <span>
+            AutoElectric Lab Pro · {CREATOR_CREDENTIALS.shortOrg} · Lead Architect:{' '}
+            {CREATOR_CREDENTIALS.leaders[0]?.name}
+          </span>
           <span className="font-mono text-[11px] tabular-nums">
             Workstation ID: {workstationId}
           </span>

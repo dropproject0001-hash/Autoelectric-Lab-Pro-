@@ -3,18 +3,26 @@
  * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   AlertTriangle,
   CheckCircle2,
   FileCheck2,
   Lock,
+  PlayCircle,
   ShieldAlert,
   XCircle,
 } from 'lucide-react';
-import type { LabModule } from '../../data/academy/universityCurriculum';
+import type { DiagnosticStepSpec, LabModule } from '../../data/academy/universityCurriculum';
 import type { AcademyModuleProgressSnapshot } from '../../utils/academy/toleranceEvaluator';
 import type { BilingualLang } from '../../types/aiAssistant';
+import type { UniversityLabModule } from '../../data/universityLabCurriculum';
+import { DEFAULT_ECU_PINS } from '../../utils/circuitSolver';
+import {
+  DEFAULT_INSTRUCTOR_TUTORIAL_SETTINGS,
+  isStepTutorialEligibleTier,
+} from '../../utils/stepTutorialBuilder';
+import { StepTutorialVideoModal } from './StepTutorialVideoModal';
 
 interface GuidedLabStepCardProps {
   module: LabModule;
@@ -33,6 +41,13 @@ export const GuidedLabStepCard: React.FC<GuidedLabStepCardProps> = ({
   onChangeConclusion,
   onOpenVerifiedPdfModal,
 }) => {
+  const [activeTutorialStep, setActiveTutorialStep] = useState<DiagnosticStepSpec | null>(null);
+  const tutorialEligible = isStepTutorialEligibleTier(module.level);
+  const moduleForModal: UniversityLabModule = {
+    ...module,
+    tier: module.level,
+  };
+
   return (
     <div
       data-testid="guided-lab-step-card"
@@ -128,6 +143,20 @@ export const GuidedLabStepCard: React.FC<GuidedLabStepCardProps> = ({
                   </strong>
                 </div>
               </div>
+
+              {tutorialEligible && (
+                <div className="pt-1 flex justify-end">
+                  <button
+                    type="button"
+                    data-testid={`guided-watch-tutorial-${step.id}`}
+                    onClick={() => setActiveTutorialStep(step)}
+                    className="inline-flex min-h-[30px] items-center gap-1.5 rounded-md border border-[#19C8F5]/55 bg-[#0E2238] px-2.5 py-1 font-mono text-[10.5px] font-semibold text-[#EAF3FF] hover:bg-[#14304E] hover:border-[#19C8F5] cursor-pointer transition-colors"
+                  >
+                    <PlayCircle className="h-3.5 w-3.5 text-[#19C8F5]" aria-hidden="true" />
+                    <span>Watch Step Tutorial</span>
+                  </button>
+                </div>
+              )}
             </article>
           );
         })}
@@ -184,6 +213,20 @@ export const GuidedLabStepCard: React.FC<GuidedLabStepCardProps> = ({
           </span>
         </button>
       </div>
+
+      {activeTutorialStep && (
+        <StepTutorialVideoModal
+          isOpen={Boolean(activeTutorialStep)}
+          onClose={() => setActiveTutorialStep(null)}
+          module={moduleForModal}
+          step={activeTutorialStep}
+          ecuPins={DEFAULT_ECU_PINS}
+          settings={{
+            ...DEFAULT_INSTRUCTOR_TUTORIAL_SETTINGS,
+            narrationStyle: lang === 'TL' ? 'TAGLISH_COACH' : 'INSTRUCTOR_DETAILED',
+          }}
+        />
+      )}
     </div>
   );
 };

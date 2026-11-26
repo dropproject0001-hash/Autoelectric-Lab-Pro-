@@ -26,6 +26,8 @@ import { LabStatusFooter } from './components/LabStatusFooter';
 import { AppErrorBoundary } from './components/AppErrorBoundary';
 import { VoiceMacroLibrary } from './components/VoiceMacroLibrary';
 import { IntroductionPinLandingPage } from './components/IntroductionPinLandingPage';
+import { WelcomeBenchOverlay } from './components/WelcomeBenchOverlay';
+import { getOrCreateWorkstationDeviceId } from './services/licenseClientService';
 import { APP_LOGO_SRC } from './constants/branding';
 import { recordRenderCycle } from './utils/perfMonitor';
 import {
@@ -159,9 +161,24 @@ import {
 import { formatCloudSyncError } from './utils/cloudSyncErrorUtils';
 
 
-function AuthorizedBenchLabWorkspace() {
+interface AuthorizedBenchLabWorkspaceProps {
+  initialShowWelcomeOverlay?: boolean;
+  onConsumeWelcomeOverlay?: () => void;
+}
+
+function AuthorizedBenchLabWorkspace({
+  initialShowWelcomeOverlay = false,
+  onConsumeWelcomeOverlay,
+}: AuthorizedBenchLabWorkspaceProps) {
   // Introduction View Modal (opened on demand via Tools > Slide Walkthrough)
   const [showIntroModal, setShowIntroModal] = useState(false);
+  const [showWelcomeOverlay, setShowWelcomeOverlay] = useState(initialShowWelcomeOverlay);
+
+  useEffect(() => {
+    if (initialShowWelcomeOverlay) {
+      setShowWelcomeOverlay(true);
+    }
+  }, [initialShowWelcomeOverlay]);
 
   // Saved Bench & Diagnostic Logs Modal
   const [showCloudModal, setShowCloudModal] = useState(false);
@@ -2226,12 +2243,49 @@ function AuthorizedBenchLabWorkspace() {
         onVoiceTranscript={handleTopBarVoiceTranscript}
         onBenchVoiceAction={handleBenchVoiceAction}
       />
+
+      {/* Post-Verification Two-Phase Welcome & Creator Credentials Overlay */}
+      <WelcomeBenchOverlay
+        isOpen={showWelcomeOverlay}
+        accessLabel={
+          isAdminUnlocked
+            ? 'Admin Master Session'
+            : user
+              ? 'Google Cloud Sync Session'
+              : accessMode === 'TRIAL_ACTIVE'
+                ? 'Verified 8-Digit Trial PIN'
+                : 'Authorized Bench Session'
+        }
+        userEmail={user?.email ?? null}
+        workstationId={getOrCreateWorkstationDeviceId()}
+        onDismiss={() => {
+          setShowWelcomeOverlay(false);
+          onConsumeWelcomeOverlay?.();
+        }}
+      />
     </div>
   );
 }
 
 export default function App() {
   const { accessReady, isBenchEntryAuthorized } = useTrialAccess();
+  const prevAuthorizedRef = useRef<boolean | null>(null);
+  const [showWelcomeOnEntry, setShowWelcomeOnEntry] = useState(false);
+
+  useEffect(() => {
+    if (!accessReady) return;
+    const params =
+      typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    const isAutostart = params?.get('autostart') === '1';
+
+    if (prevAuthorizedRef.current === false && isBenchEntryAuthorized && !isAutostart) {
+      setShowWelcomeOnEntry(true);
+    }
+    if (!isBenchEntryAuthorized) {
+      setShowWelcomeOnEntry(false);
+    }
+    prevAuthorizedRef.current = isBenchEntryAuthorized;
+  }, [accessReady, isBenchEntryAuthorized]);
 
   if (!accessReady) {
     return (
@@ -2252,5 +2306,10 @@ export default function App() {
     return <IntroductionPinLandingPage />;
   }
 
-  return <AuthorizedBenchLabWorkspace />;
+  return (
+    <AuthorizedBenchLabWorkspace
+      initialShowWelcomeOverlay={showWelcomeOnEntry}
+      onConsumeWelcomeOverlay={() => setShowWelcomeOnEntry(false)}
+    />
+  );
 }

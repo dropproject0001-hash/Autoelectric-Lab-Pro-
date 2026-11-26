@@ -15,7 +15,7 @@ import {
   TrendingUp,
   X,
 } from 'lucide-react';
-import { APP_ICON_SRC, APP_LOGO_SRC } from '../constants/branding';
+import { APP_ICON_SRC, APP_LOGO_SRC, CREATOR_CREDENTIALS } from '../constants/branding';
 
 export interface CredentialsModalProps {
   isOpen: boolean;
@@ -179,51 +179,46 @@ export const CredentialsModal: React.FC<CredentialsModalProps> = ({
 
               {/* Leadership & Ownership Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <article className="rounded-xl border border-[#203653] bg-[#0E192A]/95 p-3.5 flex flex-col gap-2.5 shadow-[inset_0_1px_0_rgba(220,240,255,0.04)]">
-                  <div className="flex items-center justify-between gap-2 border-b border-[#203653]/80 pb-2">
-                    <span className="font-hud text-[11px] font-bold uppercase tracking-[0.13em] text-[#19C8F5]">
-                      Lead Systems Architect
-                    </span>
-                    <Cpu className="h-4 w-4 text-[#19C8F5] shrink-0" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h3 className="text-[15px] font-bold tracking-tight text-[#EAF3FF]">
-                      Ruben Llego
-                    </h3>
-                    <div className="mt-0.5 font-mono text-[11px] text-[#FFB020]">
-                      Owner &amp; Head Developer
+                {CREATOR_CREDENTIALS.leaders.map((leader) => (
+                  <article
+                    key={leader.id}
+                    className="rounded-xl border border-[#203653] bg-[#0E192A]/95 p-3.5 flex flex-col gap-2.5 shadow-[inset_0_1px_0_rgba(220,240,255,0.04)]"
+                  >
+                    <div className="flex items-center justify-between gap-2 border-b border-[#203653]/80 pb-2">
+                      <span
+                        className={`font-hud text-[11px] font-bold uppercase tracking-[0.13em] ${
+                          leader.accent === 'cyan' ? 'text-[#19C8F5]' : 'text-[#FFB020]'
+                        }`}
+                      >
+                        {leader.roleTitle}
+                      </span>
+                      {leader.accent === 'cyan' ? (
+                        <Cpu className="h-4 w-4 text-[#19C8F5] shrink-0" aria-hidden="true" />
+                      ) : (
+                        <TrendingUp className="h-4 w-4 text-[#FFB020] shrink-0" aria-hidden="true" />
+                      )}
                     </div>
-                  </div>
-                  <p className="text-[12px] leading-relaxed text-[#91A4BD]">
-                    Architected the Modified Nodal Analysis (MNA) circuit solver matrix, ECU pinout
-                    diagnostic engine, D3 harness topology, and real-time bench telemetry framework.
-                  </p>
-                  <div className="mt-auto pt-1 flex items-center gap-1.5 font-mono text-[11px] text-[#EAF3FF]/90">
-                    <Mail className="h-3.5 w-3.5 text-[#19C8F5] shrink-0" aria-hidden="true" />
-                    <span className="truncate">rubenlleg12@gmail.com</span>
-                  </div>
-                </article>
-
-                <article className="rounded-xl border border-[#203653] bg-[#0E192A]/95 p-3.5 flex flex-col gap-2.5 shadow-[inset_0_1px_0_rgba(220,240,255,0.04)]">
-                  <div className="flex items-center justify-between gap-2 border-b border-[#203653]/80 pb-2">
-                    <span className="font-hud text-[11px] font-bold uppercase tracking-[0.13em] text-[#FFB020]">
-                      VIP Investor &amp; Co-Owner
-                    </span>
-                    <TrendingUp className="h-4 w-4 text-[#FFB020] shrink-0" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h3 className="text-[15px] font-bold tracking-tight text-[#EAF3FF]">
-                      Elnombre Danong
-                    </h3>
-                    <div className="mt-0.5 font-mono text-[11px] text-[#19C8F5]">
-                      Executive Co-Owner &amp; Strategic Backer
+                    <div>
+                      <h3 className="text-[15px] font-bold tracking-tight text-[#EAF3FF]">
+                        {leader.name}
+                      </h3>
+                      <div
+                        className={`mt-0.5 font-mono text-[11px] ${
+                          leader.accent === 'cyan' ? 'text-[#FFB020]' : 'text-[#19C8F5]'
+                        }`}
+                      >
+                        {leader.subtitle}
+                      </div>
                     </div>
-                  </div>
-                  <p className="text-[12px] leading-relaxed text-[#91A4BD]">
-                    Foundational early strategic investor driving EV diagnostic capability,
-                    dedicated physical hardware lab tooling expansion, and global workshop scale.
-                  </p>
-                </article>
+                    <p className="text-[12px] leading-relaxed text-[#91A4BD]">{leader.bio}</p>
+                    {leader.email && (
+                      <div className="mt-auto pt-1 flex items-center gap-1.5 font-mono text-[11px] text-[#EAF3FF]/90">
+                        <Mail className="h-3.5 w-3.5 text-[#19C8F5] shrink-0" aria-hidden="true" />
+                        <span className="truncate">{leader.email}</span>
+                      </div>
+                    )}
+                  </article>
+                ))}
               </div>
 
               {/* Verified Security & Compliance Instrumentation Well */}

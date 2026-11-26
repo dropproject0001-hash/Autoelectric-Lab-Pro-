@@ -2327,6 +2327,7 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
         <Suspense fallback={null}>
           <UniversityLabGuidanceCard
             module={activeUniversityModule}
+            ecuPins={pins}
             liveBench={{
               powerSupply,
               multimeter,
