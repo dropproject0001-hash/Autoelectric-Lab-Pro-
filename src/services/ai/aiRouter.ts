@@ -18,7 +18,10 @@ import {
   type GeminiChatRole,
   type StructuredAiHttpError,
 } from '../geminiIntelligenceService';
-import { saveVerifiedKnowledgeEntry } from './localKnowledgeDB';
+import {
+  saveVerifiedKnowledgeEntry,
+  searchLocalFirstKnowledge,
+} from './localKnowledgeDB';
 import {
   isLiveTelemetryQuery,
   lookupVoiceInteractionCache,
@@ -546,6 +549,7 @@ export async function queryAiDiagnosticRouter(params: {
   if (
     !bypassInteractionCache &&
     !forceOffline &&
+    isBrowserOnline() &&
     extractedTokens.length > 0 &&
     !liveTelemetryQuery
   ) {
@@ -581,6 +585,71 @@ export async function queryAiDiagnosticRouter(params: {
         servedFromInteractionCache: true,
         cacheHitCount: cachedHit.hitCount,
         attemptTrail: cacheTrail,
+        benchSnapshotSummary: benchContextText,
+        createdAt: hitNow,
+      };
+    }
+
+    // Step 2: Check Persistent Local-First Knowledge Database (semantic + keyword + synonym search)
+    // before making any online AI request (Sections 7 & 8)
+    const localKnowledgeHit = await searchLocalFirstKnowledge({
+      query: trimmedQuery,
+      tokens: extractedTokens,
+      lang,
+      minScore: 0.62,
+    });
+
+    if (localKnowledgeHit) {
+      const hitNow = Date.now();
+      const kbRecord = localKnowledgeHit.record;
+      const kbTrail: AiTierAttemptLog[] = [
+        {
+          tier: kbRecord.sourceTier,
+          outcome: 'VOICE_CACHE_HIT',
+          reason: `Served from Local-First Knowledge DB (${localKnowledgeHit.matchType}, score=${localKnowledgeHit.score}, 0 online API calls)`,
+        },
+      ];
+
+      emitStatus({
+        activeTier: kbRecord.sourceTier,
+        phase: 'ACTIVE',
+        lastUpdatedAt: hitNow,
+        isOfflineFallback: false,
+        attemptTrail: kbTrail,
+      });
+
+      const conversationalSummary =
+        lang === 'TL'
+          ? `Boss, mula sa ating Local-First Verified Knowledge DB (${kbRecord.subject}): ${kbRecord.rootCauseSummary}`
+          : `From our Local-First Verified Knowledge Database (${kbRecord.subject}): ${kbRecord.rootCauseSummary}`;
+
+      return {
+        id: `local-kb-hit-${hitNow}`,
+        lang,
+        tierUsed: kbRecord.sourceTier,
+        tierLabel: getTierMetadata(kbRecord.sourceTier).label,
+        sourceProvenance: 'LOCAL_VERIFIED_CACHE',
+        confidence: kbRecord.confidence,
+        blockedByScoreGate: false,
+        subject: kbRecord.subject,
+        conversationalSummary,
+        cards: buildThreeRepairStepCards({
+          lang,
+          subject: kbRecord.subject,
+          safetyWarning: kbRecord.safetyWarning,
+          rootCause: kbRecord.rootCauseSummary,
+          verificationAction: kbRecord.verificationStep,
+          telemetry,
+        }),
+        extractedTokens,
+        attemptTrail: kbTrail,
+        cachedLocally: true,
+        servedFromLocalKnowledgeDb: true,
+        localKnowledgeRecordId: kbRecord.id,
+        knowledgeClassification: kbRecord.classification,
+        evidenceSource: kbRecord.evidenceSource || 'LOCAL_TECHNICAL_KNOWLEDGE',
+        evidenceStatus: kbRecord.evidenceStatus || 'VALID',
+        cacheHitCount: kbRecord.hitCount,
         benchSnapshotSummary: benchContextText,
         createdAt: hitNow,
       };
@@ -711,7 +780,14 @@ export async function queryAiDiagnosticRouter(params: {
           rootCauseSummary: parsed.rootCause,
           verificationStep: parsed.verificationAction,
           rawAnswer: res.reply,
+          originalQuestion: trimmedQuery,
         });
+
+        // If online AI returned unsafe advice that was classified as REJECTED_INFORMATION,
+        // refuse to serve it and fall back to the deterministic safety-verified offline engine.
+        if (cacheOutcome.classification === 'REJECTED_INFORMATION') {
+          break;
+        }
 
         emitStatus({
           activeTier: effectiveTier.id,
@@ -756,11 +832,15 @@ export async function queryAiDiagnosticRouter(params: {
           extractedTokens,
           attemptTrail,
           cachedLocally: cacheOutcome.saved,
+          localKnowledgeRecordId: cacheOutcome.record?.id,
+          knowledgeClassification: cacheOutcome.classification,
+          evidenceSource: cacheOutcome.record?.evidenceSource || 'LOCAL_TECHNICAL_KNOWLEDGE',
+          evidenceStatus: cacheOutcome.record?.evidenceStatus || 'VALID',
           benchSnapshotSummary: benchContextText,
           createdAt: successNow,
         };
 
-        if (!liveTelemetryQuery) {
+        if (!liveTelemetryQuery && cacheOutcome.saved) {
           await saveVoiceInteractionCache({
             channel: 'DIAGNOSTIC_ROUTER',
             lang,

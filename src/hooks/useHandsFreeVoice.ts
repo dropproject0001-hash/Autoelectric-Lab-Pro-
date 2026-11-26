@@ -30,6 +30,7 @@ import {
 } from '../services/ai/voiceInteractionCache';
 import type { VoiceModalAction } from '../services/ai/systemVoiceKnowledgeBase';
 import { queryAiDiagnosticRouter } from '../services/ai/aiRouter';
+import { offlineVoiceAssistant } from '../services/offlineVoiceService';
 import {
   parseThreeDVoiceCommand,
   type BenchVoiceSimulationAction,
@@ -169,9 +170,13 @@ export function useHandsFreeVoice(params: {
 
   const [isHandsFreeActive, setIsHandsFreeActive] = useState(false);
   const [status, setStatus] = useState<HandsFreeVoiceStatus>('STANDBY');
-  const [memory, setMemory] = useState<VoiceSessionMemory>(() =>
-    createInitialVoiceSessionMemory(activeModuleId, activeTab, lang)
-  );
+  const [memory, setMemory] = useState<VoiceSessionMemory>(() => {
+    const shared = offlineVoiceAssistant.getSessionMemory();
+    if (shared && shared.activeModuleId === activeModuleId) {
+      return { ...shared, activeTab, lang };
+    }
+    return createInitialVoiceSessionMemory(activeModuleId, activeTab, lang);
+  });
   const [lastTranscript, setLastTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
   const [lastTurn, setLastTurn] = useState<VoiceCoachTurnResult | null>(null);
@@ -204,6 +209,7 @@ export function useHandsFreeVoice(params: {
 
   useEffect(() => {
     memoryRef.current = memory;
+    offlineVoiceAssistant.setSessionMemory(memory);
   }, [memory]);
 
   useEffect(() => {
@@ -216,6 +222,9 @@ export function useHandsFreeVoice(params: {
 
   useEffect(() => {
     langRef.current = lang;
+    if (offlineVoiceAssistant.getLanguage() !== lang) {
+      offlineVoiceAssistant.setLanguage(lang);
+    }
   }, [lang]);
 
   useEffect(() => {

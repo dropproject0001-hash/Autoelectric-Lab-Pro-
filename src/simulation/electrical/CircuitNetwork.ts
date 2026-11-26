@@ -3,7 +3,7 @@
  * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
  */
 
-import { MatrixSolver } from '../engine/MatrixSolver';
+import { MatrixSolver, type MatrixSolverStatus } from '../engine/MatrixSolver';
 
 export interface ResistorBranch {
   id: string;
@@ -33,12 +33,141 @@ export interface CurrentSourceBranch {
   currentAmps: number;
 }
 
+export type NodeMeasurementReliabilityStatus =
+  | 'VALID'
+  | 'UNRESOLVED'
+  | 'UNSTABLE'
+  | 'UNAVAILABLE';
+
 export interface CircuitSolutionResult {
   nodeVoltages: Record<string, number>;
+  /** Strictly null for floating, disconnected, or unresolved nodes — never silently converted to a valid 0V reading */
+  validatedNodeVoltages?: Record<string, number | null>;
+  nodeMeasurementStatuses?: Record<string, NodeMeasurementReliabilityStatus>;
+  unresolvedNodes?: string[];
+  solverStatus?: MatrixSolverStatus;
+  maxResidual?: number;
+  isResidualValid?: boolean;
   branchCurrentsAmps: Record<string, number>;
   sourceCurrentDrawAmps: number;
   isSolved: boolean;
   warnings: string[];
+}
+
+export interface InspectedNodeMeasurement {
+  nodeId: string;
+  status: NodeMeasurementReliabilityStatus;
+  isValid: boolean;
+  isFloatingOrUnresolved: boolean;
+  voltage: number | null;
+  displayText: string;
+  warning?: string;
+}
+
+/**
+ * Inspects a solved node measurement from CircuitSolutionResult without ever silently converting
+ * an unresolved or unreferenced node into a valid 0.00V reading.
+ */
+export function inspectNodeMeasurement(
+  solution: CircuitSolutionResult,
+  nodeName: string | null | undefined
+): InspectedNodeMeasurement {
+  const norm = String(nodeName ?? '').trim().toLowerCase();
+  if (!norm) {
+    return {
+      nodeId: '',
+      status: 'UNAVAILABLE',
+      isValid: false,
+      isFloatingOrUnresolved: false,
+      voltage: null,
+      displayText: '---',
+      warning: 'No probe terminal attached.',
+    };
+  }
+
+  if (norm === '0' || norm === 'gnd' || norm === 'chassis-gnd') {
+    return {
+      nodeId: norm,
+      status: 'VALID',
+      isValid: true,
+      isFloatingOrUnresolved: false,
+      voltage: 0.0,
+      displayText: '0.00 V',
+    };
+  }
+
+  const explicitStatus = solution.nodeMeasurementStatuses?.[norm];
+  const isUnresolvedList = solution.unresolvedNodes?.includes(norm) ?? false;
+
+  if (!solution.isSolved || solution.solverStatus === 'NON_FINITE') {
+    return {
+      nodeId: norm,
+      status: 'UNAVAILABLE',
+      isValid: false,
+      isFloatingOrUnresolved: true,
+      voltage: null,
+      displayText: 'ERR (SOLVER)',
+      warning: 'Circuit solver did not converge to a finite solution.',
+    };
+  }
+
+  if (explicitStatus === 'UNRESOLVED' || isUnresolvedList) {
+    return {
+      nodeId: norm,
+      status: 'UNRESOLVED',
+      isValid: false,
+      isFloatingOrUnresolved: true,
+      voltage: null,
+      displayText: 'OPEN / FLOATING',
+      warning: `Node "${norm}" is electrically floating with no DC reference path to ground (KL31). Cannot treat as a valid 0V measurement.`,
+    };
+  }
+
+  if (explicitStatus === 'UNAVAILABLE' || !(norm in solution.nodeVoltages)) {
+    return {
+      nodeId: norm,
+      status: 'UNAVAILABLE',
+      isValid: false,
+      isFloatingOrUnresolved: true,
+      voltage: null,
+      displayText: 'UNRESOLVED',
+      warning: `Node "${norm}" is not registered or connected in the active circuit network.`,
+    };
+  }
+
+  const rawV = solution.nodeVoltages[norm];
+  if (!Number.isFinite(rawV)) {
+    return {
+      nodeId: norm,
+      status: 'UNAVAILABLE',
+      isValid: false,
+      isFloatingOrUnresolved: true,
+      voltage: null,
+      displayText: 'ERR (NaN)',
+      warning: `Non-finite voltage computed at node "${norm}".`,
+    };
+  }
+
+  if (explicitStatus === 'UNSTABLE' || solution.solverStatus === 'UNSTABLE') {
+    return {
+      nodeId: norm,
+      status: 'UNSTABLE',
+      isValid: false,
+      isFloatingOrUnresolved: false,
+      voltage: rawV,
+      displayText: `${rawV.toFixed(2)} V (UNSTABLE)`,
+      warning: `Numerical instability / high residual detected while solving node "${norm}".`,
+    };
+  }
+
+  return {
+    nodeId: norm,
+    status: 'VALID',
+    isValid: true,
+    isFloatingOrUnresolved: false,
+    voltage: rawV,
+    displayText: `${rawV.toFixed(2)} V`,
+  };
 }
 
 /**
@@ -52,6 +181,7 @@ export class CircuitNetwork {
   private voltageSources: Map<string, VoltageSourceBranch> = new Map();
   private currentSources: Map<string, CurrentSourceBranch> = new Map();
   private gMin: number = 1e-9; // 1 GΩ shunt conductance to ground for numerical stability on floating nodes
+  private static readonly OPEN_CIRCUIT_RESISTANCE_THRESHOLD = 5e8; // >= 500 MΩ treated as open-circuit isolation for DC reference check
 
   constructor() {
     this.reset();
@@ -164,6 +294,49 @@ export class CircuitNetwork {
   }
 
   /**
+   * Identifies all node indices that have a physical DC conductive reference path to Ground (node 0).
+   * Excludes open-circuit cut-wire placeholders (>= 500 MΩ) and artificial Gmin regularization.
+   */
+  private findGroundReferencedNodeIndices(): Set<number> {
+    const adjacency = new Map<number, Set<number>>();
+    const addEdge = (u: number, v: number) => {
+      if (!adjacency.has(u)) adjacency.set(u, new Set());
+      if (!adjacency.has(v)) adjacency.set(v, new Set());
+      adjacency.get(u)!.add(v);
+      adjacency.get(v)!.add(u);
+    };
+
+    for (const res of this.resistors.values()) {
+      if (
+        Number.isFinite(res.resistanceOhms) &&
+        res.resistanceOhms < CircuitNetwork.OPEN_CIRCUIT_RESISTANCE_THRESHOLD
+      ) {
+        addEdge(res.idxA, res.idxB);
+      }
+    }
+
+    for (const vs of this.voltageSources.values()) {
+      addEdge(vs.idxPos, vs.idxNeg);
+    }
+
+    const visited = new Set<number>([0]);
+    const queue: number[] = [0];
+    while (queue.length > 0) {
+      const curr = queue.shift()!;
+      const neighbors = adjacency.get(curr);
+      if (!neighbors) continue;
+      for (const next of neighbors) {
+        if (!visited.has(next)) {
+          visited.add(next);
+          queue.push(next);
+        }
+      }
+    }
+
+    return visited;
+  }
+
+  /**
    * Solves the complete DC circuit using Modified Nodal Analysis (MNA).
    * Constructs the conductance matrix G, incidence matrices B & C, and RHS vector.
    */
@@ -176,6 +349,12 @@ export class CircuitNetwork {
     if (nonGroundNodes <= 0) {
       return {
         nodeVoltages: { 'chassis-gnd': 0 },
+        validatedNodeVoltages: { 'chassis-gnd': 0 },
+        nodeMeasurementStatuses: { 'chassis-gnd': 'VALID', '0': 'VALID', gnd: 'VALID' },
+        unresolvedNodes: [],
+        solverStatus: 'VALID',
+        maxResidual: 0,
+        isResidualValid: true,
         branchCurrentsAmps: {},
         sourceCurrentDrawAmps: 0,
         isSolved: true,
@@ -183,10 +362,13 @@ export class CircuitNetwork {
       };
     }
 
+    // Determine genuine ground reachability BEFORE stamping artificial Gmin shunt
+    const groundReferencedIndices = this.findGroundReferencedNodeIndices();
+
     const A: number[][] = Array.from({ length: totalUnknowns }, () => new Array(totalUnknowns).fill(0));
     const b: number[] = new Array(totalUnknowns).fill(0);
 
-    // 1. Stamp shunt conductance to ground Gmin to prevent floating node singularity
+    // 1. Stamp shunt conductance to ground Gmin to prevent floating node matrix crash
     for (let i = 0; i < nonGroundNodes; i++) {
       A[i][i] += this.gMin;
     }
@@ -254,12 +436,18 @@ export class CircuitNetwork {
       vSourceIdx++;
     }
 
-    let x: number[];
+    let diagResult;
     try {
-      x = MatrixSolver.solveInPlace(A, b);
+      diagResult = MatrixSolver.solveWithDiagnostics(A, b);
     } catch {
       return {
         nodeVoltages: {},
+        validatedNodeVoltages: {},
+        nodeMeasurementStatuses: {},
+        unresolvedNodes: Array.from(this.nodeMap.keys()).filter((k) => k !== '0' && k !== 'gnd' && k !== 'chassis-gnd'),
+        solverStatus: 'NON_FINITE',
+        maxResidual: Infinity,
+        isResidualValid: false,
         branchCurrentsAmps: {},
         sourceCurrentDrawAmps: 0,
         isSolved: false,
@@ -267,14 +455,78 @@ export class CircuitNetwork {
       };
     }
 
-    // Extract node voltages
+    if (diagResult.hasNonFinite) {
+      return {
+        nodeVoltages: {},
+        validatedNodeVoltages: {},
+        nodeMeasurementStatuses: {},
+        unresolvedNodes: Array.from(this.nodeMap.keys()).filter((k) => k !== '0' && k !== 'gnd' && k !== 'chassis-gnd'),
+        solverStatus: 'NON_FINITE',
+        maxResidual: diagResult.maxResidual,
+        isResidualValid: false,
+        branchCurrentsAmps: {},
+        sourceCurrentDrawAmps: 0,
+        isSolved: false,
+        warnings: [...diagResult.warnings, 'Non-finite result detected in circuit solver.'],
+      };
+    }
+
+    const x = diagResult.solution;
+    const solverUnresolvedSet = new Set(diagResult.unresolvedIndices);
+
+    // Extract node voltages & explicit measurement reliability statuses
     const nodeVoltages: Record<string, number> = {};
+    const validatedNodeVoltages: Record<string, number | null> = {};
+    const nodeMeasurementStatuses: Record<string, NodeMeasurementReliabilityStatus> = {};
+    const unresolvedNodes: string[] = [];
+    const warnings: string[] = [...diagResult.warnings];
+
     for (const [name, index] of this.nodeMap.entries()) {
       if (index === 0) {
         nodeVoltages[name] = 0.0;
+        validatedNodeVoltages[name] = 0.0;
+        nodeMeasurementStatuses[name] = 'VALID';
       } else {
-        const v = x[index - 1] ?? 0.0;
-        nodeVoltages[name] = Math.abs(v) < 1e-6 ? 0.0 : v;
+        const eqIdx = index - 1;
+        const rawV = x[eqIdx] ?? 0.0;
+        const cleanV = Math.abs(rawV) < 1e-6 ? 0.0 : rawV;
+        nodeVoltages[name] = cleanV;
+
+        const originalName = this.reverseNodeMap.get(index);
+        if (originalName && originalName !== name) {
+          nodeVoltages[originalName] = cleanV;
+        }
+
+        const isFloatingTopologically = !groundReferencedIndices.has(index);
+        const isSolverSingular = solverUnresolvedSet.has(eqIdx);
+
+        if (isFloatingTopologically || isSolverSingular) {
+          validatedNodeVoltages[name] = null;
+          nodeMeasurementStatuses[name] = 'UNRESOLVED';
+          unresolvedNodes.push(name);
+          if (originalName && originalName !== name) {
+            validatedNodeVoltages[originalName] = null;
+            nodeMeasurementStatuses[originalName] = 'UNRESOLVED';
+            unresolvedNodes.push(originalName);
+          }
+          warnings.push(
+            `Node "${name}" is unresolved / floating (no DC reference path to ground KL31).`
+          );
+        } else if (diagResult.status === 'UNSTABLE') {
+          validatedNodeVoltages[name] = cleanV;
+          nodeMeasurementStatuses[name] = 'UNSTABLE';
+          if (originalName && originalName !== name) {
+            validatedNodeVoltages[originalName] = cleanV;
+            nodeMeasurementStatuses[originalName] = 'UNSTABLE';
+          }
+        } else {
+          validatedNodeVoltages[name] = cleanV;
+          nodeMeasurementStatuses[name] = 'VALID';
+          if (originalName && originalName !== name) {
+            validatedNodeVoltages[originalName] = cleanV;
+            nodeMeasurementStatuses[originalName] = 'VALID';
+          }
+        }
       }
     }
 
@@ -294,12 +546,23 @@ export class CircuitNetwork {
       totalDrawAmps += currentThroughVSource;
     }
 
+    const overallStatus: MatrixSolverStatus =
+      unresolvedNodes.length > 0 && diagResult.status === 'VALID'
+        ? 'UNRESOLVED'
+        : diagResult.status;
+
     return {
       nodeVoltages,
+      validatedNodeVoltages,
+      nodeMeasurementStatuses,
+      unresolvedNodes,
+      solverStatus: overallStatus,
+      maxResidual: diagResult.maxResidual,
+      isResidualValid: diagResult.isResidualValid,
       branchCurrentsAmps: branchCurrents,
       sourceCurrentDrawAmps: totalDrawAmps,
       isSolved: true,
-      warnings: [],
+      warnings,
     };
   }
 
@@ -389,5 +652,12 @@ export class CircuitNetwork {
 
     const rEq = deltaV / iTest;
     return rEq > 1e7 ? Infinity : rEq;
+  }
+
+  public inspectNodeMeasurement(
+    solution: CircuitSolutionResult,
+    nodeName: string | null | undefined
+  ): InspectedNodeMeasurement {
+    return inspectNodeMeasurement(solution, nodeName);
   }
 }

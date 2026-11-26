@@ -5,30 +5,39 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Activity,
+  AlertTriangle,
   ArrowLeftRight,
   Bot,
+  Check,
   ChevronDown,
   ChevronUp,
+  Globe,
   Headphones,
-  History,
   Layers,
   Mic,
   MicOff,
   Move,
   RotateCcw,
   Send,
+  ShieldAlert,
   Volume2,
-  VolumeX,
+  X,
 } from 'lucide-react';
 import { SavedBenchSession, SavedDiagnosticLog } from '../services/benchStorageService';
 import { LiveBenchContext, OfflineDiagnosticChatbot } from '../services/offlineChatbotEngine';
 import {
+  evaluateVoiceCommandSafetyAndRisk,
   offlineVoiceAssistant,
   VoiceAssistantState,
   VoiceCommandLogSource,
   VoiceResultMetadata,
 } from '../services/offlineVoiceService';
+import {
+  processVoiceCoachTurn,
+  type StructuredDiagnosticSections,
+  type VoiceKnowledgeProvenance,
+} from '../services/ai/localVoiceBrain';
+import type { BenchTelemetry, BilingualLang } from '../types/aiAssistant';
 import {
   EcuPin,
   FaultType,
@@ -226,6 +235,9 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
     title: string;
     detail: string;
     timestamp: number;
+    provenance?: VoiceKnowledgeProvenance;
+    structuredDiagnostic?: StructuredDiagnosticSections;
+    isSafetyAlert?: boolean;
   } | null>(null);
   const [voiceState, setVoiceState] = useState<VoiceAssistantState>(() =>
     offlineVoiceAssistant.getState()
@@ -263,6 +275,57 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
     }),
     [powerSupply, pins, wires, faults, circuitSolution, multimeter, selectedPinId]
   );
+
+  const benchTelemetryForCoach = useMemo<Partial<BenchTelemetry>>(() => {
+    const selectedPinObj = pins.find((p) => p.id === selectedPinId);
+    return {
+      vehicleLabel: vehicleContext
+        ? `${vehicleContext.brandLabel} ${vehicleContext.modelName}`
+        : 'Universal 4-Cyl EFI',
+      ecuProfileLabel: vehicleContext?.modelName ?? 'Universal 16-Pin EFI ECU',
+      psuEnabled: powerSupply.isOutputEnabled,
+      psuVoltageSetting: powerSupply.voltageSetting,
+      psuCurrentLimitAmps: powerSupply.currentLimit,
+      psuCurrentDrawAmps: circuitSolution.supplyCurrentDrawAmps,
+      isOcpTripped: circuitSolution.isSupplyCurrentTripped,
+      activeDtcs: circuitSolution.activeDTCs.map((d) => ({
+        code: d.code,
+        description: d.description,
+        severity: d.severity === 'CRITICAL' ? 'CRITICAL' : 'WARNING',
+      })),
+      activeFaults: faults.map((f) => ({
+        pinId: f.pinId,
+        faultType: f.faultType,
+        description: f.description,
+      })),
+      selectedPin: selectedPinObj
+        ? {
+            id: selectedPinObj.id,
+            pinNumber: selectedPinObj.pinNumber,
+            label: selectedPinObj.label,
+            name: selectedPinObj.name,
+            measuredVoltage: circuitSolution.nodeVoltages[selectedPinObj.id] ?? 0,
+            nominalVoltage: selectedPinObj.nominalVoltage,
+          }
+        : undefined,
+      dmm: {
+        isPowered: multimeter.isPowered,
+        mode: multimeter.mode,
+        displayReading: circuitSolution.multimeterReading.display,
+        unit: circuitSolution.multimeterReading.unit,
+        redProbeLabel: multimeter.redProbe.attachedLabel,
+        blackProbeLabel: multimeter.blackProbe.attachedLabel,
+      },
+    };
+  }, [
+    pins,
+    selectedPinId,
+    vehicleContext,
+    powerSupply,
+    circuitSolution,
+    faults,
+    multimeter,
+  ]);
 
   const announceVoiceResult = useCallback(
     (title: string, detail: string, speakText?: string) => {
@@ -618,26 +681,198 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
         }),
       };
 
-      const matchedMacro = voiceMacroService.findMatchingMacro(trimmed);
-      if (matchedMacro) {
-        const macroResult = executeMacroSequence(matchedMacro, pins, voiceActions);
+      const currentLang: BilingualLang = voiceState.language || 'TL';
+
+      const safetyEval = evaluateVoiceCommandSafetyAndRisk({
+        rawCommand: trimmed,
+        lang: currentLang,
+        powerSupply,
+        multimeter,
+        isSupplyCurrentTripped: circuitSolution.isSupplyCurrentTripped,
+        vehicleStatus: vehicleContext?.status,
+        pins,
+        hasPendingConfirmation: Boolean(offlineVoiceAssistant.getPendingAction()),
+      });
+
+      if (safetyEval.decision === 'CONFIRMED_PENDING') {
+        const confirmed = offlineVoiceAssistant.confirmPendingAction();
+        const reply =
+          currentLang === 'EN' ? safetyEval.spokenReplyEN : safetyEval.spokenReplyTL;
         offlineVoiceAssistant.addCommandLog({
           source,
           rawTranscript: trimmed,
-          normalizedTranscript: `Macro: ${matchedMacro.name} (${macroResult.stepResults.length} steps)`,
+          normalizedTranscript: trimmed.toLowerCase(),
           confidence: meta?.confidence,
-          status: macroResult.status === 'EXECUTED' ? 'EXECUTED' : 'FAILED',
-          category: 'MACRO',
-          actionDescription: macroResult.actionDescription,
-          spokenReply: macroResult.spokenReply,
+          status: 'EXECUTED',
+          category: 'CONFIRMATION',
+          actionDescription: confirmed
+            ? `Confirmed & executed: ${confirmed.rawCommand}`
+            : safetyEval.actionSummary,
+          spokenReply: reply,
+        });
+        announceVoiceResult('Confirmed Bench Action', confirmed?.rawCommand || reply, reply);
+        return;
+      }
+
+      if (safetyEval.decision === 'CANCELLED_PENDING') {
+        const cancelled = offlineVoiceAssistant.cancelPendingAction();
+        const reply =
+          currentLang === 'EN' ? safetyEval.spokenReplyEN : safetyEval.spokenReplyTL;
+        offlineVoiceAssistant.addCommandLog({
+          source,
+          rawTranscript: trimmed,
+          normalizedTranscript: trimmed.toLowerCase(),
+          confidence: meta?.confidence,
+          status: 'EXECUTED',
+          category: 'CONFIRMATION',
+          actionDescription: cancelled
+            ? `Cancelled pending action: ${cancelled.rawCommand}`
+            : safetyEval.actionSummary,
+          spokenReply: reply,
+        });
+        announceVoiceResult('Cancelled Bench Action', reply, reply);
+        return;
+      }
+
+      if (safetyEval.decision === 'REJECTED_SAFETY') {
+        const reply =
+          currentLang === 'EN' ? safetyEval.spokenReplyEN : safetyEval.spokenReplyTL;
+        offlineVoiceAssistant.addCommandLog({
+          source,
+          rawTranscript: trimmed,
+          normalizedTranscript: trimmed.toLowerCase(),
+          confidence: meta?.confidence,
+          status: 'REJECTED_SAFETY',
+          category: 'SAFETY_INTERLOCK',
+          actionDescription: safetyEval.safetyReason || safetyEval.actionSummary,
+          spokenReply: reply,
+          provenance: 'UNIVERSAL_BENCH_TRAINER',
         });
         if (source === 'SPEECH_API') {
           onOpenVoiceLog?.();
         }
+        setVoiceResult({
+          title: currentLang === 'EN' ? 'Safety Interlock Blocked' : 'Hinarang ng Safety Interlock',
+          detail: safetyEval.safetyReason || reply,
+          timestamp: Date.now(),
+          provenance: 'UNIVERSAL_BENCH_TRAINER',
+          isSafetyAlert: true,
+        });
+        if (voiceNavEnabled) {
+          offlineVoiceAssistant.speak(reply, true);
+        }
+        return;
+      }
+
+      const matchedMacro = voiceMacroService.findMatchingMacro(trimmed);
+      if (matchedMacro) {
+        const runMacroNow = () => {
+          const macroResult = executeMacroSequence(matchedMacro, pins, voiceActions);
+          offlineVoiceAssistant.addCommandLog({
+            source,
+            rawTranscript: trimmed,
+            normalizedTranscript: `Macro: ${matchedMacro.name} (${macroResult.stepResults.length} steps)`,
+            confidence: meta?.confidence,
+            status: macroResult.status === 'EXECUTED' ? 'EXECUTED' : 'FAILED',
+            category: 'MACRO',
+            actionDescription: macroResult.actionDescription,
+            spokenReply: macroResult.spokenReply,
+          });
+          if (source === 'SPEECH_API') {
+            onOpenVoiceLog?.();
+          }
+          announceVoiceResult(
+            `Macro: ${matchedMacro.name}`,
+            macroResult.actionDescription,
+            macroResult.spokenReply
+          );
+        };
+
+        offlineVoiceAssistant.setPendingAction({
+          id: `pending-macro-${Date.now()}`,
+          rawCommand: trimmed,
+          actionSummary: `Run multi-step macro "${matchedMacro.name}" (${matchedMacro.steps.length} steps)`,
+          riskReason:
+            currentLang === 'EN'
+              ? 'Multi-step bench macro modifies power, wiring, or instrument state.'
+              : 'Babaguhin ng multi-step macro ang power, wiring, o instrument state.',
+          source,
+          confidence: meta?.confidence,
+          createdAtMs: Date.now(),
+          execute: runMacroNow,
+        });
+        const confirmPrompt =
+          currentLang === 'EN'
+            ? `Confirmation required to run macro "${matchedMacro.name}". Say "Confirm" or tap Confirm.`
+            : `Kailangan ng kumpirmasyon para patakbuhin ang macro "${matchedMacro.name}". Sabihin ang "Confirm" o "Oo" o pindutin ang Confirm.`;
+        offlineVoiceAssistant.addCommandLog({
+          source,
+          rawTranscript: trimmed,
+          normalizedTranscript: trimmed.toLowerCase(),
+          confidence: meta?.confidence,
+          status: 'PENDING_CONFIRMATION',
+          category: 'MACRO',
+          actionDescription: `Awaiting confirmation: Macro ${matchedMacro.name}`,
+          spokenReply: confirmPrompt,
+        });
+        announceVoiceResult('Confirmation Required', confirmPrompt, confirmPrompt);
+        return;
+      }
+
+      if (safetyEval.decision === 'REQUIRES_CONFIRMATION') {
+        const executeConfirmedCommand = () => {
+          const cmd = parseAndExecuteVoiceCommand(trimmed, pins, voiceActions);
+          if (cmd.matched) {
+            offlineVoiceAssistant.addCommandLog({
+              source,
+              rawTranscript: trimmed,
+              normalizedTranscript: cmd.normalizedTranscript || trimmed.toLowerCase(),
+              confidence: meta?.confidence,
+              status: cmd.status === 'FAILED' ? 'FAILED' : 'EXECUTED',
+              category: cmd.category || 'DIAGNOSTIC',
+              actionDescription: cmd.actionDescription,
+              spokenReply: cmd.spokenReply,
+              scenarioPhId: cmd.scenarioPhId,
+              scenarioStepNumber: cmd.scenarioStepNumber,
+              guidanceKind: cmd.guidanceKind,
+            });
+            if (source === 'SPEECH_API') {
+              onOpenVoiceLog?.();
+            }
+            announceVoiceResult(`Executed: "${trimmed}"`, cmd.actionDescription, cmd.spokenReply);
+          }
+        };
+
+        offlineVoiceAssistant.setPendingAction({
+          id: `pending-cmd-${Date.now()}`,
+          rawCommand: trimmed,
+          actionSummary: safetyEval.actionSummary,
+          riskReason:
+            currentLang === 'EN'
+              ? 'State-changing bench command requires technician confirmation.'
+              : 'Kailangan ng kumpirmasyon ng technician bago baguhin ang bench state.',
+          source,
+          confidence: meta?.confidence,
+          createdAtMs: Date.now(),
+          execute: executeConfirmedCommand,
+        });
+
+        const promptText =
+          currentLang === 'EN' ? safetyEval.spokenReplyEN : safetyEval.spokenReplyTL;
+        offlineVoiceAssistant.addCommandLog({
+          source,
+          rawTranscript: trimmed,
+          normalizedTranscript: trimmed.toLowerCase(),
+          confidence: meta?.confidence,
+          status: 'PENDING_CONFIRMATION',
+          category: 'SAFETY_CONFIRMATION',
+          actionDescription: safetyEval.actionSummary,
+          spokenReply: promptText,
+        });
         announceVoiceResult(
-          `Macro: ${matchedMacro.name}`,
-          macroResult.actionDescription,
-          macroResult.spokenReply
+          currentLang === 'EN' ? 'Confirmation Required' : 'Kailangan ng Kumpirmasyon',
+          safetyEval.actionSummary,
+          promptText
         );
         return;
       }
@@ -645,6 +880,13 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
       const cmd = parseAndExecuteVoiceCommand(trimmed, pins, voiceActions);
 
       if (cmd.matched) {
+        const currentMem = offlineVoiceAssistant.getSessionMemory();
+        offlineVoiceAssistant.setSessionMemory({
+          ...currentMem,
+          lastExecutedCommand: trimmed,
+          activeTab,
+          lang: currentLang,
+        });
         offlineVoiceAssistant.addCommandLog({
           source,
           rawTranscript: trimmed,
@@ -657,6 +899,7 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
           scenarioPhId: cmd.scenarioPhId,
           scenarioStepNumber: cmd.scenarioStepNumber,
           guidanceKind: cmd.guidanceKind,
+          provenance: 'SIMULATED_MNA_TELEMETRY',
         });
         if (source === 'SPEECH_API') {
           onOpenVoiceLog?.();
@@ -666,9 +909,57 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
             title: `Voice Cmd: "${trimmed}"`,
             detail: cmd.actionDescription,
             timestamp: Date.now(),
+            provenance: 'SIMULATED_MNA_TELEMETRY',
           });
         } else {
           announceVoiceResult(`Voice Cmd: "${trimmed}"`, cmd.actionDescription, cmd.spokenReply);
+        }
+        return;
+      }
+
+      // Unified Local Voice Brain (`processVoiceCoachTurn`) for natural bilingual EN/Taglish,
+      // multi-turn diagnostic continuity ("How do I test the TPS?" -> "What should I measure?" -> "It's reading 0.04 volts" -> "What next?"),
+      // live bench telemetry awareness, and 6-tier knowledge provenance.
+      const coachTurn = processVoiceCoachTurn({
+        transcript: trimmed,
+        memory: offlineVoiceAssistant.getSessionMemory(),
+        telemetry: benchTelemetryForCoach,
+        activeTab,
+        lang: currentLang,
+        pins,
+        nodeVoltages: circuitSolution.nodeVoltages,
+      });
+
+      offlineVoiceAssistant.setSessionMemory(coachTurn.updatedMemory);
+
+      if (coachTurn.navigationAction?.type === 'TAB') {
+        onNavigateTab(coachTurn.navigationAction.tab);
+      }
+
+      if (!coachTurn.usedClarificationFallback || coachTurn.confidence >= 0.55) {
+        offlineVoiceAssistant.addCommandLog({
+          source,
+          rawTranscript: trimmed,
+          normalizedTranscript: trimmed.toLowerCase(),
+          confidence: meta?.confidence ?? coachTurn.confidence,
+          status: coachTurn.navigationAction ? 'EXECUTED' : 'FALLBACK',
+          category: coachTurn.intent,
+          actionDescription: coachTurn.displayText,
+          spokenReply: coachTurn.spokenText,
+          provenance: coachTurn.provenance,
+        });
+        if (source === 'SPEECH_API') {
+          onOpenVoiceLog?.();
+        }
+        setVoiceResult({
+          title: `${coachTurn.matchedSource}`,
+          detail: coachTurn.displayText,
+          timestamp: Date.now(),
+          provenance: coachTurn.provenance,
+          structuredDiagnostic: coachTurn.structuredDiagnostic,
+        });
+        if (voiceNavEnabled) {
+          offlineVoiceAssistant.speak(coachTurn.spokenText, true);
         }
         return;
       }
@@ -692,11 +983,21 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
         category: 'DIAGNOSTIC',
         actionDescription: cleanSummary || 'Routed to offline diagnostic assistant',
         spokenReply: reply.answer,
+        provenance: 'CURATED_DIAGNOSTIC_DATABASE',
       });
       if (source === 'SPEECH_API') {
         onOpenVoiceLog?.();
       }
-      announceVoiceResult(`Offline AI: "${trimmed}"`, cleanSummary, reply.answer);
+      setVoiceResult({
+        title: `Offline AI: "${trimmed}"`,
+        detail: cleanSummary,
+        timestamp: Date.now(),
+        provenance: 'CURATED_DIAGNOSTIC_DATABASE',
+        structuredDiagnostic: coachTurn.structuredDiagnostic,
+      });
+      if (voiceNavEnabled) {
+        offlineVoiceAssistant.speak(reply.answer, true);
+      }
     },
     [
       pins,
@@ -726,6 +1027,11 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
       savedLogs,
       savedSessions,
       liveContext,
+      benchTelemetryForCoach,
+      activeTab,
+      voiceNavEnabled,
+      voiceState.language,
+      vehicleContext?.status,
       onOpenVoiceLog,
       onOpenDiagnosticWorkflow,
       onOpenLogicCheck,
@@ -779,6 +1085,31 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
     setVoiceNavEnabled((prev) => !prev);
   };
 
+  const handleToggleLanguage = () => {
+    const nextLang: BilingualLang = voiceState.language === 'EN' ? 'TL' : 'EN';
+    offlineVoiceAssistant.setLanguage(nextLang);
+  };
+
+  const handleConfirmPendingAction = () => {
+    const confirmed = offlineVoiceAssistant.confirmPendingAction();
+    if (!confirmed) return;
+    const msg =
+      voiceState.language === 'EN'
+        ? `Confirmed & executed: ${confirmed.rawCommand}`
+        : `Kumpirmado at isinagawa: ${confirmed.rawCommand}`;
+    announceVoiceResult('Confirmed Bench Action', msg, msg);
+  };
+
+  const handleCancelPendingAction = () => {
+    const cancelled = offlineVoiceAssistant.cancelPendingAction();
+    if (!cancelled) return;
+    const msg =
+      voiceState.language === 'EN'
+        ? `Cancelled pending command: ${cancelled.rawCommand}`
+        : `Kinansela ang command: ${cancelled.rawCommand}`;
+    announceVoiceResult('Cancelled Bench Action', msg, msg);
+  };
+
   const latestQueryExecutorRef = useRef(executeVoiceOrTextQuery);
   useEffect(() => {
     latestQueryExecutorRef.current = executeVoiceOrTextQuery;
@@ -817,7 +1148,8 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
       setIsExpanded(true);
       setVoiceResult({
         title: 'Browser SpeechRecognition Unavailable',
-        detail: 'Use Chrome, Edge, or Safari for microphone voice commands, or type a command below (e.g. "Connect pin 5 to ground", "Set multimeter to 20 volts").',
+        detail:
+          'Local Diagnostic Intelligence is 100% offline-ready, but Browser SpeechRecognition API is unavailable in this browser. Type a command or tap any quick chip below.',
         timestamp: Date.now(),
       });
       return;
@@ -842,18 +1174,67 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
       className="relative z-30 shrink-0 w-full"
     >
       {/* Upward-Anchored Notices & Quick Navigator Drawer (Never floats over instruments when closed) */}
-      {(voiceState.isListening || voiceState.error || (voiceNavEnabled && voiceResult) || isExpanded) && (
+      {(voiceState.isListening ||
+        voiceState.error ||
+        voiceState.pendingAction ||
+        (voiceNavEnabled && voiceResult) ||
+        isExpanded) && (
         <div className="absolute bottom-full left-0 right-0 mb-2 flex flex-col items-end gap-2 pointer-events-none z-40">
+          {voiceState.pendingAction && (
+            <div
+              role="alertdialog"
+              aria-label="Pending bench command confirmation"
+              data-testid="voice-pending-confirmation-bar"
+              className="pointer-events-auto w-full sm:w-[392px] hud-panel border-[#ffb020]/80 bg-[#171105]/95 rounded-xl px-3.5 py-2.5 shadow-2xl text-[11px]"
+            >
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span className="font-mono font-bold text-[#ffb020] flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 text-[#ffb020] shrink-0" />
+                  {voiceState.language === 'EN'
+                    ? 'Confirm State-Changing Action'
+                    : 'Kumpirmahin ang Bench Command'}
+                </span>
+                <span className="font-mono text-[9.5px] text-[#91a4bd]">
+                  {voiceState.language === 'EN' ? 'Say "Confirm" / "Cancel"' : 'Sabihin: "Oo" / "Cancel"'}
+                </span>
+              </div>
+              <p className="text-[#eaf3ff] font-mono text-[10.5px] leading-snug mb-2">
+                {voiceState.pendingAction.actionSummary}
+              </p>
+              <div className="flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  data-testid="voice-cancel-action-btn"
+                  onClick={handleCancelPendingAction}
+                  className="hw-btn px-2.5 py-1 rounded-lg border-[#ff4d62]/60 text-[#ff8594] font-mono text-[10px] inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <X className="w-3 h-3" />
+                  <span>{voiceState.language === 'EN' ? 'Cancel' : 'Kansela'}</span>
+                </button>
+                <button
+                  type="button"
+                  data-testid="voice-confirm-action-btn"
+                  onClick={handleConfirmPendingAction}
+                  className="hw-btn hw-btn-green px-2.5 py-1 rounded-lg font-mono font-bold text-[10px] inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <Check className="w-3 h-3" />
+                  <span>{voiceState.language === 'EN' ? 'Confirm & Execute' : 'Confirm / Ituloy'}</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           {voiceState.isListening && (
             <div
               role="status"
               aria-live="polite"
-              className="pointer-events-auto w-full sm:w-[368px] hud-panel border-[#ff4d62]/70 rounded-xl px-3.5 py-2.5 shadow-2xl text-[11px]"
+              className="pointer-events-auto w-full sm:w-[392px] hud-panel border-[#ff4d62]/70 rounded-xl px-3.5 py-2.5 shadow-2xl text-[11px]"
             >
               <div className="flex items-center justify-between gap-2 mb-1">
                 <span className="font-mono font-bold text-[#ff8594] flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#ff4d62] animate-ping" />
-                  Listening{voiceState.continuousMode ? ' (Continuous)' : ''}...
+                  Listening ({voiceState.language === 'TL' ? 'Taglish / fil-PH' : 'English / en-US'})
+                  {voiceState.continuousMode ? ' · Continuous' : ''}...
                 </span>
                 <button
                   type="button"
@@ -866,7 +1247,9 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
               <p className="text-[#eaf3ff] font-mono text-[10.5px] leading-snug">
                 {voiceState.interimTranscript
                   ? `"${voiceState.interimTranscript}"`
-                  : 'Say: "Connect pin 5 to ground" or "Set multimeter to 20 volts"'}
+                  : voiceState.language === 'TL'
+                  ? 'Say: "Check mo yung voltage sa Pin 5" or "Paano mag-test ng TPS?"'
+                  : 'Say: "How do I test the TPS?" or "Read meter"'}
               </p>
             </div>
           )}
@@ -874,7 +1257,7 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
           {voiceState.error && (
             <div
               role="alert"
-              className="pointer-events-auto w-full sm:w-[368px] hud-panel border-[#ffb020]/60 rounded-xl px-3.5 py-2.5 shadow-2xl text-[11px]"
+              className="pointer-events-auto w-full sm:w-[392px] hud-panel border-[#ffb020]/60 rounded-xl px-3.5 py-2.5 shadow-2xl text-[11px]"
             >
               <div className="flex items-center justify-between gap-2">
                 <span className="font-mono font-bold text-[#ffb020] text-[10.5px]">
@@ -897,14 +1280,35 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
             <div
               role="status"
               aria-live="polite"
-              className="pointer-events-auto w-full sm:w-[368px] hud-panel border-[#20d889]/55 rounded-xl px-3.5 py-2.5 shadow-2xl text-[11px]"
+              data-testid="floating-voice-result-card"
+              className={`pointer-events-auto w-full sm:w-[392px] hud-panel rounded-xl px-3.5 py-2.5 shadow-2xl text-[11px] ${
+                voiceResult.isSafetyAlert
+                  ? 'border-[#ff4d62]/80 bg-[#1e0b10]/95'
+                  : 'border-[#20d889]/55'
+              }`}
             >
               <div className="flex items-center justify-between gap-2 mb-1">
-                <span className="font-mono font-bold text-[#20d889] flex items-center gap-1.5 truncate">
-                  <Volume2 className="w-3.5 h-3.5 text-[#20d889] shrink-0" />
+                <span
+                  className={`font-mono font-bold flex items-center gap-1.5 truncate ${
+                    voiceResult.isSafetyAlert ? 'text-[#ff8594]' : 'text-[#20d889]'
+                  }`}
+                >
+                  {voiceResult.isSafetyAlert ? (
+                    <ShieldAlert className="w-3.5 h-3.5 text-[#ff4d62] shrink-0" />
+                  ) : (
+                    <Volume2 className="w-3.5 h-3.5 text-[#20d889] shrink-0" />
+                  )}
                   {voiceResult.title}
                 </span>
                 <div className="flex items-center gap-1 shrink-0">
+                  {voiceResult.provenance && (
+                    <span
+                      data-testid="voice-provenance-badge"
+                      className="px-1.5 py-0.5 rounded bg-[#0b1829] border border-[#203653] font-mono text-[8.5px] text-[#19c8f5]"
+                    >
+                      {voiceResult.provenance}
+                    </span>
+                  )}
                   {voiceState.isSpeaking && (
                     <button
                       type="button"
@@ -926,13 +1330,40 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
                 </div>
               </div>
               <p className="text-[#eaf3ff] font-sans leading-snug line-clamp-3">{voiceResult.detail}</p>
+              {voiceResult.structuredDiagnostic && (
+                <div
+                  data-testid="voice-structured-diagnostic-card"
+                  className="mt-2 pt-2 border-t border-[#203653]/80 space-y-1 text-[10px] font-mono text-[#d4e3f6]"
+                >
+                  <div>
+                    <span className="text-[#19c8f5] font-bold">Finding: </span>
+                    <span>{voiceResult.structuredDiagnostic.finding}</span>
+                  </div>
+                  <div>
+                    <span className="text-[#20d889] font-bold">Check: </span>
+                    <span>{voiceResult.structuredDiagnostic.check}</span>
+                  </div>
+                  <div>
+                    <span className="text-[#ffb020] font-bold">Expected: </span>
+                    <span>{voiceResult.structuredDiagnostic.expectedResult}</span>
+                  </div>
+                  <div>
+                    <span className="text-[#ff8594] font-bold">Safety: </span>
+                    <span>{voiceResult.structuredDiagnostic.safety}</span>
+                  </div>
+                  <div>
+                    <span className="text-[#a5b4fc] font-bold">Next step: </span>
+                    <span>{voiceResult.structuredDiagnostic.nextStep}</span>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
           {isExpanded && (
             <div
               aria-label="Quick Navigator Drawer"
-              className="pointer-events-auto w-full sm:w-[392px] hud-panel border-[#203653] rounded-xl p-3 shadow-2xl space-y-3 text-[11px]"
+              className="pointer-events-auto w-full sm:w-[408px] hud-panel border-[#203653] rounded-xl p-3 shadow-2xl space-y-3 text-[11px]"
             >
               {/* Container Move Mode & Quick Reorder */}
               <div className="space-y-2">
@@ -1022,16 +1453,61 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
                     );
                   })}
                 </div>
+
+                {/* Direct Workspace Module Navigation Bar */}
+                <div className="flex flex-wrap gap-1 pt-1">
+                  {(
+                    [
+                      { label: 'Bench Lab', tab: 'BENCH_LAB' as LabTab },
+                      { label: 'ECU Pinouts', tab: 'CONNECTOR_PINOUTS' as LabTab },
+                      { label: '3D Twin', tab: 'THREE_D_TWIN' as LabTab },
+                      { label: 'Wiring', tab: 'WIRING_DIAGRAM' as LabTab },
+                      { label: 'Scope', tab: 'OSCILLOSCOPE' as LabTab },
+                      { label: 'PCB Scan', tab: 'PCB_DIAGNOSTICS' as LabTab },
+                      { label: 'Repair KB', tab: 'REPAIR_GUIDES' as LabTab },
+                    ] as const
+                  ).map((mod) => (
+                    <button
+                      key={mod.tab}
+                      type="button"
+                      onClick={() => onNavigateTab(mod.tab)}
+                      className={`hw-btn px-2 py-0.5 rounded-md font-mono text-[9.5px] cursor-pointer ${
+                        activeTab === mod.tab
+                          ? 'border-[#19c8f5] text-[#19c8f5] font-bold'
+                          : 'text-[#91a4bd] hover:text-white'
+                      }`}
+                    >
+                      {mod.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Offline AI Voice Quick Actions & Command Input */}
               <div className="border-t border-[#203653]/80 pt-2.5 space-y-2">
                 <div className="flex flex-wrap items-center justify-between gap-1.5">
-                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#20d889] flex items-center gap-1.5">
-                    <Bot className="w-3.5 h-3.5" />
-                    Voice Bench Control
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#20d889] flex items-center gap-1.5">
+                      <Bot className="w-3.5 h-3.5" />
+                      Unified Voice AI
+                    </span>
+                    <span
+                      title="Local diagnostic brain works 100% offline. Browser Web Speech mic depends on browser/OS speech engine."
+                      className="px-1.5 py-0.5 rounded bg-[#081326] border border-[#203653] font-mono text-[8.5px] text-[#91a4bd]"
+                    >
+                      Offline Brain · {voiceState.hasSpeechRecognition ? 'Web Speech Mic' : 'Text Mode'}
+                    </span>
+                  </div>
                   <div className="flex items-center gap-1 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={handleToggleLanguage}
+                      title="Switch shared voice recognition & diagnostic reply language (Taglish TL / English EN)"
+                      className="hw-btn px-2 py-1 rounded-lg font-mono text-[9.5px] text-[#19c8f5] inline-flex items-center gap-1 cursor-pointer"
+                    >
+                      <Globe className="w-3 h-3" />
+                      <span>{voiceState.language === 'TL' ? 'TL Taglish' : 'EN English'}</span>
+                    </button>
                     {onOpenVoiceMacroLibrary && (
                       <button
                         type="button"
@@ -1085,11 +1561,23 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
 
                 <div className="flex flex-wrap gap-1.5">
                   {[
-                    { label: 'Pin 5 → GND', cmd: 'Connect pin 5 to ground' },
-                    { label: 'DMM 20V', cmd: 'Set multimeter to 20 volts' },
+                    {
+                      label: voiceState.language === 'TL' ? 'Check Pin 5 V' : 'Check Pin 5 V',
+                      cmd:
+                        voiceState.language === 'TL'
+                          ? 'Check mo yung voltage sa Pin 5'
+                          : 'What is the voltage on Pin 5?',
+                    },
+                    {
+                      label: voiceState.language === 'TL' ? 'Test TPS' : 'How to test TPS',
+                      cmd:
+                        voiceState.language === 'TL'
+                          ? 'Ano ang expected voltage ng TPS?'
+                          : 'How do I test the TPS?',
+                    },
                     { label: 'Read Meter', cmd: 'Read meter' },
                     { label: 'Black → GND', cmd: 'Attach black probe to ground' },
-                    { label: 'Oscilloscope', cmd: 'Open oscilloscope' },
+                    { label: 'ECU Pinouts', cmd: 'Open the ECU Pinouts' },
                   ].map((chip) => (
                     <button
                       key={chip.label}
@@ -1110,7 +1598,11 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
                     type="text"
                     value={commandInput}
                     onChange={(e) => setCommandInput(e.target.value)}
-                    placeholder='Say or type: "Connect pin 5 to ground"'
+                    placeholder={
+                      voiceState.language === 'TL'
+                        ? 'Say or type: "Check mo yung voltage sa Pin 5"'
+                        : 'Say or type: "How do I test the TPS?"'
+                    }
                     aria-label="Offline voice command input"
                     className="flex-1 min-w-0 min-h-[36px] bg-[#050a12] border border-[#203653] focus:border-[#19c8f5] rounded-lg px-2.5 py-1 text-[11px] text-[#eaf3ff] placeholder:text-[#6f87a6] focus:outline-none"
                   />
@@ -1185,6 +1677,17 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
         </div>
 
         <div className="flex items-center gap-1.5 flex-wrap lg:flex-nowrap shrink-0">
+          <button
+            type="button"
+            data-testid="floating-voice-lang-toggle"
+            onClick={handleToggleLanguage}
+            title="Toggle shared voice language between Taglish (TL) and English (EN)"
+            className="hw-btn min-h-[36px] lg:min-h-[30px] flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-mono font-bold text-[#19c8f5] whitespace-nowrap cursor-pointer"
+          >
+            <Globe className="w-3 h-3 shrink-0" />
+            <span>{voiceState.language}</span>
+          </button>
+
           <button
             type="button"
             data-testid="floating-voice-fab"

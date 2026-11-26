@@ -121,6 +121,52 @@ export interface DiagnosticStepCard {
   emphasisTone: 'danger' | 'info' | 'action';
 }
 
+export type KnowledgeVerificationClassification =
+  | 'VERIFIED_TECHNICAL_KNOWLEDGE'
+  | 'SOURCE_SUPPORTED_KNOWLEDGE'
+  | 'UNIVERSAL_TRAINER_KNOWLEDGE'
+  | 'GENERAL_DIAGNOSTIC_GUIDANCE'
+  | 'UNVERIFIED_AI_RESPONSE'
+  | 'CONFLICTING_INFORMATION'
+  | 'REJECTED_INFORMATION';
+
+export type KnowledgeTechnicalCategory =
+  | 'PINOUT'
+  | 'POWER_GROUND'
+  | 'SENSOR'
+  | 'ACTUATOR'
+  | 'CAN_BUS'
+  | 'DTC'
+  | 'GENERAL_BENCH';
+
+export type KnowledgeReviewStatus =
+  | 'APPROVED'
+  | 'AWAITING_REVIEW'
+  | 'CONFLICT_FLAGGED'
+  | 'REJECTED';
+
+export type KnowledgeSafetyClassification =
+  | 'SAFE_REFERENCE'
+  | 'CAUTION_VERIFY_MANUAL'
+  | 'SAFETY_CRITICAL_LOCKED';
+
+export type KnowledgeSyncStatus = 'LOCAL_ONLY' | 'SYNCED_CLOUD' | 'PENDING_SYNC';
+
+export interface KnowledgeEcuApplicability {
+  brandKey?: string;
+  modelName?: string;
+  connectorCode?: string;
+  isUniversalTrainer: boolean;
+}
+
+export interface KnowledgeApprovalHistoryEntry {
+  version: number;
+  status: KnowledgeReviewStatus;
+  classification: KnowledgeVerificationClassification;
+  timestamp: number;
+  note: string;
+}
+
 export interface AiDiagnosticResult {
   id: string;
   lang: BilingualLang;
@@ -136,6 +182,17 @@ export interface AiDiagnosticResult {
   attemptTrail: AiTierAttemptLog[];
   cachedLocally: boolean;
   servedFromInteractionCache?: boolean;
+  servedFromLocalKnowledgeDb?: boolean;
+  localKnowledgeRecordId?: string;
+  knowledgeClassification?: KnowledgeVerificationClassification;
+  evidenceSource?:
+    | 'PHYSICAL_INSTRUMENT'
+    | 'ELECTRICAL_SIMULATION'
+    | 'VERIFIED_OEM_DOCUMENTATION'
+    | 'UNIVERSAL_TRAINER_REFERENCE'
+    | 'LOCAL_TECHNICAL_KNOWLEDGE'
+    | 'UNVERIFIED_AI_RESPONSE';
+  evidenceStatus?: 'VALID' | 'STALE' | 'UNAVAILABLE' | 'UNRESOLVED' | 'UNVERIFIED';
   cacheHitCount?: number;
   benchSnapshotSummary: string;
   createdAt: number;
@@ -154,4 +211,29 @@ export interface VerifiedKnowledgeRecord {
   verificationStep: string;
   rawAnswer: string;
   savedAtMs: number;
+  /** Extended Master Specification fields (Sections 7, 8 & 10) */
+  originalQuestion?: string;
+  relatedQuestions?: string[];
+  technicalCategory?: KnowledgeTechnicalCategory;
+  ecuApplicability?: KnowledgeEcuApplicability;
+  evidenceSource?:
+    | 'PHYSICAL_INSTRUMENT'
+    | 'ELECTRICAL_SIMULATION'
+    | 'VERIFIED_OEM_DOCUMENTATION'
+    | 'UNIVERSAL_TRAINER_REFERENCE'
+    | 'LOCAL_TECHNICAL_KNOWLEDGE'
+    | 'UNVERIFIED_AI_RESPONSE';
+  evidenceStatus?: 'VALID' | 'STALE' | 'UNAVAILABLE' | 'UNRESOLVED' | 'UNVERIFIED';
+  references?: string[];
+  classification?: KnowledgeVerificationClassification;
+  reviewStatus?: KnowledgeReviewStatus;
+  safetyClassification?: KnowledgeSafetyClassification;
+  reviewedAtMs?: number;
+  version?: number;
+  approvalHistory?: KnowledgeApprovalHistoryEntry[];
+  conflictWithRecordId?: string;
+  conflictReason?: string;
+  syncStatus?: KnowledgeSyncStatus;
+  hitCount?: number;
 }
+

@@ -175,6 +175,12 @@ export const DEFAULT_WIRES: WireConnection[] = [
 
 export interface CircuitSolution {
   nodeVoltages: Record<string, number>;
+  /** Strictly null for floating or unresolved nodes — never silently coerced to a valid 0V measurement */
+  validatedNodeVoltages?: Record<string, number | null>;
+  nodeMeasurementStatuses?: Record<string, 'VALID' | 'UNRESOLVED' | 'UNSTABLE' | 'UNAVAILABLE'>;
+  unresolvedNodes?: string[];
+  solverStatus?: 'VALID' | 'UNRESOLVED' | 'UNSTABLE' | 'NON_FINITE';
+  solverWarnings?: string[];
   nodeResistances: Record<string, number>;
   wireCurrentsMa: Record<string, number>;
   supplyCurrentDrawAmps: number;
@@ -188,6 +194,8 @@ export interface CircuitSolution {
     isWarning: boolean;
     warningMessage?: string;
     shouldBeep: boolean;
+    evidenceStatus?: 'VALID' | 'UNRESOLVED' | 'UNSTABLE' | 'UNAVAILABLE';
+    evidenceSource?: 'ELECTRICAL_SIMULATION';
   };
 }
 
@@ -973,14 +981,28 @@ export function solveCircuit(
   let dmmWarning = false;
   let dmmWarningMsg = '';
   let dmmShouldBeep = false;
+  let dmmEvidenceStatus: 'VALID' | 'UNRESOLVED' | 'UNSTABLE' | 'UNAVAILABLE' = 'VALID';
 
   if (!multimeter.isPowered) {
     dmmDisplay = 'OFF';
     dmmUnit = '';
+    dmmEvidenceStatus = 'UNAVAILABLE';
   } else if (!redNode || !blackNode) {
     dmmDisplay = '---';
     dmmUnit = '';
+    dmmEvidenceStatus = 'UNAVAILABLE';
   } else {
+    const redKnown = redNode === '0' || redNode === 'gnd' || redNode === 'chassis-gnd' || redNode in nodeVoltages;
+    const blackKnown = blackNode === '0' || blackNode === 'gnd' || blackNode === 'chassis-gnd' || blackNode in nodeVoltages;
+    const redUnresolved = !redKnown || Boolean(solution.unresolvedNodes?.includes(redNode));
+    const blackUnresolved = !blackKnown || Boolean(solution.unresolvedNodes?.includes(blackNode));
+
+    if (redUnresolved || blackUnresolved) {
+      dmmEvidenceStatus = 'UNRESOLVED';
+    } else if (solution.solverStatus === 'UNSTABLE') {
+      dmmEvidenceStatus = 'UNSTABLE';
+    }
+
     const vRed = nodeVoltages[redNode] !== undefined ? nodeVoltages[redNode] : 0.0;
     const vBlack = nodeVoltages[blackNode] !== undefined ? nodeVoltages[blackNode] : 0.0;
     const deltaV = vRed - vBlack;
@@ -989,6 +1011,20 @@ export function solveCircuit(
 
     switch (multimeter.mode) {
       case 'V_DC': {
+        if (!redKnown || !blackKnown) {
+          dmmDisplay = 'UNRESOLVED';
+          dmmVal = NaN;
+          dmmUnit = 'V DC';
+          dmmWarning = true;
+          dmmWarningMsg = `UNRESOLVED NODE: Probe attached to unreferenced node (${!redKnown ? redNode : blackNode}). Cannot treat as a valid 0V measurement.`;
+          dmmEvidenceStatus = 'UNRESOLVED';
+          break;
+        }
+        if (redUnresolved || blackUnresolved) {
+          dmmWarning = true;
+          dmmWarningMsg = `FLOATING / UNRESOLVED NODE (${redUnresolved ? redNode : blackNode}): No DC ground reference path to KL31.`;
+          dmmEvidenceStatus = 'UNRESOLVED';
+        }
         dmmVal = deltaV;
         const absV = Math.abs(deltaV);
         if (absV >= 1000) {
@@ -1453,6 +1489,11 @@ export function solveCircuit(
 
   return {
     nodeVoltages,
+    validatedNodeVoltages: solution.validatedNodeVoltages,
+    nodeMeasurementStatuses: solution.nodeMeasurementStatuses,
+    unresolvedNodes: solution.unresolvedNodes,
+    solverStatus: solution.solverStatus,
+    solverWarnings: solution.warnings,
     nodeResistances,
     wireCurrentsMa,
     supplyCurrentDrawAmps: supplyCurrentDraw,
@@ -1466,6 +1507,8 @@ export function solveCircuit(
       isWarning: dmmWarning,
       warningMessage: dmmWarningMsg,
       shouldBeep: dmmShouldBeep,
+      evidenceStatus: dmmEvidenceStatus,
+      evidenceSource: 'ELECTRICAL_SIMULATION',
     },
   };
 }

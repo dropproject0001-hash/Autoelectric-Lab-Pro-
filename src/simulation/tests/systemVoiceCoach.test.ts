@@ -31,6 +31,10 @@ import {
   resetAiRouterStateForTests,
   setAiRouterOnlineTransportForTests,
 } from '../../services/ai/aiRouter';
+import {
+  evaluateVoiceCommandSafetyAndRisk,
+  offlineVoiceAssistant,
+} from '../../services/offlineVoiceService';
 import { DEFAULT_ECU_PINS } from '../../simulation/ecu/BenchCircuitSolver';
 import type { BenchTelemetry } from '../../types/aiAssistant';
 
@@ -583,7 +587,260 @@ async function main() {
     );
   });
 
-  console.log(`\n[System-Wide Hands-Free Natural Taglish Voice Coach Suite] PASSED ${passed}/9 assertions.\n`);
+  await runTest('10. Supports natural English, Filipino Taglish, and mixed technical sentences while preserving automotive tokens', () => {
+    const mem = createInitialVoiceSessionMemory(undefined, 'BENCH_LAB', 'TL');
+
+    // 1. "Check mo yung voltage sa Pin 5."
+    const checkPin5 = processVoiceCoachTurn({
+      transcript: 'Check mo yung voltage sa Pin 5.',
+      memory: mem,
+      activeTab: 'BENCH_LAB',
+      lang: 'TL',
+      pins: DEFAULT_ECU_PINS,
+      nodeVoltages: sampleVoltages,
+      telemetry: sampleTelemetry,
+    });
+    assert.equal(checkPin5.intent, 'LIVE_BENCH_STATUS');
+    assert.ok(checkPin5.spokenText.includes('VREF_5V') && checkPin5.spokenText.includes('4.98'));
+    assert.equal(checkPin5.provenance, 'SIMULATED_MNA_TELEMETRY');
+    assert.ok(checkPin5.structuredDiagnostic?.finding);
+
+    // 2. "Bakit zero volts yung reading?"
+    const zeroRead = processVoiceCoachTurn({
+      transcript: 'Bakit zero volts yung reading?',
+      memory: mem,
+      activeTab: 'BENCH_LAB',
+      lang: 'TL',
+      telemetry: {
+        ...sampleTelemetry,
+        psuEnabled: false,
+      },
+    });
+    assert.equal(zeroRead.intent, 'LIVE_BENCH_STATUS');
+    assert.ok(/power supply|psu/i.test(zeroRead.spokenText));
+    assert.equal(zeroRead.provenance, 'SIMULATED_MNA_TELEMETRY');
+
+    // 3. "Open the ECU Pinouts."
+    const openPinouts = processVoiceCoachTurn({
+      transcript: 'Open the ECU Pinouts.',
+      memory: mem,
+      activeTab: 'BENCH_LAB',
+      lang: 'EN',
+    });
+    assert.equal(openPinouts.intent, 'WORKSPACE_NAVIGATION');
+    assert.equal(openPinouts.navigationAction?.type, 'TAB');
+    if (openPinouts.navigationAction?.type === 'TAB') {
+      assert.equal(openPinouts.navigationAction.tab, 'ECU_PINOUT');
+    }
+
+    // 4. "Paki-check kung may short to ground."
+    const shortCheck = processVoiceCoachTurn({
+      transcript: 'Paki-check kung may short to ground.',
+      memory: mem,
+      activeTab: 'BENCH_LAB',
+      lang: 'TL',
+      telemetry: sampleTelemetry,
+    });
+    assert.equal(shortCheck.intent, 'LIVE_BENCH_STATUS');
+    assert.ok(shortCheck.spokenText.includes('SHORT_TO_GND') || shortCheck.spokenText.includes('P0122'));
+
+    // 5. "Ano ang expected voltage ng TPS?"
+    const tpsExpected = processVoiceCoachTurn({
+      transcript: 'Ano ang expected voltage ng TPS?',
+      memory: mem,
+      activeTab: 'BENCH_LAB',
+      lang: 'TL',
+      telemetry: sampleTelemetry,
+    });
+    assert.equal(tpsExpected.intent, 'EXPECTED_VALUE_QUERY');
+    assert.ok(tpsExpected.spokenText.includes('0.45') && tpsExpected.spokenText.includes('4.55'));
+    assert.equal(tpsExpected.updatedMemory.currentDiagnosticScenarioId, 'tps-p0122');
+
+    // 6. "Proceed to the next diagnostic step."
+    const nextStep = processVoiceCoachTurn({
+      transcript: 'Proceed to the next diagnostic step.',
+      memory: tpsExpected.updatedMemory,
+      activeTab: 'BENCH_LAB',
+      lang: 'EN',
+      telemetry: sampleTelemetry,
+    });
+    assert.equal(nextStep.intent, 'STEP_NAVIGATION');
+    assert.equal(nextStep.updatedMemory.currentDiagnosticScenarioId, 'tps-p0122');
+  });
+
+  await runTest('11. Maintains 4-turn conversational continuity ("How do I test the TPS?" -> "What should I measure?" -> "It\'s reading 0.04 volts." -> "What next?")', () => {
+    let mem = createInitialVoiceSessionMemory(undefined, 'BENCH_LAB', 'EN');
+
+    // Turn 1: Technician asks "How do I test the TPS?"
+    const turn1 = processVoiceCoachTurn({
+      transcript: 'How do I test the TPS?',
+      memory: mem,
+      activeTab: 'BENCH_LAB',
+      lang: 'EN',
+      telemetry: sampleTelemetry,
+    });
+    assert.equal(turn1.intent, 'DTC_OR_COMPONENT_LOOKUP');
+    assert.equal(turn1.updatedMemory.currentDiagnosticScenarioId, 'tps-p0122');
+    assert.ok(/Pin 5|VREF_5V|5V/i.test(turn1.spokenText));
+    assert.ok(turn1.structuredDiagnostic);
+    assert.ok(turn1.structuredDiagnostic.finding.length > 0);
+    assert.ok(turn1.structuredDiagnostic.check.length > 0);
+    assert.ok(turn1.structuredDiagnostic.expectedResult.length > 0);
+    assert.ok(turn1.structuredDiagnostic.safety.length > 0);
+    assert.ok(turn1.structuredDiagnostic.nextStep.length > 0);
+    mem = turn1.updatedMemory;
+
+    // Turn 2: Technician asks "What should I measure?"
+    const turn2 = processVoiceCoachTurn({
+      transcript: 'What should I measure?',
+      memory: mem,
+      activeTab: 'BENCH_LAB',
+      lang: 'EN',
+      telemetry: sampleTelemetry,
+    });
+    assert.equal(turn2.updatedMemory.currentDiagnosticScenarioId, 'tps-p0122');
+    assert.ok(/0\.45|4\.55|5\.0|Pin 7|Pin 5/i.test(turn2.spokenText), 'Must know question refers to active TPS test');
+    mem = turn2.updatedMemory;
+
+    // Turn 3: Technician states "It's reading 0.04 volts."
+    const turn3 = processVoiceCoachTurn({
+      transcript: "It's reading 0.04 volts.",
+      memory: mem,
+      activeTab: 'BENCH_LAB',
+      lang: 'EN',
+      telemetry: sampleTelemetry,
+    });
+    assert.equal(turn3.intent, 'READING_EVALUATION');
+    assert.equal(turn3.updatedMemory.currentDiagnosticScenarioId, 'tps-p0122');
+    assert.ok((turn3.updatedMemory.measurementHistory?.length ?? 0) >= 1, 'Must record 0.04V in measurementHistory');
+    assert.equal(turn3.updatedMemory.measurementHistory?.[0]?.value, 0.04);
+    assert.ok(/P0122|short|open|low/i.test(turn3.spokenText));
+    mem = turn3.updatedMemory;
+
+    // Turn 4: Technician asks "What next?"
+    const turn4 = processVoiceCoachTurn({
+      transcript: 'What next?',
+      memory: mem,
+      activeTab: 'BENCH_LAB',
+      lang: 'EN',
+      telemetry: sampleTelemetry,
+    });
+    assert.equal(turn4.updatedMemory.currentDiagnosticScenarioId, 'tps-p0122');
+    assert.ok(/disconnect|TPS|Pin 5|Pin 7|VREF/i.test(turn4.spokenText), 'Must continue the TPS procedure after 0.04V reading');
+    assert.ok(turn4.updatedMemory.lastFiveResponses.length === 4);
+  });
+
+  await runTest('12. Enforces electrical safety interlocks and requires confirmation for state-changing bench commands', () => {
+    // 1. Block applying 12V to Pin 5 / 5V VREF circuit
+    const unsafe5v = evaluateVoiceCommandSafetyAndRisk({
+      rawCommand: 'Apply 12 volts to Pin 5 VREF',
+      lang: 'EN',
+      powerSupply: {
+        isOutputEnabled: true,
+        voltageSetting: 12.6,
+        currentLimit: 2.0,
+        preset: '12V_BENCH',
+      },
+    });
+    assert.equal(unsafe5v.riskLevel, 'REJECTED_SAFETY');
+    assert.equal(unsafe5v.decision, 'REJECTED_SAFETY');
+    assert.ok(/5V|regulator|VREF/i.test(unsafe5v.safetyReason || ''));
+
+    // 2. Block switching multimeter to continuity or ohms while PSU output is ON
+    const unsafeContinuity = evaluateVoiceCommandSafetyAndRisk({
+      rawCommand: 'Set the multimeter to continuity',
+      lang: 'EN',
+      powerSupply: {
+        isOutputEnabled: true,
+        voltageSetting: 12.6,
+        currentLimit: 2.0,
+        preset: '12V_BENCH',
+      },
+    });
+    assert.equal(unsafeContinuity.riskLevel, 'REJECTED_SAFETY');
+    assert.equal(unsafeContinuity.decision, 'REJECTED_SAFETY');
+    assert.ok(/OFF|energized/i.test(unsafeContinuity.spokenReplyEN));
+
+    // When PSU is OFF, switching multimeter to continuity is allowed as a state-changing command requiring confirmation
+    const safeContinuityWhenOff = evaluateVoiceCommandSafetyAndRisk({
+      rawCommand: 'Set the multimeter to continuity',
+      lang: 'EN',
+      powerSupply: {
+        isOutputEnabled: false,
+        voltageSetting: 12.6,
+        currentLimit: 2.0,
+        preset: '12V_BENCH',
+      },
+    });
+    assert.equal(safeContinuityWhenOff.decision, 'REQUIRES_CONFIRMATION');
+
+    // 3. Block raising current limit while OCP is actively tripped
+    const unsafeOcpRaise = evaluateVoiceCommandSafetyAndRisk({
+      rawCommand: 'Set current limit to 5 amps',
+      lang: 'EN',
+      isSupplyCurrentTripped: true,
+      powerSupply: {
+        isOutputEnabled: true,
+        voltageSetting: 12.6,
+        currentLimit: 2.0,
+        preset: '12V_BENCH',
+      },
+    });
+    assert.equal(unsafeOcpRaise.riskLevel, 'REJECTED_SAFETY');
+    assert.equal(unsafeOcpRaise.decision, 'REJECTED_SAFETY');
+
+    // 4. Low-risk navigation command executes immediately without confirmation gate
+    const lowRiskNav = evaluateVoiceCommandSafetyAndRisk({
+      rawCommand: 'Open the ECU Pinouts',
+      lang: 'EN',
+    });
+    assert.equal(lowRiskNav.riskLevel, 'LOW_RISK');
+    assert.equal(lowRiskNav.decision, 'EXECUTE_IMMEDIATELY');
+
+    // 5. Pending action confirmation & cancellation queue on offlineVoiceAssistant
+    let executedCount = 0;
+    offlineVoiceAssistant.setPendingAction({
+      id: 'test-pending-1',
+      rawCommand: 'Connect pin 5 to ground',
+      actionSummary: 'Confirm bench state change: "Connect pin 5 to ground"',
+      riskReason: 'Modifies bench wiring',
+      source: 'TEXT_INPUT',
+      createdAtMs: Date.now(),
+      execute: () => {
+        executedCount += 1;
+      },
+    });
+    assert.ok(offlineVoiceAssistant.getPendingAction());
+    assert.equal(
+      evaluateVoiceCommandSafetyAndRisk({
+        rawCommand: 'Confirm',
+        hasPendingConfirmation: true,
+      }).decision,
+      'CONFIRMED_PENDING'
+    );
+    offlineVoiceAssistant.confirmPendingAction();
+    assert.equal(executedCount, 1);
+    assert.equal(offlineVoiceAssistant.getPendingAction(), null);
+    assert.equal(offlineVoiceAssistant.getSessionMemory().lastExecutedCommand, 'Connect pin 5 to ground');
+  });
+
+  await runTest('13. Unified offlineVoiceAssistant reports honest offline vs browser Web Speech capabilities and synchronizes EN/TL language', () => {
+    const caps = offlineVoiceAssistant.getCapabilities();
+    assert.equal(caps.localDiagnosticIntelligence, 'OFFLINE_READY');
+    assert.equal(caps.microphoneSpeechRecognition, 'BROWSER_WEB_SPEECH_ONLINE_OR_OS');
+    assert.equal(caps.textCommandFallback, 'ALWAYS_AVAILABLE_OFFLINE');
+    assert.equal(caps.onlineGeminiEnhancement, 'OPTIONAL_WHEN_ONLINE');
+
+    offlineVoiceAssistant.setLanguage('EN');
+    assert.equal(offlineVoiceAssistant.getLanguage(), 'EN');
+    assert.equal(offlineVoiceAssistant.getSessionMemory().lang, 'EN');
+
+    offlineVoiceAssistant.setLanguage('TL');
+    assert.equal(offlineVoiceAssistant.getLanguage(), 'TL');
+    assert.equal(offlineVoiceAssistant.getSessionMemory().lang, 'TL');
+  });
+
+  console.log(`\n[System-Wide Hands-Free Natural Taglish Voice Coach Suite] PASSED ${passed}/13 assertions.\n`);
 }
 
 main().catch((err) => {
