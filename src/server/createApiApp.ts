@@ -34,6 +34,10 @@ import {
   resolveAdjustedThinkingLevel,
   selectFreeTierRoutes,
 } from './services/geminiFreeTierRouter';
+import {
+  executeFreeTierGatewayPrompt,
+  getGatewayUsageSnapshot,
+} from './services/geminiFreeTierGateway';
 import { validateImagePayload } from './services/imagePayloadValidator';
 import {
   buildNhtsaProvenance,
@@ -1915,72 +1919,12 @@ Execute Google Search Grounding to retrieve ${
           });
         }
 
-        if (!hasConfiguredGeminiKeys()) {
-          return res.status(503).json({
-            error: 'Gemini API Key is not configured. Please check Settings > Secrets.',
-            code: 'MISSING_API_KEY',
-          });
-        }
-
-        const routePlan = selectFreeTierRoutes('gemini-omni-1.2-flash', []);
-        const selectedKey = routePlan.selected?.apiKey || process.env.GEMINI_API_KEY;
-        if (!selectedKey) {
-          return res.status(503).json({
-            error: 'Gemini API Key is not configured. Please check Settings > Secrets.',
-            code: 'MISSING_API_KEY',
-          });
-        }
-        const ai = getGeminiClientForApiKey(selectedKey);
-
-        const cleanBase64 = imageBase64
-          .replace(/^data:image\/[a-zA-Z0-9.+-]+;base64,/, '')
-          .trim();
-        const selectedAspect: '16:9' | '9:16' = aspectRatio === '9:16' ? '9:16' : '16:9';
-        const cleanPrompt =
-          typeof prompt === 'string' && prompt.trim()
-            ? prompt.trim().slice(0, 2000)
-            : 'Animate this automotive circuit component, showing dynamic electrical current and signal pulses flowing through the traces.';
-
-        const interaction = await ai.interactions.create(
-          {
-            model: 'gemini-omni-1.2-flash',
-            input: [
-              {
-                type: 'image',
-                mime_type: validation.normalizedMimeType,
-                data: cleanBase64,
-              },
-              {
-                type: 'text',
-                text: cleanPrompt,
-              },
-            ],
-            background: false,
-            store: false,
-            stream: false,
-            response_format: {
-              type: 'video',
-              aspect_ratio: selectedAspect,
-            },
-          },
-          { timeout: 300_000 }
-        );
-
-        const videoPart = interaction.output_video;
-        if (videoPart && videoPart.data) {
-          const videoDataUrl = `data:${videoPart.mime_type || 'video/mp4'};base64,${videoPart.data}`;
-          return res.json({
-            status: 'SUCCESS',
-            videoUrl: videoDataUrl,
-            aspectRatio: selectedAspect,
-            model: 'gemini-omni-1.2-flash',
-            timestamp: new Date().toISOString(),
-          });
-        }
-
-        return res.status(502).json({
-          error: 'Video generation completed without output video data.',
-          code: 'VIDEO_GENERATION_FAILED',
+        // Section 4: Paid billing-required video models are permanently prohibited
+        return res.status(403).json({
+          error:
+            'Paid video generation (gemini-omni-1.2-flash) is disabled under the Free-Tier AI Only policy. Local interactive simulation remains available.',
+          code: 'PAID_MODEL_PROHIBITED',
+          fallbackToLocalAi: true,
         });
       } catch (err: unknown) {
         const classified = classifyGeminiError(err);
@@ -2230,87 +2174,13 @@ Execute Google Search Grounding to retrieve ${
           };
         }
 
-        if (!hasConfiguredGeminiKeys()) {
-          return res.status(503).json({
-            error: 'Gemini API Key is not configured. Please check Settings > Secrets.',
-            code: 'MISSING_API_KEY',
-          });
-        }
-
-        const routePlan = selectFreeTierRoutes('gemini-nano-banana-2.1', []);
-        const selectedKey = routePlan.selected?.apiKey || process.env.GEMINI_API_KEY;
-        if (!selectedKey) {
-          return res.status(503).json({
-            error: 'Gemini API Key is not configured. Please check Settings > Secrets.',
-            code: 'MISSING_API_KEY',
-          });
-        }
-        const ai = getGeminiClientForApiKey(selectedKey);
-
-        const selectedAspect =
-          aspectRatio === '16:9' ? '16:9' : aspectRatio === '4:3' ? '4:3' : '1:1';
-        const parts: Array<
-          { inlineData: { mimeType: string; data: string } } | { text: string }
-        > = [];
-        if (validatedBaseImage) {
-          parts.push({
-            inlineData: {
-              mimeType: validatedBaseImage.mimeType,
-              data: validatedBaseImage.base64,
-            },
-          });
-        }
-        parts.push({ text: cleanPrompt });
-
-        const controller = new AbortController();
-        const timeoutHandle = setTimeout(() => controller.abort(), 90_000);
-        try {
-          const response = await Promise.race([
-            ai.models.generateContent({
-              model: 'gemini-nano-banana-2.1',
-              contents: { parts },
-              config: {
-                abortSignal: controller.signal,
-                imageConfig: {
-                  aspectRatio: selectedAspect,
-                  imageSize: '1K',
-                },
-              },
-            }),
-            new Promise<never>((_resolve, reject) => {
-              controller.signal.addEventListener(
-                'abort',
-                () => reject(new Error('Image generation timed out on gemini-nano-banana-2.1')),
-                { once: true }
-              );
-            }),
-          ]);
-
-          let generatedDataUrl: string | null = null;
-          const candidateParts = response.candidates?.[0]?.content?.parts ?? [];
-          for (const part of candidateParts) {
-            if (part.inlineData?.data) {
-              generatedDataUrl = `data:${part.inlineData.mimeType || 'image/png'};base64,${part.inlineData.data}`;
-              break;
-            }
-          }
-
-          if (generatedDataUrl) {
-            return res.json({
-              status: 'SUCCESS',
-              imageUrl: generatedDataUrl,
-              model: 'gemini-nano-banana-2.1',
-              timestamp: new Date().toISOString(),
-            });
-          }
-
-          return res.status(502).json({
-            error: 'Image generation completed without output image data.',
-            code: 'IMAGE_GENERATION_FAILED',
-          });
-        } finally {
-          clearTimeout(timeoutHandle);
-        }
+        // Section 4: Paid billing-required image generation models are permanently prohibited
+        return res.status(403).json({
+          error:
+            'Paid image generation (gemini-nano-banana-2.1) is disabled under the Free-Tier AI Only policy.',
+          code: 'PAID_MODEL_PROHIBITED',
+          fallbackToLocalAi: true,
+        });
       } catch (err: unknown) {
         const classified = classifyGeminiError(err);
         const raw = classified.rawMessage.toLowerCase();
@@ -2718,18 +2588,73 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
   app.get('/api/autoelectric/health', (_req, res) => {
     const provider = resolveImageAnalysisProviderName();
     const hasGeminiKey = hasConfiguredGeminiKeys();
-    const hasOpenAiKey = Boolean(process.env.OPENAI_API_KEY);
     res.json({
       status: 'ONLINE',
       authProtected: true,
       serviceMode: provider === 'manual' ? 'MANUAL_REVIEW' : 'AI_IMAGE_ANALYSIS',
-      hasApiKey: provider === 'openai' ? hasOpenAiKey : hasGeminiKey,
+      hasApiKey: hasGeminiKey,
       hasGeminiKey,
-      hasOpenAiKey,
       imageAnalysisProvider: provider,
+      freeTierGateway: {
+        cloudShutoffActive: getGatewayUsageSnapshot().cloudShutoffActive,
+        enabledAllowlistModels: getGatewayUsageSnapshot()
+          .allowlist.filter((m) => m.enabled)
+          .map((m) => m.modelId),
+      },
       timestamp: new Date().toISOString(),
     });
   });
+
+  // ==========================================================================
+  // M4: GEMINI FREE-TIER GATEWAY (Default-Disabled Allowlist, Quota Shutoff, Privacy Filter)
+  // ==========================================================================
+  app.post(
+    '/api/autoelectric/ai/gateway',
+    requireAuthOrTrialSession,
+    requireActiveLicense,
+    aiRateAndConcurrencyGuard,
+    smallJsonParser,
+    async (req: AuthenticatedRequest, res) => {
+      const { model, prompt, systemInstruction } = req.body || {};
+      if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
+        return res.status(400).json({
+          error: 'Missing or empty prompt.',
+          code: 'INVALID_REQUEST',
+        });
+      }
+      if (prompt.length > 6000) {
+        return res.status(400).json({
+          error: 'Prompt exceeds maximum length (6000 chars).',
+          code: 'INVALID_REQUEST',
+        });
+      }
+
+      const requestedModel = typeof model === 'string' ? model.trim() : '';
+      const result = await executeFreeTierGatewayPrompt({
+        modelId: requestedModel,
+        prompt,
+        systemInstruction:
+          typeof systemInstruction === 'string' ? systemInstruction.slice(0, 2000) : undefined,
+        actor: req.authUser?.uid || 'authenticated-user',
+      });
+
+      if (!result.ok) {
+        return res.status(result.statusCode).json({
+          error: result.error,
+          code: result.code,
+          fallbackToLocalAi: result.fallbackToLocalAi,
+        });
+      }
+
+      return res.json({
+        status: 'SUCCESS',
+        reply: result.reply,
+        model: result.model,
+        privacyRedactions: result.privacyRedactions ?? 0,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  );
 
   app.get(
     '/api/autoelectric/ai/quota-status',
