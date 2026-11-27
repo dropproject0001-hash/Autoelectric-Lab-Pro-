@@ -36,8 +36,19 @@ import {
 } from './services/geminiFreeTierRouter';
 import {
   executeFreeTierGatewayPrompt,
+  getGatewayAuditLog,
   getGatewayUsageSnapshot,
+  recordAdminKnowledgeAuditEvent,
+  recordCredentialRotationAudit,
+  setEmergencyCloudShutoff,
+  setFreeTierModelAllowlistState,
+  setGatewayQuotaLimits,
 } from './services/geminiFreeTierGateway';
+import {
+  approveAdaptiveKnowledgeItem,
+  listAdaptiveKnowledgeQueue,
+  rejectOrSupersedeAdaptiveItem,
+} from '../services/ai/adaptiveKnowledgeEngine';
 import { validateImagePayload } from './services/imagePayloadValidator';
 import {
   buildNhtsaProvenance,
@@ -2655,6 +2666,182 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
       });
     }
   );
+
+  // ==========================================================================
+  // M8: ADMIN AI CONTROL CENTER ROUTES (Strictly Backend-Enforced Admin Only)
+  // ==========================================================================
+  app.get('/api/autoelectric/admin/ai/overview', requirePinOrFirebaseAdmin, (_req, res) => {
+    const gateway = getGatewayUsageSnapshot();
+    const knowledgeQueue = listAdaptiveKnowledgeQueue();
+    const auditLog = getGatewayAuditLog();
+    return res.json({
+      status: 'SUCCESS',
+      gateway,
+      knowledgeAnalytics: {
+        totalCaptured: knowledgeQueue.all.length,
+        pendingReviewCount: knowledgeQueue.pendingReview.length,
+        conflictCount: knowledgeQueue.conflicts.length,
+        trustedCount: knowledgeQueue.trusted.length,
+      },
+      knowledgeQueue,
+      auditLog,
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  app.post(
+    '/api/autoelectric/admin/ai/allowlist',
+    requirePinOrFirebaseAdmin,
+    smallJsonParser,
+    (req: AuthenticatedRequest, res) => {
+      const { modelId, enabled, freeTierEligibilityVerified, verificationNotes } = req.body || {};
+      const result = setFreeTierModelAllowlistState({
+        modelId: typeof modelId === 'string' ? modelId : '',
+        enabled: Boolean(enabled),
+        freeTierEligibilityVerified: Boolean(freeTierEligibilityVerified),
+        verificationNotes: typeof verificationNotes === 'string' ? verificationNotes : undefined,
+        actor: resolveAdminActor(req),
+      });
+      if (!result.ok) {
+        return res.status(result.statusCode).json({
+          error: result.error,
+          code: result.statusCode === 403 ? 'ALLOWLIST_FORBIDDEN' : 'INVALID_REQUEST',
+        });
+      }
+      return res.json({
+        status: 'SUCCESS',
+        entry: result.entry,
+        gateway: getGatewayUsageSnapshot(),
+      });
+    }
+  );
+
+  app.post(
+    '/api/autoelectric/admin/ai/shutoff',
+    requirePinOrFirebaseAdmin,
+    smallJsonParser,
+    (req: AuthenticatedRequest, res) => {
+      const { active, reason } = req.body || {};
+      setEmergencyCloudShutoff({
+        active: Boolean(active),
+        reason: typeof reason === 'string' ? reason : undefined,
+        actor: resolveAdminActor(req),
+      });
+      return res.json({
+        status: 'SUCCESS',
+        gateway: getGatewayUsageSnapshot(),
+      });
+    }
+  );
+
+  app.post(
+    '/api/autoelectric/admin/ai/quota',
+    requirePinOrFirebaseAdmin,
+    smallJsonParser,
+    (req: AuthenticatedRequest, res) => {
+      const { dailyQuotaLimit, rpmLimit } = req.body || {};
+      setGatewayQuotaLimits({
+        dailyQuotaLimit: dailyQuotaLimit !== undefined ? Number(dailyQuotaLimit) : undefined,
+        rpmLimit: rpmLimit !== undefined ? Number(rpmLimit) : undefined,
+        actor: resolveAdminActor(req),
+      });
+      return res.json({
+        status: 'SUCCESS',
+        gateway: getGatewayUsageSnapshot(),
+      });
+    }
+  );
+
+  app.post(
+    '/api/autoelectric/admin/ai/credential-rotation',
+    requirePinOrFirebaseAdmin,
+    smallJsonParser,
+    (req: AuthenticatedRequest, res) => {
+      const { note, intervalDays } = req.body || {};
+      const rotation = recordCredentialRotationAudit({
+        actor: resolveAdminActor(req),
+        note: typeof note === 'string' ? note : '',
+        intervalDays: intervalDays !== undefined ? Number(intervalDays) : undefined,
+      });
+      return res.json({
+        status: 'SUCCESS',
+        credentialRotation: rotation,
+      });
+    }
+  );
+
+  app.post(
+    '/api/autoelectric/admin/ai/knowledge/approve',
+    requirePinOrFirebaseAdmin,
+    smallJsonParser,
+    (req: AuthenticatedRequest, res) => {
+      const { id, targetStatus, reviewNote } = req.body || {};
+      if (!id || typeof id !== 'string') {
+        return res.status(400).json({ error: 'Missing record id.', code: 'INVALID_REQUEST' });
+      }
+      const status = targetStatus === 'VERIFIED' ? 'VERIFIED' : 'TECHNICIAN_CONFIRMED';
+      const outcome = approveAdaptiveKnowledgeItem({
+        id,
+        targetStatus: status,
+        approverActor: resolveAdminActor(req),
+        approverRole: 'ADMIN',
+        reviewNote: typeof reviewNote === 'string' ? reviewNote : undefined,
+      });
+      if (!outcome.ok) {
+        return res.status(404).json({ error: outcome.error, code: 'RECORD_NOT_FOUND' });
+      }
+      recordAdminKnowledgeAuditEvent({
+        actor: resolveAdminActor(req),
+        action: 'KNOWLEDGE_APPROVED',
+        targetId: id,
+        detail: `Approved adaptive knowledge record as ${status}.`,
+      });
+      return res.json({
+        status: 'SUCCESS',
+        item: outcome.item,
+      });
+    }
+  );
+
+  app.post(
+    '/api/autoelectric/admin/ai/knowledge/reject',
+    requirePinOrFirebaseAdmin,
+    smallJsonParser,
+    (req: AuthenticatedRequest, res) => {
+      const { id, targetStatus, reason } = req.body || {};
+      if (!id || typeof id !== 'string') {
+        return res.status(400).json({ error: 'Missing record id.', code: 'INVALID_REQUEST' });
+      }
+      const status = targetStatus === 'SUPERSEDED' ? 'SUPERSEDED' : 'REJECTED';
+      const outcome = rejectOrSupersedeAdaptiveItem({
+        id,
+        targetStatus: status,
+        actor: resolveAdminActor(req),
+        reason: typeof reason === 'string' ? reason : 'Rejected by administrator.',
+      });
+      if (!outcome.ok) {
+        return res.status(404).json({ error: outcome.error, code: 'RECORD_NOT_FOUND' });
+      }
+      recordAdminKnowledgeAuditEvent({
+        actor: resolveAdminActor(req),
+        action: 'KNOWLEDGE_REJECTED',
+        targetId: id,
+        detail: `Marked adaptive knowledge record as ${status}.`,
+      });
+      return res.json({
+        status: 'SUCCESS',
+        item: outcome.item,
+      });
+    }
+  );
+
+  app.get('/api/autoelectric/admin/ai/audit-log', requirePinOrFirebaseAdmin, (_req, res) => {
+    return res.json({
+      status: 'SUCCESS',
+      auditLog: getGatewayAuditLog(),
+      timestamp: new Date().toISOString(),
+    });
+  });
 
   app.get(
     '/api/autoelectric/ai/quota-status',

@@ -365,6 +365,21 @@ export function recordCredentialRotationAudit(params: {
   return getGatewayUsageSnapshot().credentialRotation;
 }
 
+export function recordAdminKnowledgeAuditEvent(params: {
+  actor: string;
+  action: 'KNOWLEDGE_APPROVED' | 'KNOWLEDGE_REJECTED';
+  targetId: string;
+  detail: string;
+}): GatewayAuditEntry {
+  return appendAudit({
+    actor: params.actor,
+    action: params.action,
+    target: params.targetId,
+    outcome: 'UPDATED',
+    detail: params.detail,
+  });
+}
+
 export function getGatewayAuditLog(): GatewayAuditEntry[] {
   return [...auditLog];
 }
