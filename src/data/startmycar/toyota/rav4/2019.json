@@ -1,0 +1,2054 @@
+{
+  "schemaVersion": "1.0.0",
+  "provenance": {
+    "source": "StartMyCar",
+    "sourceUrl": "https://www.startmycar.com/toyota/rav4/info/fusebox/2019/5th-gen",
+    "crawledAt": "2026-11-27T10:11:19.669Z",
+    "zeroFabricationIntegrity": true,
+    "tier": "VERIFIED",
+    "deduplicationStatus": "NEW_RECORD"
+  },
+  "identification": {
+    "make": "Toyota",
+    "makeSlug": "toyota",
+    "model": "RAV4",
+    "modelSlug": "rav4",
+    "year": 2019,
+    "generation": "5th-gen",
+    "platformCode": null,
+    "marketRegions": [
+      "Global",
+      "North America",
+      "ASEAN"
+    ],
+    "enginesDetected": []
+  },
+  "powerDistribution": {
+    "totalBoxes": 3,
+    "totalCavities": 139,
+    "totalFuses": 114,
+    "totalRelays": 25,
+    "boxes": [
+      {
+        "boxIndex": 0,
+        "boxName": "Fuse Box of the Toyota RAV4",
+        "location": "OTHER",
+        "diagramUrl": "https://rewise-images.s3.amazonaws.com/originals/legos/fusebox-diagrams/659c2e01_toyota-rav4-2019-nafta-méxico.png",
+        "thumbnailUrl": "https://images.startmycar.com/legos/fusebox-thumbnails/fusebox-toyota-rav4-2019-genid-g5-0.webp",
+        "fuses": [
+          {
+            "id": "1",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(FOG RR) Rear fog lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_ANTINIEBLA(ubicacion=PARTE_TRASERA)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "2",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(ECU-B NO.2) Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "ECU"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "3",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(OBD) On-board diagnostics",
+            "circuitRole": "OBD2_DLC",
+            "relatedEntities": [
+              "SISTEMA_OBD"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "4",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(ECU-B NO.1) Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "ECU"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "5",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(DOME) Dome light and interior light",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_DE_HABITACULO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "6",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "(D/L) Power door lock system",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "7",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(TRUNK OPN) Power trunk lid opener",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "8",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(STOP) Stop lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_FRENO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "9",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "10",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(AM2) Starter system",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "ARRANQUE",
+              "SISTEMA_DE_IGNICION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "11",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(ECU-DCC NO2) Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "ECU"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "12",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(HAZ) Hazard light",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "13",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(ECU-DCC NO1) Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "ECU"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "14",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(PANEL) Instrument panel lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_TESTIGO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "15",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "(RADIO) Radio and audio system",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "ESTEREO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "16",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(TAIL) Tail lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUCES_TRASERAS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "17",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(DOOR R/R) Rear right door",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "PUERTA(ubicacion=LUGAR_CUADRANTE(lat=LADO_DERECHO,long=PARTE_TRASERA))",
+              "PORTON_TRASERO(ubicacion=LADO_DERECHO)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "18",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(DOOR F/L) Front left door lock",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "CERRADURA_DE_PUERTA(ubicacion=LUGAR_CUADRANTE(lat=LADO_IZQUIERDO,long=PARTE_DELANTERA))",
+              "CERRADURA(of=PUERTA(ubicacion=LUGAR_CUADRANTE(lat=LADO_IZQUIERDO,long=PARTE_DELANTERA)))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "19",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(S-HORN) Horn / anti-theft deterrent",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "BOCINA",
+              "INMOVILIZADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "20",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(DOOR F/R) Front right door",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "PUERTA(ubicacion=LUGAR_CUADRANTE(lat=LADO_DERECHO,long=PARTE_DELANTERA))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "21",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(STRG LOOK) Steering lock",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "22",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "(P/OUTLET NO.1) Cigar lighter / power outlet",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "ENCENDEDOR",
+              "TOMA_12V"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "23",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(DCM) Data communication module (telematics system)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "24",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(SFT LOCK-ACC) AT Shift lock control system",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "25",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(ECU-ACC) Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "ECU"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "26",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(WASHER) Windshield washer",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "LIMPIA_PARABRISAS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "27",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(ECU-IG1 NO.3) Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "ECU"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "28",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "29",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(EPS-IG1) Electric power steering",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "30",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(ECU-IG1 NO.4) Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "ECU"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "31",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(A/BAG-IG2) Airbag",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [
+              "AIRBAG"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "32",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(BKUP LP) Backup lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_RETROCESO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "33",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(METER-IG2) Instrument cluster",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "TABLERO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "34",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(ECU-IG1 NO.2) Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "ECU"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "35",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(ECU-IG2 NO.3) Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "ECU"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "36",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(ECU-IG1 NO.1) Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "ECU"
+            ],
+            "notUsed": false
+          }
+        ],
+        "activeEcuAndSensors": {
+          "ecuFuses": [
+            {
+              "id": "2",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(ECU-B NO.2) Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "ECU"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "4",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "(ECU-B NO.1) Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "ECU"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "11",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(ECU-DCC NO2) Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "ECU"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "13",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "(ECU-DCC NO1) Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "ECU"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "25",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "(ECU-ACC) Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "ECU"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "27",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 7.5,
+              "description": "(ECU-IG1 NO.3) Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "ECU"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "30",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(ECU-IG1 NO.4) Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "ECU"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "34",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 7.5,
+              "description": "(ECU-IG1 NO.2) Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "ECU"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "35",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "(ECU-IG2 NO.3) Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "ECU"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "36",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "(ECU-IG1 NO.1) Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "ECU"
+              ],
+              "notUsed": false
+            }
+          ],
+          "sensorPowerFuses": [],
+          "obdDlcFuses": [
+            {
+              "id": "3",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 7.5,
+              "description": "(OBD) On-board diagnostics",
+              "circuitRole": "OBD2_DLC",
+              "relatedEntities": [
+                "SISTEMA_OBD"
+              ],
+              "notUsed": false
+            }
+          ],
+          "ignitionFuses": [
+            {
+              "id": "10",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 7.5,
+              "description": "(AM2) Starter system",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "ARRANQUE",
+                "SISTEMA_DE_IGNICION"
+              ],
+              "notUsed": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 1,
+        "boxName": "Engine Fuse Box (Left Side)",
+        "location": "ENGINE_BAY",
+        "diagramUrl": "https://rewise-images.s3.amazonaws.com/originals/legos/fusebox-diagrams/ed3d47ca_toyota-rav4-2020.jpg",
+        "thumbnailUrl": "https://images.startmycar.com/legos/fusebox-thumbnails/fusebox-toyota-rav4-2019-genid-g5-1.webp",
+        "fuses": [
+          {
+            "id": "1",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(USB2) USB charger",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "2",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(H-LP HI LH) Left-hand headlight high beam",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "3",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(H-LP HI RH) Right-hand headlight high beam",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "4",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 30,
+            "description": "(DEF) Rear window defogger",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "DESEMPANADOR_TRASERO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "5",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 30,
+            "description": "(PBD) Power back door",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "6",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "NOISE FILTER",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "7",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(D-DBL LCK) Door double locking",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "8",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 30,
+            "description": "(S/HTR MAIN) Seat heater",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "9",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 30,
+            "description": "(4WD) All wheel drive system",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "10",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(FOG FR) Front fog lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_ANTINIEBLA(ubicacion=PARTE_DELANTERA)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "11",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(P/OUTLET NO.2) Cigar lighter / power outlet",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "ENCENDEDOR",
+              "TOMA_12V"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "12",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(DRL) Daytime running lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUCES_CIRCULACION_DIURNA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "13",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 30,
+            "description": "(TOWING) Trailer lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUCES_DELANTERAS(of=REMOLQUE)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "14",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 30,
+            "description": "(H-LP CLN) Headlight cleaner",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LAVA_FAROS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "15",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 50,
+            "description": "(HTR) Air conditioning system",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "AIRE_ACONDICIONADO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "16",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(AMP. NO.2) Audio system",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "ESTEREO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "17",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(H-LP RH) Right-hand headlight",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUCES_DELANTERAS(ubicacion=LADO_DERECHO)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "18",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(AMP NO.1) Audio system",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "ESTEREO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "19",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(EFI-MAIN NO.4) Multiport fuel injection system",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "SISTEMA_DE_INYECCION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "20",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(H-LP LH) Left-hand headlight",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUCES_DELANTERAS(ubicacion=LADO_IZQUIERDO)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "21",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "VVT",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [
+              "TECNOLOGIA_VVT"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "22",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(BATT-S) Battery and charging system",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "PROP_CARGA",
+              "ALTERNADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "23",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "D INJ",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "24",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "25",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(EFI-MAIN NO.2) Multiport fuel injection system",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "SISTEMA_DE_INYECCION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "26",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(HORN) Horn",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "BOCINA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "27",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(EFI-MAIN NO.1) Multiport fuel injection system",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "SISTEMA_DE_INYECCION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "28",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(IG2 MAIN) Protects several circuits",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "29",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 30,
+            "description": "DC CUT",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "30",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 30,
+            "description": "(TOWING-B) Trailer lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUCES_DELANTERAS(of=REMOLQUE)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "31",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 30,
+            "description": "(ST NO.2) Starter system",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "ARRANQUE",
+              "SISTEMA_DE_IGNICION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "32",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 30,
+            "description": "(EFI-MAIN NO.3) Multiport fuel injection system",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "SISTEMA_DE_INYECCION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "33",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 30,
+            "description": "(ST NO.1) Starter system",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "ARRANQUE",
+              "SISTEMA_DE_IGNICION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "34",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(MIR HTR) Mirror heater",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "35",
+            "type": "fuse",
+            "format": "50-30-50",
+            "amp": 50,
+            "description": "(BBC NO.1) Stop & Start system",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "36",
+            "type": "fuse",
+            "format": "50-30-50",
+            "amp": 30,
+            "description": "(WIPER) Wipers",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "LIMPIA_PARABRISAS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "37",
+            "type": "fuse",
+            "format": "50-30-50",
+            "amp": 50,
+            "description": "(BBC NO.2) Stop & Start system",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "38",
+            "type": "fuse",
+            "format": "50-30-30",
+            "amp": 50,
+            "description": "(ABS NO.1) Anti-lock braking system",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [
+              "SISTEMA_ABS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "39",
+            "type": "fuse",
+            "format": "50-30-30",
+            "amp": 50,
+            "description": "(ABS NO.2) Anti-lock braking system",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [
+              "SISTEMA_ABS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "40",
+            "type": "fuse",
+            "format": "50-30-30",
+            "amp": 50,
+            "description": "(J/B-B) Junction box bus",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "41",
+            "type": "fuse-block",
+            "format": "honda-8",
+            "amp": 80,
+            "description": "(EPS) Electric power steering",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "42",
+            "type": "fuse-block",
+            "format": "honda-8",
+            "amp": 60,
+            "description": "R/B NO.1",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "43",
+            "type": "fuse-block",
+            "format": "honda-8",
+            "amp": 120,
+            "description": "(ALT) Battery and charging system",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "PROP_CARGA",
+              "ALTERNADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "44",
+            "type": "fuse-block",
+            "format": "honda-8",
+            "amp": 60,
+            "description": "(FAN NO.1) Electric cooling fan",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "VENTILADOR_RADIADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "45",
+            "type": "fuse-block",
+            "format": "honda-8",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "46",
+            "type": "fuse-block",
+            "format": "honda-8",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "47",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(INJ) Fuel injectors",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "INYECTOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "48",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(ECU IG2 NO2) Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "ECU"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "49",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(ECU IG2 NO.1) Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "ECU"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "50",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(EFI2 NO.2) Multiport fuel injection system",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "SISTEMA_DE_INYECCION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "51",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(EFI NO.1) Multiport fuel injection system",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "SISTEMA_DE_INYECCION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "52",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(EFI NO.2) Multiport fuel injection system",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "SISTEMA_DE_INYECCION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "53",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "54",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(WIPER) Wipers",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "LIMPIA_PARABRISAS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "55",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(DIM) Instrument panel lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_TESTIGO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "56",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "D INJ",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "57",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(DRL) Daytime running lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUCES_CIRCULACION_DIURNA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "58",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(EFI-MAIN NO. 1) Multiport fuel injection system",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "SISTEMA_DE_INYECCION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "59",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(HORN) Horn",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "BOCINA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "60",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(H-LP RH) Right-hand headlight",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUCES_DELANTERAS(ubicacion=LADO_DERECHO)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "61",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(ST NO.2) Starter system",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "ARRANQUE",
+              "SISTEMA_DE_IGNICION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "62",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(H-LP LH) Left-hand headlight",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUCES_DELANTERAS(ubicacion=LADO_IZQUIERDO)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "63",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "VVT",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [
+              "TECNOLOGIA_VVT"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "64",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(IG2 NO.1) Protects several circuits",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "65",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(ST NO.1) Starter system",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "ARRANQUE",
+              "SISTEMA_DE_IGNICION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "66",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(FOG FR) Front fog lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_ANTINIEBLA(ubicacion=PARTE_DELANTERA)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "67",
+            "type": "relay",
+            "format": "full",
+            "amp": null,
+            "description": "(DEF) Rear window defogger",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "DESEMPANADOR_TRASERO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "68",
+            "type": "relay",
+            "format": "full",
+            "amp": null,
+            "description": "(EFI-MAIN NO.3) Multiport fuel injection system",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "SISTEMA_DE_INYECCION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "69",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(USB1) USB charger",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          }
+        ],
+        "activeEcuAndSensors": {
+          "ecuFuses": [
+            {
+              "id": "19",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(EFI-MAIN NO.4) Multiport fuel injection system",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "SISTEMA_DE_INYECCION"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "23",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 20,
+              "description": "D INJ",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "25",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 20,
+              "description": "(EFI-MAIN NO.2) Multiport fuel injection system",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "SISTEMA_DE_INYECCION"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "27",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 20,
+              "description": "(EFI-MAIN NO.1) Multiport fuel injection system",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "SISTEMA_DE_INYECCION"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "32",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 30,
+              "description": "(EFI-MAIN NO.3) Multiport fuel injection system",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "SISTEMA_DE_INYECCION"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "48",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(ECU IG2 NO2) Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "ECU"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "49",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(ECU IG2 NO.1) Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "ECU"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "50",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(EFI2 NO.2) Multiport fuel injection system",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "SISTEMA_DE_INYECCION"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "51",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(EFI NO.1) Multiport fuel injection system",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "SISTEMA_DE_INYECCION"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "52",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 7.5,
+              "description": "(EFI NO.2) Multiport fuel injection system",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "SISTEMA_DE_INYECCION"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "56",
+              "type": "relay",
+              "format": "half",
+              "amp": null,
+              "description": "D INJ",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "58",
+              "type": "relay",
+              "format": "half",
+              "amp": null,
+              "description": "(EFI-MAIN NO. 1) Multiport fuel injection system",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "SISTEMA_DE_INYECCION"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "68",
+              "type": "relay",
+              "format": "full",
+              "amp": null,
+              "description": "(EFI-MAIN NO.3) Multiport fuel injection system",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "SISTEMA_DE_INYECCION"
+              ],
+              "notUsed": false
+            }
+          ],
+          "sensorPowerFuses": [
+            {
+              "id": "21",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 20,
+              "description": "VVT",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [
+                "TECNOLOGIA_VVT"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "63",
+              "type": "relay",
+              "format": "half",
+              "amp": null,
+              "description": "VVT",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [
+                "TECNOLOGIA_VVT"
+              ],
+              "notUsed": false
+            }
+          ],
+          "obdDlcFuses": [],
+          "ignitionFuses": [
+            {
+              "id": "31",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 30,
+              "description": "(ST NO.2) Starter system",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "ARRANQUE",
+                "SISTEMA_DE_IGNICION"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "33",
+              "type": "fuse",
+              "format": "cartridge-j",
+              "amp": 30,
+              "description": "(ST NO.1) Starter system",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "ARRANQUE",
+                "SISTEMA_DE_IGNICION"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "35",
+              "type": "fuse",
+              "format": "50-30-50",
+              "amp": 50,
+              "description": "(BBC NO.1) Stop & Start system",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "37",
+              "type": "fuse",
+              "format": "50-30-50",
+              "amp": 50,
+              "description": "(BBC NO.2) Stop & Start system",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "61",
+              "type": "relay",
+              "format": "half",
+              "amp": null,
+              "description": "(ST NO.2) Starter system",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "ARRANQUE",
+                "SISTEMA_DE_IGNICION"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "65",
+              "type": "relay",
+              "format": "half",
+              "amp": null,
+              "description": "(ST NO.1) Starter system",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "ARRANQUE",
+                "SISTEMA_DE_IGNICION"
+              ],
+              "notUsed": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 2,
+        "boxName": "Engine Fuse Box (Right Side)",
+        "location": "ENGINE_BAY",
+        "diagramUrl": "https://rewise-images.s3.amazonaws.com/originals/legos/fusebox-diagrams/12a8d775_toyota-rav4-2020.jpg",
+        "thumbnailUrl": "https://images.startmycar.com/legos/fusebox-thumbnails/fusebox-toyota-rav4-2019-genid-g5-2.webp",
+        "fuses": [
+          {
+            "id": "1",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "2",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "3",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "4",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "5",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(MIR HTR) Mirror heater",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "6",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "7",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 30,
+            "description": "(TOWING-B) Trailer lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUCES_DELANTERAS(of=REMOLQUE)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "8",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "9",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "10",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "11",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "12",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "13",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(STRG HTR) Heated steering wheel",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "14",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 30,
+            "description": "(S/HTR MAIN) Seat heater",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "15",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "WASH NZL HTR",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "16",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 30,
+            "description": "(TOWING) Trailer lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUCES_DELANTERAS(of=REMOLQUE)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "17",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "S-HTR RR",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "18",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "19",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "(DEICER) Deicer or defroster",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "20",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "(S/HTR F/R) Seat heater",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "21",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "(S/HTR F/L) Front seat heater",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "ASIENTO_TERMICO(ubicacion=PARTE_DELANTERA)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "22",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 30,
+            "description": "(H-LP CLN) Headlight cleaner",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LAVA_FAROS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "23",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 50,
+            "description": "HWD NO.2",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "24",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 30,
+            "description": "(PBD) Power back door",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "25",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 50,
+            "description": "HWD NO.1",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R1",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "MIR MTR NO.1",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R2",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "MIR MTR NO.2",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R3",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "WASH NZL HTR",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R4",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(H-LP CLN) Headlight cleaner",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LAVA_FAROS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "R5",
+            "type": "relay",
+            "format": "full",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R6",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R7",
+            "type": "relay",
+            "format": "full",
+            "amp": null,
+            "description": "HWD NO.1",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R8",
+            "type": "relay",
+            "format": "full",
+            "amp": null,
+            "description": "HWD NO.2",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R9",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "DEICER/ HWD NO.3",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          }
+        ],
+        "activeEcuAndSensors": {
+          "ecuFuses": [],
+          "sensorPowerFuses": [],
+          "obdDlcFuses": [],
+          "ignitionFuses": []
+        }
+      }
+    ]
+  },
+  "ecuAndSensorCircuits": {
+    "hasDedicatedEcmFeed": true,
+    "hasObdDlcFeed": true,
+    "hasFuelPumpRelay": false,
+    "hasSensorVrefFeed": true,
+    "circuitHighlights": [
+      "Dedicated ECM / Engine Control Power Feeds",
+      "OBD-II DLC Diagnostic Pin 16 Fused Power Feed",
+      "Sensor Reference Rails & VVT / O2 Actuator Fuses"
+    ]
+  },
+  "offlineIngestionReady": true
+}

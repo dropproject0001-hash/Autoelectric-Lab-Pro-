@@ -1,0 +1,154 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-11-27T10:11:24.458Z",
+  "totalVehicles": 14,
+  "totalFusesAndRelays": 1790,
+  "tierSummary": {
+    "verified": 12,
+    "communityUnverified": 2,
+    "lowRatingRestricted": 0
+  },
+  "brands": [
+    {
+      "brand": "Toyota",
+      "makeSlug": "toyota",
+      "models": [
+        {
+          "model": "Corolla",
+          "modelSlug": "corolla",
+          "years": [
+            2020
+          ],
+          "filePathTemplate": "src/data/startmycar/toyota/corolla/{year}.json"
+        },
+        {
+          "model": "Hilux",
+          "modelSlug": "hilux",
+          "years": [
+            2019
+          ],
+          "filePathTemplate": "src/data/startmycar/toyota/hilux/{year}.json"
+        },
+        {
+          "model": "Camry",
+          "modelSlug": "camry",
+          "years": [
+            2020
+          ],
+          "filePathTemplate": "src/data/startmycar/toyota/camry/{year}.json"
+        },
+        {
+          "model": "RAV4",
+          "modelSlug": "rav4",
+          "years": [
+            2019
+          ],
+          "filePathTemplate": "src/data/startmycar/toyota/rav4/{year}.json"
+        }
+      ]
+    },
+    {
+      "brand": "Ford",
+      "makeSlug": "ford",
+      "models": [
+        {
+          "model": "Ranger",
+          "modelSlug": "ranger",
+          "years": [
+            2019
+          ],
+          "filePathTemplate": "src/data/startmycar/ford/ranger/{year}.json"
+        },
+        {
+          "model": "F-150",
+          "modelSlug": "f-150",
+          "years": [
+            2016
+          ],
+          "filePathTemplate": "src/data/startmycar/ford/f-150/{year}.json"
+        }
+      ]
+    },
+    {
+      "brand": "Nissan",
+      "makeSlug": "nissan",
+      "models": [
+        {
+          "model": "Sentra",
+          "modelSlug": "sentra",
+          "years": [
+            2018,
+            2016
+          ],
+          "filePathTemplate": "src/data/startmycar/nissan/sentra/{year}.json"
+        },
+        {
+          "model": "Navara",
+          "modelSlug": "navara",
+          "years": [
+            2020
+          ],
+          "filePathTemplate": "src/data/startmycar/nissan/navara/{year}.json"
+        }
+      ]
+    },
+    {
+      "brand": "Honda",
+      "makeSlug": "honda",
+      "models": [
+        {
+          "model": "Civic",
+          "modelSlug": "civic",
+          "years": [
+            2018
+          ],
+          "filePathTemplate": "src/data/startmycar/honda/civic/{year}.json"
+        },
+        {
+          "model": "CR-V",
+          "modelSlug": "cr-v",
+          "years": [
+            2019
+          ],
+          "filePathTemplate": "src/data/startmycar/honda/cr-v/{year}.json"
+        }
+      ]
+    },
+    {
+      "brand": "Isuzu",
+      "makeSlug": "isuzu",
+      "models": [
+        {
+          "model": "D-Max",
+          "modelSlug": "d-max",
+          "years": [
+            2020
+          ],
+          "filePathTemplate": "src/data/startmycar/isuzu/d-max/{year}.json"
+        }
+      ]
+    },
+    {
+      "brand": "Suzuki",
+      "makeSlug": "suzuki",
+      "models": [
+        {
+          "model": "Swift",
+          "modelSlug": "swift",
+          "years": [
+            2018
+          ],
+          "filePathTemplate": "src/data/startmycar/suzuki/swift/{year}.json"
+        },
+        {
+          "model": "Jimny",
+          "modelSlug": "jimny",
+          "years": [
+            2020
+          ],
+          "filePathTemplate": "src/data/startmycar/suzuki/jimny/{year}.json"
+        }
+      ]
+    }
+  ]
+}

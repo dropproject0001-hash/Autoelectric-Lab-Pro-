@@ -1,0 +1,2251 @@
+{
+  "schemaVersion": "1.0.0",
+  "provenance": {
+    "source": "StartMyCar",
+    "sourceUrl": "https://www.startmycar.com/ford/f-150/info/fusebox/2016",
+    "crawledAt": "2026-11-27T10:11:20.572Z",
+    "zeroFabricationIntegrity": true,
+    "tier": "VERIFIED",
+    "deduplicationStatus": "AUGMENTED_EXISTING",
+    "matchedRepositoryRecordId": "preset-ford-f-150-2016"
+  },
+  "identification": {
+    "make": "Ford",
+    "makeSlug": "ford",
+    "model": "F-150",
+    "modelSlug": "f-150",
+    "year": 2016,
+    "generation": null,
+    "platformCode": null,
+    "marketRegions": [
+      "Global",
+      "North America",
+      "ASEAN"
+    ],
+    "enginesDetected": []
+  },
+  "powerDistribution": {
+    "totalBoxes": 2,
+    "totalCavities": 168,
+    "totalFuses": 140,
+    "totalRelays": 28,
+    "boxes": [
+      {
+        "boxIndex": 0,
+        "boxName": "Power Distribution Box",
+        "location": "OTHER",
+        "diagramUrl": "https://opinautos-images.s3.amazonaws.com/legos/fusebox-diagrams/d54f69a5_ford-f-150-2015.png",
+        "thumbnailUrl": "https://images.startmycar.com/legos/fusebox-thumbnails/fusebox-ford-f-150-2016-genid-g13-0.webp",
+        "fuses": [
+          {
+            "id": "1",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "2",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "3",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "4",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Telescoping side-view mirror.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "5",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 40,
+            "description": "Rear window defroster.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "DESEMPANADOR_TRASERO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "6",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "7",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "8",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Telescoping side-view mirror.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "9",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "10",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "11",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 60,
+            "description": "Automatic brake system motor.",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "12",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 50,
+            "description": "Body control module 1.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "MODULO_CARROCERIA",
+              "CARROCERIA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "13",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 60,
+            "description": "Body control module 2.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "MODULO_CARROCERIA",
+              "CARROCERIA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "14",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "Amplifier.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "AMPLIFICADOR",
+              "AMPLIFICADOR_EQUIPO_SONIDO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "15",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "4x4.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "DOBLE_TRACCION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "16",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Spot light module.",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_LECTURA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "17",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "Heated seat.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "CALEFACCION_DE_ASIENTO",
+              "CALEFACCION_DE_ASIENTO(of=ASIENTO)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "18",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Steering-column lock.",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [
+              "BLOQUEO_COLUMAN_DIRECCION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "19",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Power seats.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "ASIENTO_ELECTRICO",
+              "COMANDO_AJUSTE_ASIENTO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "20",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "Snow plow. Rear heated seats.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "21A",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "21B",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "22",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 30,
+            "description": "Windshield wiper motor.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "MOTOR_IMPULSOR(of=LIMPIA_PARABRISAS)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "23",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 15,
+            "description": "Rain sensor.",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [
+              "SENSOR_DE_LLUVIA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "24",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 25,
+            "description": "Series fan feed.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "25",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "26",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 30,
+            "description": "Driver seat motors.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "27",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 30,
+            "description": "Passenger power seat.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "ASIENTO_ELECTRICO(ubicacion=LADO_DERECHO)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "28",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 30,
+            "description": "Climate controlled seat.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "CALEFACCION_DE_ASIENTO",
+              "CALEFACCION_DE_ASIENTO(of=ASIENTO)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "29",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "30",
+            "type": "relay",
+            "format": "ultra",
+            "amp": null,
+            "description": "Air conditioner clutch relay.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "RELAY(protects=CLUTCH_AIRE_ACONDICIONADO)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "31",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "32",
+            "type": "relay",
+            "format": "ultra",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "33",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 50,
+            "description": "Electric fan 3.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "VENTILADOR_RADIADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "34",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 25,
+            "description": "Trailer tow park lamps.",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_DE_ESTACIONAMIENTO(of=REMOLQUE)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "35",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 20,
+            "description": "Trailer tow stop-turn relay fuse.",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "36",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 25,
+            "description": "Trailer tow lamps module.",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUCES_DELANTERAS(of=REMOLQUE)",
+              "MODULO_LUCES_TRAILER"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "37",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 50,
+            "description": "Electric fan 1.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "VENTILADOR_RADIADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "38",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Alt A sensor.",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "39",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Integrated wheel end solenoid.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "40",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "E-locker.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "41",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Telescoping mirror.",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [
+              "ESPEJO_TELESCOPICO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "42",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 30,
+            "description": "Transmission fluid pump.",
+            "circuitRole": "FUEL_PUMP",
+            "relatedEntities": [
+              "BOMBA_DE_TRANSMISION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "43",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "Horn.",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "BOCINA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "44",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Air conditioner clutch.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "CLUTCH_AIRE_ACONDICIONADO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "45",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Powertrain control module relay coil.",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "BOBINA(of=RELAY(protects=PCM))",
+              "RELAY(protects=RELAY(protects=PCM))",
+              "RELAY(protects=PCM)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "46",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Wiper relay coil.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "BOBINA(of=RELAY(protects=LIMPIA_PARABRISAS))",
+              "RELAY(protects=RELAY(protects=LIMPIA_PARABRISAS))",
+              "RELAY(protects=LIMPIA_PARABRISAS)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "47",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "48",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "49",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 30,
+            "description": "Trailer brake control module.",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [
+              "CONTROLADOR_ELECTRONICO_FRENO(of=REMOLQUE)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "50",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 30,
+            "description": "Power running boards.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "51",
+            "type": "relay",
+            "format": "ultra",
+            "amp": null,
+            "description": "Fuel pump relay.",
+            "circuitRole": "FUEL_PUMP",
+            "relatedEntities": [
+              "RELAY(protects=BOMBA_DE_COMBUSTIBLE)",
+              "RELAY(protects=BOMBA(fluid=COMBUSTIBLE))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "52",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "53",
+            "type": "relay",
+            "format": "ultra",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "54",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 30,
+            "description": "Voltage quality module. Body-control-module voltage-qualitymodule feed.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "REGULADOR_DE_VOLTAGE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "55",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 40,
+            "description": "Body control module RP2 feed.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "56",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 20,
+            "description": "Fuel pump.",
+            "circuitRole": "FUEL_PUMP",
+            "relatedEntities": [
+              "BOMBA(fluid=COMBUSTIBLE)",
+              "BOMBA_DE_COMBUSTIBLE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "57",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 30,
+            "description": "Right-hand EPB actuator.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "ACTUADOR(of=FRENO_DE_MANO_ELECTRONICO(ubicacion=LADO_DERECHO))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "58",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 30,
+            "description": "Left-hand EPB actuator.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "ACTUADOR(of=FRENO_DE_MANO_ELECTRONICO(ubicacion=LADO_IZQUIERDO))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "59",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 30,
+            "description": "Starter.",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "BURRO_DE_ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "60",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 40,
+            "description": "Blower motor.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "VENTILADOR_DE_CLIMATIZADOR",
+              "MOTOR_IMPULSOR(of=VENTILADOR_DE_CLIMATIZADOR)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "61",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 30,
+            "description": "Brake control module. Automatic brake system valves.",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [
+              "TESTIGO_FRENO_DE_MANO",
+              "FRENO",
+              "CONTROLADOR_ELECTRONICO_FRENO",
+              "VALVULA(of=ASISTENCIA_FRENADO_DE_EMERGENCIA)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "62",
+            "type": "relay",
+            "format": "ultra",
+            "amp": null,
+            "description": "Power seat relay.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "RELAY(protects=ASIENTO_ELECTRICO)",
+              "RELAY(protects=COMANDO_AJUSTE_ASIENTO)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "63",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "Heated mirrors.",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [
+              "DESEMPANADOR_ESPEJOS",
+              "CALENTADOR_ESPEJO_LATERAL"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "64",
+            "type": "relay",
+            "format": "ultra",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "65",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Starter relay.",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "RELAY(protects=BURRO_DE_ARRANQUE)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "66",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Powertrain control module relay.",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "RELAY(protects=PCM)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "67",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Windshield wiper relay.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "RELAY(protects=LIMPIA_PARABRISAS)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "68",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Blower motor relay.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "RELAY(protects=MOTOR_IMPULSOR(of=VENTILADOR_DE_CLIMATIZADOR))",
+              "RELAY(protects=VENTILADOR_DE_CLIMATIZADOR)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "69",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Power sliding back window relay.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "RELAY(protects=LEVANTAVIDRIOS(of=VENTANILLA,ubicacion=PARTE_TRASERA))",
+              "RELAY(protects=LEVANTAVIDRIOS(of=VENTANILLA(ubicacion=PARTE_TRASERA)))",
+              "RELAY(protects=LEVANTAVIDRIOS(of=LUNETA_TRASERA))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "70",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Electric fan 1 relay.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "RELAY(protects=VENTILADOR_RADIADOR)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "71",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "72",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 25,
+            "description": "4x4.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "DOBLE_TRACCION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "73",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "74",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 30,
+            "description": "PDRG motor.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "75",
+            "type": "relay",
+            "format": "ultra",
+            "amp": null,
+            "description": "Horn relay.",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "RELAY(protects=BOCINA)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "76",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "77",
+            "type": "relay",
+            "format": "ultra",
+            "amp": null,
+            "description": "Steering column lock relay.",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [
+              "RELAY(protects=BLOQUEO_COLUMAN_DIRECCION)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "78",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "79",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Trailer tow parking lamp relay.",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "RELAY(protects=LUZ_DE_ESTACIONAMIENTO(of=REMOLQUE))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "80",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Rear window defroster relay.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "RELAY(protects=DESEMPANADOR_TRASERO)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "81",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "82",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "PDRG close relay.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "83",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "84",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "85",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "86",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "87",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Trailer tow backup lamps.",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_RETROCESO(of=REMOLQUE)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "88",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "89",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 20,
+            "description": "Cigar lighter power point 1.",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "ENCENDEDOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "90",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 20,
+            "description": "Power point 2.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "TOMA_12V"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "91",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 20,
+            "description": "Power point 3.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "TOMA_12V"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "92",
+            "type": "fuse",
+            "format": "cartridge-m",
+            "amp": 20,
+            "description": "Power point 4.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "TOMA_12V"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "93",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "[GTDI vehicle] power 1.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "MODO_POWER"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "93",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "[PFI vehicle] power 1.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "MODO_POWER"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "94",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "95",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "Vehicle power 2.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "AUTOMOVIL",
+              "TOMA_12V"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "96",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "97",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Vehicle power 3.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "AUTOMOVIL",
+              "TOMA_12V"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "98",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "99",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "Vehicle power 4 [PFI].",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "AUTOMOVIL",
+              "TOMA_12V"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "99",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "Vehicle power 4 [GTDI].",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "AUTOMOVIL",
+              "TOMA_12V"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "100",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "101",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "102",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Snow plow relay.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "103",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "104",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Electic fan 3 relay.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "105",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Power steering.",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [
+              "DIRECCION_ASISTIDA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "106",
+            "type": "fuse",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "107",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Anti-lock brakes.",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [
+              "SISTEMA_ABS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "108",
+            "type": "fuse",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "109",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Powertrain control module.",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "PCM"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "110",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "4x4 run/start. Adaptive cruise control.",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "CRUISE_CONTROL"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "111",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Transmission pump run-start.",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "112",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "113",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "Left hand blind spot information system. Rear view camera. Front view camera. Voltage quality module.",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [
+              "CAMARA_REVERSA",
+              "CAMARA_DELANTERA",
+              "REGULADOR_DE_VOLTAGE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "114",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Electric fan 2 relay.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "RELAY(protects=VENTILADOR_RADIADOR)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "115",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "116",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "SVG2",
+            "type": "fuse",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "SVG1",
+            "type": "fuse",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "SVG3",
+            "type": "fuse",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "SVG4",
+            "type": "fuse",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "SVG5",
+            "type": "fuse",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "SVG6",
+            "type": "fuse",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "SVG7",
+            "type": "fuse",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "SVG8",
+            "type": "fuse",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "SVG10",
+            "type": "fuse",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "SVG12",
+            "type": "fuse",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          }
+        ],
+        "activeEcuAndSensors": {
+          "ecuFuses": [
+            {
+              "id": "45",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "Powertrain control module relay coil.",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "BOBINA(of=RELAY(protects=PCM))",
+                "RELAY(protects=RELAY(protects=PCM))",
+                "RELAY(protects=PCM)"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "66",
+              "type": "relay",
+              "format": "half",
+              "amp": null,
+              "description": "Powertrain control module relay.",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "RELAY(protects=PCM)"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "109",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "Powertrain control module.",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "PCM"
+              ],
+              "notUsed": false
+            }
+          ],
+          "sensorPowerFuses": [
+            {
+              "id": "23",
+              "type": "fuse",
+              "format": "cartridge-m",
+              "amp": 15,
+              "description": "Rain sensor.",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [
+                "SENSOR_DE_LLUVIA"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "38",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "Alt A sensor.",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "113",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "Left hand blind spot information system. Rear view camera. Front view camera. Voltage quality module.",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [
+                "CAMARA_REVERSA",
+                "CAMARA_DELANTERA",
+                "REGULADOR_DE_VOLTAGE"
+              ],
+              "notUsed": false
+            }
+          ],
+          "obdDlcFuses": [],
+          "ignitionFuses": [
+            {
+              "id": "59",
+              "type": "fuse",
+              "format": "cartridge-m",
+              "amp": 30,
+              "description": "Starter.",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "BURRO_DE_ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "65",
+              "type": "relay",
+              "format": "half",
+              "amp": null,
+              "description": "Starter relay.",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "RELAY(protects=BURRO_DE_ARRANQUE)"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "110",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "4x4 run/start. Adaptive cruise control.",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "CRUISE_CONTROL"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "111",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "Transmission pump run-start.",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [],
+              "notUsed": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 1,
+        "boxName": "Passenger Compartment Fuse Panel",
+        "location": "INTERIOR_CABIN",
+        "diagramUrl": "https://opinautos-images.s3.amazonaws.com/legos/fusebox-diagrams/15eb0a78_ford-f-150-2015.png",
+        "thumbnailUrl": "https://images.startmycar.com/legos/fusebox-thumbnails/fusebox-ford-f-150-2016-genid-g13-1.webp",
+        "fuses": [
+          {
+            "id": "1",
+            "type": "fuse",
+            "format": "micro",
+            "amp": 10,
+            "description": "Demand lamp relay. Power seats relay. Glove box. Vanity lamps. Overhead console. Dome. Courtesy. Map lamps.",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [
+              "RELAY(protects=ASIENTO_ELECTRICO)",
+              "RELAY(protects=COMANDO_AJUSTE_ASIENTO)",
+              "CONSOLA_DE_TECHO",
+              "LUZ_DE_HABITACULO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "2",
+            "type": "fuse",
+            "format": "micro",
+            "amp": 5,
+            "description": "Memory module logic. Memory seat switches. Lumbar motor.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "INTERRUPTOR(of=MEMORIA_ASIENTO)",
+              "AJUSTE_LUMBAR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "3",
+            "type": "fuse",
+            "format": "micro",
+            "amp": 20,
+            "description": "Driver door lock motor.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "MOTOR_IMPULSOR(of=CERRADURA(of=PUERTA(ubicacion=LADO_IZQUIERDO)))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "4",
+            "type": "fuse",
+            "format": "micro",
+            "amp": 5,
+            "description": "Trailer brake control.",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "5",
+            "type": "fuse",
+            "format": "micro",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "6",
+            "type": "fuse",
+            "format": "micro3",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "7",
+            "type": "fuse",
+            "format": "micro3",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "8",
+            "type": "fuse",
+            "format": "micro3",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "9",
+            "type": "fuse",
+            "format": "micro3",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "10",
+            "type": "fuse",
+            "format": "micro3",
+            "amp": 5,
+            "description": "Not used (spare).",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "11",
+            "type": "fuse",
+            "format": "micro3",
+            "amp": 5,
+            "description": "Combined sensor module.",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "12",
+            "type": "fuse",
+            "format": "micro3",
+            "amp": 5,
+            "description": "Climate head module. Smart datalink converter.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "13",
+            "type": "fuse",
+            "format": "micro3",
+            "amp": 5,
+            "description": "Cluster. SCCM.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "TABLERO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "14",
+            "type": "fuse",
+            "format": "micro3",
+            "amp": 10,
+            "description": "Brake.",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [
+              "FRENO",
+              "TESTIGO_FRENO_DE_MANO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "15",
+            "type": "fuse",
+            "format": "micro3",
+            "amp": 10,
+            "description": "Smart datalink converter.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "16",
+            "type": "fuse",
+            "format": "micro",
+            "amp": 15,
+            "description": "Tailgate release.",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "CERRADURA(of=PORTON_TRASERO)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "17",
+            "type": "fuse",
+            "format": "micro3",
+            "amp": 5,
+            "description": "HUD. Ignition switch and passive-entry passivestart start stop switch.",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "18",
+            "type": "fuse",
+            "format": "micro3",
+            "amp": 5,
+            "description": "Key inhibit solenoid. Tow haul (O/D) cancel for floor or column shifter.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "19",
+            "type": "fuse",
+            "format": "micro3",
+            "amp": 5,
+            "description": "Unidentified",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "20",
+            "type": "fuse",
+            "format": "micro3",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "21",
+            "type": "fuse",
+            "format": "micro3",
+            "amp": 5,
+            "description": "HUD. In car temperature with humidity sensor.",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "22",
+            "type": "fuse",
+            "format": "micro3",
+            "amp": 5,
+            "description": "EPB. Power seat.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "23",
+            "type": "fuse",
+            "format": "micro",
+            "amp": 10,
+            "description": "PDRG switch. Inverter. Driver side window. Moonroof. Vista roof.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "INVERTER",
+              "VENTANILLA(ubicacion=LADO_IZQUIERDO)",
+              "TECHO_SOLAR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "24",
+            "type": "fuse",
+            "format": "micro",
+            "amp": 20,
+            "description": "Central lock/unlock.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "25",
+            "type": "fuse",
+            "format": "micro",
+            "amp": 30,
+            "description": "Driver door control module.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "PUERTA(ubicacion=LADO_IZQUIERDO)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "26",
+            "type": "fuse",
+            "format": "micro",
+            "amp": 30,
+            "description": "Passenger door control module.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "PUERTA(ubicacion=LADO_DERECHO)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "27",
+            "type": "fuse",
+            "format": "micro",
+            "amp": 30,
+            "description": "Vista roof. Moonroof.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "TECHO_SOLAR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "28",
+            "type": "fuse",
+            "format": "micro",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "29",
+            "type": "fuse",
+            "format": "micro",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "30",
+            "type": "fuse",
+            "format": "micro",
+            "amp": null,
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "NOT_USED_FUSE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "31",
+            "type": "fuse",
+            "format": "micro",
+            "amp": 15,
+            "description": "Adjustable pedal switch and motor.",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [
+              "INTERRUPTOR(of=REGULACION_ELECTRICA_PEDALES)",
+              "MOTOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "32",
+            "type": "fuse",
+            "format": "micro",
+            "amp": 10,
+            "description": "Multi-function display. Global position system. Sync 1. Sync 2. Radio frequency receiver.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "COMPUTADORA_ABORDO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "33",
+            "type": "fuse",
+            "format": "micro",
+            "amp": 20,
+            "description": "Radio.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "ESTEREO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "34",
+            "type": "fuse",
+            "format": "micro",
+            "amp": 30,
+            "description": "Run-start relay.",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "35",
+            "type": "fuse",
+            "format": "micro",
+            "amp": 5,
+            "description": "Restraints module.",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [
+              "AIRBAG",
+              "MODULO_AIRBAG",
+              "MODULO(of=AIRBAG)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "36",
+            "type": "fuse",
+            "format": "micro",
+            "amp": 15,
+            "description": "360 camera module. Heated steering wheel module. Rear-view mirror. Rear heated seats.",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [
+              "ESPEJO_LATERAL"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "37",
+            "type": "fuse",
+            "format": "micro",
+            "amp": null,
+            "description": "Power distribution box run-start fuses.",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "38",
+            "type": "fuse",
+            "format": "maxi-ford",
+            "amp": 30,
+            "description": "Rear window switches and motors.",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "MOTOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "SVG1",
+            "type": "fuse",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          }
+        ],
+        "activeEcuAndSensors": {
+          "ecuFuses": [],
+          "sensorPowerFuses": [
+            {
+              "id": "1",
+              "type": "fuse",
+              "format": "micro",
+              "amp": 10,
+              "description": "Demand lamp relay. Power seats relay. Glove box. Vanity lamps. Overhead console. Dome. Courtesy. Map lamps.",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [
+                "RELAY(protects=ASIENTO_ELECTRICO)",
+                "RELAY(protects=COMANDO_AJUSTE_ASIENTO)",
+                "CONSOLA_DE_TECHO",
+                "LUZ_DE_HABITACULO"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "11",
+              "type": "fuse",
+              "format": "micro3",
+              "amp": 5,
+              "description": "Combined sensor module.",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "21",
+              "type": "fuse",
+              "format": "micro3",
+              "amp": 5,
+              "description": "HUD. In car temperature with humidity sensor.",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "31",
+              "type": "fuse",
+              "format": "micro",
+              "amp": 15,
+              "description": "Adjustable pedal switch and motor.",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [
+                "INTERRUPTOR(of=REGULACION_ELECTRICA_PEDALES)",
+                "MOTOR"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "36",
+              "type": "fuse",
+              "format": "micro",
+              "amp": 15,
+              "description": "360 camera module. Heated steering wheel module. Rear-view mirror. Rear heated seats.",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [
+                "ESPEJO_LATERAL"
+              ],
+              "notUsed": false
+            }
+          ],
+          "obdDlcFuses": [],
+          "ignitionFuses": [
+            {
+              "id": "17",
+              "type": "fuse",
+              "format": "micro3",
+              "amp": 5,
+              "description": "HUD. Ignition switch and passive-entry passivestart start stop switch.",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "34",
+              "type": "fuse",
+              "format": "micro",
+              "amp": 30,
+              "description": "Run-start relay.",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "37",
+              "type": "fuse",
+              "format": "micro",
+              "amp": null,
+              "description": "Power distribution box run-start fuses.",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [],
+              "notUsed": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "ecuAndSensorCircuits": {
+    "hasDedicatedEcmFeed": true,
+    "hasObdDlcFeed": false,
+    "hasFuelPumpRelay": true,
+    "hasSensorVrefFeed": true,
+    "circuitHighlights": [
+      "Dedicated ECM / Engine Control Power Feeds",
+      "Primary Fuel Pump Control Circuit / Relay",
+      "Sensor Reference Rails & VVT / O2 Actuator Fuses"
+    ]
+  },
+  "offlineIngestionReady": true
+}

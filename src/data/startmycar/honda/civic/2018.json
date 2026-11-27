@@ -1,0 +1,1503 @@
+{
+  "schemaVersion": "1.0.0",
+  "provenance": {
+    "source": "StartMyCar",
+    "sourceUrl": "https://www.startmycar.com/honda/civic/info/fusebox/2018/trims-sedan",
+    "crawledAt": "2026-11-27T10:11:22.288Z",
+    "zeroFabricationIntegrity": true,
+    "tier": "COMMUNITY_UNVERIFIED",
+    "deduplicationStatus": "AUGMENTED_EXISTING",
+    "matchedRepositoryRecordId": "preset-honda-civic-2018"
+  },
+  "identification": {
+    "make": "Honda",
+    "makeSlug": "honda",
+    "model": "Civic",
+    "modelSlug": "civic",
+    "year": 2018,
+    "generation": "trims-sedan",
+    "platformCode": null,
+    "marketRegions": [
+      "Global",
+      "North America",
+      "ASEAN"
+    ],
+    "enginesDetected": []
+  },
+  "powerDistribution": {
+    "totalBoxes": 2,
+    "totalCavities": 112,
+    "totalFuses": 100,
+    "totalRelays": 12,
+    "boxes": [
+      {
+        "boxIndex": 0,
+        "boxName": "Engine Compartment Fuse Box",
+        "location": "ENGINE_BAY",
+        "thumbnailUrl": "https://images.startmycar.com/legos/fusebox-thumbnails/fusebox-honda-civic-2018-genid-g10-trims-sedan-0.webp",
+        "fuses": [
+          {
+            "id": "1",
+            "type": "fuse-block",
+            "format": "honda-8",
+            "amp": 60,
+            "description": "Passenger's Power Seat [Models with the smart entry system have an ENGINE START/STOP button instead of an ignition switch.], Rear Seat Heaters[Models with the smart entry system have an ENGINE START/STOP button instead of an ignition switch.], [Models without SPORT mode]",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "ASIENTO_ELECTRICO(ubicacion=LADO_DERECHO)",
+              "CALEFACCION_DE_ASIENTO(of=ASIENTO(ubicacion=PARTE_TRASERA))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "1",
+            "type": "fuse-block",
+            "format": "honda-8",
+            "amp": 60,
+            "description": "Adaptive Damper System, Rear Seat Heaters[Models with the smart entry system have an ENGINE START/STOP button instead of an ignition switch.], [Models with SPORT mode]",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "CALEFACCION_DE_ASIENTO(of=ASIENTO(ubicacion=PARTE_TRASERA))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "1",
+            "type": "fuse-block",
+            "format": "honda-8",
+            "amp": 30,
+            "description": "Cooling Fan [2.0L engine models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "VENTILADOR_RADIADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "1",
+            "type": "fuse-block",
+            "format": "honda-8",
+            "amp": 50,
+            "description": "Cooling Fan [1.5L engine models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "VENTILADOR_RADIADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "1",
+            "type": "fuse-block",
+            "format": "honda-8",
+            "amp": 30,
+            "description": "IG Main [Models with smart entry system]",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "ACCESORIO_ELECTRICO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "1",
+            "type": "fuse-block",
+            "format": "honda-8",
+            "amp": 60,
+            "description": "_[Models without smart entry system]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "1",
+            "type": "fuse-block",
+            "format": "honda-8",
+            "amp": 30,
+            "description": "Headlight High Beam Main",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "1",
+            "type": "fuse-block",
+            "format": "honda-8",
+            "amp": 125,
+            "description": "Battery",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "BATERIA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "2",
+            "type": "fuse-block",
+            "format": "honda-generic",
+            "amp": 70,
+            "description": "EPS",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [
+              "DIRECCION_ELECTROASISTIDA",
+              "TESTIGO_DIRECCION_ELECTROASISTIDA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "2",
+            "type": "fuse-block",
+            "format": "honda-generic",
+            "amp": 30,
+            "description": "IG Main [Models with smart entry system]",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "ACCESORIO_ELECTRICO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "2",
+            "type": "fuse-block",
+            "format": "honda-generic",
+            "amp": 50,
+            "description": "IG Main [Models without smart entry system]",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "ACCESORIO_ELECTRICO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "2",
+            "type": "fuse-block",
+            "format": "honda-generic",
+            "amp": 40,
+            "description": "Fuse Box Option [Models with the smart entry system have an ENGINE START/STOP button instead of an ignition switch.]",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "2",
+            "type": "fuse-block",
+            "format": "honda-generic",
+            "amp": 60,
+            "description": "Fuse Box",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "2",
+            "type": "fuse-block",
+            "format": "honda-generic",
+            "amp": 30,
+            "description": "Front Wiper Motor",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "MOTOR_IMPULSOR(of=LIMPIA_PARABRISAS(ubicacion=PARTE_DELANTERA))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "2",
+            "type": "fuse-block",
+            "format": "honda-generic",
+            "amp": 30,
+            "description": "Headlight Low Beam Main",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LAMPARA(of=LUZ_BAJA)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "3",
+            "type": "fuse-block",
+            "format": "honda-generic",
+            "amp": 40,
+            "description": "Rear Defroster",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "DESEMPANADOR_TRASERO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "3",
+            "type": "fuse-block",
+            "format": "honda-generic",
+            "amp": 30,
+            "description": "Starter Motor [Models with smart entry system]",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "BURRO_DE_ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "3",
+            "type": "fuse-block",
+            "format": "honda-generic",
+            "amp": 40,
+            "description": "_[Models without smart entry system]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "3",
+            "type": "fuse-block",
+            "format": "honda-generic",
+            "amp": 40,
+            "description": "Fuse Box",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "3",
+            "type": "fuse-block",
+            "format": "honda-generic",
+            "amp": 40,
+            "description": "ABS/VSA Motor",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "3",
+            "type": "fuse-block",
+            "format": "honda-generic",
+            "amp": 40,
+            "description": "ABS/VSA FSR",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "3",
+            "type": "fuse-block",
+            "format": "honda-generic",
+            "amp": 40,
+            "description": "Blower Motor",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "VENTILADOR_DE_CLIMATIZADOR",
+              "MOTOR_IMPULSOR(of=VENTILADOR_DE_CLIMATIZADOR)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "4",
+            "type": "fuse-block",
+            "format": "honda-single",
+            "amp": null,
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "5",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "Cooling Fan",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "VENTILADOR_RADIADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "6",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "Washer",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "SAPITO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "7",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "FI Main",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "8",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "FI Sub",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "9",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Stop Lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "TESTIGO_STOP"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "10",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "Injector [1.5L engine models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "INYECTOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "11",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "LAF",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [
+              "SENSOR_OXIGENO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "12",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "FI ECU",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "13",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Parking Lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_DE_ESTACIONAMIENTO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "14",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "Hazard",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_BALIZA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "15",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "IG Coil",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "RELAY(protects=ACCESORIO_ELECTRICO)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "16",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "Transmission [Continuously variable transmission models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "CAJA_DE_TRANSMISION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "17",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Daytime Running Lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUCES_CIRCULACION_DIURNA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "18",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Back Up",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "19",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "Audio",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "ESTEREO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "20",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 30,
+            "description": "Audio AMP [Models with the smart entry system have an ENGINE START/STOP button instead of an ignition switch.]",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "AMPLIFICADOR(of=ESTEREO)",
+              "AMPLIFICADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "21",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Interior Lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_DE_HABITACULO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "22",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "Front Fog Lights [Models with the smart entry system have an ENGINE START/STOP button instead of an ignition switch.]",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "LUZ_ANTINIEBLA(ubicacion=PARTE_DELANTERA)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "23",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "A/C Compressor [Models with the smart entry system have an ENGINE START/STOP button instead of an ignition switch.]",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "COMPRESOR_DE_AC"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "24",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Horn",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "BOCINA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "25",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Left Headlight Low Beam",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LAMPARA(of=LUZ_BAJA(ubicacion=LADO_IZQUIERDO))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "26",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Right Headlight Low Beam",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LAMPARA(of=LUZ_BAJA(ubicacion=LADO_DERECHO))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "27",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "VB ACT [1.5L engine models]",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "28",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Left Headlight High Beam",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "29",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Right Headlight High Beam",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "30",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "31",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "Rear Seat Heaters [Models with the smart entry system have an ENGINE START/STOP button instead of an ignition switch.]",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "CALEFACCION_DE_ASIENTO(of=ASIENTO(ubicacion=PARTE_TRASERA))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "32",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "Passenger's Power Seat Sliding [Models with the smart entry system have an ENGINE START/STOP button instead of an ignition switch.] , [Models without SPORT mode]",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "32",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "- [Models with SPORT mode]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "33",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "Passenger's Power Seat Reclining [Models with the smart entry system have an ENGINE START/STOP button instead of an ignition switch.] , [Models without SPORT mode]",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "33",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "Adaptive Damper System [Models with SPORT mode]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "34",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "35",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "36",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R1",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R2",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R3",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R4",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R5",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R6",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R7",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R8",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R9",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R10",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R11",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R12",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          }
+        ],
+        "activeEcuAndSensors": {
+          "ecuFuses": [
+            {
+              "id": "12",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "FI ECU",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [],
+              "notUsed": false
+            }
+          ],
+          "sensorPowerFuses": [
+            {
+              "id": "11",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "LAF",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [
+                "SENSOR_OXIGENO"
+              ],
+              "notUsed": false
+            }
+          ],
+          "obdDlcFuses": [],
+          "ignitionFuses": [
+            {
+              "id": "1",
+              "type": "fuse-block",
+              "format": "honda-8",
+              "amp": 60,
+              "description": "Passenger's Power Seat [Models with the smart entry system have an ENGINE START/STOP button instead of an ignition switch.], Rear Seat Heaters[Models with the smart entry system have an ENGINE START/STOP button instead of an ignition switch.], [Models without SPORT mode]",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "ASIENTO_ELECTRICO(ubicacion=LADO_DERECHO)",
+                "CALEFACCION_DE_ASIENTO(of=ASIENTO(ubicacion=PARTE_TRASERA))"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "1",
+              "type": "fuse-block",
+              "format": "honda-8",
+              "amp": 60,
+              "description": "Adaptive Damper System, Rear Seat Heaters[Models with the smart entry system have an ENGINE START/STOP button instead of an ignition switch.], [Models with SPORT mode]",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "CALEFACCION_DE_ASIENTO(of=ASIENTO(ubicacion=PARTE_TRASERA))"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "2",
+              "type": "fuse-block",
+              "format": "honda-generic",
+              "amp": 40,
+              "description": "Fuse Box Option [Models with the smart entry system have an ENGINE START/STOP button instead of an ignition switch.]",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "3",
+              "type": "fuse-block",
+              "format": "honda-generic",
+              "amp": 30,
+              "description": "Starter Motor [Models with smart entry system]",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "BURRO_DE_ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "20",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 30,
+              "description": "Audio AMP [Models with the smart entry system have an ENGINE START/STOP button instead of an ignition switch.]",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "AMPLIFICADOR(of=ESTEREO)",
+                "AMPLIFICADOR"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "22",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 15,
+              "description": "Front Fog Lights [Models with the smart entry system have an ENGINE START/STOP button instead of an ignition switch.]",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "LUZ_ANTINIEBLA(ubicacion=PARTE_DELANTERA)"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "23",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "A/C Compressor [Models with the smart entry system have an ENGINE START/STOP button instead of an ignition switch.]",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "COMPRESOR_DE_AC"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "31",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 15,
+              "description": "Rear Seat Heaters [Models with the smart entry system have an ENGINE START/STOP button instead of an ignition switch.]",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "CALEFACCION_DE_ASIENTO(of=ASIENTO(ubicacion=PARTE_TRASERA))"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "32",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 20,
+              "description": "Passenger's Power Seat Sliding [Models with the smart entry system have an ENGINE START/STOP button instead of an ignition switch.] , [Models without SPORT mode]",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "33",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 20,
+              "description": "Passenger's Power Seat Reclining [Models with the smart entry system have an ENGINE START/STOP button instead of an ignition switch.] , [Models without SPORT mode]",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [],
+              "notUsed": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 1,
+        "boxName": "Interior Fuse Box",
+        "location": "INTERIOR_CABIN",
+        "thumbnailUrl": "https://images.startmycar.com/legos/fusebox-thumbnails/fusebox-honda-civic-2018-genid-g10-trims-sedan-1.webp",
+        "fuses": [
+          {
+            "id": "1",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Accessory",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "ACCESORIO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "1",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "_[Models with smart entry system] -",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "2",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "Key Lock [Models without smart entry system]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "3",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "4",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "Front Sensor Camera [Models with smart entry system]",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "4",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Transmission [Models without smart entry system] , [Continuously variable transmission models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "CAJA_DE_TRANSMISION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "5",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Option",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "6",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "SRS Indicator",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [
+              "TESTIGO_SRS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "7",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Meter",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "8",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "Fuel Pump",
+            "circuitRole": "FUEL_PUMP",
+            "relatedEntities": [
+              "BOMBA(fluid=COMBUSTIBLE)",
+              "BOMBA_DE_COMBUSTIBLE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "9",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "AIRCON",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "10",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "11",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "Engine Control",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "ECU"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "12",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Passenger Side Door Lock",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "CIERRE_CENTRALIZADO(ubicacion=LADO_DERECHO)",
+              "CERRADURA(of=PUERTA(ubicacion=LADO_DERECHO))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "13",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Driver Side Rear Door Unlock",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "CIERRE_CENTRALIZADO(ubicacion=LUGAR_CUADRANTE(lat=LADO_IZQUIERDO,long=PARTE_TRASERA))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "14",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "Rear Driver's Side Power Window",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "LEVANTAVIDRIOS(ubicacion=LUGAR_CUADRANTE(lat=LADO_IZQUIERDO,long=PARTE_TRASERA))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "15",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "Front Passenger's Side Power Window",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "LEVANTAVIDRIOS(ubicacion=LUGAR_CUADRANTE(lat=LADO_DERECHO,long=PARTE_DELANTERA))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "16",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "Door Lock",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "CIERRE_CENTRALIZADO",
+              "CERRADURA(of=PUERTA)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "17",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Transmission [Models with smart entry system] , [Continuously variable transmission models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "CAJA_DE_TRANSMISION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "17",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "Front Sensor Camera [Models without smart entry system]",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "18",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "19",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "Moonroof [Models with smart entry system]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "TECHO_SOLAR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "20",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "21",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "ACG",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "22",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Daytime Running Lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUCES_CIRCULACION_DIURNA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "23",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "24",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "Front Sensor Camera [Models with smart entry system]",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "25",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Driver's Door Lock",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "CIERRE_CENTRALIZADO(ubicacion=LADO_IZQUIERDO)",
+              "CERRADURA(of=PUERTA(ubicacion=LADO_IZQUIERDO))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "26",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Passenger Side Door Unlock",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "CIERRE_CENTRALIZADO(ubicacion=LADO_DERECHO)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "27",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "Rear Passenger's Side Power Window",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "LEVANTAVIDRIOS(ubicacion=LUGAR_CUADRANTE(lat=LADO_DERECHO,long=PARTE_TRASERA))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "28",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "Driver's Power Window",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "LEVANTAVIDRIOS(ubicacion=LADO_IZQUIERDO)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "29",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "Front Accessory Power Socket",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "TOMA_12V(ubicacion=PARTE_DELANTERA)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "30",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Smart Entry [Models with smart entry system]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "30",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "- [Models without smart entry system]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "31",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "Driver's Power Seat Reclining [Models with smart entry system]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "32",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "Front Seat Heater [Models with smart entry system]",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "CALEFACCION_DE_ASIENTO(of=ASIENTO(ubicacion=PARTE_DELANTERA))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "33",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "Driver's Power Seat Sliding [Models with smart entry system]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "34",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "VSA/ABS",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [
+              "CONTROL_DE_ESTABILIDAD",
+              "SISTEMA_ABS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "35",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "SRS",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [
+              "AIRBAG",
+              "TESTIGO_SRS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "36",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "37",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "38",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Driver Side Rear Door Lock",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "CIERRE_CENTRALIZADO(ubicacion=LUGAR_CUADRANTE(lat=LADO_IZQUIERDO,long=PARTE_TRASERA))",
+              "CERRADURA(of=PUERTA(ubicacion=LUGAR_CUADRANTE(lat=LADO_IZQUIERDO,long=PARTE_TRASERA)))"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "39",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Driver's Door Unlock",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "CIERRE_CENTRALIZADO(ubicacion=LADO_IZQUIERDO)"
+            ],
+            "notUsed": false
+          }
+        ],
+        "activeEcuAndSensors": {
+          "ecuFuses": [
+            {
+              "id": "11",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "Engine Control",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "ECU"
+              ],
+              "notUsed": false
+            }
+          ],
+          "sensorPowerFuses": [
+            {
+              "id": "4",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "Front Sensor Camera [Models with smart entry system]",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "17",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "Front Sensor Camera [Models without smart entry system]",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "24",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "Front Sensor Camera [Models with smart entry system]",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [],
+              "notUsed": false
+            }
+          ],
+          "obdDlcFuses": [],
+          "ignitionFuses": []
+        }
+      }
+    ]
+  },
+  "ecuAndSensorCircuits": {
+    "hasDedicatedEcmFeed": true,
+    "hasObdDlcFeed": false,
+    "hasFuelPumpRelay": true,
+    "hasSensorVrefFeed": true,
+    "circuitHighlights": [
+      "Dedicated ECM / Engine Control Power Feeds",
+      "Primary Fuel Pump Control Circuit / Relay",
+      "Sensor Reference Rails & VVT / O2 Actuator Fuses"
+    ]
+  },
+  "offlineIngestionReady": true
+}

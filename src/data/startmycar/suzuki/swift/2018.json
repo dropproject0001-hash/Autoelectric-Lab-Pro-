@@ -1,0 +1,1905 @@
+{
+  "schemaVersion": "1.0.0",
+  "provenance": {
+    "source": "StartMyCar",
+    "sourceUrl": "https://www.startmycar.com/suzuki/swift/info/fusebox/2018/third-global-generation_japan",
+    "crawledAt": "2026-11-27T10:11:23.635Z",
+    "zeroFabricationIntegrity": true,
+    "tier": "VERIFIED",
+    "deduplicationStatus": "NEW_RECORD"
+  },
+  "identification": {
+    "make": "Suzuki",
+    "makeSlug": "suzuki",
+    "model": "Swift",
+    "modelSlug": "swift",
+    "year": 2018,
+    "generation": "third-global-generation_japan",
+    "platformCode": null,
+    "marketRegions": [
+      "Global",
+      "North America",
+      "ASEAN"
+    ],
+    "enginesDetected": []
+  },
+  "powerDistribution": {
+    "totalBoxes": 5,
+    "totalCavities": 155,
+    "totalFuses": 120,
+    "totalRelays": 35,
+    "boxes": [
+      {
+        "boxIndex": 0,
+        "boxName": "Passenger Fuse Box",
+        "location": "INTERIOR_CABIN",
+        "diagramUrl": "https://rewise-images.s3.amazonaws.com/originals/legos/fusebox-diagrams/dc44e663_suzuki-swift-2018.jpg",
+        "thumbnailUrl": "https://images.startmycar.com/legos/fusebox-thumbnails/fusebox-suzuki-swift-2018-country-japan-genid-g6-0.webp",
+        "fuses": [
+          {
+            "id": "1",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 30,
+            "description": "(P/W) Power Windows",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "LEVANTAVIDRIOS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "2",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(MTR) Meter",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "3",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "(IG) ignition",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "ACCESORIO_ELECTRICO",
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "4",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(IG1 SIG2) Power Steering",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "5",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(SHIFT) Not used",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [
+              "CAMBIO_MARCHA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "6",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(S/R) Not used",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "7",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "8",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(D/L) Door lock",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "9",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "(STL) Steering Lock",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "10",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(HAZ) Hazard",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_BALIZA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "11",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(A-STOP) Engine controller",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "12",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(RR FOG) Rear fog lamp",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_ANTINIEBLA",
+              "LAMPARA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "13",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(ABS) ABS/ESP",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [
+              "SISTEMA_ABS",
+              "CONTROL_DE_ESTABILIDAD"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "14",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "(S/H) Seat heater",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "15",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(IG1 SIG3) Camera",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "16",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(DOME2) Interior light",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "17",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(DOME) Meter",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "18",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "(RADIO) Radio",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "ESTEREO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "19",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(CONT) Not used",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "20",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(KEY2) Ignition switch",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "21",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(P/WT) Power window Timer function",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "22",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(KEY) Ignition switch",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "LLAVE",
+              "ARRANQUE",
+              "INTERRUPTOR",
+              "TAMBOR_DE_ENCENDIDO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "23",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "(HORN) Horn",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "BOCINA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "24",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(TAIL) Tail lamp left (With auto light system)",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "25",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(TAIL) Tail lamp left and right (Without auto light system) Tail lamp right (With auto light system)",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "26",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(A/B) Airbag",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "27",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(IG1 SIG) Idling stop or BCM",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "28",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(BACK) Backlight",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "29",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(ACC3) Not used",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "30",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(RR DEF) Rear Defogger",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "DESEMPANADOR_TRASERO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "31",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(MRR HTR) Door mirror heater",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "32",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "(ACC2) Accessories socket",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "33",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(ACC) Radio",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "GENERIC_FUSE_NAME",
+              "ESTEREO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "34",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(WIP) Rear wiper",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "LIMPIA_PARABRISAS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "35",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(IG2 SIG) Blower fan",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "36",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "(WASH) Washer motor",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "37",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "(FR WIP) Front Wiper",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "LIMPIA_PARABRISAS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "38",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(STOP) Brake light",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [
+              "LUZ_FRENO",
+              "TESTIGO_FRENO_DE_MANO",
+              "TESTIGO_STOP"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "R1",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          }
+        ],
+        "activeEcuAndSensors": {
+          "ecuFuses": [
+            {
+              "id": "11",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "(A-STOP) Engine controller",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [],
+              "notUsed": false
+            }
+          ],
+          "sensorPowerFuses": [
+            {
+              "id": "5",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 20,
+              "description": "(SHIFT) Not used",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [
+                "CAMBIO_MARCHA"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "15",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "(IG1 SIG3) Camera",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [],
+              "notUsed": false
+            }
+          ],
+          "obdDlcFuses": [],
+          "ignitionFuses": [
+            {
+              "id": "3",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 15,
+              "description": "(IG) ignition",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "ACCESORIO_ELECTRICO",
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "20",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "(KEY2) Ignition switch",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "22",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "(KEY) Ignition switch",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "LLAVE",
+                "ARRANQUE",
+                "INTERRUPTOR",
+                "TAMBOR_DE_ENCENDIDO"
+              ],
+              "notUsed": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 1,
+        "boxName": "Engine Fuse Box (K10C, K12C, K12M, K14C)",
+        "location": "ENGINE_BAY",
+        "diagramUrl": "https://rewise-images.s3.amazonaws.com/originals/legos/fusebox-diagrams/4b816d5b_suzuki-swift-2018.jpg",
+        "thumbnailUrl": "https://images.startmycar.com/legos/fusebox-thumbnails/fusebox-suzuki-swift-2018-country-japan-genid-g6-1.webp",
+        "fuses": [
+          {
+            "id": "7",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 30,
+            "description": "Starting motor",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "8",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 30,
+            "description": "Blower fan",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "9",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 40,
+            "description": "Battery [Models with Auto-on headlight system or LED headlights]",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "10",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 40,
+            "description": "ABS motor",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "11",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 40,
+            "description": "Ignition switch",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "12",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 30,
+            "description": "B/U",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "13",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 30,
+            "description": "SUB BAT [K12C engine model with SHVS]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "14",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "15",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "16",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "ABS control module",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "17",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "Headlight (Left)",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "18",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "Headlight (Right)",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "19",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "20",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 40,
+            "description": "Radiator fan [K10C engine models and Sport models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "20",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 30,
+            "description": "Radiator fan [K12C and K12M engine models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "21",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 30,
+            "description": "Radiator fan [Sport models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "22",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 60,
+            "description": "Power steering",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "23",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "24",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "25",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "Front fog light",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "26",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Air compressor",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "27",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 50,
+            "description": "Ignition switch 2",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "28",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "Transmission [Models with automatic transmission or CVT]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "29",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "FI [K12C and K12M engine models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "29",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 30,
+            "description": "FI main [K10C engine models and Sport models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "30",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 30,
+            "description": "FI main [K10C engine models and Sport models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "31",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "32",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "33",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "Starting Signal",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "34",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "35",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "INJ DRV [K10C engine models and Sport models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "36",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "37",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Fl [K10C engine models and Sport models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "Connector",
+            "type": "fuse",
+            "format": "generic",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R1",
+            "type": "relay",
+            "format": "full",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R2",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "RDTR2",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R3",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "T/M PUMP",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R4",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "RDTR",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R5",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "ST",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R6",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "BLW",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R7",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R8",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "VVT",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R9",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "FUEL PUMP",
+            "circuitRole": "FUEL_PUMP",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R10",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "HORN",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R11",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "RDTR3",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R12",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "CPRSR",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          }
+        ],
+        "activeEcuAndSensors": {
+          "ecuFuses": [],
+          "sensorPowerFuses": [
+            {
+              "id": "R8",
+              "type": "relay",
+              "format": "half",
+              "amp": null,
+              "description": "VVT",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [],
+              "notUsed": false
+            }
+          ],
+          "obdDlcFuses": [],
+          "ignitionFuses": [
+            {
+              "id": "7",
+              "type": "fuse",
+              "format": "cartridge-j",
+              "amp": 30,
+              "description": "Starting motor",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "11",
+              "type": "fuse",
+              "format": "cartridge-j",
+              "amp": 40,
+              "description": "Ignition switch",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "27",
+              "type": "fuse",
+              "format": "cartridge-j",
+              "amp": 50,
+              "description": "Ignition switch 2",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "33",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "Starting Signal",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [],
+              "notUsed": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 2,
+        "boxName": "Engine Sub-Relay Box (K10C, K12C, K12D, K12M, K14C)",
+        "location": "ENGINE_BAY",
+        "diagramUrl": "https://rewise-images.s3.amazonaws.com/originals/legos/fusebox-diagrams/3209a818_suzuki-swift-2018.jpg",
+        "thumbnailUrl": "https://images.startmycar.com/legos/fusebox-thumbnails/fusebox-suzuki-swift-2018-country-japan-genid-g6-2.webp",
+        "fuses": [
+          {
+            "id": "37",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "38",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "Headlight high [Models with Auto-on headlight system or LED headlights]",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "39",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "Headlight high (Right) [Models with Auto-on headlight system or LED headlights]",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "40",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "Headlight high (Left) [Models with Auto-on headlight system or LED headlights]",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R1",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R2",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R3",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R4",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R5",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          }
+        ],
+        "activeEcuAndSensors": {
+          "ecuFuses": [],
+          "sensorPowerFuses": [],
+          "obdDlcFuses": [],
+          "ignitionFuses": []
+        }
+      },
+      {
+        "boxIndex": 3,
+        "boxName": "Engine Fuse Box (K12D, K14D)",
+        "location": "ENGINE_BAY",
+        "diagramUrl": "https://rewise-images.s3.amazonaws.com/originals/legos/fusebox-diagrams/0b7eacf3_suzuki-swift-2018.jpg",
+        "thumbnailUrl": "https://images.startmycar.com/legos/fusebox-thumbnails/fusebox-suzuki-swift-2018-country-japan-genid-g6-3.webp",
+        "fuses": [
+          {
+            "id": "7",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 30,
+            "description": "Starting motor",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "8",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 30,
+            "description": "Blower fan [K14D engine models]",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "9",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 40,
+            "description": "Battery [Models with Auto-on headlight system or LED headlights (for K12D engine models)]",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "10",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 40,
+            "description": "ABS motor",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "11",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 40,
+            "description": "Ignition switch",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "12",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 30,
+            "description": "B/U",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "13",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Sub battery [K14D engine models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "14",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "15",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "16",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "ABS control module",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "17",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "Headlight (Left) [K12D engine models]",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "18",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "Headlight (Right) [K12D engine models]",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "19",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "20",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 40,
+            "description": "Radiator fan [K12D engine models] / FI MAIN [K14D engine models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "21",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "22",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 60,
+            "description": "Power steering",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "23",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "24",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "25",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "Front fog light",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "26",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Air compressor [Models with air conditoning system (for K14D engine models)]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "27",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 50,
+            "description": "Ignition switch 2",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "28",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "VVT",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "29",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "FI [K12D engine models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "30",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "T/M [K12D engine models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "30",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "Fuel pump [K14D engine models]",
+            "circuitRole": "FUEL_PUMP",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "31",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "32",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "T/M Pump [Models with CVT and SHVS (for K12D engine models)]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "33",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "Starting Signal",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "34",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "Air compressor [K12D engine models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "35",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "INJ DRV [K14D engine models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "36",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "FL2 [K14D engine models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "37",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "FI [K14D engine models]",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "Connector",
+            "type": "fuse",
+            "format": "generic",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R1",
+            "type": "relay",
+            "format": "full",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R2",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "RDTR2",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R3",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "T/M PUMP",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R4",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "RDTR",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R5",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "ST",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R6",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "BLW",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R7",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R8",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "VVT",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R9",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "FUEL PUMP",
+            "circuitRole": "FUEL_PUMP",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R10",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "HORN",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R11",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "RDTR3",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R12",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "CPRSR",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          }
+        ],
+        "activeEcuAndSensors": {
+          "ecuFuses": [],
+          "sensorPowerFuses": [
+            {
+              "id": "28",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 20,
+              "description": "VVT",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "R8",
+              "type": "relay",
+              "format": "half",
+              "amp": null,
+              "description": "VVT",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [],
+              "notUsed": false
+            }
+          ],
+          "obdDlcFuses": [],
+          "ignitionFuses": [
+            {
+              "id": "7",
+              "type": "fuse",
+              "format": "cartridge-j",
+              "amp": 30,
+              "description": "Starting motor",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "11",
+              "type": "fuse",
+              "format": "cartridge-j",
+              "amp": 40,
+              "description": "Ignition switch",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "27",
+              "type": "fuse",
+              "format": "cartridge-j",
+              "amp": 50,
+              "description": "Ignition switch 2",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "33",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "Starting Signal",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [],
+              "notUsed": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 4,
+        "boxName": "Engine Sub-Fuse Box (K14D)",
+        "location": "ENGINE_BAY",
+        "diagramUrl": "https://rewise-images.s3.amazonaws.com/originals/legos/fusebox-diagrams/612ac6a5_suzuki-swift-2018.jpg",
+        "thumbnailUrl": "https://images.startmycar.com/legos/fusebox-thumbnails/fusebox-suzuki-swift-2018-country-japan-genid-g6-4.webp",
+        "fuses": [
+          {
+            "id": "1",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 30,
+            "description": "(RDTR) Radiator fan",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "VENTILADOR_RADIADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "2",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 40,
+            "description": "(RDTR) Radiator fan",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "VENTILADOR_RADIADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "3",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(FR FOG) Front fog lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_ANTINIEBLA(ubicacion=PARTE_DELANTERA)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "4",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(DC/DC) DC to DC transformer 400 watts",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "5",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "H/L R",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "6",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "(H/L L) Left-hand headlight",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUCES_DELANTERAS(ubicacion=LADO_IZQUIERDO)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "7",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(H/L HI) Headlights high beam",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "8",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "9",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "10",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "(H/L HI R) Right-hand headlight high beam",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "11",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "(H/L HI L) Left-hand headlight high beam",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R1",
+            "type": "relay",
+            "format": "full",
+            "amp": null,
+            "description": "EWP",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R2",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R3",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(H/L HI) Headlights high beam",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R4",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "H/L R",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R5",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(H/L L) Left-hand headlight",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUCES_DELANTERAS(ubicacion=LADO_IZQUIERDO)"
+            ],
+            "notUsed": false
+          }
+        ],
+        "activeEcuAndSensors": {
+          "ecuFuses": [],
+          "sensorPowerFuses": [],
+          "obdDlcFuses": [],
+          "ignitionFuses": []
+        }
+      }
+    ]
+  },
+  "ecuAndSensorCircuits": {
+    "hasDedicatedEcmFeed": true,
+    "hasObdDlcFeed": false,
+    "hasFuelPumpRelay": true,
+    "hasSensorVrefFeed": true,
+    "circuitHighlights": [
+      "Dedicated ECM / Engine Control Power Feeds",
+      "Primary Fuel Pump Control Circuit / Relay",
+      "Sensor Reference Rails & VVT / O2 Actuator Fuses"
+    ]
+  },
+  "offlineIngestionReady": true
+}

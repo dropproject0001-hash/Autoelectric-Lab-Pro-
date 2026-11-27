@@ -1,0 +1,3427 @@
+{
+  "schemaVersion": "1.0.0",
+  "provenance": {
+    "source": "StartMyCar",
+    "sourceUrl": "https://www.startmycar.com/toyota/hilux/info/fusebox/2019",
+    "crawledAt": "2026-11-27T10:11:18.808Z",
+    "zeroFabricationIntegrity": true,
+    "tier": "VERIFIED",
+    "deduplicationStatus": "AUGMENTED_EXISTING",
+    "matchedRepositoryRecordId": "preset-toyota-hilux-2019"
+  },
+  "identification": {
+    "make": "Toyota",
+    "makeSlug": "toyota",
+    "model": "Hilux",
+    "modelSlug": "hilux",
+    "year": 2019,
+    "generation": null,
+    "platformCode": null,
+    "marketRegions": [
+      "Global",
+      "North America",
+      "ASEAN"
+    ],
+    "enginesDetected": []
+  },
+  "powerDistribution": {
+    "totalBoxes": 4,
+    "totalCavities": 179,
+    "totalFuses": 155,
+    "totalRelays": 24,
+    "boxes": [
+      {
+        "boxIndex": 0,
+        "boxName": "Engine Compartment Fuse Box [Gasoline]",
+        "location": "ENGINE_BAY",
+        "diagramUrl": "https://rewise-images.s3.amazonaws.com/originals/legos/fusebox-diagrams/4a51851d_toyota-hilux-2018.jpg",
+        "thumbnailUrl": "https://images.startmycar.com/legos/fusebox-thumbnails/fusebox-toyota-hilux-2019-genid-g8.1-0.webp",
+        "fuses": [
+          {
+            "id": "1",
+            "type": "fuse",
+            "format": "50-30-30",
+            "amp": 50,
+            "description": "(ABS NO.1) ABS, TRC, VSC, Downhill Assist Control, Hill-Start Assist Control",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "SISTEMA_ABS",
+              "CONTROL_DE_TRACCION",
+              "CONTROL_DE_ESTABILIDAD",
+              "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+              "ASISTENCIA_EN_PENDIENTES"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "2",
+            "type": "fuse",
+            "format": "50-30-30",
+            "amp": 30,
+            "description": "(ABS NO.2) ABS, TRC, VSC, Downhill Assist Control, Hill-Start Assist Control",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "SISTEMA_ABS",
+              "CONTROL_DE_TRACCION",
+              "CONTROL_DE_ESTABILIDAD",
+              "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+              "ASISTENCIA_EN_PENDIENTES"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "3",
+            "type": "fuse",
+            "format": "50-30-30",
+            "amp": 30,
+            "description": "(R/BI/P-ALT) \"IG1 NO.2' Relay: \"4WD-IG\", \"S/HTR\", \"S/HTR/S/VENT\", \"IG1 NO.5\" Fuses",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "4",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(INV) Power Outlet (Voltage Inverter)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "5",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(ECU-ALT NO.1) Double Locking",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "6",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "7",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(STOP)  Stop Light, ABS, TRC, VSC, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Charging, Downhill Assist Control, Entry & Start System, Hill-Start Assist Control, Immobiliser System, Shift Lock, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "LUZ_FRENO",
+              "TESTIGO_STOP",
+              "SISTEMA_ABS",
+              "CONTROL_DE_TRACCION",
+              "CONTROL_DE_ESTABILIDAD",
+              "SISTEMA_DE_INYECCION",
+              "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+              "ASISTENCIA_EN_PENDIENTES",
+              "DESBLOQUEO_CAJA_AUT",
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "8",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(STRG HTR) Heated Steering Wheel",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "9",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(4WD-ALT) 4WD",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "10",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 50,
+            "description": "(R/B FLOOR-ALT) \"DEF\" Relay, \"DEF\", \"FOG RR\", \"DEICER\", \"DEF-S\" Fuses",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "DESEMPANADOR",
+              "LUZ_ANTINIEBLA(ubicacion=PARTE_TRASERA)",
+              "DESEMPANADOR_TRASERO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "11",
+            "type": "fuse",
+            "format": "cartridge-flf",
+            "amp": 140,
+            "description": "(ALT) \"P/W\" Relay, \"ACC\" Relay, \"R/B FLOOR-ALT', \"R/B I/P-ALT\", \"4WD-ALT\", \"INV\", \"ABS NO.1\", \"ABS NO.2\", \"STOP\", \"P/SEAT\", \"P/SEAT (D)\", \"H-LP CLN\", \"STRGHTR\", \"ECU-ALT NO.1\", \"PTC HTR NO.1\", \"PTCHTRNO.2\", \"CDS FAN/PTC HTR NO.3\", \"HTR\", \"DOOR R/L\", \"DOOR NO.1\", \"DOOR R/R\", \"DOOR NO.2\", \"FOG FR/DRL\", \"TAIL\", \"OBD\", \"ECU-ALT NO.2\", \"AM1\", \"P/OUTLET NO.1\", \"SFT LOCK-ACC\" Fuses",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "GENERIC_FUSE_NAME",
+              "RELAY",
+              "ALTERNADOR",
+              "RELAY(protects=GENERIC_FUSE_NAME)",
+              "GENERIC_FUSE_NAME(protects=RELAY)",
+              "SISTEMA_ABS",
+              "TESTIGO_STOP",
+              "LUZ_FRENO",
+              "MARCHA_PARKING",
+              "ASIENTO",
+              "TESTIGO_DIRECCION_ASISTIDA",
+              "COMANDO_AJUSTE_ASIENTO",
+              "ASIENTO_ELECTRICO",
+              "GENERIC_FUSE_NAME(protects=ECU)",
+              "GENERIC_FUSE_NAME(numero=UNO,protects=ECU)",
+              "CALENTADOR_AIRE_ADMISION",
+              "CALEFACCION",
+              "CALEFACCION_DE_ASIENTO",
+              "PUERTA",
+              "LUZ_ANTINIEBLA",
+              "LUCES_CIRCULACION_DIURNA",
+              "SISTEMA_OBD",
+              "GENERIC_FUSE_NAME(numero=DOS,protects=ECU)",
+              "ACCESORIO_ELECTRICO",
+              "TOMA_12V"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "12",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(H-LP RHLO) Right-Hand Headlight (Low Beam)",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "13",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(H-LP LHLO) Left-Hand Headlight (Low Beam), Headlight Beam Level Control, Headlight Cleaner",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "14",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(H-LP RH-HI) Right-Hand Headlight (High Beam)",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_ALTA",
+              "LUCES_DELANTERAS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "15",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(H-LP LH-HI) Left-Hand Headlight (High Beam)",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_ALTA",
+              "LUCES_DELANTERAS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "16",
+            "type": "fuse",
+            "format": "40-30-30",
+            "amp": 30,
+            "description": "(P/SEAT(D))  Power Seat",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "17",
+            "type": "fuse",
+            "format": "40-30-30",
+            "amp": 30,
+            "description": "(PTCHTR NO.2) PTC Heater",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "18",
+            "type": "fuse",
+            "format": "40-30-30",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "19",
+            "type": "fuse",
+            "format": "50-30-30",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "20",
+            "type": "fuse",
+            "format": "50-30-30",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "21",
+            "type": "fuse",
+            "format": "50-30-30",
+            "amp": 50,
+            "description": "(PTC HTR NO.1) PTC Heater",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "CALENTADOR_AIRE_ADMISION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "22",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 30,
+            "description": "(H-LP CLN) Headlight Cleaner",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "23",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "24",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(S-HORN) Theft Deterrent",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "25",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(MAYDAY) Telematics System",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "26",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(HORN) Horn, Entry & Start System, Immobiliser System, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "BOCINA",
+              "ARRANQUE",
+              "INMOVILIZADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "27",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(EFI-B) Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "28",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(ALT-S/ICS) Charging",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "29",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(SMART) Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "30",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(ECU-B NO.3) Air Conditioner (Automatic), Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Immobiliser System, Mirror Heater, Multiplex Communication System, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "SISTEMA_DE_INYECCION",
+              "ARRANQUE",
+              "INMOVILIZADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "31",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(A/F HTR) Air Fuel Ratio Sensor",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "32",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(STRG LOCK/ AM2 NO.1) Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "33",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "(INJ)  Combination Meter, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Ignition",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "SISTEMA_DE_INYECCION",
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "34",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(ECU-B NO.2) Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "35",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "(ECU-B NO.4) Automatic Light Control, Door Lock Control, Entry & Start System, Front Fog Light, Headlight, Illumination, Immobiliser System Interior Light, Power Window, Rear Fog Light, Starting, Steering Lock, Taillight, Theft Deterrent, Wireless Door Lock Control",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "LUZ_ANTINIEBLA(ubicacion=PARTE_DELANTERA)",
+              "LUCES_DELANTERAS",
+              "BACKLIGHT",
+              "LEVANTAVIDRIOS",
+              "LUZ_ANTINIEBLA(ubicacion=PARTE_TRASERA)",
+              "ARRANQUE",
+              "LUCES_TRASERAS",
+              "INMOVILIZADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "36",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "37",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 30,
+            "description": "(D/C CUT) \"ECU-B NO.1\", \"RADIO\", \"DOME\" Fuses",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "ESTEREO",
+              "LUZ_DE_HABITACULO",
+              "FUSIBLE_LUZ_DE_HABITACULO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "38",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "39",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "40",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "41",
+            "type": "fuse",
+            "format": "cartridge-flf",
+            "amp": 80,
+            "description": "(GLOW) Glow System",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "42",
+            "type": "fuse",
+            "format": "cartridge-flf",
+            "amp": 60,
+            "description": "(J/B-B) \"EFI-MAIN NO.1\" Relay, \"EFI-MAIN NO.2\" Relay, \"EFI-MAIN NO.1\", \"EFI-MAIN NO.2\", \"TURN&HAZ\", \"ETCS\", \"EFI NO.1\", \"AM2 NO.2\" Fuses",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "EFI",
+              "GENERIC_FUSE_NAME(numero=DOS)",
+              "FUSIBLE(numero=DOS,protects=GENERIC_FUSE_NAME)",
+              "FUSIBLE(protects=GENERIC_FUSE_NAME(numero=DOS))",
+              "GENERIC_FUSE_NAME(numero=DOS,protects=FUSIBLE)",
+              "GENERIC_FUSE_NAME(protects=FUSIBLE_DE_ENCENDIDO_2)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "43",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(DOME) Immobiliser System, Entry & Start System, Interior Light, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "LUZ_DE_HABITACULO",
+              "ARRANQUE",
+              "INMOVILIZADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "44",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(RADIO) Audio System, Navigation System, Rear View Monitor System",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "ESTEREO",
+              "NAVEGADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "45",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(ECU-B NO.1) 4WD, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, ABS, Air Conditioner (Automatic), Audio System, Charging, Clock, Combination Meter, Door Lock Control, Double Locking, Downhill Assist Control, Entry & Start System, Headlight, Headlight Beam Level Control (Automatic), Headlight Cleaner, Hill-Start Assist Control, Illumination, Immobiliser System, Interior Light, Key Reminder, Lane Departure Alert, Light Reminder, Navigation System, Pre-Collision System, Rear View Monitor System, Seat Belt Warning, SRS, Starting, Steering Lock, Stop & Start System, Taillight, Telematics System, Theft Deterrent, Tire Pressure Warning System, TRC, Turn Signal and Hazard Warning Light, VSC, Wireless Door Lock Control",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "SISTEMA_DE_INYECCION",
+              "SISTEMA_ABS",
+              "ESTEREO",
+              "RELOJ",
+              "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+              "LUCES_DELANTERAS",
+              "ASISTENCIA_EN_PENDIENTES",
+              "BACKLIGHT",
+              "LUZ_DE_HABITACULO",
+              "NAVEGADOR",
+              "AIRBAG",
+              "TESTIGO_SRS",
+              "ARRANQUE",
+              "LUCES_TRASERAS",
+              "INMOVILIZADOR",
+              "CONTROL_DE_TRACCION",
+              "LUZ_DIRECCIONAL",
+              "CONTROL_DE_ESTABILIDAD"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "46",
+            "type": "fuse",
+            "amp": 40,
+            "description": "(BBC NO.3) Stop & Start System",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "47",
+            "type": "fuse",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "48",
+            "type": "fuse",
+            "amp": 40,
+            "description": "(BBC NO.1) Stop & Start System",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "49",
+            "type": "fuse",
+            "amp": 30,
+            "description": "(ST NO.1) Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "50",
+            "type": "fuse",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "51",
+            "type": "fuse",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "52",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 50,
+            "description": "(AIR PMP) Air Pump",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "52",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 50,
+            "description": "(DCU-MAIN) \"DCU-MAIN\" Relay, \"DCU NO.1\", \"DCU NO.2\", \"DCU-B\", \"NOX PM\" Fuses",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "53",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 40,
+            "description": "(H-LP MAIN) \"H-LP\" Relay, \"DIMMER\" Relay, \"H-LP LH-LO\", \"H-LP RH-LO\", \"H-LP LH-HI\", \"H-LP RH-HI\" Fuses",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUCES_DELANTERAS",
+              "RELAY",
+              "LUZ_BAJA(ubicacion=LADO_IZQUIERDO)",
+              "LUZ_BAJA(ubicacion=LADO_DERECHO)",
+              "LUZ_ALTA(ubicacion=LADO_IZQUIERDO)",
+              "LUZ_ALTA(ubicacion=LADO_DERECHO)",
+              "FUSIBLE_LUZ_ALTA_DERECHA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "54",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(ODS) Occupant Detection ECU",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R1",
+            "type": "relay",
+            "format": "full",
+            "amp": null,
+            "description": "Dimmer",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R2",
+            "type": "relay",
+            "format": "full",
+            "amp": null,
+            "description": "Headlight (H-LP)",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUCES_DELANTERAS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "R3",
+            "type": "relay",
+            "format": "full",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R4",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Air Fuel Ratio Sensor (A/F HTR)",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R5",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Fuel Pump / Air Pump (FUEL PMP/AIR PMP HTR)",
+            "circuitRole": "FUEL_PUMP",
+            "relatedEntities": [
+              "BOMBA(fluid=COMBUSTIBLE)",
+              "BOMBA_DE_COMBUSTIBLE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "R6",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Stop Lights/Electric cooling fan (STOP/CDS FAN)",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R7",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Starter (ST NO.1)",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "BURRO_DE_ARRANQUE",
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "R8",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Horn",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "BOCINA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "R9",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Fuel Injector (INJ)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "SVG1",
+            "type": "fuse",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "Battery",
+            "type": "fuse",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          }
+        ],
+        "activeEcuAndSensors": {
+          "ecuFuses": [
+            {
+              "id": "5",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(ECU-ALT NO.1) Double Locking",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "7",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(STOP)  Stop Light, ABS, TRC, VSC, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Charging, Downhill Assist Control, Entry & Start System, Hill-Start Assist Control, Immobiliser System, Shift Lock, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "LUZ_FRENO",
+                "TESTIGO_STOP",
+                "SISTEMA_ABS",
+                "CONTROL_DE_TRACCION",
+                "CONTROL_DE_ESTABILIDAD",
+                "SISTEMA_DE_INYECCION",
+                "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+                "ASISTENCIA_EN_PENDIENTES",
+                "DESBLOQUEO_CAJA_AUT",
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "11",
+              "type": "fuse",
+              "format": "cartridge-flf",
+              "amp": 140,
+              "description": "(ALT) \"P/W\" Relay, \"ACC\" Relay, \"R/B FLOOR-ALT', \"R/B I/P-ALT\", \"4WD-ALT\", \"INV\", \"ABS NO.1\", \"ABS NO.2\", \"STOP\", \"P/SEAT\", \"P/SEAT (D)\", \"H-LP CLN\", \"STRGHTR\", \"ECU-ALT NO.1\", \"PTC HTR NO.1\", \"PTCHTRNO.2\", \"CDS FAN/PTC HTR NO.3\", \"HTR\", \"DOOR R/L\", \"DOOR NO.1\", \"DOOR R/R\", \"DOOR NO.2\", \"FOG FR/DRL\", \"TAIL\", \"OBD\", \"ECU-ALT NO.2\", \"AM1\", \"P/OUTLET NO.1\", \"SFT LOCK-ACC\" Fuses",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "GENERIC_FUSE_NAME",
+                "RELAY",
+                "ALTERNADOR",
+                "RELAY(protects=GENERIC_FUSE_NAME)",
+                "GENERIC_FUSE_NAME(protects=RELAY)",
+                "SISTEMA_ABS",
+                "TESTIGO_STOP",
+                "LUZ_FRENO",
+                "MARCHA_PARKING",
+                "ASIENTO",
+                "TESTIGO_DIRECCION_ASISTIDA",
+                "COMANDO_AJUSTE_ASIENTO",
+                "ASIENTO_ELECTRICO",
+                "GENERIC_FUSE_NAME(protects=ECU)",
+                "GENERIC_FUSE_NAME(numero=UNO,protects=ECU)",
+                "CALENTADOR_AIRE_ADMISION",
+                "CALEFACCION",
+                "CALEFACCION_DE_ASIENTO",
+                "PUERTA",
+                "LUZ_ANTINIEBLA",
+                "LUCES_CIRCULACION_DIURNA",
+                "SISTEMA_OBD",
+                "GENERIC_FUSE_NAME(numero=DOS,protects=ECU)",
+                "ACCESORIO_ELECTRICO",
+                "TOMA_12V"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "27",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 7.5,
+              "description": "(EFI-B) Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "30",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(ECU-B NO.3) Air Conditioner (Automatic), Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Immobiliser System, Mirror Heater, Multiplex Communication System, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "SISTEMA_DE_INYECCION",
+                "ARRANQUE",
+                "INMOVILIZADOR"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "33",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 15,
+              "description": "(INJ)  Combination Meter, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Ignition",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "SISTEMA_DE_INYECCION",
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "34",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(ECU-B NO.2) Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "35",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 25,
+              "description": "(ECU-B NO.4) Automatic Light Control, Door Lock Control, Entry & Start System, Front Fog Light, Headlight, Illumination, Immobiliser System Interior Light, Power Window, Rear Fog Light, Starting, Steering Lock, Taillight, Theft Deterrent, Wireless Door Lock Control",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "LUZ_ANTINIEBLA(ubicacion=PARTE_DELANTERA)",
+                "LUCES_DELANTERAS",
+                "BACKLIGHT",
+                "LEVANTAVIDRIOS",
+                "LUZ_ANTINIEBLA(ubicacion=PARTE_TRASERA)",
+                "ARRANQUE",
+                "LUCES_TRASERAS",
+                "INMOVILIZADOR"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "37",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 30,
+              "description": "(D/C CUT) \"ECU-B NO.1\", \"RADIO\", \"DOME\" Fuses",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "ESTEREO",
+                "LUZ_DE_HABITACULO",
+                "FUSIBLE_LUZ_DE_HABITACULO"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "42",
+              "type": "fuse",
+              "format": "cartridge-flf",
+              "amp": 60,
+              "description": "(J/B-B) \"EFI-MAIN NO.1\" Relay, \"EFI-MAIN NO.2\" Relay, \"EFI-MAIN NO.1\", \"EFI-MAIN NO.2\", \"TURN&HAZ\", \"ETCS\", \"EFI NO.1\", \"AM2 NO.2\" Fuses",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "EFI",
+                "GENERIC_FUSE_NAME(numero=DOS)",
+                "FUSIBLE(numero=DOS,protects=GENERIC_FUSE_NAME)",
+                "FUSIBLE(protects=GENERIC_FUSE_NAME(numero=DOS))",
+                "GENERIC_FUSE_NAME(numero=DOS,protects=FUSIBLE)",
+                "GENERIC_FUSE_NAME(protects=FUSIBLE_DE_ENCENDIDO_2)"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "45",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(ECU-B NO.1) 4WD, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, ABS, Air Conditioner (Automatic), Audio System, Charging, Clock, Combination Meter, Door Lock Control, Double Locking, Downhill Assist Control, Entry & Start System, Headlight, Headlight Beam Level Control (Automatic), Headlight Cleaner, Hill-Start Assist Control, Illumination, Immobiliser System, Interior Light, Key Reminder, Lane Departure Alert, Light Reminder, Navigation System, Pre-Collision System, Rear View Monitor System, Seat Belt Warning, SRS, Starting, Steering Lock, Stop & Start System, Taillight, Telematics System, Theft Deterrent, Tire Pressure Warning System, TRC, Turn Signal and Hazard Warning Light, VSC, Wireless Door Lock Control",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "SISTEMA_DE_INYECCION",
+                "SISTEMA_ABS",
+                "ESTEREO",
+                "RELOJ",
+                "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+                "LUCES_DELANTERAS",
+                "ASISTENCIA_EN_PENDIENTES",
+                "BACKLIGHT",
+                "LUZ_DE_HABITACULO",
+                "NAVEGADOR",
+                "AIRBAG",
+                "TESTIGO_SRS",
+                "ARRANQUE",
+                "LUCES_TRASERAS",
+                "INMOVILIZADOR",
+                "CONTROL_DE_TRACCION",
+                "LUZ_DIRECCIONAL",
+                "CONTROL_DE_ESTABILIDAD"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "54",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 7.5,
+              "description": "(ODS) Occupant Detection ECU",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [],
+              "notUsed": false
+            }
+          ],
+          "sensorPowerFuses": [
+            {
+              "id": "31",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 20,
+              "description": "(A/F HTR) Air Fuel Ratio Sensor",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "R4",
+              "type": "relay",
+              "format": "half",
+              "amp": null,
+              "description": "Air Fuel Ratio Sensor (A/F HTR)",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [],
+              "notUsed": false
+            }
+          ],
+          "obdDlcFuses": [],
+          "ignitionFuses": [
+            {
+              "id": "1",
+              "type": "fuse",
+              "format": "50-30-30",
+              "amp": 50,
+              "description": "(ABS NO.1) ABS, TRC, VSC, Downhill Assist Control, Hill-Start Assist Control",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "SISTEMA_ABS",
+                "CONTROL_DE_TRACCION",
+                "CONTROL_DE_ESTABILIDAD",
+                "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+                "ASISTENCIA_EN_PENDIENTES"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "2",
+              "type": "fuse",
+              "format": "50-30-30",
+              "amp": 30,
+              "description": "(ABS NO.2) ABS, TRC, VSC, Downhill Assist Control, Hill-Start Assist Control",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "SISTEMA_ABS",
+                "CONTROL_DE_TRACCION",
+                "CONTROL_DE_ESTABILIDAD",
+                "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+                "ASISTENCIA_EN_PENDIENTES"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "26",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(HORN) Horn, Entry & Start System, Immobiliser System, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "BOCINA",
+                "ARRANQUE",
+                "INMOVILIZADOR"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "29",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 7.5,
+              "description": "(SMART) Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "32",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(STRG LOCK/ AM2 NO.1) Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "43",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(DOME) Immobiliser System, Entry & Start System, Interior Light, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "LUZ_DE_HABITACULO",
+                "ARRANQUE",
+                "INMOVILIZADOR"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "46",
+              "type": "fuse",
+              "amp": 40,
+              "description": "(BBC NO.3) Stop & Start System",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "48",
+              "type": "fuse",
+              "amp": 40,
+              "description": "(BBC NO.1) Stop & Start System",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "49",
+              "type": "fuse",
+              "amp": 30,
+              "description": "(ST NO.1) Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "R7",
+              "type": "relay",
+              "format": "half",
+              "amp": null,
+              "description": "Starter (ST NO.1)",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "BURRO_DE_ARRANQUE",
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 1,
+        "boxName": "Engine Compartment Fuse Box [Diesel]",
+        "location": "ENGINE_BAY",
+        "diagramUrl": "https://rewise-images.s3.amazonaws.com/originals/legos/fusebox-diagrams/4a51851d_toyota-hilux-2018.jpg",
+        "thumbnailUrl": "https://images.startmycar.com/legos/fusebox-thumbnails/fusebox-toyota-hilux-2019-genid-g8.1-1.webp",
+        "fuses": [
+          {
+            "id": "1",
+            "type": "fuse",
+            "format": "50-30-50",
+            "amp": 50,
+            "description": "(ABS NO.1) ABS, TRC, VSC, Downhill Assist Control, Hill-Start Assist Control",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "SISTEMA_ABS",
+              "CONTROL_DE_TRACCION",
+              "CONTROL_DE_ESTABILIDAD",
+              "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+              "ASISTENCIA_EN_PENDIENTES"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "2",
+            "type": "fuse",
+            "format": "50-30-50",
+            "amp": 30,
+            "description": "(ABS NO.2) ABS, TRC, VSC, Downhill Assist Control, Hill-Start Assist Control",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "SISTEMA_ABS",
+              "CONTROL_DE_TRACCION",
+              "CONTROL_DE_ESTABILIDAD",
+              "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+              "ASISTENCIA_EN_PENDIENTES"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "3",
+            "type": "fuse",
+            "format": "50-30-50",
+            "amp": 30,
+            "description": "(R/BI/P-ALT) \"IG1 NO.2' Relay: \"4WD-IG\", \"S/HTR\", \"S/HTR/S/VENT\", \"IG1 NO.5\" Fuses",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "4",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(INV) Power Outlet (Voltage Inverter)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "5",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(ECU-ALT NO.1) Double Locking",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "6",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "((P/Outlet NO.2)) Cigar lighter / power outlet",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "ENCENDEDOR",
+              "TOMA_12V"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "7",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(STOP) Stop Light, ABS, TRC, VSC, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Charging, Downhill Assist Control, Entry & Start System, Hill-Start Assist Control, Immobiliser System, Shift Lock, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "LUZ_FRENO",
+              "TESTIGO_STOP",
+              "SISTEMA_ABS",
+              "CONTROL_DE_TRACCION",
+              "CONTROL_DE_ESTABILIDAD",
+              "SISTEMA_DE_INYECCION",
+              "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+              "ASISTENCIA_EN_PENDIENTES",
+              "DESBLOQUEO_CAJA_AUT",
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "8",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(STRG HTR) Heated Steering Wheel",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "9",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(4WD-ALT) 4WD",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "10",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 50,
+            "description": "(R/B FLOOR-ALT) \"DEF\" Relay, \"DEF\", \"FOG RR\", \"DEICER\", \"DEF-S\" Fuses",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "DESEMPANADOR",
+              "LUZ_ANTINIEBLA(ubicacion=PARTE_TRASERA)",
+              "DESEMPANADOR_TRASERO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "11",
+            "type": "fuse",
+            "format": "cartridge-flf",
+            "amp": 140,
+            "description": "(ALT) \"P/W\" Relay, \"ACC\" Relay, \"R/B FLOOR-ALT', \"R/B I/P-ALT\", \"4WD-ALT\", \"INV\", \"ABS NO.1\", \"ABS NO.2\", \"STOP\", \"P/SEAT\", \"P/SEAT (D)\", \"H-LP CLN\", \"STRGHTR\", \"ECU-ALT NO.1\", \"PTC HTR NO.1\", \"PTCHTRNO.2\", \"CDS FAN/PTC HTR NO.3\", \"HTR\", \"DOOR R/L\", \"DOOR NO.1\", \"DOOR R/R\", \"DOOR NO.2\", \"FOG FR/DRL\", \"TAIL\", \"OBD\", \"ECU-ALT NO.2\", \"AM1\", \"P/OUTLET NO.1\", \"SFT LOCK-ACC\" Fuses",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "GENERIC_FUSE_NAME",
+              "RELAY",
+              "ALTERNADOR",
+              "RELAY(protects=GENERIC_FUSE_NAME)",
+              "GENERIC_FUSE_NAME(protects=RELAY)",
+              "SISTEMA_ABS",
+              "TESTIGO_STOP",
+              "LUZ_FRENO",
+              "MARCHA_PARKING",
+              "ASIENTO",
+              "TESTIGO_DIRECCION_ASISTIDA",
+              "COMANDO_AJUSTE_ASIENTO",
+              "ASIENTO_ELECTRICO",
+              "GENERIC_FUSE_NAME(protects=ECU)",
+              "GENERIC_FUSE_NAME(numero=UNO,protects=ECU)",
+              "CALENTADOR_AIRE_ADMISION",
+              "CALEFACCION",
+              "CALEFACCION_DE_ASIENTO",
+              "PUERTA",
+              "LUZ_ANTINIEBLA",
+              "LUCES_CIRCULACION_DIURNA",
+              "SISTEMA_OBD",
+              "GENERIC_FUSE_NAME(numero=DOS,protects=ECU)",
+              "ACCESORIO_ELECTRICO",
+              "TOMA_12V"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "12",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(H-LP RHLO) Right-Hand Headlight (Low Beam)",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "13",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(H-LP LHLO) Left-Hand Headlight (Low Beam), Headlight Beam Level Control, Headlight Cleaner",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "14",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(H-LP RH-HI) Right-Hand Headlight (High Beam)",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_ALTA",
+              "LUCES_DELANTERAS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "15",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(H-LP LH-HI) Left-Hand Headlight (High Beam)",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_ALTA",
+              "LUCES_DELANTERAS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "16",
+            "type": "fuse",
+            "format": "40-30-30",
+            "amp": 30,
+            "description": "(P/SEAT(D))  Power Seat",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "17",
+            "type": "fuse",
+            "format": "40-30-30",
+            "amp": 30,
+            "description": "(PTCHTR NO.2) PTC Heater",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "18",
+            "type": "fuse",
+            "format": "40-30-30",
+            "amp": null,
+            "description": "(CLR RR) CLR RR",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "19",
+            "type": "fuse",
+            "format": "50-30-30",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "20",
+            "type": "fuse",
+            "format": "50-30-30",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "21",
+            "type": "fuse",
+            "format": "50-30-30",
+            "amp": 50,
+            "description": "(PTC HTR NO.1) PTC Heater",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "CALENTADOR_AIRE_ADMISION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "22",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 30,
+            "description": "(H-LP CLN) Headlight Cleaner",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "23",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": null,
+            "description": "(CDS FAN/\nPTC HTR NO.3) Ar condicionado, Aquecedor PTC, Ventilador de arrefecimento eléctrico",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "24",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(S-HORN) Theft Deterrent",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "25",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(MAYDAY) Telematics System",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "26",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(HORN) Horn, Entry & Start System, Immobiliser System, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "BOCINA",
+              "ARRANQUE",
+              "INMOVILIZADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "27",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(EFI-B) Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "28",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(ALT-S/ICS) Charging",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "29",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(SMART) Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "30",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(ECU-B NO.3) Air Conditioner (Automatic), Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Immobiliser System, Mirror Heater, Multiplex Communication System, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "SISTEMA_DE_INYECCION",
+              "ARRANQUE",
+              "INMOVILIZADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "31",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "(EDU) Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "32",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(STRG LOCK/ AM2 NO.1) Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "33",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 30,
+            "description": "(ST NO.2) [2GD-FTV with Stop & Start System]: Entry 8t Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "34",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(ECU-B NO.2) Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "35",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "(ECU-B NO.4) Automatic Light Control, Door Lock Control, Entry & Start System, Front Fog Light, Headlight, Illumination, Immobiliser System Interior Light, Power Window, Rear Fog Light, Starting, Steering Lock, Taillight, Theft Deterrent, Wireless Door Lock Control",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "LUZ_ANTINIEBLA(ubicacion=PARTE_DELANTERA)",
+              "LUCES_DELANTERAS",
+              "BACKLIGHT",
+              "LEVANTAVIDRIOS",
+              "LUZ_ANTINIEBLA(ubicacion=PARTE_TRASERA)",
+              "ARRANQUE",
+              "LUCES_TRASERAS",
+              "INMOVILIZADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "36",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "37",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 30,
+            "description": "(D/C CUT) \"ECU-B NO.1\", \"RADIO\", \"DOME\" Fuses",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "ESTEREO",
+              "LUZ_DE_HABITACULO",
+              "FUSIBLE_LUZ_DE_HABITACULO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "38",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "39",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "40",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "41",
+            "type": "fuse",
+            "format": "cartridge-flf",
+            "amp": 80,
+            "description": "(GLOW) Glow System",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "42",
+            "type": "fuse",
+            "format": "cartridge-flf",
+            "amp": 60,
+            "description": "(J/B-B) \"EFI-MAIN NO.1\" Relay, \"EFI-MAIN NO.2\" Relay, \"EFI-MAIN NO.1\", \"EFI-MAIN NO.2\", \"TURN&HAZ\", \"ETCS\", \"EFI NO.1\", \"AM2 NO.2\" Fuses",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "EFI",
+              "GENERIC_FUSE_NAME(numero=DOS)",
+              "FUSIBLE(numero=DOS,protects=GENERIC_FUSE_NAME)",
+              "FUSIBLE(protects=GENERIC_FUSE_NAME(numero=DOS))",
+              "GENERIC_FUSE_NAME(numero=DOS,protects=FUSIBLE)",
+              "GENERIC_FUSE_NAME(protects=FUSIBLE_DE_ENCENDIDO_2)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "43",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(DOME) Immobiliser System, Entry & Start System, Interior Light, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "LUZ_DE_HABITACULO",
+              "ARRANQUE",
+              "INMOVILIZADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "44",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(RADIO) Audio System, Navigation System, Rear View Monitor System",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "ESTEREO",
+              "NAVEGADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "45",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(ECU-B NO.1) 4WD, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, ABS, Air Conditioner (Automatic), Audio System, Charging, Clock, Combination Meter, Door Lock Control, Double Locking, Downhill Assist Control, Entry & Start System, Headlight, Headlight Beam Level Control (Automatic), Headlight Cleaner, Hill-Start Assist Control, Illumination, Immobiliser System, Interior Light, Key Reminder, Lane Departure Alert, Light Reminder, Navigation System, Pre-Collision System, Rear View Monitor System, Seat Belt Warning, SRS, Starting, Steering Lock, Stop & Start System, Taillight, Telematics System, Theft Deterrent, Tire Pressure Warning System, TRC, Turn Signal and Hazard Warning Light, VSC, Wireless Door Lock Control",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "SISTEMA_DE_INYECCION",
+              "SISTEMA_ABS",
+              "ESTEREO",
+              "RELOJ",
+              "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+              "LUCES_DELANTERAS",
+              "ASISTENCIA_EN_PENDIENTES",
+              "BACKLIGHT",
+              "LUZ_DE_HABITACULO",
+              "NAVEGADOR",
+              "AIRBAG",
+              "TESTIGO_SRS",
+              "ARRANQUE",
+              "LUCES_TRASERAS",
+              "INMOVILIZADOR",
+              "CONTROL_DE_TRACCION",
+              "LUZ_DIRECCIONAL",
+              "CONTROL_DE_ESTABILIDAD"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "46",
+            "type": "fuse",
+            "format": "40-40-40",
+            "amp": 40,
+            "description": "(BBC NO.3) Stop & Start System",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "47",
+            "type": "fuse",
+            "format": "40-40-40",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "48",
+            "type": "fuse",
+            "format": "40-40-40",
+            "amp": 40,
+            "description": "(BBC NO.1) Stop & Start System",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "49",
+            "type": "fuse",
+            "format": "50-30-50",
+            "amp": 50,
+            "description": "(ST NO.1)  Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "50",
+            "type": "fuse",
+            "format": "50-30-50",
+            "amp": null,
+            "description": "(BBC NO.2 / AMP) BBC NO.2 / AMP",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "AMPLIFICADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "51",
+            "type": "fuse",
+            "format": "50-30-50",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "52",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 50,
+            "description": "(AIR PMP) Air Pump",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "52",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 50,
+            "description": "(DCU-MAIN) \"DCU-MAIN\" Relay, \"DCU NO.1\", \"DCU NO.2\", \"DCU-B\", \"NOX PM\" Fuses",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "53",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 40,
+            "description": "(H-LP MAIN) \"H-LP\" Relay, \"DIMMER\" Relay, \"H-LP LH-LO\", \"H-LP RH-LO\", \"H-LP LH-HI\", \"H-LP RH-HI\" Fuses",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUCES_DELANTERAS",
+              "RELAY",
+              "LUZ_BAJA(ubicacion=LADO_IZQUIERDO)",
+              "LUZ_BAJA(ubicacion=LADO_DERECHO)",
+              "LUZ_ALTA(ubicacion=LADO_IZQUIERDO)",
+              "LUZ_ALTA(ubicacion=LADO_DERECHO)",
+              "FUSIBLE_LUZ_ALTA_DERECHA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "54",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(ODS) Occupant Detection ECU",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "Battery",
+            "type": "fuse",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R1",
+            "type": "relay",
+            "format": "full",
+            "amp": null,
+            "description": "(Dimmer) Instrument panel lights",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_TESTIGO",
+              "BACKLIGHT(of=TABLERO)"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "R2",
+            "type": "relay",
+            "format": "full",
+            "amp": null,
+            "description": "Headlight (H-LP)",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUCES_DELANTERAS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "R3",
+            "type": "relay",
+            "format": "full",
+            "amp": null,
+            "description": "Starter (ST NO.1)",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "BURRO_DE_ARRANQUE",
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "R4",
+            "type": "relay",
+            "format": "full",
+            "amp": null,
+            "description": "Glow System (GLOW)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R5",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Stop Lights/Electric cooling fan (STOP/CDS FAN)",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R6",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "[2GD-FTV with Stop & Start System]: Starter (ST NO.2)",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "BURRO_DE_ARRANQUE",
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "R7",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Horn) Horn",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "BOCINA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "R8",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "Injector Driver (EDU)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "SVG1",
+            "type": "fuse",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          }
+        ],
+        "activeEcuAndSensors": {
+          "ecuFuses": [
+            {
+              "id": "5",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(ECU-ALT NO.1) Double Locking",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "7",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(STOP) Stop Light, ABS, TRC, VSC, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Charging, Downhill Assist Control, Entry & Start System, Hill-Start Assist Control, Immobiliser System, Shift Lock, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "LUZ_FRENO",
+                "TESTIGO_STOP",
+                "SISTEMA_ABS",
+                "CONTROL_DE_TRACCION",
+                "CONTROL_DE_ESTABILIDAD",
+                "SISTEMA_DE_INYECCION",
+                "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+                "ASISTENCIA_EN_PENDIENTES",
+                "DESBLOQUEO_CAJA_AUT",
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "11",
+              "type": "fuse",
+              "format": "cartridge-flf",
+              "amp": 140,
+              "description": "(ALT) \"P/W\" Relay, \"ACC\" Relay, \"R/B FLOOR-ALT', \"R/B I/P-ALT\", \"4WD-ALT\", \"INV\", \"ABS NO.1\", \"ABS NO.2\", \"STOP\", \"P/SEAT\", \"P/SEAT (D)\", \"H-LP CLN\", \"STRGHTR\", \"ECU-ALT NO.1\", \"PTC HTR NO.1\", \"PTCHTRNO.2\", \"CDS FAN/PTC HTR NO.3\", \"HTR\", \"DOOR R/L\", \"DOOR NO.1\", \"DOOR R/R\", \"DOOR NO.2\", \"FOG FR/DRL\", \"TAIL\", \"OBD\", \"ECU-ALT NO.2\", \"AM1\", \"P/OUTLET NO.1\", \"SFT LOCK-ACC\" Fuses",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "GENERIC_FUSE_NAME",
+                "RELAY",
+                "ALTERNADOR",
+                "RELAY(protects=GENERIC_FUSE_NAME)",
+                "GENERIC_FUSE_NAME(protects=RELAY)",
+                "SISTEMA_ABS",
+                "TESTIGO_STOP",
+                "LUZ_FRENO",
+                "MARCHA_PARKING",
+                "ASIENTO",
+                "TESTIGO_DIRECCION_ASISTIDA",
+                "COMANDO_AJUSTE_ASIENTO",
+                "ASIENTO_ELECTRICO",
+                "GENERIC_FUSE_NAME(protects=ECU)",
+                "GENERIC_FUSE_NAME(numero=UNO,protects=ECU)",
+                "CALENTADOR_AIRE_ADMISION",
+                "CALEFACCION",
+                "CALEFACCION_DE_ASIENTO",
+                "PUERTA",
+                "LUZ_ANTINIEBLA",
+                "LUCES_CIRCULACION_DIURNA",
+                "SISTEMA_OBD",
+                "GENERIC_FUSE_NAME(numero=DOS,protects=ECU)",
+                "ACCESORIO_ELECTRICO",
+                "TOMA_12V"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "27",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 7.5,
+              "description": "(EFI-B) Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "30",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(ECU-B NO.3) Air Conditioner (Automatic), Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Immobiliser System, Mirror Heater, Multiplex Communication System, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "SISTEMA_DE_INYECCION",
+                "ARRANQUE",
+                "INMOVILIZADOR"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "34",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(ECU-B NO.2) Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "35",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 25,
+              "description": "(ECU-B NO.4) Automatic Light Control, Door Lock Control, Entry & Start System, Front Fog Light, Headlight, Illumination, Immobiliser System Interior Light, Power Window, Rear Fog Light, Starting, Steering Lock, Taillight, Theft Deterrent, Wireless Door Lock Control",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "LUZ_ANTINIEBLA(ubicacion=PARTE_DELANTERA)",
+                "LUCES_DELANTERAS",
+                "BACKLIGHT",
+                "LEVANTAVIDRIOS",
+                "LUZ_ANTINIEBLA(ubicacion=PARTE_TRASERA)",
+                "ARRANQUE",
+                "LUCES_TRASERAS",
+                "INMOVILIZADOR"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "37",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 30,
+              "description": "(D/C CUT) \"ECU-B NO.1\", \"RADIO\", \"DOME\" Fuses",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "ESTEREO",
+                "LUZ_DE_HABITACULO",
+                "FUSIBLE_LUZ_DE_HABITACULO"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "42",
+              "type": "fuse",
+              "format": "cartridge-flf",
+              "amp": 60,
+              "description": "(J/B-B) \"EFI-MAIN NO.1\" Relay, \"EFI-MAIN NO.2\" Relay, \"EFI-MAIN NO.1\", \"EFI-MAIN NO.2\", \"TURN&HAZ\", \"ETCS\", \"EFI NO.1\", \"AM2 NO.2\" Fuses",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "EFI",
+                "GENERIC_FUSE_NAME(numero=DOS)",
+                "FUSIBLE(numero=DOS,protects=GENERIC_FUSE_NAME)",
+                "FUSIBLE(protects=GENERIC_FUSE_NAME(numero=DOS))",
+                "GENERIC_FUSE_NAME(numero=DOS,protects=FUSIBLE)",
+                "GENERIC_FUSE_NAME(protects=FUSIBLE_DE_ENCENDIDO_2)"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "45",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(ECU-B NO.1) 4WD, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, ABS, Air Conditioner (Automatic), Audio System, Charging, Clock, Combination Meter, Door Lock Control, Double Locking, Downhill Assist Control, Entry & Start System, Headlight, Headlight Beam Level Control (Automatic), Headlight Cleaner, Hill-Start Assist Control, Illumination, Immobiliser System, Interior Light, Key Reminder, Lane Departure Alert, Light Reminder, Navigation System, Pre-Collision System, Rear View Monitor System, Seat Belt Warning, SRS, Starting, Steering Lock, Stop & Start System, Taillight, Telematics System, Theft Deterrent, Tire Pressure Warning System, TRC, Turn Signal and Hazard Warning Light, VSC, Wireless Door Lock Control",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "SISTEMA_DE_INYECCION",
+                "SISTEMA_ABS",
+                "ESTEREO",
+                "RELOJ",
+                "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+                "LUCES_DELANTERAS",
+                "ASISTENCIA_EN_PENDIENTES",
+                "BACKLIGHT",
+                "LUZ_DE_HABITACULO",
+                "NAVEGADOR",
+                "AIRBAG",
+                "TESTIGO_SRS",
+                "ARRANQUE",
+                "LUCES_TRASERAS",
+                "INMOVILIZADOR",
+                "CONTROL_DE_TRACCION",
+                "LUZ_DIRECCIONAL",
+                "CONTROL_DE_ESTABILIDAD"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "54",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 7.5,
+              "description": "(ODS) Occupant Detection ECU",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [],
+              "notUsed": false
+            }
+          ],
+          "sensorPowerFuses": [],
+          "obdDlcFuses": [],
+          "ignitionFuses": [
+            {
+              "id": "1",
+              "type": "fuse",
+              "format": "50-30-50",
+              "amp": 50,
+              "description": "(ABS NO.1) ABS, TRC, VSC, Downhill Assist Control, Hill-Start Assist Control",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "SISTEMA_ABS",
+                "CONTROL_DE_TRACCION",
+                "CONTROL_DE_ESTABILIDAD",
+                "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+                "ASISTENCIA_EN_PENDIENTES"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "2",
+              "type": "fuse",
+              "format": "50-30-50",
+              "amp": 30,
+              "description": "(ABS NO.2) ABS, TRC, VSC, Downhill Assist Control, Hill-Start Assist Control",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "SISTEMA_ABS",
+                "CONTROL_DE_TRACCION",
+                "CONTROL_DE_ESTABILIDAD",
+                "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+                "ASISTENCIA_EN_PENDIENTES"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "26",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(HORN) Horn, Entry & Start System, Immobiliser System, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "BOCINA",
+                "ARRANQUE",
+                "INMOVILIZADOR"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "29",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 7.5,
+              "description": "(SMART) Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "32",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(STRG LOCK/ AM2 NO.1) Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "33",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 30,
+              "description": "(ST NO.2) [2GD-FTV with Stop & Start System]: Entry 8t Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "43",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(DOME) Immobiliser System, Entry & Start System, Interior Light, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "LUZ_DE_HABITACULO",
+                "ARRANQUE",
+                "INMOVILIZADOR"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "46",
+              "type": "fuse",
+              "format": "40-40-40",
+              "amp": 40,
+              "description": "(BBC NO.3) Stop & Start System",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "48",
+              "type": "fuse",
+              "format": "40-40-40",
+              "amp": 40,
+              "description": "(BBC NO.1) Stop & Start System",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "49",
+              "type": "fuse",
+              "format": "50-30-50",
+              "amp": 50,
+              "description": "(ST NO.1)  Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "R3",
+              "type": "relay",
+              "format": "full",
+              "amp": null,
+              "description": "Starter (ST NO.1)",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "BURRO_DE_ARRANQUE",
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "R6",
+              "type": "relay",
+              "format": "half",
+              "amp": null,
+              "description": "[2GD-FTV with Stop & Start System]: Starter (ST NO.2)",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "BURRO_DE_ARRANQUE",
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 2,
+        "boxName": "Passenger Compartment Fuse Panel ",
+        "location": "INTERIOR_CABIN",
+        "diagramUrl": "https://rewise-images.s3.amazonaws.com/originals/legos/fusebox-diagrams/30741744_toyota-hilux-2018.jpg",
+        "thumbnailUrl": "https://images.startmycar.com/legos/fusebox-thumbnails/fusebox-toyota-hilux-2019-genid-g8.1-2.webp",
+        "fuses": [
+          {
+            "id": "1",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(METER) Combination Meter, 4WD, ABS, Air Conditioner (Automatic), Audio System, Charging, Door Lock Control, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry 8t Start System, Headlight, Headlight Beam Level Control (Automatic), Headlight Cleaner, Hill-Start Assist Control, Illumination, Immobiliser System, Interior Light, Key Reminder, Lane Departure Alert, Light Reminder, Navigation System, Pre-Collision System, Rear View Monitor System, Seat Belt Warning, SRS, Starting, Steering Lock, Stop & Start System, Taillight, Telematics System, Theft Deterrent, Tire Pressure Warning System, TRC, Turn Signal and Hazard Warning Light, VSC, Wireless Door Lock Control",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "DOBLE_TRACCION",
+              "SISTEMA_ABS",
+              "ESTEREO",
+              "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+              "SISTEMA_DE_INYECCION",
+              "LUCES_DELANTERAS",
+              "ASISTENCIA_EN_PENDIENTES",
+              "BACKLIGHT",
+              "LUZ_DE_HABITACULO",
+              "NAVEGADOR",
+              "AIRBAG",
+              "TESTIGO_SRS",
+              "ARRANQUE",
+              "LUCES_TRASERAS",
+              "INMOVILIZADOR",
+              "CONTROL_DE_TRACCION",
+              "LUZ_DIRECCIONAL",
+              "CONTROL_DE_ESTABILIDAD"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "2",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(A/BAG) SRS Airbag System",
+            "circuitRole": "CHASSIS",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "3",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(IG2 NO.3) Charging, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Immobiliser System, Multiplex Communication System, Telematics System",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "SISTEMA_DE_INYECCION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "4",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(SFT LOCKACC) Shift Lock",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "5",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "(P/OUTLET NO.1) Power Outlet",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "TOMA_12V"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "6",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(IG2 NO.2) Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "7",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "(WIPER) Front Wiper and Washer",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "LIMPIA_PARABRISAS",
+              "SAPITO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "8",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(IG1 NO.1) Audio System, Back-Up Light, Charging, Combination Meter, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Lane Departure Alert, Navigation System, Rear View Monitor System",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "ACCESORIO_ELECTRICO",
+              "ESTEREO",
+              "LUZ_RETROCESO",
+              "SISTEMA_DE_INYECCION",
+              "NAVEGADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "9",
+            "type": "fuse",
+            "format": "mini",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "10",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(IG1 NO.3) ABS, Downhill Assist Control, Hill-Start Assist Control, Stop & Start System, TRC, VSC",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "ACCESORIO_ELECTRICO",
+              "SISTEMA_ABS",
+              "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+              "ASISTENCIA_EN_PENDIENTES",
+              "CONTROL_DE_TRACCION",
+              "CONTROL_DE_ESTABILIDAD"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "11",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(IG1 NO.4) Air Conditioner, Audio System, Automatic Light Control, Charging, Combination Meter, Door Lock Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Front Fog Light, Headlight, Headlight Beam Level Control (Automatic), Headlight Cleaner, Illumination, Immobiliser System, Interior Light, Mirror Heater, Multiplex Communication System, Navigation System, Power Outlet, Power Window, Rear Fog Light, Rear View Monitor System, Rear Window Defogger, Seat Belt Warning, SRS, Starting, Steering Lock, Stop & Start System, Taillight, Theft Deterrent, Tire Pressure Warning System, Wireless Door Lock Control",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "ACCESORIO_ELECTRICO",
+              "AIRE_ACONDICIONADO",
+              "ESTEREO",
+              "SISTEMA_DE_INYECCION",
+              "LUZ_ANTINIEBLA(ubicacion=PARTE_DELANTERA)",
+              "LUCES_DELANTERAS",
+              "BACKLIGHT",
+              "LUZ_DE_HABITACULO",
+              "NAVEGADOR",
+              "TOMA_12V",
+              "LEVANTAVIDRIOS",
+              "LUZ_ANTINIEBLA(ubicacion=PARTE_TRASERA)",
+              "DESEMPANADOR_TRASERO",
+              "AIRBAG",
+              "TESTIGO_SRS",
+              "ARRANQUE",
+              "LUCES_TRASERAS",
+              "INMOVILIZADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "12",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "(WASHER) Front Wiper and Washer",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "SAPITO",
+              "LIMPIA_PARABRISAS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "13",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(IG1 NO.2) Charging, Shift Lock",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [
+              "DESBLOQUEO_CAJA_AUT"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "14",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 40,
+            "description": "(HTR) Air Conditioner, Charging",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "CALEFACCION",
+              "AIRE_ACONDICIONADO",
+              "CALEFACCION_DE_ASIENTO"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "15",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 40,
+            "description": "(AM1) Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "16",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(TAIL) [1GR-FE, 1KD-FTV, 2KD-FTV, 1TR-FE, 2TR-FE, 5L-E]: Taillight, Illumination, Automatic Light Control, Charging, Entry & Start System, Front Fog Light, Immobiliser System, Key Reminder, Light Reminder, Rear Fog Light, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "BACKLIGHT",
+              "LUZ_ANTINIEBLA(ubicacion=PARTE_DELANTERA)",
+              "LUZ_ANTINIEBLA(ubicacion=PARTE_TRASERA)",
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "16",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(ECU-ALT NO.2) [1GD-FTV, 2GD-FTV]: Door Lock Control, Power Window, Theft Deterrent",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "LEVANTAVIDRIOS",
+              "INMOVILIZADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "17",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(FOG FR/DRL) Front Fog Light, Headlight, Illumination, Taillight",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_ANTINIEBLA",
+              "LUCES_CIRCULACION_DIURNA",
+              "LUCES_DELANTERAS",
+              "BACKLIGHT",
+              "LUCES_TRASERAS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "18",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(ECU-ALT NO.2) [1GR-FE, 1KD-FTV, 2KD-FTV, 1TR-FE, 2TR-FE, 5L-E]: Door Lock Control, Power Window, Theft Deterrent",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "LEVANTAVIDRIOS",
+              "INMOVILIZADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "18",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(TAIL) [1GD-FTV,2GD-FTV]: Taillight, Illumination, Automatic Light Control, Charging, Entry & Start System, Front Fog Light, Immobiliser System, Key Reminder, Light Reminder, Rear Fog Light, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "BACKLIGHT",
+              "LUZ_ANTINIEBLA(ubicacion=PARTE_DELANTERA)",
+              "LUZ_ANTINIEBLA(ubicacion=PARTE_TRASERA)",
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "19",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(OBD) On-Board Diagnosis System",
+            "circuitRole": "OBD2_DLC",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "20",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(EFI NO.1) ABS, Air Conditioner, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Hill-Start Assist Control, Stop & Start System, TRC, VSC",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "EFI",
+              "SISTEMA_ABS",
+              "AIRE_ACONDICIONADO",
+              "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+              "SISTEMA_DE_INYECCION",
+              "ASISTENCIA_EN_PENDIENTES",
+              "CONTROL_DE_TRACCION",
+              "CONTROL_DE_ESTABILIDAD"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "21",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 5,
+            "description": "(IG2 NO.1) Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "GENERIC_FUSE_NAME",
+              "SISTEMA_DE_INYECCION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "22",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "(DOOR NO.2) Power Window",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "PUERTA",
+              "LEVANTAVIDRIOS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "23",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "(DOOR R/L) Power Window",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "24",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "(DOOR R/R) Power Window",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "25",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 30,
+            "description": "(DOOR NO.1) Power Window",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "PUERTA",
+              "LEVANTAVIDRIOS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "26",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(ETCS) [1GR-FE, 1KD-FTV, 2KD-FTV, 1TR-FE, 2TR-FE, 5L-E]: Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "26",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "(EFI-MAIN NO.1) [1GD-FTV, 2GD-FTV]: ABS, Air Conditioner, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Hill-Start Assist Control, TRC, VSC",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "EFI",
+              "SISTEMA_ABS",
+              "AIRE_ACONDICIONADO",
+              "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+              "SISTEMA_DE_INYECCION",
+              "ASISTENCIA_EN_PENDIENTES",
+              "CONTROL_DE_TRACCION",
+              "CONTROL_DE_ESTABILIDAD"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "27",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "(EFI-MAIN NO.1) [1GR-FE, 1KD-FTV, 2KD-FTV, 1TR-FE, 2TR-FE, 5L-E]: ABS, Air Conditioner, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Hill-Start Assist Control, TRC, VSC",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "EFI",
+              "SISTEMA_ABS",
+              "AIRE_ACONDICIONADO",
+              "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+              "SISTEMA_DE_INYECCION",
+              "ASISTENCIA_EN_PENDIENTES",
+              "CONTROL_DE_TRACCION",
+              "CONTROL_DE_ESTABILIDAD"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "27",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "(EFI-MAIN NO.2) [1GD-FTV, 2GD-FTV]: Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "EFI",
+              "SISTEMA_DE_INYECCION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "28",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(TURN&HAZ) Turn Signal and Hazard Warning Light, Combination Meter, Door Lock Control, Entry & Start System, Immobiliser System, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "relatedEntities": [
+              "ARRANQUE",
+              "INMOVILIZADOR"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "29",
+            "type": "fuse",
+            "format": "cartridge-j",
+            "amp": 30,
+            "description": "(AM2 NO.2) Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "GENERIC_FUSE_NAME",
+              "SISTEMA_DE_INYECCION",
+              "ARRANQUE"
+            ],
+            "notUsed": false
+          }
+        ],
+        "activeEcuAndSensors": {
+          "ecuFuses": [
+            {
+              "id": "1",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "(METER) Combination Meter, 4WD, ABS, Air Conditioner (Automatic), Audio System, Charging, Door Lock Control, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry 8t Start System, Headlight, Headlight Beam Level Control (Automatic), Headlight Cleaner, Hill-Start Assist Control, Illumination, Immobiliser System, Interior Light, Key Reminder, Lane Departure Alert, Light Reminder, Navigation System, Pre-Collision System, Rear View Monitor System, Seat Belt Warning, SRS, Starting, Steering Lock, Stop & Start System, Taillight, Telematics System, Theft Deterrent, Tire Pressure Warning System, TRC, Turn Signal and Hazard Warning Light, VSC, Wireless Door Lock Control",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "DOBLE_TRACCION",
+                "SISTEMA_ABS",
+                "ESTEREO",
+                "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+                "SISTEMA_DE_INYECCION",
+                "LUCES_DELANTERAS",
+                "ASISTENCIA_EN_PENDIENTES",
+                "BACKLIGHT",
+                "LUZ_DE_HABITACULO",
+                "NAVEGADOR",
+                "AIRBAG",
+                "TESTIGO_SRS",
+                "ARRANQUE",
+                "LUCES_TRASERAS",
+                "INMOVILIZADOR",
+                "CONTROL_DE_TRACCION",
+                "LUZ_DIRECCIONAL",
+                "CONTROL_DE_ESTABILIDAD"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "3",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "(IG2 NO.3) Charging, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Immobiliser System, Multiplex Communication System, Telematics System",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "SISTEMA_DE_INYECCION"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "8",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(IG1 NO.1) Audio System, Back-Up Light, Charging, Combination Meter, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Lane Departure Alert, Navigation System, Rear View Monitor System",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "ACCESORIO_ELECTRICO",
+                "ESTEREO",
+                "LUZ_RETROCESO",
+                "SISTEMA_DE_INYECCION",
+                "NAVEGADOR"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "11",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(IG1 NO.4) Air Conditioner, Audio System, Automatic Light Control, Charging, Combination Meter, Door Lock Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Front Fog Light, Headlight, Headlight Beam Level Control (Automatic), Headlight Cleaner, Illumination, Immobiliser System, Interior Light, Mirror Heater, Multiplex Communication System, Navigation System, Power Outlet, Power Window, Rear Fog Light, Rear View Monitor System, Rear Window Defogger, Seat Belt Warning, SRS, Starting, Steering Lock, Stop & Start System, Taillight, Theft Deterrent, Tire Pressure Warning System, Wireless Door Lock Control",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "ACCESORIO_ELECTRICO",
+                "AIRE_ACONDICIONADO",
+                "ESTEREO",
+                "SISTEMA_DE_INYECCION",
+                "LUZ_ANTINIEBLA(ubicacion=PARTE_DELANTERA)",
+                "LUCES_DELANTERAS",
+                "BACKLIGHT",
+                "LUZ_DE_HABITACULO",
+                "NAVEGADOR",
+                "TOMA_12V",
+                "LEVANTAVIDRIOS",
+                "LUZ_ANTINIEBLA(ubicacion=PARTE_TRASERA)",
+                "DESEMPANADOR_TRASERO",
+                "AIRBAG",
+                "TESTIGO_SRS",
+                "ARRANQUE",
+                "LUCES_TRASERAS",
+                "INMOVILIZADOR"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "16",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(ECU-ALT NO.2) [1GD-FTV, 2GD-FTV]: Door Lock Control, Power Window, Theft Deterrent",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "LEVANTAVIDRIOS",
+                "INMOVILIZADOR"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "18",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(ECU-ALT NO.2) [1GR-FE, 1KD-FTV, 2KD-FTV, 1TR-FE, 2TR-FE, 5L-E]: Door Lock Control, Power Window, Theft Deterrent",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "LEVANTAVIDRIOS",
+                "INMOVILIZADOR"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "20",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(EFI NO.1) ABS, Air Conditioner, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Hill-Start Assist Control, Stop & Start System, TRC, VSC",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "EFI",
+                "SISTEMA_ABS",
+                "AIRE_ACONDICIONADO",
+                "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+                "SISTEMA_DE_INYECCION",
+                "ASISTENCIA_EN_PENDIENTES",
+                "CONTROL_DE_TRACCION",
+                "CONTROL_DE_ESTABILIDAD"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "21",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "(IG2 NO.1) Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "GENERIC_FUSE_NAME",
+                "SISTEMA_DE_INYECCION"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "26",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 25,
+              "description": "(EFI-MAIN NO.1) [1GD-FTV, 2GD-FTV]: ABS, Air Conditioner, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Hill-Start Assist Control, TRC, VSC",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "EFI",
+                "SISTEMA_ABS",
+                "AIRE_ACONDICIONADO",
+                "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+                "SISTEMA_DE_INYECCION",
+                "ASISTENCIA_EN_PENDIENTES",
+                "CONTROL_DE_TRACCION",
+                "CONTROL_DE_ESTABILIDAD"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "27",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 25,
+              "description": "(EFI-MAIN NO.1) [1GR-FE, 1KD-FTV, 2KD-FTV, 1TR-FE, 2TR-FE, 5L-E]: ABS, Air Conditioner, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Hill-Start Assist Control, TRC, VSC",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "EFI",
+                "SISTEMA_ABS",
+                "AIRE_ACONDICIONADO",
+                "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+                "SISTEMA_DE_INYECCION",
+                "ASISTENCIA_EN_PENDIENTES",
+                "CONTROL_DE_TRACCION",
+                "CONTROL_DE_ESTABILIDAD"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "27",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 25,
+              "description": "(EFI-MAIN NO.2) [1GD-FTV, 2GD-FTV]: Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "EFI",
+                "SISTEMA_DE_INYECCION"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "29",
+              "type": "fuse",
+              "format": "cartridge-j",
+              "amp": 30,
+              "description": "(AM2 NO.2) Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "GENERIC_FUSE_NAME",
+                "SISTEMA_DE_INYECCION",
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            }
+          ],
+          "sensorPowerFuses": [],
+          "obdDlcFuses": [
+            {
+              "id": "19",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(OBD) On-Board Diagnosis System",
+              "circuitRole": "OBD2_DLC",
+              "relatedEntities": [],
+              "notUsed": false
+            }
+          ],
+          "ignitionFuses": [
+            {
+              "id": "6",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 5,
+              "description": "(IG2 NO.2) Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "10",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(IG1 NO.3) ABS, Downhill Assist Control, Hill-Start Assist Control, Stop & Start System, TRC, VSC",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "ACCESORIO_ELECTRICO",
+                "SISTEMA_ABS",
+                "ASISTENCIA_DESCENSO_EN_PENDIENTE",
+                "ASISTENCIA_EN_PENDIENTES",
+                "CONTROL_DE_TRACCION",
+                "CONTROL_DE_ESTABILIDAD"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "15",
+              "type": "fuse",
+              "format": "cartridge-j",
+              "amp": 40,
+              "description": "(AM1) Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "16",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(TAIL) [1GR-FE, 1KD-FTV, 2KD-FTV, 1TR-FE, 2TR-FE, 5L-E]: Taillight, Illumination, Automatic Light Control, Charging, Entry & Start System, Front Fog Light, Immobiliser System, Key Reminder, Light Reminder, Rear Fog Light, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "BACKLIGHT",
+                "LUZ_ANTINIEBLA(ubicacion=PARTE_DELANTERA)",
+                "LUZ_ANTINIEBLA(ubicacion=PARTE_TRASERA)",
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "18",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(TAIL) [1GD-FTV,2GD-FTV]: Taillight, Illumination, Automatic Light Control, Charging, Entry & Start System, Front Fog Light, Immobiliser System, Key Reminder, Light Reminder, Rear Fog Light, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "BACKLIGHT",
+                "LUZ_ANTINIEBLA(ubicacion=PARTE_DELANTERA)",
+                "LUZ_ANTINIEBLA(ubicacion=PARTE_TRASERA)",
+                "ARRANQUE"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "28",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(TURN&HAZ) Turn Signal and Hazard Warning Light, Combination Meter, Door Lock Control, Entry & Start System, Immobiliser System, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "relatedEntities": [
+                "ARRANQUE",
+                "INMOVILIZADOR"
+              ],
+              "notUsed": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 3,
+        "boxName": "Passenger Compartment Relay Box №1",
+        "location": "INTERIOR_CABIN",
+        "diagramUrl": "https://rewise-images.s3.amazonaws.com/originals/legos/fusebox-diagrams/bd51ab16_toyota-hilux-2017.jpg",
+        "thumbnailUrl": "https://images.startmycar.com/legos/fusebox-thumbnails/fusebox-toyota-hilux-2019-genid-g8.1-3.webp",
+        "fuses": [
+          {
+            "id": "1",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "(DCU NO.1) Urea Pump Control ECU",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "2",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(DCU NO.2) Urea Pump Control ECU",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "3",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 20,
+            "description": "(NOX PM) Nitrogen Oxides Sensor",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "4",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 7.5,
+            "description": "(DCU-B) Urea Pump Control ECU",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "5",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(DEF-S) Mirror Heater, Multiport Fuel Injection System/Sequential, Multiport Fuel Injection System",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "SISTEMA_DE_INYECCION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "6",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 10,
+            "description": "(FOG RR) Rear Fog Light",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_ANTINIEBLA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "7",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 15,
+            "description": "(DEICER) Windshield Wiper Deicer",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "DESEMPANADOR_TRASERO",
+              "DESEMPANADOR_LIMPIAPARABRISAS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "8",
+            "type": "fuse",
+            "format": "mini",
+            "amp": 25,
+            "description": "(DEF) Rear Window Defogger, Mirror Heater, Multiport Fuel Injection System/Sequential, Multiport Fuel Injection System",
+            "circuitRole": "ECU_POWER",
+            "relatedEntities": [
+              "DESEMPANADOR",
+              "DESEMPANADOR_TRASERO",
+              "SISTEMA_DE_INYECCION"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "R1",
+            "type": "relay",
+            "format": "full",
+            "amp": null,
+            "description": "(DCU-MAIN) Urea Pump",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R2",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(NOX PM) Nitrogen Oxides Sensor",
+            "circuitRole": "SENSOR_VREF",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R3",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(DEICER) Windshield Wiper Deicer",
+            "circuitRole": "ACCESSORY",
+            "relatedEntities": [
+              "DESEMPANADOR_TRASERO",
+              "DESEMPANADOR_LIMPIAPARABRISAS"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "R4",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(FOG RR) Rear fog light",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "LUZ_ANTINIEBLA"
+            ],
+            "notUsed": false
+          },
+          {
+            "id": "R5",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(Unused / Spare cavity)",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": true
+          },
+          {
+            "id": "R6",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(INV) Inverter",
+            "circuitRole": "UNKNOWN",
+            "relatedEntities": [],
+            "notUsed": false
+          },
+          {
+            "id": "R7",
+            "type": "relay",
+            "format": "half",
+            "amp": null,
+            "description": "(DEF) Rear Window Defogger, Mirror Heater",
+            "circuitRole": "LIGHTING",
+            "relatedEntities": [
+              "DESEMPANADOR",
+              "DESEMPANADOR_TRASERO"
+            ],
+            "notUsed": false
+          }
+        ],
+        "activeEcuAndSensors": {
+          "ecuFuses": [
+            {
+              "id": "1",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 25,
+              "description": "(DCU NO.1) Urea Pump Control ECU",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "2",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 20,
+              "description": "(DCU NO.2) Urea Pump Control ECU",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "4",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 7.5,
+              "description": "(DCU-B) Urea Pump Control ECU",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "5",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 10,
+              "description": "(DEF-S) Mirror Heater, Multiport Fuel Injection System/Sequential, Multiport Fuel Injection System",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "SISTEMA_DE_INYECCION"
+              ],
+              "notUsed": false
+            },
+            {
+              "id": "8",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 25,
+              "description": "(DEF) Rear Window Defogger, Mirror Heater, Multiport Fuel Injection System/Sequential, Multiport Fuel Injection System",
+              "circuitRole": "ECU_POWER",
+              "relatedEntities": [
+                "DESEMPANADOR",
+                "DESEMPANADOR_TRASERO",
+                "SISTEMA_DE_INYECCION"
+              ],
+              "notUsed": false
+            }
+          ],
+          "sensorPowerFuses": [
+            {
+              "id": "3",
+              "type": "fuse",
+              "format": "mini",
+              "amp": 20,
+              "description": "(NOX PM) Nitrogen Oxides Sensor",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [],
+              "notUsed": false
+            },
+            {
+              "id": "R2",
+              "type": "relay",
+              "format": "half",
+              "amp": null,
+              "description": "(NOX PM) Nitrogen Oxides Sensor",
+              "circuitRole": "SENSOR_VREF",
+              "relatedEntities": [],
+              "notUsed": false
+            }
+          ],
+          "obdDlcFuses": [],
+          "ignitionFuses": []
+        }
+      }
+    ]
+  },
+  "ecuAndSensorCircuits": {
+    "hasDedicatedEcmFeed": true,
+    "hasObdDlcFeed": true,
+    "hasFuelPumpRelay": true,
+    "hasSensorVrefFeed": true,
+    "circuitHighlights": [
+      "Dedicated ECM / Engine Control Power Feeds",
+      "OBD-II DLC Diagnostic Pin 16 Fused Power Feed",
+      "Primary Fuel Pump Control Circuit / Relay",
+      "Sensor Reference Rails & VVT / O2 Actuator Fuses"
+    ]
+  },
+  "offlineIngestionReady": true
+}
