@@ -714,8 +714,12 @@ export const PinWaveformOscilloscope: React.FC<PinWaveformOscilloscopeProps> = R
               <h3 className="text-[11px] sm:text-xs font-hud font-bold uppercase tracking-wider text-slate-100 truncate">
                 Pin Oscilloscope
               </h3>
-              <span className="text-[9px] font-bold text-slate-400 uppercase">
-                SIM · MNA
+              <span
+                data-testid="pin-scope-simulated-badge"
+                title="Virtual MNA waveform synthesis — not a physical oscilloscope capture"
+                className="px-1.5 py-0.5 text-[9px] font-mono font-bold rounded bg-amber-500/15 border border-amber-400/40 text-amber-300 uppercase tracking-wider"
+              >
+                SIMULATED · MNA
               </span>
               {ch1Pin && (
                 <span className="px-1.5 py-0.5 text-[9px] font-bold rounded-[2px] bg-[#0e1411] border border-emerald-600/50 text-emerald-300">

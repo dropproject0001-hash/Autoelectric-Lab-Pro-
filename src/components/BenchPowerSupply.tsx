@@ -114,8 +114,12 @@ export const BenchPowerSupply: React.FC<BenchPowerSupplyProps> = React.memo(({
           <span className="text-[11px] sm:text-xs font-hud font-bold tracking-wider text-[#eaf3ff] uppercase truncate">
             Bench DC Power Supply Module
           </span>
-          <span className="text-[9.5px] font-mono text-[#91a4bd] hidden sm:inline shrink-0">
-            SIM 0-30V / 10A
+          <span
+            data-testid="psu-simulated-badge"
+            title="Virtual MNA software power supply — not connected to physical hardware"
+            className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-400/40 text-amber-300 uppercase tracking-wider shrink-0"
+          >
+            SIMULATED
           </span>
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
