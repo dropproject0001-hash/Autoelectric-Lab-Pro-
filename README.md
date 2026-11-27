@@ -17,7 +17,7 @@ AutoElectric Lab Pro is an automotive electrical technician software platform en
   - ECDSA P-256 asymmetric cryptographic offline licenses (`offlineLicenseCrypto.ts`).
   - Single-device timed trial PINs (`trialPinService.ts`) with durable disk persistence configured via `VECL_DATA_DIR`.
   - Immediate server-side admin token revocation via `jti` blacklist and session minimum issued-at timestamps.
-  - Unauthenticated first-run admin setup is **disabled by default** (`VECL_ALLOW_FIRST_RUN_ADMIN_SETUP=false`), requiring server environment credentials (`VECL_ADMIN_MASTER_PIN`) in production.
+  - Unauthenticated first-run admin setup is **disabled in strict production** (`NODE_ENV=production` / `VECL_STRICT_PRODUCTION_SECRETS=true`) and can be explicitly disabled anytime via `VECL_ALLOW_FIRST_RUN_ADMIN_SETUP=false`; in local/preview mode with no `VECL_ADMIN_MASTER_PIN` set, the admin console offers a one-time scrypt-hashed claim form that locks once claimed.
 
 ---
 
@@ -42,7 +42,7 @@ See `.env.example` for all configurable variables:
 | `VECL_DATA_DIR` | Persistent storage directory for trial store & offline keys | `.data` |
 | `VECL_ADMIN_MASTER_PIN` | Server-managed Master Admin PIN | `(unset)` |
 | `VECL_ADMIN_UIDS` | Comma-separated Firebase UIDs authorized as server admins | `(unset)` |
-| `VECL_ALLOW_FIRST_RUN_ADMIN_SETUP` | Allow claiming admin PIN without env secret | `false` |
+| `VECL_ALLOW_FIRST_RUN_ADMIN_SETUP` | Set `false` to disable one-time first-run setup in non-strict preview (always disabled in strict production) | `true` in preview / `false` in prod |
 | `VECL_STRICT_PRODUCTION_SECRETS` | Enforce non-empty production signing keys & secrets | `false` |
 | `GEMINI_API_KEY` | Google Gemini API key for server-side AI endpoints | `(from Settings > Secrets)` |
 

@@ -6,8 +6,22 @@
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
+import http from 'node:http';
 import path from 'node:path';
 import type { Request, Response } from 'express';
+import { createAutoelectricApiApp } from '../../server/createApiApp';
+import {
+  getMasterAdminPinPolicyStatus,
+  isValidMasterAdminProof,
+  MASTER_ADMIN_ACTOR_UID,
+  resetAdminMasterPinServiceForTests,
+  verifyMasterAdminPinAgainstEnvHash,
+} from '../../server/services/adminMasterPinService';
+import {
+  isSecondaryConfirmationSatisfied,
+  maskMasterAdminPin,
+  validateMasterPinModification,
+} from '../../utils/adminPinValidation';
 import {
   FirebaseTokenVerificationError,
   logFirebaseAuthStartupDiagnostics,
@@ -3420,6 +3434,274 @@ async function main() {
         `${file} must support drag-box transient zoom`
       );
     }
+  });
+
+  await runTest('adminMasterPinService hashes VECL_ADMIN_MASTER_PIN with scrypt and exclusively gates /api/autoelectric/license/admin/* routes', async () => {
+    const prevEnvPin = process.env.VECL_ADMIN_MASTER_PIN;
+    const prevStrict = process.env.VECL_STRICT_PRODUCTION_SECRETS;
+    const prevAdminUids = process.env.VECL_ADMIN_UIDS;
+
+    resetAdminMasterPinServiceForTests();
+    resetLicenseStoreForTests();
+
+    const app = createAutoelectricApiApp();
+    const server = http.createServer(app);
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+    const addr = server.address();
+    const port = typeof addr === 'object' && addr ? addr.port : 0;
+    const baseUrl = `http://127.0.0.1:${port}`;
+
+    try {
+      // 1. Fails closed when VECL_ADMIN_MASTER_PIN is unset
+      delete process.env.VECL_ADMIN_MASTER_PIN;
+      resetAdminMasterPinServiceForTests();
+      assert.equal(getMasterAdminPinPolicyStatus().envConfigured, false);
+      const missingEnvRes = verifyMasterAdminPinAgainstEnvHash('1234-5678-90');
+      assert.equal(missingEnvRes.valid, false);
+      assert.equal(missingEnvRes.statusCode, 503);
+      assert.equal(missingEnvRes.code, 'ADMIN_ENV_PIN_NOT_CONFIGURED');
+
+      // 2. Rejects weak env PIN in strict mode
+      process.env.VECL_STRICT_PRODUCTION_SECRETS = 'true';
+      process.env.VECL_ADMIN_MASTER_PIN = 'short123';
+      resetAdminMasterPinServiceForTests();
+      const weakEnvRes = verifyMasterAdminPinAgainstEnvHash('short123');
+      assert.equal(weakEnvRes.valid, false);
+      assert.equal(weakEnvRes.statusCode, 503);
+      assert.equal(weakEnvRes.code, 'ADMIN_ENV_PIN_TOO_WEAK');
+
+      // 3. Strong env PIN is hashed via scrypt and verifies with timingSafeEqual
+      process.env.VECL_ADMIN_MASTER_PIN = '9081-7263-5544';
+      resetAdminMasterPinServiceForTests();
+      const policy = getMasterAdminPinPolicyStatus();
+      assert.equal(policy.envConfigured, true);
+      assert.equal(policy.strictMode, true);
+      assert.equal(policy.meetsStrengthRequirement, true);
+      assert.equal(policy.algorithm, 'scrypt-timingSafeEqual');
+
+      const exactOk = verifyMasterAdminPinAgainstEnvHash('9081-7263-5544');
+      assert.equal(exactOk.valid, true);
+      assert.ok(exactOk.proof);
+      assert.equal(isValidMasterAdminProof(exactOk.proof), true);
+      assert.equal(exactOk.proof.adminUid, MASTER_ADMIN_ACTOR_UID);
+
+      // Normalized numeric format is accepted; forged proof objects are rejected
+      const normalizedOk = verifyMasterAdminPinAgainstEnvHash('908172635544');
+      assert.equal(normalizedOk.valid, true);
+      assert.equal(
+        isValidMasterAdminProof({ adminUid: MASTER_ADMIN_ACTOR_UID, verifiedAtMs: Date.now() }),
+        false
+      );
+
+      // 4. Rate limits invalid PIN attempts per IP while allowing legitimate admin calls
+      const badIp = '10.0.0.77';
+      for (let i = 0; i < 8; i++) {
+        const badAttempt = verifyMasterAdminPinAgainstEnvHash('0000-0000-0000', { ipKey: badIp });
+        assert.equal(badAttempt.valid, false);
+        assert.equal(badAttempt.statusCode, 401);
+      }
+      const throttled = verifyMasterAdminPinAgainstEnvHash('9081-7263-5544', { ipKey: badIp });
+      assert.equal(throttled.valid, false);
+      assert.equal(throttled.statusCode, 429);
+      assert.equal(throttled.code, 'ADMIN_RATE_LIMITED');
+
+      // 5. Env PIN rotation automatically re-hashes without retaining old PIN
+      process.env.VECL_ADMIN_MASTER_PIN = 'A9x!BenchMaster2026';
+      const oldPinAfterRotate = verifyMasterAdminPinAgainstEnvHash('9081-7263-5544', {
+        ipKey: '10.0.0.88',
+      });
+      assert.equal(oldPinAfterRotate.valid, false);
+      assert.equal(oldPinAfterRotate.statusCode, 401);
+      const rotatedOk = verifyMasterAdminPinAgainstEnvHash('A9x!BenchMaster2026', {
+        ipKey: '10.0.0.88',
+      });
+      assert.equal(rotatedOk.valid, true);
+
+      // 6. HTTP route verification on /api/autoelectric/license/admin/*
+      process.env.VECL_ADMIN_UIDS = 'uid_owner_admin_01';
+      process.env.VECL_ADMIN_MASTER_PIN = 'LabMaster#2026Strict';
+      resetAdminMasterPinServiceForTests();
+
+      // Rejects unauthenticated request (401)
+      const noAuthList = await fetch(`${baseUrl}/api/autoelectric/license/admin/list`);
+      assert.equal(noAuthList.status, 401);
+
+      // Rejects Firebase JWT / Bearer tokens — VECL_ADMIN_MASTER_PIN is exclusive
+      const bearerRejected = await fetch(`${baseUrl}/api/autoelectric/license/admin/list`, {
+        headers: { Authorization: 'Bearer eyJhbGciOiJSUzI1NiJ9.fake.sig' },
+      });
+      assert.equal(bearerRejected.status, 401);
+
+      // Rejects malformed JSON BEFORE body parsing when Master PIN is invalid/missing (401 not 400)
+      const preAuthInvalidJson = await fetch(`${baseUrl}/api/autoelectric/license/admin/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Pin': 'wrong-pin-attempt' },
+        body: '{malformed-json',
+      });
+      assert.equal(preAuthInvalidJson.status, 401);
+
+      // Accepts valid VECL_ADMIN_MASTER_PIN across /generate, /list, /extend, /reset-devices, /revoke
+      const genRes = await fetch(`${baseUrl}/api/autoelectric/license/admin/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Pin': 'LabMaster#2026Strict',
+        },
+        body: JSON.stringify({ plan: 'MONTHLY_30D', notes: 'HTTP Master PIN Test' }),
+      });
+      assert.equal(genRes.status, 201);
+      const genBody = (await genRes.json()) as {
+        status: string;
+        plainCode: string;
+        license: { licenseId: string };
+      };
+      assert.equal(genBody.status, 'SUCCESS');
+      assert.ok(genBody.license.licenseId);
+
+      const listRes = await fetch(`${baseUrl}/api/autoelectric/license/admin/list`, {
+        headers: { 'X-Admin-Pin': 'LabMaster#2026Strict' },
+      });
+      assert.equal(listRes.status, 200);
+      const listBody = (await listRes.json()) as {
+        authMode: string;
+        licenses: Array<{ licenseId: string }>;
+      };
+      assert.equal(listBody.authMode, 'VECL_ADMIN_MASTER_PIN');
+      assert.equal(
+        listBody.licenses.some((l) => l.licenseId === genBody.license.licenseId),
+        true
+      );
+
+      const extendRes = await fetch(`${baseUrl}/api/autoelectric/license/admin/extend`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Pin': 'LabMaster#2026Strict',
+        },
+        body: JSON.stringify({ licenseId: genBody.license.licenseId, additionalDays: 10 }),
+      });
+      assert.equal(extendRes.status, 200);
+
+      const resetRes = await fetch(`${baseUrl}/api/autoelectric/license/admin/reset-devices`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Pin': 'LabMaster#2026Strict',
+        },
+        body: JSON.stringify({ licenseId: genBody.license.licenseId }),
+      });
+      assert.equal(resetRes.status, 200);
+
+      const revokeRes = await fetch(`${baseUrl}/api/autoelectric/license/admin/revoke`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Pin': 'LabMaster#2026Strict',
+        },
+        body: JSON.stringify({
+          licenseId: genBody.license.licenseId,
+          revoked: true,
+          reason: 'Audit test',
+        }),
+      });
+      assert.equal(revokeRes.status, 200);
+    } finally {
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+      resetAdminMasterPinServiceForTests();
+      resetLicenseStoreForTests();
+      if (prevEnvPin === undefined) delete process.env.VECL_ADMIN_MASTER_PIN;
+      else process.env.VECL_ADMIN_MASTER_PIN = prevEnvPin;
+      if (prevStrict === undefined) delete process.env.VECL_STRICT_PRODUCTION_SECRETS;
+      else process.env.VECL_STRICT_PRODUCTION_SECRETS = prevStrict;
+      if (prevAdminUids === undefined) delete process.env.VECL_ADMIN_UIDS;
+      else process.env.VECL_ADMIN_UIDS = prevAdminUids;
+    }
+  });
+
+  await runTest('AdminPinManagerModal masks currently active PIN, validates modifications, and enforces secondary confirmation', () => {
+    const claimedConfig = {
+      masterEnvConfigured: false,
+      adminClaimed: true,
+      setupEnabled: false,
+      pinInitialized: true,
+    };
+
+    // 1. Active & proposed PIN masking never leaks plaintext characters
+    const masked8 = maskMasterAdminPin('90817263');
+    assert.equal(masked8, '••••••••');
+    assert.equal(masked8.includes('9'), false);
+    assert.equal(masked8.includes('3'), false);
+
+    // 2. Rejects env-managed modification attempts
+    const envLockedRes = validateMasterPinModification({
+      currentPin: '90817263',
+      newPin: '492817',
+      confirmNewPin: '492817',
+      config: { ...claimedConfig, masterEnvConfigured: true },
+    });
+    assert.equal(envLockedRes.valid, false);
+    assert.equal(envLockedRes.checks.envNotLocked, false);
+
+    // 3. Rejects trivial sequential/repeated PINs, matching current PIN, and mismatched confirmation
+    const trivialRes = validateMasterPinModification({
+      currentPin: '90817263',
+      newPin: '123456',
+      confirmNewPin: '123456',
+      config: claimedConfig,
+    });
+    assert.equal(trivialRes.valid, false);
+    assert.equal(trivialRes.checks.newPinNotTrivial, false);
+
+    const samePinRes = validateMasterPinModification({
+      currentPin: '90817263',
+      newPin: '90817263',
+      confirmNewPin: '90817263',
+      config: claimedConfig,
+    });
+    assert.equal(samePinRes.valid, false);
+    assert.equal(samePinRes.checks.newPinDiffersFromCurrent, false);
+
+    const mismatchRes = validateMasterPinModification({
+      currentPin: '90817263',
+      newPin: '492817',
+      confirmNewPin: '492818',
+      config: claimedConfig,
+    });
+    assert.equal(mismatchRes.valid, false);
+    assert.equal(mismatchRes.checks.confirmMatchesNewPin, false);
+
+    // 4. Accepts strong valid modification & enforces secondary confirmation gate
+    const validRes = validateMasterPinModification({
+      currentPin: '90817263',
+      newPin: '492817',
+      confirmNewPin: '492817',
+      config: claimedConfig,
+    });
+    assert.equal(validRes.valid, true);
+
+    assert.equal(
+      isSecondaryConfirmationSatisfied({ acknowledged: false, confirmationText: 'CONFIRM' }),
+      false
+    );
+    assert.equal(
+      isSecondaryConfirmationSatisfied({ acknowledged: true, confirmationText: 'yes' }),
+      false
+    );
+    assert.equal(
+      isSecondaryConfirmationSatisfied({ acknowledged: true, confirmationText: ' confirm ' }),
+      true
+    );
+
+    // 5. Verify AdminPinManagerModal wires masked display, validation layer, and secondary confirmation
+    const modalSrc = fs.readFileSync(
+      path.resolve('src/components/billing/AdminPinManagerModal.tsx'),
+      'utf8'
+    );
+    assert.ok(modalSrc.includes('masked-active-master-pin'));
+    assert.ok(modalSrc.includes('maskMasterAdminPin'));
+    assert.ok(modalSrc.includes('validateMasterPinModification'));
+    assert.ok(modalSrc.includes('master-pin-secondary-confirmation'));
+    assert.ok(modalSrc.includes('isSecondaryConfirmationSatisfied'));
   });
 
   console.log(`\nSecurity & Offline Test Summary: ${passed} passed, ${failed} failed.`);

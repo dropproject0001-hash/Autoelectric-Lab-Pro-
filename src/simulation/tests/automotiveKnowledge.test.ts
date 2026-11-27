@@ -12,6 +12,11 @@ import {
   importCatalogFromJson,
 } from '../../services/automotiveKnowledgeService';
 import { normalizeSystemCategory } from '../../utils/automotiveTaxonomy';
+import {
+  buildOemCountingMonitorSnapshot,
+  filterOemCorrelationRows,
+  summarizeCorrelationRows,
+} from '../../utils/oemCountingMonitor';
 
 let passed = 0;
 let failed = 0;
@@ -82,6 +87,46 @@ async function main() {
 
     const badImport = importCatalogFromJson('{"invalid": true}');
     assert.equal(badImport.success, false, 'Invalid JSON schema must be rejected');
+  });
+
+  await runTest('OEM Counting Monitor aggregates live Fuse-Box.info, StartMyCar, and Dual-OEM correlation counts accurately', () => {
+    const catalog = loadAutomotiveKnowledgeCatalog();
+    const snapshot = buildOemCountingMonitorSnapshot(catalog);
+
+    assert.equal(snapshot.oemProfilesCount, 17, 'Expected 17 bundled OEM profiles');
+    assert.equal(snapshot.brandCount, 6, 'Expected 6 major OEM brands');
+    assert.equal(snapshot.fbiCavitiesMapped, 2464, 'Expected 2,464 Fuse-Box.info cavities mapped');
+    assert.equal(snapshot.smcFleetCavities, 1790, 'Expected 1,790 StartMyCar fleet cavities');
+    assert.equal(snapshot.totalCombinedCavities, 4254, 'Expected 4,254 total combined cavities');
+    assert.equal(snapshot.dualOemCorrelatedCount, 13, 'Expected 13 Dual-OEM correlated profiles');
+    assert.equal(snapshot.singleSourceCount, 4, 'Expected 4 single-source FBI profiles');
+    assert.ok(snapshot.overallMatchRatePercent >= 95, `Expected >=95% match rate, got ${snapshot.overallMatchRatePercent}`);
+    assert.equal(snapshot.integrityPolicyPercent, 100, 'Expected 100% zero-fabrication integrity');
+    assert.equal(snapshot.zeroFabricationVerified, true, 'Zero-fabrication policy must verify true');
+    assert.equal(snapshot.catalogReferenceCount, catalog.statistics.referenceCount);
+
+    // First 5 canonical rows match Toyota ordering
+    assert.equal(snapshot.rows[0].displayModel, 'Toyota Corolla');
+    assert.equal(snapshot.rows[0].yearsLabel, '2019-2022');
+    assert.equal(snapshot.rows[0].chassisCode, 'E210');
+    assert.equal(snapshot.rows[0].fbiCavities, 126);
+    assert.equal(snapshot.rows[0].smcCavities, 197);
+
+    assert.equal(snapshot.rows[1].displayModel, 'Toyota Corolla Facelift');
+    assert.equal(snapshot.rows[1].yearsLabel, '2023-2025');
+    assert.equal(snapshot.rows[1].fbiCavities, 121);
+    assert.equal(snapshot.rows[1].smcCavities, null);
+
+    // Filtering and summary math
+    const dualRows = filterOemCorrelationRows(snapshot.rows, { correlationFilter: 'DUAL_OEM' });
+    assert.equal(dualRows.length, 13);
+    const singleRows = filterOemCorrelationRows(snapshot.rows, { correlationFilter: 'SINGLE_SOURCE' });
+    assert.equal(singleRows.length, 4);
+    const toyotaRows = filterOemCorrelationRows(snapshot.rows, { makeSlug: 'toyota' });
+    assert.equal(toyotaRows.length, 5);
+    const toyotaSummary = summarizeCorrelationRows(toyotaRows);
+    assert.equal(toyotaSummary.fbiCavitiesTotal, 126 + 121 + 151 + 89 + 110);
+    assert.equal(toyotaSummary.dualOemCount, 4);
   });
 
   console.log(`\nAutomotive Knowledge Tests Summary: ${passed} passed, ${failed} failed`);

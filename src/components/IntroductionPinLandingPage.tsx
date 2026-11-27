@@ -14,6 +14,8 @@ import {
   Cpu,
   Delete,
   ExternalLink,
+  Eye,
+  EyeOff,
   FileDown,
   KeyRound,
   Laptop,
@@ -57,6 +59,7 @@ import {
 } from '../services/licenseClientService';
 import {
   AdminPinConfigStatus,
+  changeAdminMasterPinClient,
   ClientTrialPinRecord,
   fetchAdminPinConfigStatus,
   fetchAdminTrialPinsList,
@@ -170,8 +173,14 @@ export const IntroductionPinLandingPage: React.FC = () => {
 
   // Admin Master state
   const [adminConfig, setAdminConfig] = useState<AdminPinConfigStatus | null>(null);
+  const [adminConfigLoading, setAdminConfigLoading] = useState(false);
   const [masterPinInput, setMasterPinInput] = useState('');
   const [setupPinConfirm, setSetupPinConfirm] = useState('');
+  const [showMasterPin, setShowMasterPin] = useState(false);
+  const [showChangePinForm, setShowChangePinForm] = useState(false);
+  const [currentPinInput, setCurrentPinInput] = useState('');
+  const [newPinInput, setNewPinInput] = useState('');
+  const [newPinConfirm, setNewPinConfirm] = useState('');
   const [trialDurationHours, setTrialDurationHours] = useState<TrialDurationHours>(4);
   const [trialNotes, setTrialNotes] = useState('');
   const [generatedPinBanner, setGeneratedPinBanner] = useState<{
@@ -184,6 +193,7 @@ export const IntroductionPinLandingPage: React.FC = () => {
   const workstationId = getOrCreateWorkstationDeviceId();
 
   const loadAdminConfigAndList = useCallback(async () => {
+    setAdminConfigLoading(true);
     try {
       const cfg = await fetchAdminPinConfigStatus();
       setAdminConfig(cfg);
@@ -193,6 +203,8 @@ export const IntroductionPinLandingPage: React.FC = () => {
       }
     } catch {
       // Non-fatal while checking admin config
+    } finally {
+      setAdminConfigLoading(false);
     }
   }, [isAdminUnlocked]);
 
@@ -288,7 +300,13 @@ export const IntroductionPinLandingPage: React.FC = () => {
       playAccessGrantedChime();
       setMasterPinInput('');
       setSetupPinConfirm('');
-      setAdminConfig({ masterEnvConfigured: false, adminClaimed: true, setupEnabled: false });
+      setShowMasterPin(false);
+      setAdminConfig({
+        masterEnvConfigured: false,
+        adminClaimed: true,
+        setupEnabled: false,
+        pinInitialized: true,
+      });
       markAdminSessionActive(true);
       const list = await fetchAdminTrialPinsList();
       setAdminTrials(list.trials);
@@ -315,6 +333,7 @@ export const IntroductionPinLandingPage: React.FC = () => {
       await loginAdminMasterPinClient(masterPinInput.trim());
       playAccessGrantedChime();
       setMasterPinInput('');
+      setShowMasterPin(false);
       markAdminSessionActive(true);
       const list = await fetchAdminTrialPinsList();
       setAdminTrials(list.trials);
@@ -322,6 +341,45 @@ export const IntroductionPinLandingPage: React.FC = () => {
     } catch (err: unknown) {
       playSystemLockSound('error');
       setErrorMsg(err instanceof Error ? err.message : 'Incorrect Master Admin PIN.');
+      void loadAdminConfigAndList();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChangeMasterPin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    const cleanedNew = newPinInput.replace(/\D/g, '');
+    const cleanedConfirm = newPinConfirm.replace(/\D/g, '');
+    if (!currentPinInput.trim()) {
+      playSystemLockSound('error');
+      setErrorMsg('Enter your current Master Admin PIN.');
+      return;
+    }
+    if (cleanedNew.length < 6 || cleanedNew.length > 12) {
+      playSystemLockSound('error');
+      setErrorMsg('New Master Admin PIN must be 6 to 12 numeric digits.');
+      return;
+    }
+    if (cleanedNew !== cleanedConfirm) {
+      playSystemLockSound('error');
+      setErrorMsg('New Master Admin PIN confirmation does not match.');
+      return;
+    }
+    setLoading(true);
+    try {
+      await changeAdminMasterPinClient(currentPinInput.trim(), cleanedNew);
+      playAccessGrantedChime();
+      setCurrentPinInput('');
+      setNewPinInput('');
+      setNewPinConfirm('');
+      setShowChangePinForm(false);
+      setSuccessMsg('Master Admin PIN updated. Earlier sessions have been invalidated.');
+    } catch (err: unknown) {
+      playSystemLockSound('error');
+      setErrorMsg(err instanceof Error ? err.message : 'Failed to update Master Admin PIN.');
     } finally {
       setLoading(false);
     }
@@ -398,7 +456,12 @@ export const IntroductionPinLandingPage: React.FC = () => {
     markAdminSessionActive(false);
     setAdminTrials([]);
     setGeneratedPinBanner(null);
+    setShowChangePinForm(false);
+    setCurrentPinInput('');
+    setNewPinInput('');
+    setNewPinConfirm('');
     setSuccessMsg('Admin Master session locked and token revoked.');
+    void loadAdminConfigAndList();
   };
 
   const handleCopyPin = async (value: string) => {
@@ -1094,7 +1157,11 @@ export const IntroductionPinLandingPage: React.FC = () => {
             {activeTab === 'ADMIN_MASTER' && (
               <div className="space-y-4">
                 {!isAdminUnlocked ? (
-                  adminConfig && adminConfig.setupEnabled && !adminConfig.masterEnvConfigured && !adminConfig.adminClaimed ? (
+                  adminConfig === null ? (
+                    <div className="rounded-md border border-[#203653] bg-[#050A12] px-4 py-5 text-center font-mono text-xs text-[#91A4BD]">
+                      Checking server Master Admin PIN status...
+                    </div>
+                  ) : adminConfig.setupEnabled && !adminConfig.pinInitialized ? (
                     <form onSubmit={handleFirstRunAdminSetup} className="space-y-3.5">
                       <div>
                         <h2 className="text-sm font-semibold text-[#FFB020]">
@@ -1105,18 +1172,28 @@ export const IntroductionPinLandingPage: React.FC = () => {
                         </p>
                       </div>
                       <div className="space-y-2.5">
+                        <div className="relative">
+                          <input
+                            type={showMasterPin ? 'text' : 'password'}
+                            name="vecl-admin-setup-pin"
+                            inputMode="numeric"
+                            autoComplete="new-password"
+                            value={masterPinInput}
+                            onChange={(e) => setMasterPinInput(e.target.value.replace(/\D/g, '').slice(0, 12))}
+                            placeholder="Choose Master Admin PIN (6–12 digits)"
+                            className="w-full rounded-md border border-[#203653] bg-[#050A12] pl-3.5 pr-10 py-2.5 font-mono text-sm text-[#EAF3FF] placeholder:text-[#5F748E] focus:border-[#FFB020] focus:outline-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowMasterPin((v) => !v)}
+                            aria-label={showMasterPin ? 'Hide Master PIN' : 'Show Master PIN'}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#91A4BD] hover:text-[#EAF3FF] cursor-pointer"
+                          >
+                            {showMasterPin ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </button>
+                        </div>
                         <input
-                          type="password"
-                          name="vecl-admin-setup-pin"
-                          inputMode="numeric"
-                          autoComplete="new-password"
-                          value={masterPinInput}
-                          onChange={(e) => setMasterPinInput(e.target.value.replace(/\D/g, '').slice(0, 12))}
-                          placeholder="Choose Master Admin PIN (6–12 digits)"
-                          className="w-full rounded-md border border-[#203653] bg-[#050A12] px-3.5 py-2.5 font-mono text-sm text-[#EAF3FF] placeholder:text-[#5F748E] focus:border-[#FFB020] focus:outline-none"
-                        />
-                        <input
-                          type="password"
+                          type={showMasterPin ? 'text' : 'password'}
                           name="vecl-admin-setup-pin-confirm"
                           inputMode="numeric"
                           autoComplete="new-password"
@@ -1134,6 +1211,25 @@ export const IntroductionPinLandingPage: React.FC = () => {
                         {loading ? 'Saving Master PIN...' : 'Claim Master Admin PIN'}
                       </button>
                     </form>
+                  ) : !adminConfig.pinInitialized ? (
+                    <div className="space-y-3 rounded-md border border-[#FFB020]/50 bg-[#1B1408] p-4">
+                      <div className="flex items-center gap-2 text-sm font-semibold text-[#FFB020]">
+                        <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden="true" />
+                        <span>Master Admin PIN Not Configured</span>
+                      </div>
+                      <p className="text-xs text-[#D9E8FA] leading-relaxed">
+                        First-run web PIN setup is disabled in this environment and no server Master Admin PIN secret is configured yet. Set the Master Admin PIN in your server environment settings and restart the server.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => void loadAdminConfigAndList()}
+                        disabled={adminConfigLoading}
+                        className="inline-flex min-h-[38px] items-center gap-1.5 rounded-md border border-[#FFB020]/60 bg-[#050A12] px-3 py-1.5 font-mono text-xs font-semibold text-[#FFB020] hover:bg-[#0E192A] cursor-pointer"
+                      >
+                        <RefreshCw className={`h-3.5 w-3.5 ${adminConfigLoading ? 'animate-spin' : ''}`} />
+                        <span>Re-check Server Config</span>
+                      </button>
+                    </div>
                   ) : (
                     <form onSubmit={handleAdminMasterLogin} className="space-y-3.5">
                       <div>
@@ -1144,16 +1240,25 @@ export const IntroductionPinLandingPage: React.FC = () => {
                           Enter the Master Admin PIN to issue 8-digit trial PINs (3h to 1 year) or open the bench lab directly as administrator.
                         </p>
                       </div>
-                      <input
-                        type="password"
-                        name="vecl-admin-master-pin"
-                        inputMode="numeric"
-                        autoComplete="one-time-code"
-                        value={masterPinInput}
-                        onChange={(e) => setMasterPinInput(e.target.value)}
-                        placeholder="Enter Master Admin PIN"
-                        className="w-full rounded-md border border-[#203653] bg-[#050A12] px-3.5 py-2.5 font-mono text-sm text-[#EAF3FF] placeholder:text-[#5F748E] focus:border-[#FFB020] focus:outline-none"
-                      />
+                      <div className="relative">
+                        <input
+                          type={showMasterPin ? 'text' : 'password'}
+                          name="vecl-admin-master-pin"
+                          autoComplete="one-time-code"
+                          value={masterPinInput}
+                          onChange={(e) => setMasterPinInput(e.target.value)}
+                          placeholder="Enter Master Admin PIN"
+                          className="w-full rounded-md border border-[#203653] bg-[#050A12] pl-3.5 pr-10 py-2.5 font-mono text-sm text-[#EAF3FF] placeholder:text-[#5F748E] focus:border-[#FFB020] focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowMasterPin((v) => !v)}
+                          aria-label={showMasterPin ? 'Hide Master PIN' : 'Show Master PIN'}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#91A4BD] hover:text-[#EAF3FF] cursor-pointer"
+                        >
+                          {showMasterPin ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
                       <button
                         type="submit"
                         disabled={loading || !masterPinInput.trim()}
@@ -1171,7 +1276,7 @@ export const IntroductionPinLandingPage: React.FC = () => {
                         <Unlock className="h-4 w-4" aria-hidden="true" />
                         <span>Admin Master Verified</span>
                       </span>
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <button
                           type="button"
                           onClick={() => {
@@ -1183,6 +1288,18 @@ export const IntroductionPinLandingPage: React.FC = () => {
                           <span>Enter Bench Lab</span>
                           <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                         </button>
+                        {!adminConfig?.masterEnvConfigured && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowChangePinForm((v) => !v);
+                              setErrorMsg(null);
+                            }}
+                            className="min-h-[38px] rounded-md border border-[#203653] bg-[#0E192A] px-3 py-1.5 text-xs font-medium text-[#FFB020] hover:border-[#FFB020]/60 cursor-pointer"
+                          >
+                            {showChangePinForm ? 'Cancel PIN Change' : 'Change PIN'}
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={handleLockAdmin}
@@ -1192,6 +1309,49 @@ export const IntroductionPinLandingPage: React.FC = () => {
                         </button>
                       </div>
                     </div>
+
+                    {showChangePinForm && !adminConfig?.masterEnvConfigured && (
+                      <form
+                        onSubmit={handleChangeMasterPin}
+                        className="rounded-lg border border-[#FFB020]/45 bg-[#050A12] p-3.5 space-y-2.5"
+                      >
+                        <div className="text-xs font-semibold text-[#FFB020]">
+                          Update Claimed Master Admin PIN
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                          <input
+                            type="password"
+                            value={currentPinInput}
+                            onChange={(e) => setCurrentPinInput(e.target.value)}
+                            placeholder="Current PIN"
+                            className="rounded-md border border-[#203653] bg-[#0A1220] px-3 py-2 font-mono text-xs text-[#EAF3FF] focus:border-[#FFB020] focus:outline-none"
+                          />
+                          <input
+                            type="password"
+                            inputMode="numeric"
+                            value={newPinInput}
+                            onChange={(e) => setNewPinInput(e.target.value.replace(/\D/g, '').slice(0, 12))}
+                            placeholder="New PIN (6–12 digits)"
+                            className="rounded-md border border-[#203653] bg-[#0A1220] px-3 py-2 font-mono text-xs text-[#EAF3FF] focus:border-[#FFB020] focus:outline-none"
+                          />
+                          <input
+                            type="password"
+                            inputMode="numeric"
+                            value={newPinConfirm}
+                            onChange={(e) => setNewPinConfirm(e.target.value.replace(/\D/g, '').slice(0, 12))}
+                            placeholder="Confirm new PIN"
+                            className="rounded-md border border-[#203653] bg-[#0A1220] px-3 py-2 font-mono text-xs text-[#EAF3FF] focus:border-[#FFB020] focus:outline-none"
+                          />
+                        </div>
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="min-h-[36px] rounded-md bg-[#FFB020] px-3.5 py-1.5 text-xs font-bold text-[#060B14] hover:bg-[#FFC24D] disabled:opacity-50 cursor-pointer"
+                        >
+                          {loading ? 'Updating PIN...' : 'Save New Master PIN'}
+                        </button>
+                      </form>
+                    )}
 
                     {/* Issue New 8-Digit Trial PIN */}
                     <form onSubmit={handleGeneratePin} className="space-y-3">

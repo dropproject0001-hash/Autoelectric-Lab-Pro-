@@ -103,6 +103,28 @@ function persistLedgerToDisk(): void {
   }
 }
 
+function parseP256PrivateKeyFromEnv(envJwkRaw: string): ServerSigningKeys {
+  try {
+    const parsedPrivate = JSON.parse(envJwkRaw) as crypto.JsonWebKey;
+    if (!parsedPrivate || typeof parsedPrivate !== 'object' || Array.isArray(parsedPrivate)) {
+      throw new Error('NOT_AN_OBJECT');
+    }
+    const privateKey = crypto.createPrivateKey({ key: parsedPrivate, format: 'jwk' });
+    const publicKey = crypto.createPublicKey(privateKey);
+    const publicKeyJwk = publicKey.export({ format: 'jwk' }) as JsonWebKey;
+    if (privateKey.asymmetricKeyType !== 'ec' || publicKeyJwk.crv !== 'P-256') {
+      throw new Error('UNSUPPORTED_CURVE');
+    }
+    return { privateKey, publicKeyJwk };
+  } catch {
+    // An operator-supplied key that cannot be parsed must never be silently replaced:
+    // doing so would invalidate every previously issued offline license.
+    throw new Error(
+      'OFFLINE_LICENSE_JWK_INVALID: AELP_LICENSE_SIGNING_PRIVATE_KEY_JWK is set but is not a valid P-256 private JWK.'
+    );
+  }
+}
+
 function getOrInitializeServerSigningKeys(): ServerSigningKeys {
   if (cachedServerKeys) return cachedServerKeys;
 
@@ -113,29 +135,13 @@ function getOrInitializeServerSigningKeys(): ServerSigningKeys {
         'OFFLINE_LICENSE_JWK_MISSING: AELP_LICENSE_SIGNING_PRIVATE_KEY_JWK must be configured in strict production mode.'
       );
     }
-    const parsedPrivate = JSON.parse(envJwkRaw) as crypto.JsonWebKey;
-    const privateKey = crypto.createPrivateKey({ key: parsedPrivate, format: 'jwk' });
-    const publicKey = crypto.createPublicKey(privateKey);
-    const publicKeyJwk = publicKey.export({ format: 'jwk' }) as JsonWebKey;
-    cachedServerKeys = { privateKey, publicKeyJwk };
+    cachedServerKeys = parseP256PrivateKeyFromEnv(envJwkRaw);
     return cachedServerKeys;
   }
 
   if (envJwkRaw) {
-    try {
-      const parsedPrivate = JSON.parse(envJwkRaw) as crypto.JsonWebKey;
-      const privateKey = crypto.createPrivateKey({ key: parsedPrivate, format: 'jwk' });
-      const publicKey = crypto.createPublicKey(privateKey);
-      const publicKeyJwk = publicKey.export({ format: 'jwk' }) as JsonWebKey;
-      cachedServerKeys = { privateKey, publicKeyJwk };
-      return cachedServerKeys;
-    } catch {
-      // An operator-supplied key that cannot be parsed must never be silently replaced:
-      // doing so would invalidate every previously issued offline license.
-      throw new Error(
-        'OFFLINE_LICENSE_JWK_INVALID: AELP_LICENSE_SIGNING_PRIVATE_KEY_JWK is set but is not a valid P-256 private JWK.'
-      );
-    }
+    cachedServerKeys = parseP256PrivateKeyFromEnv(envJwkRaw);
+    return cachedServerKeys;
   }
 
   const keyFilePath = resolveSigningKeyFilePath();

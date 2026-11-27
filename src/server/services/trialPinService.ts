@@ -706,20 +706,26 @@ export function isFirstRunAdminSetupEnabled(): boolean {
   const envPin = (process.env.VECL_ADMIN_MASTER_PIN || '').trim();
   if (envPin.length > 0) return false;
   if (isStrictProductionSecrets()) return false;
-  return process.env.VECL_ALLOW_FIRST_RUN_ADMIN_SETUP === 'true';
+  const explicit = (process.env.VECL_ALLOW_FIRST_RUN_ADMIN_SETUP || '').trim().toLowerCase();
+  if (explicit === 'false' || explicit === '0') return false;
+  return true;
 }
 
 export function getAdminPinConfigStatus(): {
   masterEnvConfigured: boolean;
   adminClaimed: boolean;
   setupEnabled: boolean;
+  pinInitialized: boolean;
 } {
   ensureTrialStoreLoaded();
   const envPin = (process.env.VECL_ADMIN_MASTER_PIN || '').trim();
+  const masterEnvConfigured = envPin.length > 0;
+  const adminClaimed = storedAdminCredential !== null;
   return {
-    masterEnvConfigured: envPin.length > 0,
-    adminClaimed: storedAdminCredential !== null,
-    setupEnabled: isFirstRunAdminSetupEnabled(),
+    masterEnvConfigured,
+    adminClaimed,
+    setupEnabled: isFirstRunAdminSetupEnabled() && !adminClaimed,
+    pinInitialized: masterEnvConfigured || adminClaimed,
   };
 }
 
@@ -758,6 +764,59 @@ export function setupFirstRunAdminPin(
     adminId: 'master_pin_admin',
     jti: crypto.randomBytes(12).toString('hex'),
     issuedAtMs: nowMs,
+    expiresAtMs,
+  } satisfies AdminSessionTokenPayload);
+
+  return { adminToken, expiresAtMs };
+}
+
+export function changeClaimedAdminPin(
+  currentRawPin: string,
+  newRawPin: string,
+  nowMs = Date.now()
+): { adminToken: string; expiresAtMs: number } {
+  ensureTrialStoreLoaded();
+  const envPin = (process.env.VECL_ADMIN_MASTER_PIN || '').trim();
+  if (envPin.length > 0) {
+    throw new Error('ADMIN_ENV_MANAGED');
+  }
+  if (!storedAdminCredential) {
+    throw new Error('ADMIN_PIN_NOT_INITIALIZED');
+  }
+
+  const cleanedCurrent = normalizeTrialPin(currentRawPin || '');
+  if (!cleanedCurrent || cleanedCurrent.length < 4 || cleanedCurrent.length > 64) {
+    throw new Error('INVALID_MASTER_PIN');
+  }
+  const candidateHash = crypto
+    .scryptSync(`vecl:admin:v1:${cleanedCurrent}`, storedAdminCredential.salt, 32)
+    .toString('hex');
+  if (!constantTimeHexEquals(candidateHash, storedAdminCredential.scryptHash)) {
+    throw new Error('INVALID_MASTER_PIN');
+  }
+
+  const cleanedNew = normalizeTrialPin(newRawPin || '');
+  if (!/^\d{6,12}$/.test(cleanedNew)) {
+    throw new Error('INVALID_ADMIN_PIN_FORMAT');
+  }
+
+  const salt = crypto.randomBytes(16).toString('hex');
+  const scryptHash = crypto.scryptSync(`vecl:admin:v1:${cleanedNew}`, salt, 32).toString('hex');
+  storedAdminCredential = {
+    salt,
+    scryptHash,
+    createdAtMs: nowMs,
+  };
+  adminSessionMinIssuedAtMs = Math.max(adminSessionMinIssuedAtMs, nowMs);
+  persistTrialStoreToDisk(nowMs);
+
+  const issuedAtMs = Math.max(nowMs, adminSessionMinIssuedAtMs);
+  const expiresAtMs = issuedAtMs + ADMIN_SESSION_TTL_MS;
+  const adminToken = signHmacToken('vecl_admin_v1', {
+    kind: 'admin_v1',
+    adminId: 'master_pin_admin',
+    jti: crypto.randomBytes(12).toString('hex'),
+    issuedAtMs,
     expiresAtMs,
   } satisfies AdminSessionTokenPayload);
 

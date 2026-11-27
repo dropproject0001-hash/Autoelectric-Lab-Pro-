@@ -38,12 +38,33 @@ process.env.VECL_DATA_DIR = dir;
   assert.throws(() => lic.signLabReportHash('nothex'), /INVALID_LAB_REPORT_HASH/);
   console.log('PASS lab report ECDSA sign/verify + tamper + bad hash, keyId', sig.keyId);
 
-  // --- malformed operator JWK must throw, never silently replaced
+  // --- malformed operator JWK must throw, never silently replaced (non-strict and strict)
   lic.setOfflineLicenseDataDirForTests(dir + '-2');
   process.env.AELP_LICENSE_SIGNING_PRIVATE_KEY_JWK = '{not json';
   assert.throws(() => lic.getPublicVerificationKeyJwk(), /OFFLINE_LICENSE_JWK_INVALID/);
+  process.env.NODE_ENV = 'production';
+  process.env.AELP_LICENSE_SIGNING_PRIVATE_KEY_JWK = '{"kty":"EC","crv":"P-256"}garbage';
+  assert.throws(() => lic.getPublicVerificationKeyJwk(), /OFFLINE_LICENSE_JWK_INVALID/);
+
+  // Verify /api/billing/public-key returns structured 503 JSON without HTML stack trace
+  const http = await import('node:http');
+  const { createAutoelectricApiApp } = await import('../../server/createApiApp');
+  const apiApp = createAutoelectricApiApp();
+  const srv = http.createServer(apiApp);
+  await new Promise<void>((resolve) => srv.listen(0, '127.0.0.1', resolve));
+  try {
+    const addr = srv.address();
+    assert.ok(addr && typeof addr !== 'string');
+    const badRes = await fetch(`http://127.0.0.1:${addr.port}/api/billing/public-key`);
+    assert.equal(badRes.status, 503);
+    const badBody = (await badRes.json()) as { status?: string; code?: string };
+    assert.equal(badBody.status, 'ERROR');
+    assert.equal(badBody.code, 'OFFLINE_LICENSE_KEY_UNAVAILABLE');
+  } finally {
+    srv.close();
+  }
   delete process.env.AELP_LICENSE_SIGNING_PRIVATE_KEY_JWK;
-  console.log('PASS malformed JWK fails loudly');
+  console.log('PASS malformed JWK fails loudly and /api/billing/public-key returns structured 503 JSON');
 
   // --- strict production: missing HMAC secret must refuse
   process.env.NODE_ENV = 'production';

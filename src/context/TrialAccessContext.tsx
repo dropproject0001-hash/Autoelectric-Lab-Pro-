@@ -22,6 +22,7 @@ import {
   redeemTrialPinClient,
   setActiveTrialToken,
   setAdminPinToken,
+  subscribeAdminSessionChanges,
   subscribeTrialLockEvents,
 } from '../services/trialPinClientService';
 import { useAuth } from './AuthContext';
@@ -220,6 +221,23 @@ export const TrialAccessProvider: React.FC<{ children: React.ReactNode }> = ({ c
       setIsModalOpen(false);
     });
   }, []);
+
+  // Keep React admin session state in sync if in-memory admin token is cleared on 401/expiry/revocation
+  useEffect(() => {
+    return subscribeAdminSessionChanges((unlocked) => {
+      setIsAdminUnlocked(unlocked);
+      if (!unlocked) {
+        setAdminEnteredBench(false);
+        setAdminAuditTrials([]);
+        setAdminAuditLog([]);
+        setAdminAuditSummary(null);
+        void refreshAccessStatus();
+      } else {
+        setAccessMode('ADMIN');
+        setLockNotice(null);
+      }
+    });
+  }, [refreshAccessStatus]);
 
   // 1-second live countdown ticker + automatic expiry transition when clock hits zero
   useEffect(() => {

@@ -5,18 +5,34 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import {
+  AlertTriangle,
   CheckCircle2,
   Copy,
+  Eye,
+  EyeOff,
   KeyRound,
   Lock,
   QrCode,
   RefreshCw,
+  ShieldAlert,
   ShieldCheck,
   Upload,
   X,
 } from 'lucide-react';
 import { useTrialAccess } from '../../context/TrialAccessContext';
-import { getAdminPinToken } from '../../services/trialPinClientService';
+import {
+  type AdminPinConfigStatus,
+  changeAdminMasterPinClient,
+  fetchAdminPinConfigStatus,
+  getAdminPinToken,
+  setAdminPinToken,
+} from '../../services/trialPinClientService';
+import {
+  isSecondaryConfirmationSatisfied,
+  maskMasterAdminPin,
+  SECONDARY_CONFIRMATION_KEYWORD,
+  validateMasterPinModification,
+} from '../../utils/adminPinValidation';
 import {
   compressQrImageFile,
   savePaymentQrConfig,
@@ -47,7 +63,9 @@ export const AdminPinManagerModal: React.FC<AdminPinManagerModalProps> = ({
   const { isAdminUnlocked, openAccessModal } = useTrialAccess();
   const qrConfig = usePaymentQrConfig();
 
-  const [activeTab, setActiveTab] = useState<'LICENSE_GEN' | 'QR_UPLOAD'>('LICENSE_GEN');
+  const [activeTab, setActiveTab] = useState<'LICENSE_GEN' | 'QR_UPLOAD' | 'MASTER_PIN'>(
+    'LICENSE_GEN'
+  );
   const [durationDays, setDurationDays] = useState<SubscriptionDurationDays>(30);
   const [technicianNote, setTechnicianNote] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -55,6 +73,22 @@ export const AdminPinManagerModal: React.FC<AdminPinManagerModalProps> = ({
   const [ledger, setLedger] = useState<IssuedOfflineLicenseRecord[]>([]);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Master Admin PIN Validation & Secondary Confirmation state
+  const [adminPinConfig, setAdminPinConfig] = useState<AdminPinConfigStatus | null>(null);
+  const [isLoadingPinConfig, setIsLoadingPinConfig] = useState(false);
+  const [currentMasterPinInput, setCurrentMasterPinInput] = useState('');
+  const [newMasterPinInput, setNewMasterPinInput] = useState('');
+  const [confirmNewMasterPinInput, setConfirmNewMasterPinInput] = useState('');
+  const [showCurrentMasterPin, setShowCurrentMasterPin] = useState(false);
+  const [showNewMasterPin, setShowNewMasterPin] = useState(false);
+  const [pinValidationErrors, setPinValidationErrors] = useState<string[]>([]);
+  const [pendingSecondaryConfirmation, setPendingSecondaryConfirmation] = useState(false);
+  const [secondaryAckChecked, setSecondaryAckChecked] = useState(false);
+  const [secondaryConfirmKeywordInput, setSecondaryConfirmKeywordInput] = useState('');
+  const [isUpdatingMasterPin, setIsUpdatingMasterPin] = useState(false);
+  const [masterPinStatusMsg, setMasterPinStatusMsg] = useState<string | null>(null);
+  const [masterPinErrorMsg, setMasterPinErrorMsg] = useState<string | null>(null);
 
   // Admin E-Wallet QR Uploader state
   const [accountName, setAccountName] = useState(qrConfig.accountName);
@@ -66,12 +100,40 @@ export const AdminPinManagerModal: React.FC<AdminPinManagerModalProps> = ({
   const [isCompressing, setIsCompressing] = useState(false);
   const [qrSaveNotice, setQrSaveNotice] = useState<string | null>(null);
 
+  const resetMasterPinFormState = useCallback((clearMessages = true) => {
+    setCurrentMasterPinInput('');
+    setNewMasterPinInput('');
+    setConfirmNewMasterPinInput('');
+    setShowCurrentMasterPin(false);
+    setShowNewMasterPin(false);
+    setPinValidationErrors([]);
+    setPendingSecondaryConfirmation(false);
+    setSecondaryAckChecked(false);
+    setSecondaryConfirmKeywordInput('');
+    if (clearMessages) {
+      setMasterPinStatusMsg(null);
+      setMasterPinErrorMsg(null);
+    }
+  }, []);
+
   useEffect(() => {
     setAccountName(qrConfig.accountName);
     setAccountNumber(qrConfig.accountNumber);
     setInstructionsTaglish(qrConfig.instructionsTaglish);
     setPreviewQrDataUrl(qrConfig.qrImageDataUrl);
   }, [qrConfig]);
+
+  const loadMasterPinConfig = useCallback(async () => {
+    setIsLoadingPinConfig(true);
+    try {
+      const cfg = await fetchAdminPinConfigStatus();
+      setAdminPinConfig(cfg);
+    } catch {
+      setAdminPinConfig(null);
+    } finally {
+      setIsLoadingPinConfig(false);
+    }
+  }, []);
 
   const fetchLedger = useCallback(async () => {
     const token = getAdminPinToken();
@@ -84,6 +146,10 @@ export const AdminPinManagerModal: React.FC<AdminPinManagerModalProps> = ({
           Accept: 'application/json',
         },
       });
+      if (res.status === 401) {
+        setAdminPinToken(null);
+        return;
+      }
       if (res.ok) {
         const data = (await res.json()) as { licenses?: IssuedOfflineLicenseRecord[] };
         if (Array.isArray(data.licenses)) {
@@ -98,8 +164,11 @@ export const AdminPinManagerModal: React.FC<AdminPinManagerModalProps> = ({
   useEffect(() => {
     if (isOpen && isAdminUnlocked) {
       void fetchLedger();
+      void loadMasterPinConfig();
+    } else if (!isOpen) {
+      resetMasterPinFormState(true);
     }
-  }, [isOpen, isAdminUnlocked, fetchLedger]);
+  }, [isOpen, isAdminUnlocked, fetchLedger, loadMasterPinConfig, resetMasterPinFormState]);
 
   if (!isOpen) return null;
 
@@ -131,6 +200,9 @@ export const AdminPinManagerModal: React.FC<AdminPinManagerModalProps> = ({
         error?: string;
       };
       if (!res.ok || !data.record) {
+        if (res.status === 401) {
+          setAdminPinToken(null);
+        }
         setErrorMessage(data.error || `Failed to generate signed license (HTTP ${res.status}).`);
         return;
       }
@@ -192,6 +264,91 @@ export const AdminPinManagerModal: React.FC<AdminPinManagerModalProps> = ({
     setQrSaveNotice('Saved & Published to AutoLabPro_BillingConfig! Live inside Upgrade modal.');
   };
 
+  const livePinValidation = validateMasterPinModification({
+    currentPin: currentMasterPinInput,
+    newPin: newMasterPinInput,
+    confirmNewPin: confirmNewMasterPinInput,
+    config: adminPinConfig,
+  });
+
+  const handleStageMasterPinModification = (e: React.FormEvent) => {
+    e.preventDefault();
+    setMasterPinStatusMsg(null);
+    setMasterPinErrorMsg(null);
+
+    const validation = validateMasterPinModification({
+      currentPin: currentMasterPinInput,
+      newPin: newMasterPinInput,
+      confirmNewPin: confirmNewMasterPinInput,
+      config: adminPinConfig,
+    });
+
+    if (!validation.valid) {
+      setPinValidationErrors(validation.errors);
+      setPendingSecondaryConfirmation(false);
+      return;
+    }
+
+    setPinValidationErrors([]);
+    setSecondaryAckChecked(false);
+    setSecondaryConfirmKeywordInput('');
+    setPendingSecondaryConfirmation(true);
+  };
+
+  const handleConfirmMasterPinModification = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMasterPinStatusMsg(null);
+    setMasterPinErrorMsg(null);
+
+    const validation = validateMasterPinModification({
+      currentPin: currentMasterPinInput,
+      newPin: newMasterPinInput,
+      confirmNewPin: confirmNewMasterPinInput,
+      config: adminPinConfig,
+    });
+
+    if (!validation.valid) {
+      setPinValidationErrors(validation.errors);
+      setPendingSecondaryConfirmation(false);
+      return;
+    }
+
+    if (
+      !isSecondaryConfirmationSatisfied({
+        acknowledged: secondaryAckChecked,
+        confirmationText: secondaryConfirmKeywordInput,
+      })
+    ) {
+      setMasterPinErrorMsg(
+        `Secondary confirmation required: check the acknowledgment box and type ${SECONDARY_CONFIRMATION_KEYWORD}.`
+      );
+      return;
+    }
+
+    setIsUpdatingMasterPin(true);
+    try {
+      await changeAdminMasterPinClient(currentMasterPinInput, newMasterPinInput);
+      resetMasterPinFormState(false);
+      setMasterPinStatusMsg(
+        'Master Admin PIN updated securely. Previous Admin Console sessions have been invalidated.'
+      );
+      await loadMasterPinConfig();
+    } catch (err) {
+      setMasterPinErrorMsg(
+        err instanceof Error ? err.message : 'Failed to update Master Admin PIN.'
+      );
+    } finally {
+      setIsUpdatingMasterPin(false);
+    }
+  };
+
+  const handleTabChange = (nextTab: 'LICENSE_GEN' | 'QR_UPLOAD' | 'MASTER_PIN') => {
+    if (nextTab !== 'MASTER_PIN') {
+      resetMasterPinFormState(true);
+    }
+    setActiveTab(nextTab);
+  };
+
   return (
     <div
       data-testid="admin-pin-manager-modal"
@@ -246,10 +403,10 @@ export const AdminPinManagerModal: React.FC<AdminPinManagerModalProps> = ({
         ) : (
           <div className="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
             {/* Tabs */}
-            <div className="flex gap-2 border-b border-slate-800 pb-3">
+            <div className="flex flex-wrap gap-2 border-b border-slate-800 pb-3">
               <button
                 type="button"
-                onClick={() => setActiveTab('LICENSE_GEN')}
+                onClick={() => handleTabChange('LICENSE_GEN')}
                 className={`px-3 py-1.5 rounded-md border font-mono text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer ${
                   activeTab === 'LICENSE_GEN'
                     ? 'border-amber-400 bg-amber-500/20 text-amber-100'
@@ -261,7 +418,7 @@ export const AdminPinManagerModal: React.FC<AdminPinManagerModalProps> = ({
               </button>
               <button
                 type="button"
-                onClick={() => setActiveTab('QR_UPLOAD')}
+                onClick={() => handleTabChange('QR_UPLOAD')}
                 className={`px-3 py-1.5 rounded-md border font-mono text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer ${
                   activeTab === 'QR_UPLOAD'
                     ? 'border-cyan-400 bg-cyan-500/20 text-cyan-100'
@@ -270,6 +427,19 @@ export const AdminPinManagerModal: React.FC<AdminPinManagerModalProps> = ({
               >
                 <QrCode className="w-3.5 h-3.5" />
                 <span>Admin E-Wallet QR Uploader</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleTabChange('MASTER_PIN')}
+                data-testid="tab-master-pin-security"
+                className={`px-3 py-1.5 rounded-md border font-mono text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer ${
+                  activeTab === 'MASTER_PIN'
+                    ? 'border-emerald-400 bg-emerald-500/20 text-emerald-100'
+                    : 'border-slate-700 bg-slate-900 text-slate-400'
+                }`}
+              >
+                <ShieldAlert className="w-3.5 h-3.5" />
+                <span>Master Admin PIN</span>
               </button>
             </div>
 
@@ -417,7 +587,7 @@ export const AdminPinManagerModal: React.FC<AdminPinManagerModalProps> = ({
                   </div>
                 </div>
               </div>
-            ) : (
+            ) : activeTab === 'QR_UPLOAD' ? (
               /* Admin E-Wallet QR Uploader */
               <form
                 onSubmit={handlePublishQrConfig}
@@ -519,6 +689,309 @@ export const AdminPinManagerModal: React.FC<AdminPinManagerModalProps> = ({
                   </div>
                 </div>
               </form>
+            ) : (
+              /* Master Admin PIN Validation & Secondary Confirmation Layer */
+              <div className="space-y-4" data-testid="master-pin-manager-panel">
+                {/* Masked Active PIN Status Banner */}
+                <div className="rounded-xl border border-slate-800 bg-slate-900/75 p-4 flex flex-wrap items-center justify-between gap-3">
+                  <div className="space-y-1">
+                    <div className="font-mono text-[10px] uppercase tracking-wider text-slate-400">
+                      Currently Active Master Admin PIN
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <span
+                        data-testid="masked-active-master-pin"
+                        className="rounded border border-slate-700 bg-slate-950 px-3 py-1 font-mono text-sm font-bold tracking-[0.25em] text-amber-300 select-none"
+                      >
+                        {adminPinConfig?.pinInitialized ? maskMasterAdminPin(null, 8) : 'NOT INITIALIZED'}
+                      </span>
+                      <span className="font-mono text-[10.5px] text-slate-300">
+                        {isLoadingPinConfig
+                          ? 'Checking server status...'
+                          : adminPinConfig?.masterEnvConfigured
+                            ? 'Server Env Managed (VECL_ADMIN_MASTER_PIN)'
+                            : adminPinConfig?.adminClaimed
+                              ? 'Claimed Workstation Credential (scrypt-hashed)'
+                              : 'Unclaimed'}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => void loadMasterPinConfig()}
+                    disabled={isLoadingPinConfig}
+                    className="inline-flex items-center gap-1.5 rounded border border-slate-700 bg-slate-950 px-3 py-1.5 font-mono text-[10.5px] text-cyan-300 hover:border-cyan-500/60 cursor-pointer"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingPinConfig ? 'animate-spin' : ''}`} />
+                    <span>Refresh Status</span>
+                  </button>
+                </div>
+
+                {masterPinErrorMsg && (
+                  <div className="rounded border border-rose-500/60 bg-rose-950/50 px-3 py-2 font-mono text-[11px] text-rose-200">
+                    {masterPinErrorMsg}
+                  </div>
+                )}
+
+                {masterPinStatusMsg && (
+                  <div className="rounded border border-emerald-500/60 bg-emerald-950/40 px-3 py-2 font-mono text-[11px] text-emerald-200 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span>{masterPinStatusMsg}</span>
+                  </div>
+                )}
+
+                {adminPinConfig?.masterEnvConfigured ? (
+                  <div className="rounded-xl border border-amber-500/45 bg-amber-950/20 p-4 space-y-2">
+                    <div className="flex items-center gap-2 font-hud text-xs font-bold uppercase text-amber-300">
+                      <Lock className="w-4 h-4 shrink-0" />
+                      <span>Environment-Managed Secret Lock</span>
+                    </div>
+                    <p className="font-mono text-[11px] text-slate-300 leading-relaxed">
+                      The active Master Admin PIN (<span className="text-amber-300 tracking-widest">{maskMasterAdminPin(null, 8)}</span>) is managed exclusively via the server <code className="text-slate-100">VECL_ADMIN_MASTER_PIN</code> environment variable and cannot be modified from the browser UI. Rotate the value in your deployment secrets and restart the server.
+                    </p>
+                  </div>
+                ) : !pendingSecondaryConfirmation ? (
+                  <form
+                    onSubmit={handleStageMasterPinModification}
+                    className="rounded-xl border border-slate-800 bg-slate-900/70 p-4 space-y-4"
+                    data-testid="master-pin-validation-form"
+                  >
+                    <div className="border-b border-slate-800 pb-2.5">
+                      <h3 className="font-hud text-xs font-bold uppercase tracking-wider text-amber-300">
+                        Step 1 — Validate Active PIN &amp; Proposed Rotation
+                      </h3>
+                      <p className="font-mono text-[10.5px] text-slate-400 mt-0.5">
+                        Your current active PIN stays masked. All validation rules must pass before proceeding to secondary confirmation.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <label className="space-y-1">
+                        <span className="font-mono text-[10px] uppercase text-slate-400">
+                          Current Active PIN
+                        </span>
+                        <div className="relative">
+                          <input
+                            type={showCurrentMasterPin ? 'text' : 'password'}
+                            autoComplete="current-password"
+                            value={currentMasterPinInput}
+                            onChange={(e) => {
+                              setCurrentMasterPinInput(e.target.value);
+                              setPinValidationErrors([]);
+                            }}
+                            placeholder="••••••••"
+                            required
+                            className="w-full rounded border border-slate-700 bg-slate-950 pl-2.5 pr-8 py-2 font-mono text-xs text-slate-100 focus:border-amber-400 focus:outline-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowCurrentMasterPin((v) => !v)}
+                            aria-label={showCurrentMasterPin ? 'Mask current PIN' : 'Reveal current PIN'}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 cursor-pointer"
+                          >
+                            {showCurrentMasterPin ? (
+                              <EyeOff className="w-3.5 h-3.5" />
+                            ) : (
+                              <Eye className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        </div>
+                      </label>
+
+                      <label className="space-y-1">
+                        <span className="font-mono text-[10px] uppercase text-slate-400">
+                          New Master PIN (6–12 Digits)
+                        </span>
+                        <div className="relative">
+                          <input
+                            type={showNewMasterPin ? 'text' : 'password'}
+                            inputMode="numeric"
+                            autoComplete="new-password"
+                            value={newMasterPinInput}
+                            onChange={(e) => {
+                              setNewMasterPinInput(e.target.value.replace(/\D/g, '').slice(0, 12));
+                              setPinValidationErrors([]);
+                            }}
+                            placeholder="6–12 digits"
+                            required
+                            className="w-full rounded border border-slate-700 bg-slate-950 pl-2.5 pr-8 py-2 font-mono text-xs text-slate-100 focus:border-amber-400 focus:outline-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowNewMasterPin((v) => !v)}
+                            aria-label={showNewMasterPin ? 'Mask new PIN' : 'Reveal new PIN'}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 cursor-pointer"
+                          >
+                            {showNewMasterPin ? (
+                              <EyeOff className="w-3.5 h-3.5" />
+                            ) : (
+                              <Eye className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        </div>
+                      </label>
+
+                      <label className="space-y-1">
+                        <span className="font-mono text-[10px] uppercase text-slate-400">
+                          Confirm New Master PIN
+                        </span>
+                        <input
+                          type={showNewMasterPin ? 'text' : 'password'}
+                          inputMode="numeric"
+                          autoComplete="new-password"
+                          value={confirmNewMasterPinInput}
+                          onChange={(e) => {
+                            setConfirmNewMasterPinInput(
+                              e.target.value.replace(/\D/g, '').slice(0, 12)
+                            );
+                            setPinValidationErrors([]);
+                          }}
+                          placeholder="Re-enter new PIN"
+                          required
+                          className="w-full rounded border border-slate-700 bg-slate-950 px-2.5 py-2 font-mono text-xs text-slate-100 focus:border-amber-400 focus:outline-none"
+                        />
+                      </label>
+                    </div>
+
+                    {/* Validation Policy Checklist */}
+                    <div className="rounded-lg border border-slate-800 bg-slate-950/75 p-3 grid grid-cols-1 sm:grid-cols-2 gap-1.5 font-mono text-[10.5px]">
+                      <div className={livePinValidation.checks.currentPinPresent ? 'text-emerald-300' : 'text-slate-400'}>
+                        {livePinValidation.checks.currentPinPresent ? '✓' : '○'} Current active PIN entered (masked)
+                      </div>
+                      <div className={livePinValidation.checks.newPinFormatValid ? 'text-emerald-300' : 'text-slate-400'}>
+                        {livePinValidation.checks.newPinFormatValid ? '✓' : '○'} New PIN is 6–12 numeric digits
+                      </div>
+                      <div className={livePinValidation.checks.newPinNotTrivial ? 'text-emerald-300' : 'text-slate-400'}>
+                        {livePinValidation.checks.newPinNotTrivial ? '✓' : '○'} Not a repeated or sequential pattern
+                      </div>
+                      <div className={livePinValidation.checks.newPinDiffersFromCurrent ? 'text-emerald-300' : 'text-slate-400'}>
+                        {livePinValidation.checks.newPinDiffersFromCurrent ? '✓' : '○'} Distinct from currently active PIN
+                      </div>
+                      <div className={livePinValidation.checks.confirmMatchesNewPin ? 'text-emerald-300' : 'text-slate-400'}>
+                        {livePinValidation.checks.confirmMatchesNewPin ? '✓' : '○'} Confirmation entry matches new PIN
+                      </div>
+                    </div>
+
+                    {pinValidationErrors.length > 0 && (
+                      <div
+                        data-testid="master-pin-validation-errors"
+                        className="rounded border border-rose-500/60 bg-rose-950/45 p-3 space-y-1 font-mono text-[11px] text-rose-200"
+                      >
+                        {pinValidationErrors.map((errText) => (
+                          <div key={errText}>• {errText}</div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="flex justify-end">
+                      <button
+                        type="submit"
+                        data-testid="master-pin-review-button"
+                        className="py-2 px-4 rounded-md border border-amber-500/70 bg-amber-600/30 hover:bg-amber-500/40 font-mono text-xs font-bold text-amber-100 cursor-pointer"
+                      >
+                        Validate &amp; Continue to Secondary Confirmation
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  /* Step 2: Mandatory Secondary Confirmation Gate */
+                  <form
+                    onSubmit={(e) => void handleConfirmMasterPinModification(e)}
+                    className="rounded-xl border border-amber-500/65 bg-amber-950/20 p-4 space-y-4"
+                    data-testid="master-pin-secondary-confirmation"
+                  >
+                    <div className="flex items-start gap-2.5 border-b border-amber-500/30 pb-3">
+                      <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                      <div>
+                        <h3 className="font-hud text-xs font-bold uppercase tracking-wider text-amber-200">
+                          Step 2 — Secondary Confirmation Required
+                        </h3>
+                        <p className="font-mono text-[10.5px] text-slate-300 mt-0.5">
+                          Modifying the Master Admin PIN immediately revokes all other active administrator console sessions. Review masked values below before confirming.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 rounded-lg border border-slate-800 bg-slate-950/80 p-3 font-mono text-[11px]">
+                      <div>
+                        <span className="text-slate-400 block text-[10px] uppercase">
+                          Current Active PIN (Masked)
+                        </span>
+                        <span className="text-slate-200 tracking-[0.2em] font-bold">
+                          {maskMasterAdminPin(currentMasterPinInput)}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 block text-[10px] uppercase">
+                          Proposed New PIN (Masked)
+                        </span>
+                        <span className="text-emerald-300 tracking-[0.2em] font-bold">
+                          {maskMasterAdminPin(newMasterPinInput)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <label className="flex items-start gap-2.5 cursor-pointer rounded-lg border border-slate-800 bg-slate-950/60 p-3">
+                      <input
+                        type="checkbox"
+                        checked={secondaryAckChecked}
+                        onChange={(e) => setSecondaryAckChecked(e.target.checked)}
+                        className="mt-0.5 accent-amber-500"
+                      />
+                      <span className="font-mono text-[11px] text-slate-200">
+                        I confirm modifying the Master Admin PIN and understand existing admin tokens will be invalidated.
+                      </span>
+                    </label>
+
+                    <label className="block space-y-1">
+                      <span className="font-mono text-[10px] uppercase text-slate-400">
+                        Type <strong className="text-amber-300">{SECONDARY_CONFIRMATION_KEYWORD}</strong> to authorize modification
+                      </span>
+                      <input
+                        type="text"
+                        value={secondaryConfirmKeywordInput}
+                        onChange={(e) => setSecondaryConfirmKeywordInput(e.target.value)}
+                        placeholder={SECONDARY_CONFIRMATION_KEYWORD}
+                        required
+                        className="w-full sm:max-w-xs rounded border border-slate-700 bg-slate-950 px-3 py-2 font-mono text-xs uppercase text-amber-200 focus:border-amber-400 focus:outline-none"
+                      />
+                    </label>
+
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                      <button
+                        type="button"
+                        disabled={isUpdatingMasterPin}
+                        onClick={() => {
+                          setPendingSecondaryConfirmation(false);
+                          setSecondaryAckChecked(false);
+                          setSecondaryConfirmKeywordInput('');
+                          setMasterPinErrorMsg(null);
+                        }}
+                        className="py-2 px-3.5 rounded-md border border-slate-700 bg-slate-900 hover:bg-slate-800 font-mono text-xs text-slate-300 cursor-pointer"
+                      >
+                        Back to Edit
+                      </button>
+
+                      <button
+                        type="submit"
+                        disabled={
+                          isUpdatingMasterPin ||
+                          !isSecondaryConfirmationSatisfied({
+                            acknowledged: secondaryAckChecked,
+                            confirmationText: secondaryConfirmKeywordInput,
+                          })
+                        }
+                        data-testid="master-pin-confirm-submit"
+                        className="py-2 px-4 rounded-md border border-emerald-500/70 bg-emerald-600/30 hover:bg-emerald-500/40 disabled:opacity-45 font-mono text-xs font-bold text-emerald-100 cursor-pointer"
+                      >
+                        {isUpdatingMasterPin
+                          ? 'Rotating Master Admin PIN...'
+                          : 'Confirm & Update Master Admin PIN'}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
             )}
           </div>
         )}

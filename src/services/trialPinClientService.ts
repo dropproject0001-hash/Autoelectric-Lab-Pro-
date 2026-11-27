@@ -117,6 +117,7 @@ export interface AdminPinConfigStatus {
   masterEnvConfigured: boolean;
   adminClaimed: boolean;
   setupEnabled: boolean;
+  pinInitialized: boolean;
 }
 
 // Keep signed trial & admin tokens strictly in JS memory (never localStorage/sessionStorage)
@@ -126,11 +127,31 @@ let inMemoryAdminToken: string | null = null;
 type TrialLockListener = (code: string, message: string) => void;
 const trialLockListeners = new Set<TrialLockListener>();
 
+type AdminSessionListener = (unlocked: boolean) => void;
+const adminSessionListeners = new Set<AdminSessionListener>();
+
 export function subscribeTrialLockEvents(listener: TrialLockListener): () => void {
   trialLockListeners.add(listener);
   return () => {
     trialLockListeners.delete(listener);
   };
+}
+
+export function subscribeAdminSessionChanges(listener: AdminSessionListener): () => void {
+  adminSessionListeners.add(listener);
+  return () => {
+    adminSessionListeners.delete(listener);
+  };
+}
+
+function notifyAdminSessionChanged(unlocked: boolean): void {
+  for (const listener of adminSessionListeners) {
+    try {
+      listener(unlocked);
+    } catch {
+      // Ignore subscriber errors
+    }
+  }
 }
 
 export function notifyTrialLockedFromServer(code: string, message: string): void {
@@ -159,7 +180,12 @@ export function getAdminPinToken(): string | null {
 }
 
 export function setAdminPinToken(token: string | null): void {
-  inMemoryAdminToken = token && token.trim() ? token.trim() : null;
+  const prev = inMemoryAdminToken;
+  const next = token && token.trim() ? token.trim() : null;
+  inMemoryAdminToken = next;
+  if (Boolean(prev) !== Boolean(next)) {
+    notifyAdminSessionChanged(Boolean(next));
+  }
 }
 
 export async function getClientBearerToken(forceRefresh = false): Promise<string | null> {
@@ -288,10 +314,16 @@ export async function fetchAdminPinConfigStatus(): Promise<AdminPinConfigStatus>
   if (!res.ok) {
     throw new Error(data.error || `Unable to load admin configuration (${res.status})`);
   }
+  const masterEnvConfigured = Boolean(data.masterEnvConfigured);
+  const adminClaimed = Boolean(data.adminClaimed);
   return {
-    masterEnvConfigured: Boolean(data.masterEnvConfigured),
-    adminClaimed: Boolean(data.adminClaimed),
+    masterEnvConfigured,
+    adminClaimed,
     setupEnabled: Boolean(data.setupEnabled),
+    pinInitialized:
+      typeof data.pinInitialized === 'boolean'
+        ? data.pinInitialized
+        : masterEnvConfigured || adminClaimed,
   };
 }
 
@@ -335,6 +367,35 @@ export async function loginAdminMasterPinClient(masterPin: string): Promise<{
   };
   if (!res.ok || !data.adminToken) {
     throw new Error(data.error || `Admin unlock failed (${res.status}).`);
+  }
+  setAdminPinToken(data.adminToken);
+  return {
+    adminToken: data.adminToken,
+    expiresAtMs: data.expiresAtMs ?? Date.now() + 12 * 3600_000,
+  };
+}
+
+export async function changeAdminMasterPinClient(
+  currentPin: string,
+  newPin: string
+): Promise<{ adminToken: string; expiresAtMs: number }> {
+  const headers = await buildAdminAuthHeaders();
+  const res = await fetch('/api/autoelectric/trial/admin/change-pin', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ currentPin: currentPin.trim(), newPin: newPin.trim() }),
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    adminToken?: string;
+    expiresAtMs?: number;
+    error?: string;
+    code?: string;
+  };
+  if (!res.ok || !data.adminToken) {
+    if (res.status === 401 && data.code !== 'INVALID_MASTER_PIN') {
+      setAdminPinToken(null);
+    }
+    throw new Error(data.error || `Failed to update Master Admin PIN (${res.status}).`);
   }
   setAdminPinToken(data.adminToken);
   return {
@@ -470,6 +531,9 @@ export async function revokeAdminTrialPinClient(
     error?: string;
   };
   if (!res.ok || !data.trial) {
+    if (res.status === 401) {
+      setAdminPinToken(null);
+    }
     throw new Error(data.error || `Failed to update trial PIN status (${res.status}).`);
   }
   return data.trial;
@@ -487,6 +551,9 @@ export async function resetAdminTrialDeviceClient(trialId: string): Promise<Clie
     error?: string;
   };
   if (!res.ok || !data.trial) {
+    if (res.status === 401) {
+      setAdminPinToken(null);
+    }
     throw new Error(data.error || `Failed to reset device binding (${res.status}).`);
   }
   return data.trial;

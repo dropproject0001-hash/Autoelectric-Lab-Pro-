@@ -26,6 +26,7 @@ import { SYSTEM_CATEGORIES } from '../data/automotiveKnowledgeSeed';
 import { SystemCategoryId } from '../types/automotiveKnowledge';
 import { VEHICLE_CATALOG } from '../utils/vehicleEcuRegistry';
 import { playCockpitTabDetent, playRotaryEncoderTick } from '../utils/audioFeedback';
+import { OemCountingMonitor } from './OemCountingMonitor';
 
 interface KnowledgeCenterPanelProps {
   onSelectVehicleContext?: (make: string, model: string) => void;
@@ -133,6 +134,31 @@ export const KnowledgeCenterPanel: React.FC<KnowledgeCenterPanelProps> = ({
           {importExportStatus}
         </div>
       )}
+
+      {/* Live OEM Information Counting Monitor & Dual-OEM Correlation Table */}
+      <OemCountingMonitor
+        catalog={catalog}
+        selectedMake={selectedMake}
+        selectedModel={selectedModel}
+        searchQuery={searchQuery}
+        onSelectBrandFilter={(makeSlug) => {
+          setSelectedMake(makeSlug);
+          setSelectedModel('all');
+        }}
+        onSelectVehicleRow={(row) => {
+          const isSame =
+            selectedMake.toLowerCase() === row.makeSlug &&
+            selectedModel.toLowerCase() === row.model.toLowerCase();
+          if (isSame) {
+            setSelectedMake('all');
+            setSelectedModel('all');
+          } else {
+            setSelectedMake(row.makeSlug);
+            setSelectedModel(row.model);
+          }
+        }}
+        onLaunchBenchContext={onSelectVehicleContext}
+      />
 
       {/* Search & Filter Toolbar */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 my-6">

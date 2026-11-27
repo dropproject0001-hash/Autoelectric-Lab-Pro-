@@ -16,6 +16,8 @@ import {
   Copy,
   Delete,
   Download,
+  Eye,
+  EyeOff,
   FileDown,
   History,
   KeyRound,
@@ -44,6 +46,7 @@ import {
 } from '../context/TrialAccessContext';
 import {
   AdminPinConfigStatus,
+  changeAdminMasterPinClient,
   ClientTrialPinRecord,
   fetchAdminPinConfigStatus,
   formatTrialDurationLabel,
@@ -139,6 +142,11 @@ export const AdminLicenseModal: React.FC<AdminLicenseModalProps> = ({
   const [adminConfig, setAdminConfig] = useState<AdminPinConfigStatus | null>(null);
   const [masterPinInput, setMasterPinInput] = useState('');
   const [setupPinConfirm, setSetupPinConfirm] = useState('');
+  const [showMasterPin, setShowMasterPin] = useState(false);
+  const [showChangePinForm, setShowChangePinForm] = useState(false);
+  const [currentPinInput, setCurrentPinInput] = useState('');
+  const [newPinInput, setNewPinInput] = useState('');
+  const [newPinConfirm, setNewPinConfirm] = useState('');
   const [trialDurationHours, setTrialDurationHours] = useState<TrialDurationHours>(4);
   const [unusedPickupHours, setUnusedPickupHours] = useState<number>(72);
   const [trialNotesInput, setTrialNotesInput] = useState('');
@@ -316,8 +324,14 @@ export const AdminLicenseModal: React.FC<AdminLicenseModalProps> = ({
       await setupFirstRunAdminPinClient(cleaned);
       setMasterPinInput('');
       setSetupPinConfirm('');
+      setShowMasterPin(false);
       markAdminSessionActive(true);
-      setAdminConfig({ masterEnvConfigured: false, adminClaimed: true, setupEnabled: false });
+      setAdminConfig({
+        masterEnvConfigured: false,
+        adminClaimed: true,
+        setupEnabled: false,
+        pinInitialized: true,
+      });
       await loadAdminTrialRegistry();
       setSuccessMsg('Master Admin PIN initialized and console unlocked.');
     } catch (err: unknown) {
@@ -339,11 +353,46 @@ export const AdminLicenseModal: React.FC<AdminLicenseModalProps> = ({
     try {
       await loginAdminMasterPinClient(masterPinInput.trim());
       setMasterPinInput('');
+      setShowMasterPin(false);
       markAdminSessionActive(true);
       await loadAdminTrialRegistry();
       setSuccessMsg('Administrator Trial PIN Console unlocked.');
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : 'Incorrect Master Admin PIN.');
+      void refreshAllAccessData(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChangeMasterPin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    const cleanedNew = newPinInput.replace(/\D/g, '');
+    const cleanedConfirm = newPinConfirm.replace(/\D/g, '');
+    if (!currentPinInput.trim()) {
+      setErrorMsg('Enter your current Master Admin PIN.');
+      return;
+    }
+    if (cleanedNew.length < 6 || cleanedNew.length > 12) {
+      setErrorMsg('New Master Admin PIN must be 6 to 12 numeric digits.');
+      return;
+    }
+    if (cleanedNew !== cleanedConfirm) {
+      setErrorMsg('New Master Admin PIN confirmation does not match.');
+      return;
+    }
+    setLoading(true);
+    try {
+      await changeAdminMasterPinClient(currentPinInput.trim(), cleanedNew);
+      setCurrentPinInput('');
+      setNewPinInput('');
+      setNewPinConfirm('');
+      setShowChangePinForm(false);
+      setSuccessMsg('Master Admin PIN updated. Earlier admin sessions were invalidated.');
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'Failed to update Master Admin PIN.');
     } finally {
       setLoading(false);
     }
@@ -355,7 +404,12 @@ export const AdminLicenseModal: React.FC<AdminLicenseModalProps> = ({
     markAdminSessionActive(false);
     setNewlyGeneratedTrialPin(null);
     setExpandedTrialIds({});
+    setShowChangePinForm(false);
+    setCurrentPinInput('');
+    setNewPinInput('');
+    setNewPinConfirm('');
     setSuccessMsg('Administrator console locked and session token revoked.');
+    void refreshAllAccessData(false);
   };
 
   const handleGenerateTrialPin = async (e: React.FormEvent) => {
@@ -857,16 +911,30 @@ export const AdminLicenseModal: React.FC<AdminLicenseModalProps> = ({
           {activeTab === 'ADMIN_GEN' && (
             <div className="space-y-4">
               {!hasAdminRights ? (
-                adminConfig && adminConfig.setupEnabled && !adminConfig.masterEnvConfigured && !adminConfig.adminClaimed ? (
+                adminConfig === null ? (
+                  <div className="mx-auto max-w-md rounded-md border border-[#203653] bg-[#0E192A] p-5 text-center font-mono text-xs text-[#91A4BD]">
+                    Checking server Master Admin PIN configuration...
+                  </div>
+                ) : adminConfig.setupEnabled && !adminConfig.pinInitialized ? (
                   <form
                     onSubmit={handleFirstRunAdminSetup}
                     className="mx-auto max-w-lg space-y-3 rounded-md border border-[#FFB020]/50 bg-[#0E192A] p-4"
                   >
-                    <div className="flex items-center gap-2 text-[#FFB020]">
-                      <ShieldCheck className="h-5 w-5" aria-hidden="true" />
-                      <h3 className="font-hud text-sm font-bold uppercase tracking-wider">
-                        First-Run Master Admin PIN Setup
-                      </h3>
+                    <div className="flex items-center justify-between gap-2 text-[#FFB020]">
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+                        <h3 className="font-hud text-sm font-bold uppercase tracking-wider">
+                          First-Run Master Admin PIN Setup
+                        </h3>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowMasterPin((v) => !v)}
+                        className="inline-flex items-center gap-1 rounded border border-[#203653] bg-[#060B14] px-2 py-1 font-mono text-[10px] text-[#91A4BD] hover:text-white cursor-pointer"
+                      >
+                        {showMasterPin ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                        <span>{showMasterPin ? 'Hide' : 'Show'}</span>
+                      </button>
                     </div>
                     <p className="font-mono text-xs text-[#91A4BD]">
                       No <code className="text-[#EAF3FF]">VECL_ADMIN_MASTER_PIN</code> environment secret
@@ -878,7 +946,7 @@ export const AdminLicenseModal: React.FC<AdminLicenseModalProps> = ({
                           New Master PIN (6–12 Digits)
                         </label>
                         <input
-                          type="password"
+                          type={showMasterPin ? 'text' : 'password'}
                           inputMode="numeric"
                           value={masterPinInput}
                           onChange={(e) => setMasterPinInput(e.target.value.replace(/\D/g, '').slice(0, 12))}
@@ -892,7 +960,7 @@ export const AdminLicenseModal: React.FC<AdminLicenseModalProps> = ({
                           Confirm Master PIN
                         </label>
                         <input
-                          type="password"
+                          type={showMasterPin ? 'text' : 'password'}
                           inputMode="numeric"
                           value={setupPinConfirm}
                           onChange={(e) => setSetupPinConfirm(e.target.value.replace(/\D/g, '').slice(0, 12))}
@@ -911,6 +979,27 @@ export const AdminLicenseModal: React.FC<AdminLicenseModalProps> = ({
                       <span>Save Master Admin PIN &amp; Unlock Console</span>
                     </button>
                   </form>
+                ) : !adminConfig.pinInitialized ? (
+                  <div className="mx-auto max-w-lg space-y-3 rounded-md border border-[#FFB020]/50 bg-[#1B1408] p-4">
+                    <div className="flex items-center gap-2 text-[#FFB020]">
+                      <ShieldAlert className="h-5 w-5 shrink-0" aria-hidden="true" />
+                      <h3 className="font-hud text-sm font-bold uppercase tracking-wider">
+                        Master Admin PIN Not Configured
+                      </h3>
+                    </div>
+                    <p className="font-mono text-xs text-[#D9E8FA] leading-relaxed">
+                      First-run setup is disabled in this environment and <code className="text-[#FFB020]">VECL_ADMIN_MASTER_PIN</code> is not configured on the server yet. Set <code className="text-[#EAF3FF]">VECL_ADMIN_MASTER_PIN</code> in Settings &rarr; Secrets and restart the server.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => void refreshAllAccessData(true)}
+                      disabled={loading}
+                      className="inline-flex min-h-[36px] items-center gap-1.5 rounded border border-[#FFB020]/60 bg-[#060B14] px-3 py-1.5 font-mono text-xs font-semibold text-[#FFB020] hover:bg-[#0E192A] cursor-pointer"
+                    >
+                      <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
+                      <span>Re-check Server Config</span>
+                    </button>
+                  </div>
                 ) : (
                   <form
                     onSubmit={handleAdminMasterLogin}
@@ -929,15 +1018,24 @@ export const AdminLicenseModal: React.FC<AdminLicenseModalProps> = ({
                       <label className="mb-1 block font-mono text-[10px] uppercase text-[#91A4BD]">
                         Master Admin PIN
                       </label>
-                      <input
-                        type="password"
-                        inputMode="numeric"
-                        value={masterPinInput}
-                        onChange={(e) => setMasterPinInput(e.target.value)}
-                        placeholder="Enter Master Admin PIN"
-                        required
-                        className="w-full rounded-md border border-[#203653] bg-[#060B14] px-3 py-2.5 font-mono text-sm tracking-widest text-white focus:border-[#FFB020] focus:outline-none"
-                      />
+                      <div className="relative">
+                        <input
+                          type={showMasterPin ? 'text' : 'password'}
+                          value={masterPinInput}
+                          onChange={(e) => setMasterPinInput(e.target.value)}
+                          placeholder="Enter Master Admin PIN"
+                          required
+                          className="w-full rounded-md border border-[#203653] bg-[#060B14] pl-3 pr-10 py-2.5 font-mono text-sm tracking-widest text-white focus:border-[#FFB020] focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowMasterPin((v) => !v)}
+                          aria-label={showMasterPin ? 'Hide Master PIN' : 'Show Master PIN'}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#91A4BD] hover:text-white cursor-pointer"
+                        >
+                          {showMasterPin ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
                     </div>
                     <button
                       type="submit"
@@ -966,16 +1064,72 @@ export const AdminLicenseModal: React.FC<AdminLicenseModalProps> = ({
                         </p>
                       </div>
                       {isAdminUnlocked && (
-                        <button
-                          type="button"
-                          onClick={handleLockAdminConsole}
-                          className="inline-flex items-center gap-1 rounded border border-[#203653] bg-[#060B14] px-2.5 py-1 font-mono text-[10px] font-semibold uppercase text-[#91A4BD] hover:border-[#FF4D62]/60 hover:text-[#FF4D62] cursor-pointer whitespace-nowrap"
-                        >
-                          <LogOut className="h-3 w-3" aria-hidden="true" />
-                          <span>Lock Admin</span>
-                        </button>
+                        <div className="flex items-center gap-2">
+                          {!adminConfig?.masterEnvConfigured && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowChangePinForm((v) => !v);
+                                setErrorMsg(null);
+                              }}
+                              className="inline-flex items-center gap-1 rounded border border-[#203653] bg-[#060B14] px-2.5 py-1 font-mono text-[10px] font-semibold uppercase text-[#FFB020] hover:border-[#FFB020]/60 cursor-pointer whitespace-nowrap"
+                            >
+                              <KeyRound className="h-3 w-3" aria-hidden="true" />
+                              <span>{showChangePinForm ? 'Cancel PIN Change' : 'Change Master PIN'}</span>
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={handleLockAdminConsole}
+                            className="inline-flex items-center gap-1 rounded border border-[#203653] bg-[#060B14] px-2.5 py-1 font-mono text-[10px] font-semibold uppercase text-[#91A4BD] hover:border-[#FF4D62]/60 hover:text-[#FF4D62] cursor-pointer whitespace-nowrap"
+                          >
+                            <LogOut className="h-3 w-3" aria-hidden="true" />
+                            <span>Lock Admin</span>
+                          </button>
+                        </div>
                       )}
                     </div>
+
+                    {isAdminUnlocked && showChangePinForm && !adminConfig?.masterEnvConfigured && (
+                      <div className="rounded-md border border-[#FFB020]/45 bg-[#060B14] p-3 space-y-2.5">
+                        <div className="font-mono text-[11px] font-bold uppercase text-[#FFB020]">
+                          Rotate Claimed Master Admin PIN
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-center">
+                          <input
+                            type="password"
+                            value={currentPinInput}
+                            onChange={(e) => setCurrentPinInput(e.target.value)}
+                            placeholder="Current PIN"
+                            className="rounded border border-[#203653] bg-[#0A1220] px-2.5 py-1.5 font-mono text-xs text-white focus:border-[#FFB020] focus:outline-none"
+                          />
+                          <input
+                            type="password"
+                            inputMode="numeric"
+                            value={newPinInput}
+                            onChange={(e) => setNewPinInput(e.target.value.replace(/\D/g, '').slice(0, 12))}
+                            placeholder="New PIN (6–12 digits)"
+                            className="rounded border border-[#203653] bg-[#0A1220] px-2.5 py-1.5 font-mono text-xs text-white focus:border-[#FFB020] focus:outline-none"
+                          />
+                          <input
+                            type="password"
+                            inputMode="numeric"
+                            value={newPinConfirm}
+                            onChange={(e) => setNewPinConfirm(e.target.value.replace(/\D/g, '').slice(0, 12))}
+                            placeholder="Confirm New PIN"
+                            className="rounded border border-[#203653] bg-[#0A1220] px-2.5 py-1.5 font-mono text-xs text-white focus:border-[#FFB020] focus:outline-none"
+                          />
+                          <button
+                            type="button"
+                            disabled={loading}
+                            onClick={(e) => void handleChangeMasterPin(e)}
+                            className="min-h-[34px] rounded border border-[#FFB020]/70 bg-[#FFB020]/20 px-3 font-mono text-xs font-bold text-[#FFB020] hover:bg-[#FFB020]/30 disabled:opacity-45 cursor-pointer"
+                          >
+                            {loading ? 'Saving...' : 'Update PIN'}
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
                       <div className="md:col-span-5">

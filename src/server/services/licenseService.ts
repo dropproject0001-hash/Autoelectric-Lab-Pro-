@@ -12,6 +12,10 @@ import {
   type AuthenticatedRequest,
   type VerifiedFirebaseUser,
 } from './firebaseAuthMiddleware';
+import {
+  isValidMasterAdminProof,
+  type MasterAdminProof,
+} from './adminMasterPinService';
 
 export type LicenseDurationPlan =
   | 'TRIAL_1D'
@@ -309,6 +313,19 @@ export function isVerifiedAdminUser(user: VerifiedFirebaseUser | undefined | nul
   return false;
 }
 
+function resolveAuthorizedAdminUid(
+  adminUser: VerifiedFirebaseUser | undefined | null,
+  masterAdminProof?: MasterAdminProof | null
+): string {
+  if (isValidMasterAdminProof(masterAdminProof)) {
+    return masterAdminProof.adminUid;
+  }
+  if (isVerifiedAdminUser(adminUser)) {
+    return adminUser!.uid;
+  }
+  throw new Error('FORBIDDEN_ADMIN_ONLY');
+}
+
 export function normalizeLicenseCode(rawCode: string): string {
   const cleaned = rawCode
     .toUpperCase()
@@ -390,6 +407,7 @@ export function resolvePlanDurationDays(
 
 export function createLicenseCodeRecord(params: {
   adminUser: VerifiedFirebaseUser;
+  masterAdminProof?: MasterAdminProof;
   plan: LicenseDurationPlan;
   customDays?: number;
   unusedExpiryDays?: number;
@@ -397,9 +415,7 @@ export function createLicenseCodeRecord(params: {
   notes?: string;
   nowMs?: number;
 }): { plainCode: string; record: LicenseRecord } {
-  if (!isVerifiedAdminUser(params.adminUser)) {
-    throw new Error('FORBIDDEN_ADMIN_ONLY');
-  }
+  const actorAdminUid = resolveAuthorizedAdminUid(params.adminUser, params.masterAdminProof);
 
   const nowMs = params.nowMs ?? Date.now();
   const durationDays = resolvePlanDurationDays(params.plan, params.customDays);
@@ -444,7 +460,7 @@ export function createLicenseCodeRecord(params: {
     assignedEmail: null,
     devices: [],
     notes: typeof params.notes === 'string' ? params.notes.trim().slice(0, 240) : '',
-    createdByAdminUid: params.adminUser.uid,
+    createdByAdminUid: actorAdminUid,
     extensionHistory: [],
   };
 
@@ -633,13 +649,12 @@ export async function redeemLicenseCode(params: {
 
 export function extendLicenseDuration(params: {
   adminUser: VerifiedFirebaseUser;
+  masterAdminProof?: MasterAdminProof;
   licenseId: string;
   additionalDays: number;
   nowMs?: number;
 }): LicenseRecord {
-  if (!isVerifiedAdminUser(params.adminUser)) {
-    throw new Error('FORBIDDEN_ADMIN_ONLY');
-  }
+  const actorAdminUid = resolveAuthorizedAdminUid(params.adminUser, params.masterAdminProof);
   const nowMs = params.nowMs ?? Date.now();
   const addDays = Math.floor(Number(params.additionalDays));
   if (!Number.isFinite(addDays) || addDays < 1 || addDays > 3650) {
@@ -668,7 +683,7 @@ export function extendLicenseDuration(params: {
   record.extensionHistory.push({
     addedDays: addDays,
     extendedAtMs: nowMs,
-    adminUid: params.adminUser.uid,
+    adminUid: actorAdminUid,
   });
   persistLicenseStoreToDisk();
 
@@ -677,11 +692,10 @@ export function extendLicenseDuration(params: {
 
 export function resetLicenseDevices(params: {
   adminUser: VerifiedFirebaseUser;
+  masterAdminProof?: MasterAdminProof;
   licenseId: string;
 }): LicenseRecord {
-  if (!isVerifiedAdminUser(params.adminUser)) {
-    throw new Error('FORBIDDEN_ADMIN_ONLY');
-  }
+  resolveAuthorizedAdminUid(params.adminUser, params.masterAdminProof);
   const record = licensesById.get(params.licenseId);
   if (!record) {
     throw new Error('LICENSE_NOT_FOUND');
@@ -693,14 +707,13 @@ export function resetLicenseDevices(params: {
 
 export function setLicenseRevocation(params: {
   adminUser: VerifiedFirebaseUser;
+  masterAdminProof?: MasterAdminProof;
   licenseId: string;
   revoked: boolean;
   reason?: string;
   nowMs?: number;
 }): LicenseRecord {
-  if (!isVerifiedAdminUser(params.adminUser)) {
-    throw new Error('FORBIDDEN_ADMIN_ONLY');
-  }
+  resolveAuthorizedAdminUid(params.adminUser, params.masterAdminProof);
   const record = licensesById.get(params.licenseId);
   if (!record) {
     throw new Error('LICENSE_NOT_FOUND');
@@ -719,11 +732,10 @@ export function setLicenseRevocation(params: {
 
 export function listAllLicensesForAdmin(
   adminUser: VerifiedFirebaseUser,
-  nowMs = Date.now()
+  nowMs = Date.now(),
+  masterAdminProof?: MasterAdminProof
 ): Array<LicenseRecord & { status: LicenseStatus }> {
-  if (!isVerifiedAdminUser(adminUser)) {
-    throw new Error('FORBIDDEN_ADMIN_ONLY');
-  }
+  resolveAuthorizedAdminUid(adminUser, masterAdminProof);
   return Array.from(licensesById.values())
     .sort((a, b) => b.createdAtMs - a.createdAtMs)
     .map((rec) => ({

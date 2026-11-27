@@ -202,45 +202,76 @@ export async function redeemLicenseCodeClient(rawCode: string, deviceLabel?: str
   return data;
 }
 
-export async function fetchAdminLicensesList(): Promise<{
+async function masterPinAdminLicenseFetch<T>(
+  url: string,
+  masterPin: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const cleanPin = masterPin.trim();
+  if (!cleanPin) {
+    throw new Error('Master Admin PIN is required for license administrator operations.');
+  }
+  const res = await fetch(url, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Admin-Pin': cleanPin,
+      ...(options.headers || {}),
+    },
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data?.error || `License admin service error (${res.status})`);
+  }
+  return data as T;
+}
+
+export async function fetchAdminLicensesList(masterPin = ''): Promise<{
   adminUid: string;
   licenses: ClientLicenseRecord[];
 }> {
-  return authenticatedLicenseFetch<{
+  return masterPinAdminLicenseFetch<{
     adminUid: string;
     licenses: ClientLicenseRecord[];
-  }>('/api/autoelectric/license/admin/list', {
+  }>('/api/autoelectric/license/admin/list', masterPin, {
     method: 'GET',
   });
 }
 
-export async function generateAdminLicenseCode(params: {
-  plan: LicenseDurationPlan;
-  customDays?: number;
-  unusedExpiryDays?: number;
-  notes?: string;
-}): Promise<{
+export async function generateAdminLicenseCode(
+  params: {
+    plan: LicenseDurationPlan;
+    customDays?: number;
+    unusedExpiryDays?: number;
+    notes?: string;
+  },
+  masterPin = ''
+): Promise<{
   plainCode: string;
   license: ClientLicenseRecord;
 }> {
-  return authenticatedLicenseFetch<{
+  return masterPinAdminLicenseFetch<{
     plainCode: string;
     license: ClientLicenseRecord;
-  }>('/api/autoelectric/license/admin/generate', {
+  }>('/api/autoelectric/license/admin/generate', masterPin, {
     method: 'POST',
     body: JSON.stringify(params),
   });
 }
 
-export async function extendAdminLicense(licenseId: string, additionalDays: number) {
-  return authenticatedLicenseFetch('/api/autoelectric/license/admin/extend', {
+export async function extendAdminLicense(
+  licenseId: string,
+  additionalDays: number,
+  masterPin = ''
+) {
+  return masterPinAdminLicenseFetch('/api/autoelectric/license/admin/extend', masterPin, {
     method: 'POST',
     body: JSON.stringify({ licenseId, additionalDays }),
   });
 }
 
-export async function resetAdminLicenseDevices(licenseId: string) {
-  return authenticatedLicenseFetch('/api/autoelectric/license/admin/reset-devices', {
+export async function resetAdminLicenseDevices(licenseId: string, masterPin = '') {
+  return masterPinAdminLicenseFetch('/api/autoelectric/license/admin/reset-devices', masterPin, {
     method: 'POST',
     body: JSON.stringify({ licenseId }),
   });
@@ -249,9 +280,10 @@ export async function resetAdminLicenseDevices(licenseId: string) {
 export async function setAdminLicenseRevocation(
   licenseId: string,
   revoked: boolean,
-  reason?: string
+  reason?: string,
+  masterPin = ''
 ) {
-  return authenticatedLicenseFetch('/api/autoelectric/license/admin/revoke', {
+  return masterPinAdminLicenseFetch('/api/autoelectric/license/admin/revoke', masterPin, {
     method: 'POST',
     body: JSON.stringify({ licenseId, revoked, reason }),
   });

@@ -22,6 +22,12 @@ import {
   maskUidForDiagnostics,
   probePostgresConnection,
 } from './services/connectionHealthService';
+import { requireAuth, type AuthRequest } from '../middleware/auth.ts';
+import {
+  getOrCreateUser,
+  listDiagnosticSessionsByUid,
+  upsertDiagnosticSessionForUid,
+} from '../db/users.ts';
 import { classifyGeminiError } from './services/geminiErrorClassifier';
 import {
   getFreeTierPoolSnapshot,
@@ -51,7 +57,6 @@ import {
   createLicenseCodeRecord,
   extendLicenseDuration,
   getUserLicenseStatus,
-  isVerifiedAdminUser,
   LicenseDurationPlan,
   listAllLicensesForAdmin,
   redeemLicenseCode,
@@ -59,7 +64,9 @@ import {
   resetLicenseDevices,
   setLicenseRevocation,
 } from './services/licenseService';
+import { requireExclusiveMasterAdminPin } from './services/adminMasterPinService';
 import {
+  changeClaimedAdminPin,
   checkAdminPinRateLimit,
   checkTrialRedeemGlobalRateLimit,
   checkTrialRedeemRateLimit,
@@ -393,19 +400,14 @@ export function createAutoelectricApiApp(): express.Express {
 
   app.get(
     '/api/autoelectric/license/admin/list',
-    requireFirebaseAuth,
+    requireExclusiveMasterAdminPin,
     (req: AuthenticatedRequest, res) => {
       const user = req.authUser!;
-      if (!isVerifiedAdminUser(user)) {
-        return res.status(403).json({
-          error: 'Administrator privileges required (verified Admin UID only).',
-          code: 'FORBIDDEN_ADMIN_ONLY',
-        });
-      }
-      const licenses = listAllLicensesForAdmin(user);
+      const licenses = listAllLicensesForAdmin(user, Date.now(), req.masterAdminProof);
       return res.json({
         status: 'SUCCESS',
         adminUid: user.uid,
+        authMode: 'VECL_ADMIN_MASTER_PIN',
         licenses,
       });
     }
@@ -413,16 +415,10 @@ export function createAutoelectricApiApp(): express.Express {
 
   app.post(
     '/api/autoelectric/license/admin/generate',
-    requireFirebaseAuth,
+    requireExclusiveMasterAdminPin,
     smallJsonParser,
     (req: AuthenticatedRequest, res) => {
       const user = req.authUser!;
-      if (!isVerifiedAdminUser(user)) {
-        return res.status(403).json({
-          error: 'Administrator privileges required (verified Admin UID only).',
-          code: 'FORBIDDEN_ADMIN_ONLY',
-        });
-      }
       try {
         const { plan, customDays, unusedExpiryDays, maxDevices, notes } = req.body || {};
         const validPlans: LicenseDurationPlan[] = [
@@ -440,6 +436,7 @@ export function createAutoelectricApiApp(): express.Express {
 
         const created = createLicenseCodeRecord({
           adminUser: user,
+          masterAdminProof: req.masterAdminProof,
           plan: selectedPlan,
           customDays: typeof customDays === 'number' ? customDays : Number(customDays),
           unusedExpiryDays:
@@ -458,6 +455,12 @@ export function createAutoelectricApiApp(): express.Express {
         });
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : 'Failed to generate license code.';
+        if (msg === 'FORBIDDEN_ADMIN_ONLY') {
+          return res.status(403).json({
+            error: 'Exclusive Master Admin PIN authorization required.',
+            code: 'FORBIDDEN_ADMIN_ONLY',
+          });
+        }
         return res.status(400).json({ error: msg, code: 'INVALID_LICENSE_PARAMETERS' });
       }
     }
@@ -465,16 +468,10 @@ export function createAutoelectricApiApp(): express.Express {
 
   app.post(
     '/api/autoelectric/license/admin/extend',
-    requireFirebaseAuth,
+    requireExclusiveMasterAdminPin,
     smallJsonParser,
     (req: AuthenticatedRequest, res) => {
       const user = req.authUser!;
-      if (!isVerifiedAdminUser(user)) {
-        return res.status(403).json({
-          error: 'Administrator privileges required (verified Admin UID only).',
-          code: 'FORBIDDEN_ADMIN_ONLY',
-        });
-      }
       try {
         const { licenseId, additionalDays } = req.body || {};
         if (!licenseId || typeof licenseId !== 'string') {
@@ -482,6 +479,7 @@ export function createAutoelectricApiApp(): express.Express {
         }
         const updated = extendLicenseDuration({
           adminUser: user,
+          masterAdminProof: req.masterAdminProof,
           licenseId,
           additionalDays: Number(additionalDays),
         });
@@ -491,7 +489,8 @@ export function createAutoelectricApiApp(): express.Express {
         });
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : 'Failed to extend license.';
-        const status = msg === 'LICENSE_NOT_FOUND' ? 404 : 400;
+        const status =
+          msg === 'FORBIDDEN_ADMIN_ONLY' ? 403 : msg === 'LICENSE_NOT_FOUND' ? 404 : 400;
         return res.status(status).json({ error: msg, code: msg });
       }
     }
@@ -499,16 +498,10 @@ export function createAutoelectricApiApp(): express.Express {
 
   app.post(
     '/api/autoelectric/license/admin/reset-devices',
-    requireFirebaseAuth,
+    requireExclusiveMasterAdminPin,
     smallJsonParser,
     (req: AuthenticatedRequest, res) => {
       const user = req.authUser!;
-      if (!isVerifiedAdminUser(user)) {
-        return res.status(403).json({
-          error: 'Administrator privileges required (verified Admin UID only).',
-          code: 'FORBIDDEN_ADMIN_ONLY',
-        });
-      }
       try {
         const { licenseId } = req.body || {};
         if (!licenseId || typeof licenseId !== 'string') {
@@ -516,6 +509,7 @@ export function createAutoelectricApiApp(): express.Express {
         }
         const updated = resetLicenseDevices({
           adminUser: user,
+          masterAdminProof: req.masterAdminProof,
           licenseId,
         });
         return res.json({
@@ -524,7 +518,8 @@ export function createAutoelectricApiApp(): express.Express {
         });
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : 'Failed to reset devices.';
-        const status = msg === 'LICENSE_NOT_FOUND' ? 404 : 400;
+        const status =
+          msg === 'FORBIDDEN_ADMIN_ONLY' ? 403 : msg === 'LICENSE_NOT_FOUND' ? 404 : 400;
         return res.status(status).json({ error: msg, code: msg });
       }
     }
@@ -532,16 +527,10 @@ export function createAutoelectricApiApp(): express.Express {
 
   app.post(
     '/api/autoelectric/license/admin/revoke',
-    requireFirebaseAuth,
+    requireExclusiveMasterAdminPin,
     smallJsonParser,
     (req: AuthenticatedRequest, res) => {
       const user = req.authUser!;
-      if (!isVerifiedAdminUser(user)) {
-        return res.status(403).json({
-          error: 'Administrator privileges required (verified Admin UID only).',
-          code: 'FORBIDDEN_ADMIN_ONLY',
-        });
-      }
       try {
         const { licenseId, revoked, reason } = req.body || {};
         if (!licenseId || typeof licenseId !== 'string') {
@@ -549,6 +538,7 @@ export function createAutoelectricApiApp(): express.Express {
         }
         const updated = setLicenseRevocation({
           adminUser: user,
+          masterAdminProof: req.masterAdminProof,
           licenseId,
           revoked: revoked !== false,
           reason: typeof reason === 'string' ? reason : undefined,
@@ -559,7 +549,8 @@ export function createAutoelectricApiApp(): express.Express {
         });
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : 'Failed to update revocation state.';
-        const status = msg === 'LICENSE_NOT_FOUND' ? 404 : 400;
+        const status =
+          msg === 'FORBIDDEN_ADMIN_ONLY' ? 403 : msg === 'LICENSE_NOT_FOUND' ? 404 : 400;
         return res.status(status).json({ error: msg, code: msg });
       }
     }
@@ -837,8 +828,8 @@ export function createAutoelectricApiApp(): express.Express {
       status: 'SUCCESS',
       masterEnvConfigured: cfg.masterEnvConfigured,
       setupEnabled: cfg.setupEnabled,
-      // Never disclose unclaimed state to unauthenticated HTTP probes when first-run setup is disabled
-      adminClaimed: cfg.setupEnabled ? cfg.adminClaimed : true,
+      adminClaimed: cfg.adminClaimed,
+      pinInitialized: cfg.pinInitialized,
     });
   });
 
@@ -872,7 +863,7 @@ export function createAutoelectricApiApp(): express.Express {
         ADMIN_SETUP_DISABLED: {
           http: 403,
           message:
-            'Unauthenticated first-run Admin PIN setup is disabled by default. Configure VECL_ADMIN_MASTER_PIN on the server environment.',
+            'Unauthenticated first-run Admin PIN setup is disabled in this environment. Configure VECL_ADMIN_MASTER_PIN on the server environment.',
         },
         ADMIN_ENV_MANAGED: {
           http: 409,
@@ -920,8 +911,11 @@ export function createAutoelectricApiApp(): express.Express {
     } catch (err: unknown) {
       const code = err instanceof Error ? err.message : 'INVALID_MASTER_PIN';
       if (code === 'ADMIN_PIN_NOT_INITIALIZED') {
+        const cfg = getAdminPinConfigStatus();
         return res.status(409).json({
-          error: 'Master Admin PIN is not set up yet. Configure VECL_ADMIN_MASTER_PIN on the server environment.',
+          error: cfg.setupEnabled
+            ? 'Master Admin PIN is not set up yet. Complete First-Run Admin PIN Setup to claim your PIN.'
+            : 'Master Admin PIN is not set up yet. Configure VECL_ADMIN_MASTER_PIN on the server environment.',
           code,
         });
       }
@@ -937,6 +931,66 @@ export function createAutoelectricApiApp(): express.Express {
       });
     }
   });
+
+  app.post(
+    '/api/autoelectric/trial/admin/change-pin',
+    requirePinOrFirebaseAdmin,
+    smallJsonParser,
+    (req, res) => {
+      const rateKey = `admin-change-pin:${req.ip || 'unknown'}`;
+      const rate = checkAdminPinRateLimit(rateKey);
+      if (!rate.allowed) {
+        res.setHeader('Retry-After', String(rate.retryAfterSec || 60));
+        return res.status(429).json({
+          error: `Too many Master Admin PIN change attempts. Retry in ${rate.retryAfterSec}s.`,
+          code: 'ADMIN_RATE_LIMITED',
+        });
+      }
+
+      try {
+        const { currentPin, newPin } = req.body || {};
+        if (
+          !currentPin ||
+          typeof currentPin !== 'string' ||
+          !newPin ||
+          typeof newPin !== 'string'
+        ) {
+          return res.status(400).json({
+            error: 'Current PIN and new 6–12 digit Master Admin PIN are required.',
+            code: 'INVALID_ADMIN_PIN_FORMAT',
+          });
+        }
+        const session = changeClaimedAdminPin(currentPin, newPin);
+        return res.json({
+          status: 'SUCCESS',
+          adminToken: session.adminToken,
+          expiresAtMs: session.expiresAtMs,
+        });
+      } catch (err: unknown) {
+        const code = err instanceof Error ? err.message : 'ADMIN_CHANGE_PIN_FAILED';
+        const statusMap: Record<string, { http: number; message: string }> = {
+          ADMIN_ENV_MANAGED: {
+            http: 409,
+            message: 'Master Admin PIN is managed by server environment configuration (VECL_ADMIN_MASTER_PIN) and cannot be changed from the UI.',
+          },
+          ADMIN_PIN_NOT_INITIALIZED: {
+            http: 409,
+            message: 'No claimed Master Admin PIN exists yet.',
+          },
+          INVALID_MASTER_PIN: {
+            http: 401,
+            message: 'Current Master Admin PIN is incorrect.',
+          },
+          INVALID_ADMIN_PIN_FORMAT: {
+            http: 400,
+            message: 'New Master Admin PIN must be 6 to 12 numeric digits.',
+          },
+        };
+        const mapped = statusMap[code] || { http: 400, message: 'Failed to update Master Admin PIN.' };
+        return res.status(mapped.http).json({ error: mapped.message, code });
+      }
+    }
+  );
 
   app.post('/api/autoelectric/trial/admin/logout', requirePinOrFirebaseAdmin, (req, res) => {
     const authHeader = req.headers.authorization || '';
@@ -2860,12 +2914,24 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
   };
 
   app.get('/api/billing/public-key', (_req, res) => {
-    const publicKeyJwk = getPublicVerificationKeyJwk();
-    return res.json({
-      status: 'SUCCESS',
-      algorithm: 'ECDSA-P256-SHA256',
-      publicKeyJwk,
-    });
+    try {
+      const publicKeyJwk = getPublicVerificationKeyJwk();
+      return res.json({
+        status: 'SUCCESS',
+        algorithm: 'ECDSA-P256-SHA256',
+        publicKeyJwk,
+      });
+    } catch (err: unknown) {
+      console.error(
+        '[Billing] Public verification key unavailable:',
+        err instanceof Error ? err.message : 'Unknown error'
+      );
+      return res.status(503).json({
+        status: 'ERROR',
+        error: 'Offline license verification key is unavailable or misconfigured on the server.',
+        code: 'OFFLINE_LICENSE_KEY_UNAVAILABLE',
+      });
+    }
   });
 
   // Server-side ECDSA attestation for Academy lab-report digests (see src/services/labReportSignatureClient.ts)
@@ -2936,11 +3002,104 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
   );
 
   app.get('/api/admin/licenses', requireBillingMasterAdmin, (_req, res) => {
-    return res.json({
-      status: 'SUCCESS',
-      licenses: listIssuedOfflineLicenses(),
-    });
+    try {
+      return res.json({
+        status: 'SUCCESS',
+        licenses: listIssuedOfflineLicenses(),
+      });
+    } catch (err: unknown) {
+      console.error(
+        '[AdminBilling] Failed to list issued offline licenses:',
+        err instanceof Error ? err.message : 'Unknown error'
+      );
+      return res.status(500).json({
+        status: 'ERROR',
+        error: 'Failed to retrieve issued offline licenses.',
+        code: 'OFFLINE_LICENSE_LIST_FAILED',
+      });
+    }
   });
+
+  app.get('/api/sql/me', requireAuth, async (req: AuthRequest, res) => {
+    try {
+      const uid = req.user?.uid;
+      if (!uid) {
+        return res.status(401).json({ error: 'Unauthorized: Missing user identity' });
+      }
+      const user = await getOrCreateUser(
+        uid,
+        req.user?.email || '',
+        typeof req.user?.name === 'string' ? req.user.name : null
+      );
+      return res.json({ status: 'SUCCESS', user });
+    } catch (error: unknown) {
+      console.error('[CloudSQL] Failed to sync user profile:', error);
+      return res.status(500).json({
+        error: error instanceof Error ? error.message : 'Failed to sync user profile.',
+      });
+    }
+  });
+
+  app.get('/api/sql/diagnostic-sessions', requireAuth, async (req: AuthRequest, res) => {
+    try {
+      const uid = req.user?.uid;
+      if (!uid) {
+        return res.status(401).json({ error: 'Unauthorized: Missing user identity' });
+      }
+      const sessions = await listDiagnosticSessionsByUid(uid);
+      return res.json({ status: 'SUCCESS', sessions });
+    } catch (error: unknown) {
+      console.error('[CloudSQL] Failed to list diagnostic sessions:', error);
+      return res.status(500).json({
+        error: error instanceof Error ? error.message : 'Failed to load diagnostic sessions.',
+      });
+    }
+  });
+
+  app.post(
+    '/api/sql/diagnostic-sessions',
+    requireAuth,
+    smallJsonParser,
+    async (req: AuthRequest, res) => {
+      try {
+        const uid = req.user?.uid;
+        if (!uid) {
+          return res.status(401).json({ error: 'Unauthorized: Missing user identity' });
+        }
+        const sessionKey = typeof req.body?.sessionKey === 'string' ? req.body.sessionKey.trim() : '';
+        const vehicleMake =
+          typeof req.body?.vehicleMake === 'string' ? req.body.vehicleMake.trim() : '';
+        const vehicleModel =
+          typeof req.body?.vehicleModel === 'string' ? req.body.vehicleModel.trim() : '';
+        if (!sessionKey || !vehicleMake || !vehicleModel) {
+          return res.status(400).json({
+            error: 'sessionKey, vehicleMake, and vehicleModel are required.',
+            code: 'INVALID_SESSION_PAYLOAD',
+          });
+        }
+        const rawYear = req.body?.vehicleYear;
+        const parsedYear =
+          typeof rawYear === 'number' && Number.isInteger(rawYear) && rawYear >= 1950 && rawYear <= 2100
+            ? rawYear
+            : null;
+        const record = await upsertDiagnosticSessionForUid(uid, req.user?.email || '', {
+          sessionKey,
+          vehicleMake,
+          vehicleModel,
+          vehicleYear: parsedYear,
+          chassisCode: typeof req.body?.chassisCode === 'string' ? req.body.chassisCode : null,
+          notes: typeof req.body?.notes === 'string' ? req.body.notes : null,
+          activeDtcs: typeof req.body?.activeDtcs === 'string' ? req.body.activeDtcs : null,
+        });
+        return res.json({ status: 'SUCCESS', session: record });
+      } catch (error: unknown) {
+        console.error('[CloudSQL] Failed to save diagnostic session:', error);
+        return res.status(500).json({
+          error: error instanceof Error ? error.message : 'Failed to save diagnostic session.',
+        });
+      }
+    }
+  );
 
   app.use('/api', (req, res) => {
     const safePath = String(req.path || '').replace(/[\u0000-\u001F\u007F]/g, '').slice(0, 120);
@@ -2950,11 +3109,12 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
     });
   });
 
-  // Structured JSON error handler for route-specific body parser limits (413) and malformed JSON (400)
+  // Structured JSON error handler for route-specific body parser limits (413), malformed JSON (400),
+  // and unexpected /api errors (prevents leaking HTML stack traces)
   app.use(
     (
       err: { status?: number; statusCode?: number; type?: string; message?: string },
-      _req: express.Request,
+      req: express.Request,
       res: express.Response,
       next: express.NextFunction
     ) => {
@@ -2971,6 +3131,17 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
         return res.status(400).json({
           error: 'Malformed JSON request payload.',
           code: 'INVALID_JSON_BODY',
+        });
+      }
+      if (req.path.startsWith('/api')) {
+        console.error(
+          '[API] Unhandled route error:',
+          err instanceof Error ? err.message : 'Unknown error'
+        );
+        return res.status(500).json({
+          status: 'ERROR',
+          error: 'Internal server error processing API request.',
+          code: 'INTERNAL_API_ERROR',
         });
       }
       return next(err);

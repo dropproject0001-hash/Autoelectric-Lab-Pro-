@@ -68,6 +68,7 @@ import {
   normalizeStartMyCarYear,
 } from '../../utils/startMyCarReference';
 import {
+  changeClaimedAdminPin,
   createTrialPinRecord,
   getAdminPinConfigStatus,
   getAdminTrialAuditSnapshot,
@@ -1222,25 +1223,39 @@ async function main() {
 
     const prevAllowFirstRun = process.env.VECL_ALLOW_FIRST_RUN_ADMIN_SETUP;
     delete process.env.VECL_ALLOW_FIRST_RUN_ADMIN_SETUP;
+    const prevStrictSecrets = process.env.VECL_STRICT_PRODUCTION_SECRETS;
+    delete process.env.VECL_STRICT_PRODUCTION_SECRETS;
 
     setTrialStoreFilePathForTests(storePath);
     resetTrialStoreForTests();
 
     try {
-      // First-run setup is DISABLED by default when VECL_ADMIN_MASTER_PIN is not configured
-      const cfgBefore = getAdminPinConfigStatus();
-      assert.equal(cfgBefore.masterEnvConfigured, false);
-      assert.equal(cfgBefore.adminClaimed, false);
-      assert.equal(cfgBefore.setupEnabled, false);
+      // Explicit VECL_ALLOW_FIRST_RUN_ADMIN_SETUP=false or strict production mode disables unauthenticated setup
+      process.env.VECL_ALLOW_FIRST_RUN_ADMIN_SETUP = 'false';
+      const cfgExplicitDisabled = getAdminPinConfigStatus();
+      assert.equal(cfgExplicitDisabled.masterEnvConfigured, false);
+      assert.equal(cfgExplicitDisabled.adminClaimed, false);
+      assert.equal(cfgExplicitDisabled.setupEnabled, false);
+      assert.equal(cfgExplicitDisabled.pinInitialized, false);
       assert.throws(() => setupFirstRunAdminPin('74920183'), /ADMIN_SETUP_DISABLED/);
 
-      // Explicit opt-in via VECL_ALLOW_FIRST_RUN_ADMIN_SETUP enables first-run setup
       process.env.VECL_ALLOW_FIRST_RUN_ADMIN_SETUP = 'true';
-      assert.equal(getAdminPinConfigStatus().setupEnabled, true);
+      process.env.VECL_STRICT_PRODUCTION_SECRETS = 'true';
+      assert.equal(getAdminPinConfigStatus().setupEnabled, false);
+      assert.throws(() => setupFirstRunAdminPin('74920183'), /ADMIN_SETUP_DISABLED/);
+
+      // In non-strict preview (default), first-run setup is enabled until claimed
+      delete process.env.VECL_STRICT_PRODUCTION_SECRETS;
+      delete process.env.VECL_ALLOW_FIRST_RUN_ADMIN_SETUP;
+      const cfgPreview = getAdminPinConfigStatus();
+      assert.equal(cfgPreview.setupEnabled, true);
+      assert.equal(cfgPreview.pinInitialized, false);
 
       const firstRun = setupFirstRunAdminPin('74920183', 1_700_000_000_000);
       assert.ok(firstRun.adminToken.startsWith('vecl_admin_v1.'));
       assert.equal(verifyAdminSessionToken(firstRun.adminToken, 1_700_000_005_000).valid, true);
+      assert.equal(getAdminPinConfigStatus().pinInitialized, true);
+      assert.equal(getAdminPinConfigStatus().setupEnabled, false);
 
       // Single token revocation works cleanly
       const revokeSingle = revokeAdminSessionToken(firstRun.adminToken, 1_700_000_006_000);
@@ -1252,13 +1267,21 @@ async function main() {
       // Second first-run claim must be rejected
       assert.throws(() => setupFirstRunAdminPin('11223344'), /ADMIN_ALREADY_CLAIMED/);
 
+      // Claimed local PIN can be rotated by verifying the current PIN
+      const rotated = changeClaimedAdminPin('74920183', '83920174', 1_700_000_008_000);
+      assert.ok(rotated.adminToken.startsWith('vecl_admin_v1.'));
+      assert.throws(() => verifyMasterAdminPinAndIssueToken('74920183'), /INVALID_MASTER_PIN/);
+      assert.ok(verifyMasterAdminPinAndIssueToken('83920174', 1_700_000_008_500).adminToken);
+
       // Env Master PIN override takes precedence cleanly
       process.env.VECL_ADMIN_MASTER_PIN = '9081-7263';
       assert.equal(getAdminPinConfigStatus().masterEnvConfigured, true);
+      assert.equal(getAdminPinConfigStatus().pinInitialized, true);
       assert.throws(() => setupFirstRunAdminPin('55667788'), /ADMIN_ENV_MANAGED/);
-      const envLogin = verifyMasterAdminPinAndIssueToken('90817263', 1_700_000_000_000);
+      assert.throws(() => changeClaimedAdminPin('83920174', '55667788'), /ADMIN_ENV_MANAGED/);
+      const envLogin = verifyMasterAdminPinAndIssueToken('90817263', 1_700_000_009_000);
       assert.ok(envLogin.adminToken.startsWith('vecl_admin_v1.'));
-      assert.equal(verifyAdminSessionToken(envLogin.adminToken, 1_700_000_005_000).valid, true);
+      assert.equal(verifyAdminSessionToken(envLogin.adminToken, 1_700_000_009_500).valid, true);
 
       // Revoke all sessions invalidates all previous tokens
       revokeAllAdminSessionTokens(1_700_000_010_000);
@@ -1384,6 +1407,11 @@ async function main() {
       } else {
         process.env.VECL_ALLOW_FIRST_RUN_ADMIN_SETUP = prevAllowFirstRun;
       }
+      if (prevStrictSecrets === undefined) {
+        delete process.env.VECL_STRICT_PRODUCTION_SECRETS;
+      } else {
+        process.env.VECL_STRICT_PRODUCTION_SECRETS = prevStrictSecrets;
+      }
       resetTrialStoreForTests();
       setTrialStoreFilePathForTests(null);
       fs.rmSync(tmpDir, { recursive: true, force: true });
@@ -1417,11 +1445,16 @@ async function main() {
       assert.equal(noAuthAi.status, 401);
       assert.equal(((await noAuthAi.json()) as { code?: string }).code, 'AUTH_REQUIRED');
 
-      // Admin config reports masterEnvConfigured = true
+      // Admin config reports masterEnvConfigured = true and pinInitialized = true
       const cfgRes = await fetch(`${baseUrl}/api/autoelectric/trial/admin/config`);
       assert.equal(cfgRes.status, 200);
-      const cfgBody = (await cfgRes.json()) as { masterEnvConfigured: boolean; adminClaimed: boolean };
+      const cfgBody = (await cfgRes.json()) as {
+        masterEnvConfigured: boolean;
+        adminClaimed: boolean;
+        pinInitialized: boolean;
+      };
       assert.equal(cfgBody.masterEnvConfigured, true);
+      assert.equal(cfgBody.pinInitialized, true);
 
       // Invalid Master Admin PIN -> 401
       const badAdminRes = await fetch(`${baseUrl}/api/autoelectric/trial/admin/login`, {
@@ -1562,6 +1595,110 @@ async function main() {
       } else {
         process.env.VECL_ADMIN_MASTER_PIN = prevMasterPin;
       }
+      server.close();
+      resetTrialStoreForTests();
+      setTrialStoreFilePathForTests(null);
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  // 27b. End-to-End HTTP Preview First-Run Admin PIN Setup & Rotation
+  await runTest('HTTP /api/autoelectric/trial/admin/setup and /change-pin work cleanly in preview without .env secrets', async () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'vecl-trial-firstrun-http-'));
+    const storePath = path.join(tmpDir, 'trials.store.json');
+    const prevMasterPin = process.env.VECL_ADMIN_MASTER_PIN;
+    const prevAllowFirstRun = process.env.VECL_ALLOW_FIRST_RUN_ADMIN_SETUP;
+    const prevStrictSecrets = process.env.VECL_STRICT_PRODUCTION_SECRETS;
+    delete process.env.VECL_ADMIN_MASTER_PIN;
+    delete process.env.VECL_ALLOW_FIRST_RUN_ADMIN_SETUP;
+    delete process.env.VECL_STRICT_PRODUCTION_SECRETS;
+
+    setTrialStoreFilePathForTests(storePath);
+    resetTrialStoreForTests();
+
+    const app = createAutoelectricApiApp();
+    const server = http.createServer(app);
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', () => resolve()));
+    const address = server.address();
+    assert.ok(address && typeof address === 'object');
+    const baseUrl = `http://127.0.0.1:${address.port}`;
+
+    try {
+      const cfgBeforeRes = await fetch(`${baseUrl}/api/autoelectric/trial/admin/config`);
+      assert.equal(cfgBeforeRes.status, 200);
+      const cfgBefore = (await cfgBeforeRes.json()) as {
+        masterEnvConfigured: boolean;
+        setupEnabled: boolean;
+        adminClaimed: boolean;
+        pinInitialized: boolean;
+      };
+      assert.equal(cfgBefore.masterEnvConfigured, false);
+      assert.equal(cfgBefore.setupEnabled, true);
+      assert.equal(cfgBefore.adminClaimed, false);
+      assert.equal(cfgBefore.pinInitialized, false);
+
+      // Claim initial Master Admin PIN
+      const setupRes = await fetch(`${baseUrl}/api/autoelectric/trial/admin/setup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ masterPin: '592041' }),
+      });
+      assert.equal(setupRes.status, 201);
+      const setupBody = (await setupRes.json()) as { adminToken: string };
+      assert.ok(setupBody.adminToken.startsWith('vecl_admin_v1.'));
+
+      // Config now reports initialized and first-run setup locked
+      const cfgAfterRes = await fetch(`${baseUrl}/api/autoelectric/trial/admin/config`);
+      const cfgAfter = (await cfgAfterRes.json()) as {
+        setupEnabled: boolean;
+        adminClaimed: boolean;
+        pinInitialized: boolean;
+      };
+      assert.equal(cfgAfter.setupEnabled, false);
+      assert.equal(cfgAfter.adminClaimed, true);
+      assert.equal(cfgAfter.pinInitialized, true);
+
+      // Re-claiming fails with 409 ADMIN_ALREADY_CLAIMED
+      const secondSetupRes = await fetch(`${baseUrl}/api/autoelectric/trial/admin/setup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ masterPin: '112233' }),
+      });
+      assert.equal(secondSetupRes.status, 409);
+
+      // Authenticated PIN change updates credential and invalidates old PIN
+      const changeRes = await fetch(`${baseUrl}/api/autoelectric/trial/admin/change-pin`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${setupBody.adminToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ currentPin: '592041', newPin: '84729103' }),
+      });
+      assert.equal(changeRes.status, 200);
+      const changeBody = (await changeRes.json()) as { adminToken: string };
+      assert.ok(changeBody.adminToken.startsWith('vecl_admin_v1.'));
+
+      const oldPinLoginRes = await fetch(`${baseUrl}/api/autoelectric/trial/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ masterPin: '592041' }),
+      });
+      assert.equal(oldPinLoginRes.status, 401);
+
+      const newPinLoginRes = await fetch(`${baseUrl}/api/autoelectric/trial/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ masterPin: '84729103' }),
+      });
+      assert.equal(newPinLoginRes.status, 200);
+    } finally {
+      if (prevMasterPin === undefined) delete process.env.VECL_ADMIN_MASTER_PIN;
+      else process.env.VECL_ADMIN_MASTER_PIN = prevMasterPin;
+      if (prevAllowFirstRun === undefined) delete process.env.VECL_ALLOW_FIRST_RUN_ADMIN_SETUP;
+      else process.env.VECL_ALLOW_FIRST_RUN_ADMIN_SETUP = prevAllowFirstRun;
+      if (prevStrictSecrets === undefined) delete process.env.VECL_STRICT_PRODUCTION_SECRETS;
+      else process.env.VECL_STRICT_PRODUCTION_SECRETS = prevStrictSecrets;
       server.close();
       resetTrialStoreForTests();
       setTrialStoreFilePathForTests(null);

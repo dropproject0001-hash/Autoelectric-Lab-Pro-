@@ -7,6 +7,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import type { NextFunction, Request, Response } from 'express';
+import type { MasterAdminProof } from './adminMasterPinService';
 import {
   type PublicTrialPinRecord,
   verifyAdminSessionToken,
@@ -26,6 +27,7 @@ export interface AuthenticatedRequest extends Request {
   authUser?: VerifiedFirebaseUser;
   trialAccess?: PublicTrialPinRecord;
   isPinAdmin?: boolean;
+  masterAdminProof?: MasterAdminProof;
 }
 
 export type AuthFailureCode =
