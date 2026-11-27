@@ -1599,7 +1599,7 @@ async function main() {
     assert.equal(appleIconBuf.readUInt32BE(16), 180);
     assert.equal(appleIconBuf.readUInt32BE(20), 180);
     assert.equal(fs.existsSync(path.resolve('public/offline.html')), true);
-    assert.equal(fs.existsSync(path.resolve('public/sw.js')), true);
+    assert.equal(fs.existsSync(path.resolve('src/sw.js')), true);
 
     const indexHtml = fs.readFileSync(path.resolve('index.html'), 'utf8');
     assert.equal(indexHtml.includes('rel="manifest" href="/manifest.webmanifest"'), true);
@@ -1608,7 +1608,7 @@ async function main() {
   });
 
   await runTest('Service Worker security policy never caches Firebase Auth, License, Admin, Firestore, Gemini API, or oversized dumps', () => {
-    const swSrc = fs.readFileSync(path.resolve('public/sw.js'), 'utf8');
+    const swSrc = fs.readFileSync(path.resolve('src/sw.js'), 'utf8');
     assert.equal(swSrc.includes('/api/autoelectric/license'), true);
     assert.equal(swSrc.includes('securetoken.googleapis.com'), true);
     assert.equal(swSrc.includes('identitytoolkit.googleapis.com'), true);

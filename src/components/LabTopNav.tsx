@@ -6,6 +6,7 @@
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import {
   Activity,
+  BookOpen,
   Box,
   Cable,
   Cloud,
@@ -37,7 +38,8 @@ export type LabTab =
   | 'ECU_PINOUT'
   | 'OSCILLOSCOPE'
   | 'PCB_SCANNER'
-  | 'REPAIR_GUIDE';
+  | 'REPAIR_GUIDE'
+  | 'KNOWLEDGE_CENTER';
 
 export type RackFilter = 'ALL' | 'DMM_POWER' | 'FAULT_MATRIX';
 
@@ -92,6 +94,7 @@ const NAV_TABS: readonly NavigationItem[] = [
   { id: 'OSCILLOSCOPE', label: 'Oscilloscope', shortLabel: 'Scope', icon: Activity },
   { id: 'PCB_SCANNER', label: 'PCB Scanner', shortLabel: 'PCB', icon: ScanLine },
   { id: 'REPAIR_GUIDE', label: 'Repair Manuals', shortLabel: 'Manuals', icon: FileText },
+  { id: 'KNOWLEDGE_CENTER', label: 'Knowledge Center', shortLabel: 'Knowledge', icon: BookOpen },
 ];
 
 const FOCUS_STYLES =

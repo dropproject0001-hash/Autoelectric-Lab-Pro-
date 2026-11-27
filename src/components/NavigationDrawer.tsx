@@ -153,6 +153,7 @@ const TAB_TO_RAMTI_ICON: Record<LabTab, RamtiModuleIconName> = {
   OSCILLOSCOPE: 'oscilloscope',
   PCB_SCANNER: 'pcb_scanners',
   REPAIR_GUIDE: 'help_support',
+  KNOWLEDGE_CENTER: 'help_support',
 };
 
 function DrawerActionButton({

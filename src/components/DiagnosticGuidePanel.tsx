@@ -20,8 +20,11 @@ import {
   Wrench,
 } from 'lucide-react';
 import { DiagnosticReportModal } from './DiagnosticReportModal';
-import { BatchPinDiagnosticModal } from './BatchPinDiagnosticModal';
 import { useTrialAccess } from '../context/TrialAccessContext';
+
+const BatchPinDiagnosticModal = React.lazy(() =>
+  import('./BatchPinDiagnosticModal').then((m) => ({ default: m.BatchPinDiagnosticModal }))
+);
 import {
   DiagnosticTroubleCode,
   EcuPin,
@@ -529,18 +532,22 @@ export const DiagnosticGuidePanel: React.FC<DiagnosticGuidePanelProps> = ({
       </div>
 
       {/* Batch Pin Diagnostic Modal */}
-      <BatchPinDiagnosticModal
-        isOpen={showBatchModal}
-        onClose={() => setShowBatchModal(false)}
-        pins={pins}
-        wires={wires}
-        faults={faults}
-        selectedPinId={selectedPinId}
-        nodeVoltages={nodeVoltages}
-        powerSupply={powerSupply}
-        onSelectPin={onSelectPin}
-        onNavigateTab={onNavigateTab}
-      />
+      {showBatchModal && (
+        <React.Suspense fallback={null}>
+          <BatchPinDiagnosticModal
+            isOpen={showBatchModal}
+            onClose={() => setShowBatchModal(false)}
+            pins={pins}
+            wires={wires}
+            faults={faults}
+            selectedPinId={selectedPinId}
+            nodeVoltages={nodeVoltages}
+            powerSupply={powerSupply}
+            onSelectPin={onSelectPin}
+            onNavigateTab={onNavigateTab}
+          />
+        </React.Suspense>
+      )}
 
       {/* Diagnostic PDF Report Modal */}
       <DiagnosticReportModal

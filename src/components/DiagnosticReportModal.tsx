@@ -24,8 +24,11 @@ import {
   GraduationCap,
 } from 'lucide-react';
 import { useTrialAccess } from '../context/TrialAccessContext';
-import { UniversityLabPdfModal } from './UniversityLabPdfModal';
 import { generateSignedClientDiagnosticPdf } from '../services/clientDiagnosticPdfService';
+
+const UniversityLabPdfModal = React.lazy(() =>
+  import('./UniversityLabPdfModal').then((m) => ({ default: m.UniversityLabPdfModal }))
+);
 import {
   DiagnosticTroubleCode,
   EcuPin,
@@ -338,21 +341,23 @@ export const DiagnosticReportModal: React.FC<DiagnosticReportModalProps> = ({
           </div>
         </div>
         {isUniversityPdfOpen && (
-          <UniversityLabPdfModal
-            isOpen={isUniversityPdfOpen}
-            initialTab="EXPORT"
-            onClose={() => setIsUniversityPdfOpen(false)}
-            activeModule={null}
-            capturedSteps={[]}
-            powerSupply={powerSupply}
-            supplyCurrentDrawAmps={supplyCurrentDrawAmps}
-            faults={faults}
-            wires={wires}
-            activeDTCs={activeDTCs}
-            rpm={850}
-            ckpSignalLost={false}
-            tpsVoltage={nodeVoltages['ecu-pin-7'] ?? 0}
-          />
+          <React.Suspense fallback={null}>
+            <UniversityLabPdfModal
+              isOpen={isUniversityPdfOpen}
+              initialTab="EXPORT"
+              onClose={() => setIsUniversityPdfOpen(false)}
+              activeModule={null}
+              capturedSteps={[]}
+              powerSupply={powerSupply}
+              supplyCurrentDrawAmps={supplyCurrentDrawAmps}
+              faults={faults}
+              wires={wires}
+              activeDTCs={activeDTCs}
+              rpm={850}
+              ckpSignalLost={false}
+              tpsVoltage={nodeVoltages['ecu-pin-7'] ?? 0}
+            />
+          </React.Suspense>
         )}
 
         {!canUseExports && (

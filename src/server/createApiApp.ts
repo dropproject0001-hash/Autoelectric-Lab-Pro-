@@ -10,6 +10,7 @@ import {
   resolveImageAnalysisProviderName,
 } from './services/imageAnalysisProvider';
 import { ImageAnalysisProviderError } from './services/imageAnalysisTypes';
+import { isStrictProductionSecrets } from './services/secretsPolicy';
 import { resolveGeminiModelName } from './services/imageAnalysisNormalizer';
 import {
   AuthenticatedRequest,
@@ -60,6 +61,7 @@ import {
 } from './services/licenseService';
 import {
   checkAdminPinRateLimit,
+  checkTrialRedeemGlobalRateLimit,
   checkTrialRedeemRateLimit,
   createTrialPinRecord,
   getAdminPinConfigStatus,
@@ -78,6 +80,7 @@ import {
 import {
   generateSignedOfflineLicense,
   getPublicVerificationKeyJwk,
+  signLabReportHash,
   listIssuedOfflineLicenses,
   type SubscriptionDurationDays,
 } from './services/offlineLicenseCrypto';
@@ -742,6 +745,15 @@ export function createAutoelectricApiApp(): express.Express {
       });
     }
 
+    const globalRate = checkTrialRedeemGlobalRateLimit();
+    if (!globalRate.allowed) {
+      res.setHeader('Retry-After', String(globalRate.retryAfterSec || 60));
+      return res.status(429).json({
+        error: `Trial activation is temporarily busy. Please wait ${globalRate.retryAfterSec}s before trying again.`,
+        code: 'TRIAL_RATE_LIMITED',
+      });
+    }
+
     if (resolvedDeviceId) {
       const deviceRate = checkTrialRedeemRateLimit(`trial-redeem-dev:${resolvedDeviceId.slice(0, 80)}`);
       if (!deviceRate.allowed) {
@@ -910,6 +922,12 @@ export function createAutoelectricApiApp(): express.Express {
       if (code === 'ADMIN_PIN_NOT_INITIALIZED') {
         return res.status(409).json({
           error: 'Master Admin PIN is not set up yet. Configure VECL_ADMIN_MASTER_PIN on the server environment.',
+          code,
+        });
+      }
+      if (code === 'ADMIN_ENV_PIN_TOO_WEAK') {
+        return res.status(409).json({
+          error: 'Server Master Admin PIN is too weak for strict production mode. Use at least 10 characters in VECL_ADMIN_MASTER_PIN.',
           code,
         });
       }
@@ -2691,7 +2709,7 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
       uptimeSec: Math.floor(process.uptime()),
       persistence: {
         durableDataDirConfigured: Boolean(process.env.VECL_DATA_DIR?.trim()),
-        strictProductionSecrets: process.env.VECL_STRICT_PRODUCTION_SECRETS === 'true',
+        strictProductionSecrets: isStrictProductionSecrets(),
       },
       timestamp: new Date().toISOString(),
     });
@@ -2849,6 +2867,35 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
       publicKeyJwk,
     });
   });
+
+  // Server-side ECDSA attestation for Academy lab-report digests (see src/services/labReportSignatureClient.ts)
+  app.post(
+    '/api/autoelectric/academy/sign-report',
+    requireAuthOrTrialSession,
+    nhtsaRateGuard,
+    smallJsonParser,
+    (req, res) => {
+      const sha256Hash = typeof req.body?.sha256Hash === 'string' ? req.body.sha256Hash.trim() : '';
+      if (!/^[a-fA-F0-9]{64}$/.test(sha256Hash)) {
+        return res.status(400).json({
+          error: 'sha256Hash must be a 64-character hexadecimal SHA-256 digest.',
+          code: 'INVALID_LAB_REPORT_HASH',
+        });
+      }
+      try {
+        return res.json({ status: 'SUCCESS', signature: signLabReportHash(sha256Hash) });
+      } catch (err: unknown) {
+        console.error(
+          '[Academy] Lab report signing failed:',
+          err instanceof Error ? err.message : 'Unknown error'
+        );
+        return res.status(500).json({
+          error: 'Failed to sign lab report digest.',
+          code: 'LAB_REPORT_SIGNING_FAILED',
+        });
+      }
+    }
+  );
 
   app.post(
     '/api/admin/generate-license',

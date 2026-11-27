@@ -30,6 +30,7 @@ export default defineConfig(({command}) => {
                 'pwa-maskable-192x192.png',
                 'pwa-maskable-512x512.png',
                 'offline.html',
+                'assets/aistudio/1795727293849_0b38d1ff.jpg',
                 'assets/images/file_0000000098d48211abb177ce752b7b0e_62980da7.png',
               ],
               manifest: {

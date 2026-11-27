@@ -22,6 +22,8 @@ const ALLOWED_CACHES = new Set([
 ]);
 
 const MAX_CACHEABLE_BYTES = 2.5 * 1024 * 1024; // 2.5 MB per static asset limit
+const OFFICIAL_EMBLEM_PATH =
+  '/assets/aistudio/1795727293849_0b38d1ff.jpg';
 const BRAND_ICON_PATH =
   '/assets/images/file_0000000098d48211abb177ce752b7b0e_62980da7.png';
 
@@ -43,6 +45,7 @@ const CORE_APP_SHELL_URLS = [
   '/pwa-512x512.png',
   '/pwa-maskable-192x192.png',
   '/pwa-maskable-512x512.png',
+  OFFICIAL_EMBLEM_PATH,
   BRAND_ICON_PATH,
 ];
 

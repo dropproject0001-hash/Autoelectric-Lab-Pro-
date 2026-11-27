@@ -23,7 +23,14 @@ Thumbs.db
 temp/
 uploads/
 .aistudio/
-public/assets/aistudio/
+public/assets/aistudio/*
+# Branding images referenced by src/constants/branding.ts, vite.config.ts and src/sw.js must stay tracked
+!public/assets/aistudio/1795727293849_0b38d1ff.jpg
+!public/assets/aistudio/1795699079803_96e28eb3.jpg
+!public/assets/aistudio/1795699656648_ba33be6d.jpg
+!public/assets/aistudio/1795701476178_14294533.jpg
+!public/assets/aistudio/1795701471877_2efeb92c.jpg
+!public/assets/aistudio/1795701467304_07225485.jpg
 
 # Local runtime secrets & license HMAC stores (never commit)
 .data/

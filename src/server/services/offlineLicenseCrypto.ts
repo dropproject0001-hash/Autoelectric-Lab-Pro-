@@ -4,6 +4,7 @@
  */
 
 import crypto from 'node:crypto';
+import { isStrictProductionSecrets } from './secretsPolicy';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -106,7 +107,7 @@ function getOrInitializeServerSigningKeys(): ServerSigningKeys {
   if (cachedServerKeys) return cachedServerKeys;
 
   const envJwkRaw = (process.env.AELP_LICENSE_SIGNING_PRIVATE_KEY_JWK || '').trim();
-  if (process.env.VECL_STRICT_PRODUCTION_SECRETS === 'true') {
+  if (isStrictProductionSecrets()) {
     if (!envJwkRaw) {
       throw new Error(
         'OFFLINE_LICENSE_JWK_MISSING: AELP_LICENSE_SIGNING_PRIVATE_KEY_JWK must be configured in strict production mode.'
@@ -129,7 +130,11 @@ function getOrInitializeServerSigningKeys(): ServerSigningKeys {
       cachedServerKeys = { privateKey, publicKeyJwk };
       return cachedServerKeys;
     } catch {
-      // Fall back to persisted or fresh ECDSA P-256 keypair if env JWK is malformed
+      // An operator-supplied key that cannot be parsed must never be silently replaced:
+      // doing so would invalidate every previously issued offline license.
+      throw new Error(
+        'OFFLINE_LICENSE_JWK_INVALID: AELP_LICENSE_SIGNING_PRIVATE_KEY_JWK is set but is not a valid P-256 private JWK.'
+      );
     }
   }
 
@@ -245,6 +250,55 @@ export function generateSignedOfflineLicense(params: {
   }
   persistLedgerToDisk();
   return record;
+}
+
+const LAB_REPORT_SIGNATURE_DOMAIN = 'AELP-LAB-REPORT-v1';
+
+export interface LabReportServerSignature {
+  version: 'AELP-LABSIG-1';
+  sha256Hash: string;
+  signedAtMs: number;
+  keyId: string;
+  /** base64url ECDSA P-256 / SHA-256 signature (IEEE P1363) over `labReportSigningInput()` */
+  signature: string;
+}
+
+/** Exact byte string that is signed / verified. Domain-separated from license signatures. */
+export function labReportSigningInput(sha256Hash: string, signedAtMs: number): string {
+  return `${LAB_REPORT_SIGNATURE_DOMAIN}|${sha256Hash.toLowerCase()}|${signedAtMs}`;
+}
+
+function computeKeyId(publicKeyJwk: JsonWebKey): string {
+  return crypto
+    .createHash('sha256')
+    .update(`${publicKeyJwk.crv}|${publicKeyJwk.x}|${publicKeyJwk.y}`)
+    .digest('hex')
+    .slice(0, 16);
+}
+
+/**
+ * Signs a lab-report SHA-256 digest with the server ECDSA key, so a report cannot be forged by
+ * anyone who merely knows the (public) canonical hashing scheme. The signature proves the server
+ * attested this digest at `signedAtMs`; it is verified offline with the public key from
+ * `/api/billing/public-key`.
+ */
+export function signLabReportHash(sha256Hash: string, nowMs = Date.now()): LabReportServerSignature {
+  if (!/^[a-f0-9]{64}$/i.test(sha256Hash)) {
+    throw new Error('INVALID_LAB_REPORT_HASH');
+  }
+  const { privateKey, publicKeyJwk } = getOrInitializeServerSigningKeys();
+  const normalized = sha256Hash.toLowerCase();
+  const sigBuf = crypto.sign('sha256', Buffer.from(labReportSigningInput(normalized, nowMs), 'utf8'), {
+    key: privateKey,
+    dsaEncoding: 'ieee-p1363',
+  });
+  return {
+    version: 'AELP-LABSIG-1',
+    sha256Hash: normalized,
+    signedAtMs: nowMs,
+    keyId: computeKeyId(publicKeyJwk),
+    signature: base64UrlEncode(sigBuf),
+  };
 }
 
 export function listIssuedOfflineLicenses(): IssuedOfflineLicenseRecord[] {

@@ -4,6 +4,7 @@
  */
 
 import crypto from 'node:crypto';
+import { isStrictProductionSecrets } from './secretsPolicy';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -269,7 +270,7 @@ function resolveHmacKeyFilePath(): string {
 
 function getHmacSecret(): string {
   const envSecret = (process.env.VECL_LICENSE_HMAC_SECRET || '').trim();
-  if (process.env.VECL_STRICT_PRODUCTION_SECRETS === 'true') {
+  if (isStrictProductionSecrets()) {
     if (envSecret.length < 32) {
       throw new Error(
         'LICENSE_HMAC_SECRET_MISSING_OR_WEAK: VECL_LICENSE_HMAC_SECRET must be at least 32 characters in strict production mode.'
@@ -477,14 +478,57 @@ export function checkTrialRedeemRateLimit(key: string, nowMs = Date.now()) {
   return checkRateBucket(trialAttemptBuckets, key, REDEEM_WINDOW_MS, REDEEM_MAX_ATTEMPTS, nowMs);
 }
 
+const ADMIN_GLOBAL_WINDOW_MS = 15 * 60 * 1000;
+const ADMIN_GLOBAL_MAX_ATTEMPTS = 40;
+const TRIAL_GLOBAL_WINDOW_MS = 5 * 60 * 1000;
+const TRIAL_GLOBAL_MAX_ATTEMPTS = 300;
+const GLOBAL_BUCKET_KEY = '__global__';
+
 export function checkAdminPinRateLimit(key: string, nowMs = Date.now()) {
-  return checkRateBucket(
+  const perKey = checkRateBucket(
     adminAttemptBuckets,
     key,
     ADMIN_LOGIN_WINDOW_MS,
     ADMIN_LOGIN_MAX_ATTEMPTS,
     nowMs
   );
+  if (!perKey.allowed) return perKey;
+  // Global ceiling: distributed / IP-rotating guessing cannot exceed this budget in total.
+  return checkRateBucket(
+    adminAttemptBuckets,
+    GLOBAL_BUCKET_KEY,
+    ADMIN_GLOBAL_WINDOW_MS,
+    ADMIN_GLOBAL_MAX_ATTEMPTS,
+    nowMs
+  );
+}
+
+/** Global trial-PIN guess budget so rotating IPs / client-supplied device IDs cannot bypass throttling. */
+export function checkTrialRedeemGlobalRateLimit(nowMs = Date.now()) {
+  return checkRateBucket(
+    trialAttemptBuckets,
+    GLOBAL_BUCKET_KEY,
+    TRIAL_GLOBAL_WINDOW_MS,
+    TRIAL_GLOBAL_MAX_ATTEMPTS,
+    nowMs
+  );
+}
+
+const MIN_ENV_ADMIN_PIN_LENGTH_STRICT = 10;
+
+/** Rejects weak server-managed master PINs in strict mode; warns once otherwise. */
+let warnedWeakEnvAdminPin = false;
+function assertEnvAdminPinStrength(envPin: string): void {
+  if (envPin.length >= MIN_ENV_ADMIN_PIN_LENGTH_STRICT) return;
+  if (isStrictProductionSecrets()) {
+    throw new Error('ADMIN_ENV_PIN_TOO_WEAK');
+  }
+  if (!warnedWeakEnvAdminPin) {
+    warnedWeakEnvAdminPin = true;
+    console.warn(
+      `[TrialPin] VECL_ADMIN_MASTER_PIN is shorter than ${MIN_ENV_ADMIN_PIN_LENGTH_STRICT} characters; this is rejected when strict production secrets are enabled.`
+    );
+  }
 }
 
 export function normalizeTrialPin(rawPin: string): string {
@@ -661,7 +705,7 @@ function verifyHmacToken<T>(token: string, expectedPrefix: string): { valid: boo
 export function isFirstRunAdminSetupEnabled(): boolean {
   const envPin = (process.env.VECL_ADMIN_MASTER_PIN || '').trim();
   if (envPin.length > 0) return false;
-  if (process.env.VECL_STRICT_PRODUCTION_SECRETS === 'true') return false;
+  if (isStrictProductionSecrets()) return false;
   return process.env.VECL_ALLOW_FIRST_RUN_ADMIN_SETUP === 'true';
 }
 
@@ -732,6 +776,7 @@ export function verifyMasterAdminPinAndIssueToken(
 
   const envPin = (process.env.VECL_ADMIN_MASTER_PIN || '').trim();
   if (envPin.length > 0) {
+    assertEnvAdminPinStrength(envPin);
     // Support both exact match (trimmed) and hyphen-stripped numeric match
     const normalizedEnv = normalizeTrialPin(envPin);
     const matchesRaw = constantTimeUtf8DigestEquals(rawPin.trim(), envPin);

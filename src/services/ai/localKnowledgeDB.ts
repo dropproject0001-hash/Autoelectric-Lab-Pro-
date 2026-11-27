@@ -84,12 +84,13 @@ function hydrateMemoryFromLocalStorageMirror(): void {
   if (!hasLocalStorage()) return;
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_MIRROR_KEY);
-    if (!raw) return;
-    const parsed = JSON.parse(raw) as VerifiedKnowledgeRecord[];
-    if (Array.isArray(parsed)) {
-      for (const item of parsed) {
-        if (item && typeof item.id === 'string') {
-          memoryFallbackStore.set(item.id, item);
+    if (raw) {
+      const parsed = JSON.parse(raw) as VerifiedKnowledgeRecord[];
+      if (Array.isArray(parsed)) {
+        for (const item of parsed) {
+          if (item && typeof item.id === 'string') {
+            memoryFallbackStore.set(item.id, item);
+          }
         }
       }
     }

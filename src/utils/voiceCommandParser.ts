@@ -14,7 +14,7 @@ import {
 import { parseWorkflowStepTarget } from './diagnosticWorkflow';
 import type { ScenarioVoiceGuidanceKind } from './troubleScenarioVoiceCoach';
 
-export type LabTab = 'BENCH_LAB' | 'WIRING_DIAGRAM' | 'THREE_D_TWIN' | 'ECU_PINOUT' | 'OSCILLOSCOPE' | 'PCB_SCANNER' | 'REPAIR_GUIDE';
+export type LabTab = 'BENCH_LAB' | 'WIRING_DIAGRAM' | 'THREE_D_TWIN' | 'ECU_PINOUT' | 'OSCILLOSCOPE' | 'PCB_SCANNER' | 'REPAIR_GUIDE' | 'KNOWLEDGE_CENTER';
 
 export type VoiceCommandCategory =
   | 'WIRING'

@@ -103,6 +103,67 @@ export const SYSTEM_VOICE_KNOWLEDGE_TOPICS: readonly SystemVoiceModuleTopic[] = 
     ],
   },
   {
+    id: 'sys-nissan-sentra-multimedia',
+    tabTarget: 'BENCH_LAB',
+    actionLabelTL: 'Tignan ang Nissan Sentra Manual',
+    actionLabelEN: 'View Nissan Sentra Manual',
+    titleTL: '2025 Nissan Sentra Multimedia & NissanConnect',
+    titleEN: '2025 Nissan Sentra Multimedia & NissanConnect',
+    aliases: [
+      'nissan sentra',
+      'sentra',
+      'multimedia',
+      'nissanconnect',
+      'carplay',
+      'android auto',
+      'bluetooth',
+      'bose',
+      'tcu',
+      'tomtom',
+      'ota',
+    ],
+    howToUseTL:
+      'Para sa 2025 Nissan Sentra multimedia at NissanConnect system, gumagamit ito ng Bosch/Clarion T-Kernel architecture at Ficosa TCU Gen2K. Sinusuportahan nito ang hanggang 6 Bluetooth devices, Apple CarPlay, Android Auto, at FLAC 24-bit/96kHz USB audio.',
+    howToUseEN:
+      'The 2025 Nissan Sentra multimedia and NissanConnect system features a Bosch/Clarion T-Kernel architecture and Ficosa TCU Gen2K. It supports up to 6 Bluetooth devices, Apple CarPlay, Android Auto, and FLAC up to 24-bit/96kHz USB audio.',
+    whatsInsideTL:
+      'Kasama sa Nissan Sentra manual ang Bluetooth dual-phone HFP pairing, USB codecs (MP3, WMA, AAC, FLAC, WAV), Bose Centerpoint DSP, TCU Type B telematics (SOS, Remote Start, Geo-fencing), TomTom navigation, at ang mandatory 20-minute ignition OFF soak procedure pagkatapos ng OTA update.',
+    whatsInsideEN:
+      'The Nissan Sentra manual details Bluetooth dual-phone HFP pairing, USB codecs (MP3, WMA, AAC, FLAC, WAV), Bose Centerpoint DSP, TCU Type B telematics (SOS, Remote Start, Geo-fencing), TomTom navigation, and the mandatory 20-minute ignition OFF soak procedure following OTA updates.',
+    whatsInsideAltTL:
+      'Kumpleto ang specs ng Sentra infotainment: may Media Hub USB-A/C ports (5V, 1A), 9V-16V operating range, at TomTom hybrid GPS navigation na may 20 waypoints at 200 saved locations.',
+    whatsInsideAltEN:
+      'Sentra infotainment specs include Media Hub USB-A/C ports (5V, 1A), 9V-16V operating range, and TomTom hybrid GPS navigation with 20 waypoints and 200 saved locations.',
+    whatsInsideBulletsTL: [
+      'Hardware: Bosch/Clarion T-Kernel, Ficosa TCU Gen2K, Media Hub Type A & B ports (9V-16V DC).',
+      'Connectivity: Hanggang 6 Bluetooth devices, dual-phone HFP, Apple CarPlay & Android Auto.',
+      'Audio & Bose DSP: USB FLAC 24-bit/96kHz, MP3, WMA, WAV, at Bose Centerpoint / AudioPilot DSP.',
+      'TCU Telematics & OTA: Automatic Collision Notification SOS, Remote Engine Start, at 20-min OTA soak procedure.',
+    ],
+    whatsInsideBulletsEN: [
+      'Hardware: Bosch/Clarion T-Kernel, Ficosa TCU Gen2K, Media Hub Type A & B ports (9V-16V DC).',
+      'Connectivity: Up to 6 Bluetooth devices, dual-phone HFP, Apple CarPlay & Android Auto.',
+      'Audio & Bose DSP: USB FLAC 24-bit/96kHz, MP3, WMA, WAV, and Bose Centerpoint DSP.',
+      'TCU Telematics & OTA: Automatic Collision Notification SOS, Remote Engine Start, and 20-min OTA soak procedure.',
+    ],
+    safetyTipTL:
+      'Tandaan: Huwag i-disconnect ang 12V battery o i-ON ang ignition sa loob ng 20 minutong OTA post-update soak procedure.',
+    safetyTipEN:
+      'Important: Do not disconnect 12V battery or turn ignition ON during the 20-minute OTA post-update soak procedure.',
+    followUpChipsTL: [
+      'Paano i-pair ang Bluetooth?',
+      'Ano ang OTA soak procedure?',
+      'Anong USB codecs ang pwede?',
+      'Anong meron sa NissanConnect?',
+    ],
+    followUpChipsEN: [
+      'How to pair Bluetooth?',
+      'What is the OTA soak procedure?',
+      'What USB codecs are supported?',
+      'What is in NissanConnect?',
+    ],
+  },
+  {
     id: 'sys-ecu-pinouts',
     tabTarget: 'ECU_PINOUT',
     actionLabelTL: 'Buksan ang ECU Pinouts',

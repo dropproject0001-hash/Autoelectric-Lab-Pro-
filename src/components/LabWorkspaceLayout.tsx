@@ -119,6 +119,11 @@ const EcuRepairKnowledgeBase = lazyWithRetry(() =>
     default: m.EcuRepairKnowledgeBase,
   })),
 );
+const KnowledgeCenterPanel = lazyWithRetry(() =>
+  import("./KnowledgeCenterPanel").then((m) => ({
+    default: m.KnowledgeCenterPanel,
+  })),
+);
 const ThreeBenchTwin = lazyWithRetry(() =>
   import("./ThreeBenchTwin").then((m) => ({ default: m.ThreeBenchTwin })),
 );
@@ -335,6 +340,7 @@ const VALID_LAB_TABS: readonly LabTab[] = [
   "OSCILLOSCOPE",
   "PCB_SCANNER",
   "REPAIR_GUIDE",
+  "KNOWLEDGE_CENTER",
 ];
 const VALID_RACK_FILTERS: readonly RackFilter[] = [
   "ALL",
@@ -2845,6 +2851,24 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
                   handleApplyTroubleScenario(scenario);
                   onNavigateTab("BENCH_LAB");
                   setIsTroubleDrawerOpen(true);
+                }}
+              />,
+            )}
+          </section>
+        )}
+        {activeTab === "KNOWLEDGE_CENTER" && (
+          <section
+            aria-label="Automotive Knowledge Center"
+            className={fullPaneClass}
+          >
+            {module(
+              "Automotive Knowledge Center",
+              <KnowledgeCenterPanel
+                onSelectVehicleContext={(make, model) => {
+                  if (onSelectVehicleEcu) {
+                    onSelectVehicleEcu(make.toLowerCase(), model, null);
+                  }
+                  onNavigateTab("BENCH_LAB");
                 }}
               />,
             )}

@@ -4,6 +4,7 @@
  */
 
 import crypto from 'node:crypto';
+import { isStrictProductionSecrets } from './secretsPolicy';
 import fs from 'node:fs';
 import path from 'node:path';
 import type { NextFunction, Response } from 'express';
@@ -132,7 +133,7 @@ function resolveHmacKeyFilePath(): string {
 
 function getHmacSecret(): string {
   const envSecret = (process.env.VECL_LICENSE_HMAC_SECRET || '').trim();
-  if (process.env.VECL_STRICT_PRODUCTION_SECRETS === 'true') {
+  if (isStrictProductionSecrets()) {
     if (envSecret.length < 32) {
       throw new Error(
         'LICENSE_HMAC_SECRET_MISSING_OR_WEAK: VECL_LICENSE_HMAC_SECRET must be at least 32 characters in strict production mode.'

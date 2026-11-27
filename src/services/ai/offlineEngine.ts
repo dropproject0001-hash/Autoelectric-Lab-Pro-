@@ -61,6 +61,35 @@ export interface CuratedOfflineKnowledgeEntry {
 
 export const CURATED_VERIFIED_BENCH_ENTRIES: CuratedOfflineKnowledgeEntry[] = [
   {
+    id: 'curated-nissan-sentra-multimedia-2025',
+    subject: '2025 Nissan Sentra Multimedia, Bluetooth, CarPlay & NissanConnect Guide',
+    keywords: ['nissan', 'sentra', 'multimedia', 'nissanconnect', 'carplay', 'android', 'auto', 'bluetooth', 'bose', 'tcu', 'tomtom', 'ota', 'audio', 'usb'],
+    safetyWarningTL:
+      'ELEKTRIKAL NA BABALA: Tiyaking naka-OFF ang ignition at disconnected ang 12V battery bago galawin ang wiring harnesses ng head unit o Media Hub USB ports. Pagkatapos ng OTA software update, sundin ang mandatory 20-minute ignition OFF soak procedure.',
+    safetyWarningEN:
+      'ELECTRICAL SAFETY: Ensure ignition is OFF and 12V battery is disconnected before servicing head unit wiring harnesses or Media Hub USB ports. After any OTA software update, execute a mandatory 20-minute ignition OFF soak procedure.',
+    rootCauseTL:
+      'Ang 2025 Nissan Sentra multimedia system ay gumagamit ng Bosch/Clarion T-Kernel architecture na may Ficosa TCU Gen2K / A-IVC. Sinusuportahan nito ang hanggang 6 Bluetooth devices, dual-phone HFP, Apple CarPlay/Android Auto, FLAC 24-bit/96kHz USB audio, Bose Centerpoint DSP, at TomTom hybrid navigation.',
+    rootCauseEN:
+      'The 2025 Nissan Sentra multimedia system utilizes a Bosch/Clarion T-Kernel architecture with Ficosa TCU Gen2K / A-IVC telemetry. It supports up to 6 Bluetooth devices, dual-phone HFP, Apple CarPlay/Android Auto, FLAC up to 24-bit/96kHz, Bose Centerpoint DSP, and TomTom hybrid navigation.',
+    verificationStepTL:
+      'I-verify ang 12V battery feed sa head unit connector, suriin ang CAN bus communication, at kumpirmahin ang Media Hub USB port voltage (5V DC, max 1A).',
+    verificationStepEN:
+      'Verify 12V battery feed at the head unit connector, check CAN bus communication, and confirm Media Hub USB port regulated output (5V DC, max 1A).',
+    verificationBulletsTL: [
+      'Operating Voltage: 9V – 16V DC (Nominal 12V); Operating Temp: -30°C to +80°C.',
+      'Bluetooth: Hanggang 6 devices, dual-phone HFP; pansamantalang latency ay maaaring mangyari kung aktibo ang 2.4 GHz Wi-Fi.',
+      'USB Codecs & Bose: Suportado ang MP3, WMA, AAC, FLAC (hanggang 24-bit/96kHz), WAV, at Bose Centerpoint / AudioPilot DSP.',
+      'OTA Soak Procedure: 20-minutong key-off soak pagkatapos ng OTA update para sa non-volatile flash commit at EEPROM sync.',
+    ],
+    verificationBulletsEN: [
+      'Operating Voltage: 9V – 16V DC (Nominal 12V); Temp range: -30°C to +80°C.',
+      'Bluetooth: Up to 6 paired devices, dual-phone HFP; 2.4 GHz Wi-Fi coexistence notes apply.',
+      'USB Codecs & Bose: Supports MP3, WMA, AAC, FLAC up to 24-bit/96kHz, WAV, and Bose Centerpoint DSP.',
+      'OTA Soak Procedure: Mandatory 20-minute ignition OFF soak after OTA update for flash commit and EEPROM sync.',
+    ],
+  },
+  {
     id: 'curated-p0122-tps-low',
     subject: 'DTC P0122 — Throttle Position Sensor (TPS) Low Input',
     keywords: ['p0122', 'tps', 'throttle', 'pin 7', 'pin7', 'tps_sig', 'vref', '5v', 'low', 'input', 'toyota', '1kd', '2kd'],

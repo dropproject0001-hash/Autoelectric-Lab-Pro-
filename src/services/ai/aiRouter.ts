@@ -340,6 +340,8 @@ function isBrowserOnline(): boolean {
   return true;
 }
 
+import { getRelevantReferencesForAiContext } from '../automotiveKnowledgeService';
+
 function buildSystemInstructionPrompt(
   query: string,
   lang: BilingualLang,
@@ -349,6 +351,17 @@ function buildSystemInstructionPrompt(
     lang === 'TL'
       ? 'Respond in clear, beginner-friendly Taglish (Filipino + English technical terms) suitable for a mechanic in a repair shop.'
       : 'Respond in clear, beginner-friendly English suitable for an automotive electronics technician.';
+
+  const relevantRefs = getRelevantReferencesForAiContext({ query });
+  const refContextText =
+    relevantRefs.length > 0
+      ? relevantRefs
+          .map(
+            (r, idx) =>
+              `REF_${idx + 1}: [${r.make} ${r.model} (${r.years})] ${r.title} — ${r.summary} (Source: ${r.source.sourceName}, Status: ${r.source.verificationStatus}, URL: ${r.source.originalUrl})`
+          )
+          .join('\n')
+      : 'No specific OEM reference match found in indexed catalog; rely on verified general automotive principles and highlight missing verifications.';
 
   return [
     'AUTOELECTRIC LAB PRO — ZERO-FABRICATION DIAGNOSTIC ASSISTANT',
@@ -360,6 +373,8 @@ function buildSystemInstructionPrompt(
     'SAFETY_WARNING: <1-2 sentences of electrical safety warnings>',
     'ROOT_CAUSE: <2-3 sentences explaining the root cause and live bench telemetry>',
     'VERIFICATION_ACTION: <1 single concrete next verification step>',
+    '',
+    `VERIFIED_AUTOMOTIVE_KNOWLEDGE_REFERENCES:\n${refContextText}`,
     '',
     `LIVE_BENCH_TELEMETRY: ${benchContextText}`,
     `TECHNICIAN_QUERY: ${query}`,

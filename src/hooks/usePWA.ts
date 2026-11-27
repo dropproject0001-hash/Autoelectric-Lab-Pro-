@@ -65,7 +65,7 @@ export function detectPwaPlatformProfile(
 }
 
 /**
- * Pure security policy evaluator mirroring `/public/sw.js` `isSecuritySensitiveOrExcludedRequest`.
+ * Pure security policy evaluator mirroring `/src/sw.js` `isSecuritySensitiveOrExcludedRequest`.
  * Used by both runtime diagnostics and automated security regression tests.
  */
 export function evaluateSwRequestSecurityPolicy(params: {

@@ -13,9 +13,11 @@ export const RAMTI_SUBTITLE_LINES = [
 export const RAMTI_SUBTITLE_INLINE =
   'Ruben AutoMotive · Modern Technology · Innovation';
 
-// Primary Dark Industrial RAMTi Carbon/Metallic Crest & Backdrop Assets
-export const APP_LOGO_SRC = '/assets/aistudio/1795699079803_96e28eb3.jpg';
-export const APP_ICON_SRC = '/assets/aistudio/1795699079803_96e28eb3.jpg';
+// Primary Dark Industrial RAMTi Carbon/Metallic Crest & Official Emblem Assets
+export const APP_LOGO_SRC = '/assets/aistudio/1795727293849_0b38d1ff.jpg';
+export const APP_ICON_SRC = '/assets/aistudio/1795727293849_0b38d1ff.jpg';
+export const APP_OFFICIAL_EMBLEM_SRC =
+  '/assets/aistudio/1795727293849_0b38d1ff.jpg';
 export const APP_INDUSTRIAL_BACKDROP_SRC =
   '/assets/aistudio/1795699079803_96e28eb3.jpg';
 export const APP_BRANDING_GUIDE_SRC =
