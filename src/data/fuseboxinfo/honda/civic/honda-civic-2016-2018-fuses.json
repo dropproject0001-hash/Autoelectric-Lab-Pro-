@@ -1,0 +1,3950 @@
+{
+  "schemaVersion": "1.0.0",
+  "provenance": {
+    "source": "FuseBoxInfo",
+    "sourceUrl": "https://fuse-box.info/honda/honda-civic-2016-2018-fuses",
+    "wpPostId": 12869,
+    "crawledAt": "2026-11-27T13:43:56.012Z",
+    "zeroFabricationIntegrity": true,
+    "tier": "VERIFIED",
+    "deduplicationStatus": "AUGMENTED_EXISTING",
+    "matchedRepositoryRecordId": "preset-honda-civic"
+  },
+  "identification": {
+    "make": "Honda",
+    "makeSlug": "honda",
+    "model": "Civic",
+    "modelSlug": "civic",
+    "yearsString": "2016-2021",
+    "yearStart": 2016,
+    "yearEnd": 2021,
+    "chassisCode": "10th Gen",
+    "rawTitle": "Honda Civic (2016-2021) fuses"
+  },
+  "powerDistribution": {
+    "totalBoxes": 8,
+    "totalCavities": 391,
+    "boxes": [
+      {
+        "boxIndex": 0,
+        "boxTitle": "Assignment of the fuses in the passenger compartment (2016, 2017)",
+        "location": "INSTRUMENT_PANEL",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Accessory",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "- \n(5 A)",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Not Used (with smart entry system) \nKey Lock (without smart entry system)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "—",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "(5 A) \n(10 A)",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Front Sensor Camera (with smart entry system) \nTransmission (without smart entry system) (Continuously variable transmission models)",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Option",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "SRS Indicator",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Meter",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Fuel Pump",
+            "circuitRole": "FUEL_PUMP",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "AIRCON",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "—",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "5 A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Engine Control",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Passenger Side Door Lock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Driver Side Rear Door Unlock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Rear Driver's Side Power Window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "20 A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Front Passenger's Side Power Window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "20 A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Door Lock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "(10 A) \n(5 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Transmission (with smart entry system) (Continuously variable transmission models)  \nFront Sensor Camera (without smart entry system)",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "—",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Moon roof (option)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "—",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "ACG",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Daytime Running Lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "—",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "(5 A)",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Front Sensor Camera (option)",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Driver's Door Lock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Passenger Side Door Unlock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Rear Passenger's Side Power Window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "20 A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Driver's Power Window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "20 A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Front Accessory Power Socket",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "10 A\n-",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Smart Entry (with smart entry system)  \nNot Used (without smart entry system)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Driver's Power Seat Reclining (option)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Front Seat Heater (option)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Driver's Power Seat Sliding (option)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "34",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "VSA/ABS",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "SRS",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "36",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "—",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "37",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "—",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "38",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Driver Side Rear Door Lock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "39",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Driver's Door Unlock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "11",
+              "ampRatingString": "5 A",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Engine Control",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            }
+          ],
+          "sensorFeeds": [
+            {
+              "cavityId": "4",
+              "ampRatingString": "(5 A) \n(10 A)",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Front Sensor Camera (with smart entry system) \nTransmission (without smart entry system) (Continuously variable transmission models)",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "17",
+              "ampRatingString": "(10 A) \n(5 A)",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "Transmission (with smart entry system) (Continuously variable transmission models)  \nFront Sensor Camera (without smart entry system)",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "24",
+              "ampRatingString": "(5 A)",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Front Sensor Camera (option)",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            }
+          ],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [
+            {
+              "cavityId": "8",
+              "ampRatingString": "15 A",
+              "ampNumeric": 15,
+              "circuitName": "",
+              "description": "Fuel Pump",
+              "circuitRole": "FUEL_PUMP",
+              "isRelay": false
+            }
+          ],
+          "ignitionFeeds": []
+        }
+      },
+      {
+        "boxIndex": 1,
+        "boxTitle": "Assignment of the fuses in the engine compartment (2016, 2017)",
+        "location": "ENGINE_COMPARTMENT",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "(60 A)",
+            "ampNumeric": 60,
+            "circuitName": "",
+            "description": "Passenger's Power Seat (option) \nRear Seat Heaters (option)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "(30 A)",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Cooling Fan (2.0L)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "(50 A)",
+            "ampNumeric": 50,
+            "circuitName": "",
+            "description": "Cooling Fan (1.5L)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "30 A \n-",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "IG Main (with smart entry system)  \nNot Used (without smart entry system)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "30 A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Headlight High Beam Main",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "125 A",
+            "ampNumeric": 125,
+            "circuitName": "",
+            "description": "Battery",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "70 A",
+            "ampNumeric": 70,
+            "circuitName": "",
+            "description": "EPS",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "30 A / 50 A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "IG Main\n(30 A (with smart entry system)  / 50 A (without smart entry system))",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "(40 A)",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Fuse Box Option (option)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "60 A",
+            "ampNumeric": 60,
+            "circuitName": "",
+            "description": "Fuse Box",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "30 A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Front Wiper Motor",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "30 A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Headlight Low Beam Main",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "40 A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Rear Defroster",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "30 A \n-",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Starter Motor (with smart entry system)   \nNot Used  (without smart entry system)",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "40 A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Fuse Box",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "40 A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "ABS/VSA Motor",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "40 A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "ABS/VSA FSR",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "40 A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Blower Motor",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "5 A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Cooling Fan",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Washer",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "FI Main",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "FI Sub",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Stop Lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "(15 A)",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Injector (1.5L)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "5 A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "LAF",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "FI ECU",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Parking Lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Hazard",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "IG Coil",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "(15 A)",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Transmission (Continuously variable transmission models)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Daytime Running Lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Back Up",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Audio",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "(30 A)",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Audio AMP (option)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Interior Lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "(15 A)",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Front Fog Lights (option)",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "A/C Compressor (option)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Horn",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Left Headlight Low Beam",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Right Headlight Low Beam",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "VB ACT (1.5L)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Left Headlight High Beam",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Right Headlight High Beam",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "(15 A)",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Rear Seat Heaters",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Passenger's Power Seat Sliding (option)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Passenger's Power Seat Reclining (option)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "34",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "36",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "12",
+              "ampRatingString": "10 A",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "FI ECU",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            }
+          ],
+          "sensorFeeds": [],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": [
+            {
+              "cavityId": "3",
+              "ampRatingString": "30 A \n-",
+              "ampNumeric": 30,
+              "circuitName": "",
+              "description": "Starter Motor (with smart entry system)   \nNot Used  (without smart entry system)",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 2,
+        "boxTitle": "Assignment of the fuses in the passenger compartment (2018)",
+        "location": "INSTRUMENT_PANEL",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Accessory",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "-\n(5 A)",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Not Used (with smart entry system) \nKey Lock (without smart entry system)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "(5 A) \n(10 A)",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Front Sensor Camera (with smart entry system)  \nTransmission (without smart entry system) (Continuously variable transmission\nmodels)",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Option",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "SRS Indicator",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Meter",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Fuel Pump",
+            "circuitRole": "FUEL_PUMP",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "AIRCON",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "5 A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Engine Control",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Passenger Side Door Lock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Driver Side Rear Door Unlock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Rear Driver's Side Power Window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "20 A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Front Passenger's Side Power Window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "20 A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Door Lock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "(10 A) \n(5 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Transmission (with smart entry system) (Continuously variable transmission\nmodels)  /\nFront Sensor Camera (without smart entry system)",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Moonroof (option)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "ACG",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Daytime Running Lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "—",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "(5 A)",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Front Sensor Camera (option)",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Driver's Door Lock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Passenger Side Door Unlock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Rear Passenger's Side Power Window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "20 A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Driver's Power Window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "20 A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Front Accessory Power Socket",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "10 A\n-",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Smart Entry (with smart entry system)   \nNot Used (without smart entry system)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Driver's Power Seat Reclining (option)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Front Seat Heater (option)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Driver's Power Seat Sliding (option)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "34",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "VSA/ABS",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "SRS",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "36",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "37",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "38",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Driver Side Rear Door Lock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "39",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Driver's Door Unlock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "11",
+              "ampRatingString": "5 A",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Engine Control",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            }
+          ],
+          "sensorFeeds": [
+            {
+              "cavityId": "4",
+              "ampRatingString": "(5 A) \n(10 A)",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Front Sensor Camera (with smart entry system)  \nTransmission (without smart entry system) (Continuously variable transmission\nmodels)",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "17",
+              "ampRatingString": "(10 A) \n(5 A)",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "Transmission (with smart entry system) (Continuously variable transmission\nmodels)  /\nFront Sensor Camera (without smart entry system)",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "24",
+              "ampRatingString": "(5 A)",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Front Sensor Camera (option)",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            }
+          ],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [
+            {
+              "cavityId": "8",
+              "ampRatingString": "15 A",
+              "ampNumeric": 15,
+              "circuitName": "",
+              "description": "Fuel Pump",
+              "circuitRole": "FUEL_PUMP",
+              "isRelay": false
+            }
+          ],
+          "ignitionFeeds": []
+        }
+      },
+      {
+        "boxIndex": 3,
+        "boxTitle": "Assignment of the fuses in the engine compartment (2018)",
+        "location": "ENGINE_COMPARTMENT",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "(60 A) \n\n60 A",
+            "ampNumeric": 60,
+            "circuitName": "",
+            "description": "Passenger's Power Seat (option), Rear Seat Heaters (without SPORT mode),    \nAdaptive Damper System, Rear Seat Heaters (with SPORT mode)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "(30 A)",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Cooling Fan (2.0L)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "(50 A)",
+            "ampNumeric": 50,
+            "circuitName": "",
+            "description": "Cooling Fan (1.5L)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "—",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "30 A \n-",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "IG Main (with smart entry system)  \nNot Used (without smart entry system)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "30 A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Headlight High Beam Main",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "125 A",
+            "ampNumeric": 125,
+            "circuitName": "",
+            "description": "Battery",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "70 A",
+            "ampNumeric": 70,
+            "circuitName": "",
+            "description": "EPS",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "30 A / 50 A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "IG Main\n(30 A (with smart entry system) / 50 A (without smart entry system))",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "(40 A)",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Fuse Box Option (option)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "60 A",
+            "ampNumeric": 60,
+            "circuitName": "",
+            "description": "Fuse Box",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "30 A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Front Wiper Motor",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "30 A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Headlight Low Beam Main",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "40 A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Rear Defroster",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "30 A\n-",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Starter Motor (with smart entry system) \nNot Used (without smart entry system)",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "40 A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Fuse Box",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "40 A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "ABS/VSA Motor",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "40 A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "ABS/VSA FSR",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "40 A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Blower Motor",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "5 A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Cooling Fan",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Washer",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "FI Main",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "FI Sub",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Stop Lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "(15 A)",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Injector (1.5L)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "LAF",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "FI ECU",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Parking Lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Hazard",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "IG Coil",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "(15 A)",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Transmission (Continuously variable transmission models)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Daytime Running Lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Back Up",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Audio",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "(30 A)",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Audio AMP (option)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Interior Lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "(15 A)",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Front Fog Lights (option)",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "A/C Compressor (option)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Horn",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Left Headlight Low Beam",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Right Headlight Low Beam",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "VB ACT (1.5L)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Left Headlight High Beam",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Right Headlight High Beam",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "—",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "(15 A)",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Rear Seat Heaters (option)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "(20 A) \n-",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Passenger's Power Seat Sliding (without SPORT mode)  \nNot Used (with SPORT mode)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "(20 A) \n15 A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Passenger's Power Seat Reclining  (without SPORT mode) \nAdaptive Damper System (with SPORT mode)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "34",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "—",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "—",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "36",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "—",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "12",
+              "ampRatingString": "10 A",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "FI ECU",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            }
+          ],
+          "sensorFeeds": [],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": [
+            {
+              "cavityId": "3",
+              "ampRatingString": "30 A\n-",
+              "ampNumeric": 30,
+              "circuitName": "",
+              "description": "Starter Motor (with smart entry system) \nNot Used (without smart entry system)",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 4,
+        "boxTitle": "Assignment of the fuses in the passenger compartment (2019)",
+        "location": "INSTRUMENT_PANEL",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Accessory",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "(5 A)",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Not Used (Models with smart entry system)\n Key Lock (Models without smart entry system) (CVT models)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Not Used (Models without detachable towing hook)\n Rear Wiper (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "(5 A)",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Front Sensor Camera (Models with smart entry system)",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Transmission (Models without smart entry system) (CVT models)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Option",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "SRS Indicator",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Meter",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Fuel Pump",
+            "circuitRole": "FUEL_PUMP",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "AIRCON",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Not Used (Models without detachable towing hook)\n Rear Accessory Socket (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "5 A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Engine Control",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Passenger Side Door Lock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Driver Side Rear Door Unlock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Rear Driver's Side Power Window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "20 A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Front Passenger's Power Window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "20 A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Door Lock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Transmission (Models with smart entry system) (CVT models)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "(5 A)",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Front Sensor Camera (Models without smart entry system)",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Not Used (Models without detachable towing hook)\n Driver's Power Seat Lumbar Support (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Moonroof",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Not Used (Models without detachable towing hook)\n Starter (Models with detachable towing hook)",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "ACG",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Daytime Running Lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Not Used (Models without detachable towing hook)\n Rear Fog Light (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "(5 A)",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Front Sensor Camera",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Driver's Door Lock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Passenger Side Door Unlock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Rear Passenger's Side Power Window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "20 A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Driver's Power Window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "20 A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Front Accessory Power Socket",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Smart Entry (Models with smart entry system) \nNot Used (Models without smart entry system)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Driver's Power Seat Reclining",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Front Seat Heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Driver's Power Seat Sliding",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "34",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "VSA/ABS",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "SRS",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "36",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "—",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "37",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Not Used (Models without detachable towing hook)\n Option (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "38",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Driver Side Rear Door Lock (Models without detachable towing hook) \n Driver's Side Door Lock (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "39",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Driver's Door Unlock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "11",
+              "ampRatingString": "5 A",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Engine Control",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            }
+          ],
+          "sensorFeeds": [
+            {
+              "cavityId": "4",
+              "ampRatingString": "(5 A)",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Front Sensor Camera (Models with smart entry system)",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "17",
+              "ampRatingString": "(5 A)",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Front Sensor Camera (Models without smart entry system)",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "24",
+              "ampRatingString": "(5 A)",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Front Sensor Camera",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            }
+          ],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [
+            {
+              "cavityId": "8",
+              "ampRatingString": "15 A",
+              "ampNumeric": 15,
+              "circuitName": "",
+              "description": "Fuel Pump",
+              "circuitRole": "FUEL_PUMP",
+              "isRelay": false
+            }
+          ],
+          "ignitionFeeds": [
+            {
+              "cavityId": "20",
+              "ampRatingString": "(10 A)",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "Not Used (Models without detachable towing hook)\n Starter (Models with detachable towing hook)",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 5,
+        "boxTitle": "Assignment of the fuses in the engine compartment (2019)",
+        "location": "ENGINE_COMPARTMENT",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "(60 A)",
+            "ampNumeric": 60,
+            "circuitName": "",
+            "description": "Passenger's Power Seat\nRear Seat Heaters (Models without SPORT mode) (Models without detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "60 A",
+            "ampNumeric": 60,
+            "circuitName": "",
+            "description": "Adaptive Damper System\nRear Seat Heaters (Models with SPORT mode) (Models without detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "(60 A)",
+            "ampNumeric": 60,
+            "circuitName": "",
+            "description": "Option Block 1 (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "(30 A)",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Cooling Fan (2.0L engine) (Models without detachable towing hook) \n DCDC 1 (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "(50 A)",
+            "ampNumeric": 50,
+            "circuitName": "",
+            "description": "1 Cooling Fan (1.5L engine)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "(30 A)",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Not Used (Models without detachable towing hook) \nPremium Amp (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "30 A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "IG Main (Models with smart entry system) (Models without detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "(30 A)",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "IG Main 2 (Models with smart entry system) (Models with detachable towing hook)\nNot Used (Models without smart entry system)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "30 A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Headlight High Beam Main",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1",
+            "ampRatingString": "125 A",
+            "ampNumeric": 125,
+            "circuitName": "",
+            "description": "Battery",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "70 A",
+            "ampNumeric": 70,
+            "circuitName": "",
+            "description": "EPS",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "30 A\n50 A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "IG Main (Models without detachable towing hook) \nIG Main 1 (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "(40 A)",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Fuse Box Option",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "60 A",
+            "ampNumeric": 60,
+            "circuitName": "",
+            "description": "Fuse Box (Models without detachable towing hook) \nFuse Box 1 (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "30 A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Front Wiper Motor",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "30 A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Headlight Low Beam Main",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "40 A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Rear Defroster",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "(30 A)",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Starter Motor (Models with smart entry system)\n- (Models without smart entry system)",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "40 A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Fuse Box (Models without detachable towing hook) \n Fuse Box 2 (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "40 A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "ABS/VSA Motor",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "40 A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "ABS/VSA FSR",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "40 A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Blower Motor",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "(40 A)",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Not Used (Models without detachable towing hook) \n PTC 4 (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "(40 A)",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Not Used (Models without detachable towing hook) \n PTC 4 (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "(40 A)",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Not Used (Models without detachable towing hook) \n PTC 4 (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "(40 A)",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Not Used (Models without detachable towing hook) \n PTC 4 (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "(5 A)",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Cooling Fan",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Washer",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "FI Main",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "FI Sub (Models without detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Stop Lights (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Stop Lights (Models without detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "FI Sub (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "(15 A)",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Injector (1.5L engine)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "5 A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "LAF",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "FI ECU",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Parking Lights (Models without detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Hazard (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Hazard (Models without detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "(15 A)",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Rear Seat Heaters (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "IG Coil",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "(15 A)",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Transmission (CVT models)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Daytime Running Lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Back Up",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "(15A)",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Audio",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "(30 A)",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Audio AMP (Models without detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Parking Lights (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Interior Lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "(15 A)",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Front Fog Lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "A/C Compressor",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Horn",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Left Headlight Low Beam (Models without detachable towing hook) \nNot Used (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Right Headlight Low Beam (Models without detachable towing hook) \n Left Headlight Low Beam (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "(10 A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "VB ACT (1.5L engine) (Models without detachable towing hook) \nRight Headlight Low Beam (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Left Headlight High Beam (Models without detachable towing hook)  \nNot Used (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Right Headlight High Beam (Models without detachable towing hook)  \n Left Headlight High Beam (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "10 A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Not Used (Models without detachable towing hook)\n Right Headlight High Beam (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "(15 A)",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Rear Seat Heaters (Models without detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Passenger's Power Seat Sliding (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Passenger's Power Seat Sliding (Models without SPORT mode) (Models without detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not Used (Models with SPORT mode) (Models without detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Passenger's Power Seat Reclining (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "(20 A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Passenger's Power Seat Reclining (Models without SPORT mode) (Models without detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Adaptive Damper System (Models with SPORT mode) (Models without detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "(5 A)",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "VB ACT (Models with detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "34",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not Used (Models without detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not Used (Models without detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "36",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not Used (Models without detachable towing hook)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "12",
+              "ampRatingString": "10 A",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "FI ECU",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            }
+          ],
+          "sensorFeeds": [],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": [
+            {
+              "cavityId": "3",
+              "ampRatingString": "(30 A)",
+              "ampNumeric": 30,
+              "circuitName": "",
+              "description": "Starter Motor (Models with smart entry system)\n- (Models without smart entry system)",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 6,
+        "boxTitle": "Assignment of the fuses in the Passenger compartment (2020-2021)",
+        "location": "INSTRUMENT_PANEL",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Accessory",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "(5A)",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Models without smart entry system and Continuously variable transmission: Key Lock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "(10A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Models with detachable towing hook: Rear Wiper",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "(5A)",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Models with smart entry system: Front Sensor Camera",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Models without smart entry system and Continuously variable transmission: Transmission",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "(10A)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "(10A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Option",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "(10A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "SRS Indicator",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Meter",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Fuel Pump",
+            "circuitRole": "FUEL_PUMP",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "AIRCON",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "(20A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Models with detachable towing hook: Rear Accessory Socket",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Engine Control",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Passenger Side Door Lock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "(10A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Models without detachable towing hook: Driver Side Rear Door Unlock \nModels with detachable towing hook: Driver's Side Door Unlock",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "(20A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Rear Driver's Side Power Window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Front Passenger's Power Window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Door Lock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "(10A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Models with smart entry system and Continuously variable transmission: Transmission",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Models without smart entry system: Front Sensor Camera",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "(5A)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "(10A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Models with detachable towing hook: Driver's Power Seat Lumbar Support",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "(20A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Moonroof",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "(10A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Models with detachable towing hook: Starter",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "ACG",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "(10A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Daytime Running Lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "(10A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Models with detachable towing hook: Rear Fog Ligh",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "(5A)",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Front Sensor Camera",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "(10A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Driver's Door Lock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Passenger Side Door Unlock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "(20A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Rear Passenger's Side Power Window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Driver's Power Window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Front Accessory Power Socket",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "(10A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Models with smart entry system: Smart Entry",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "(20A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Driver's Power Seat Reclining",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "(20A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Front Seat Heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "(20A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Driver's Power Seat Sliding",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "34",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "VSA/ABS",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "SRS",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "36",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "37",
+            "ampRatingString": "(10A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Models with detachable towing hook: Option",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "38",
+            "ampRatingString": "(10A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Models without detachable towing hook: Driver Side Rear Door Lock",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Models with detachable towing hook: Driver's Side Door Lock",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "10A",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "39",
+            "ampRatingString": "(10A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Driver's Door Unlock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "11",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Engine Control",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            }
+          ],
+          "sensorFeeds": [
+            {
+              "cavityId": "4",
+              "ampRatingString": "(5A)",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Models with smart entry system: Front Sensor Camera",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "24",
+              "ampRatingString": "(5A)",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Front Sensor Camera",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            }
+          ],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [
+            {
+              "cavityId": "8",
+              "ampRatingString": "15A",
+              "ampNumeric": 15,
+              "circuitName": "",
+              "description": "Fuel Pump",
+              "circuitRole": "FUEL_PUMP",
+              "isRelay": false
+            }
+          ],
+          "ignitionFeeds": [
+            {
+              "cavityId": "20",
+              "ampRatingString": "(10A)",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "Models with detachable towing hook: Starter",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 7,
+        "boxTitle": "Assignment of the fuses in the Engine compartment (2020-2021)",
+        "location": "ENGINE_COMPARTMENT",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "60A",
+            "ampNumeric": 60,
+            "circuitName": "",
+            "description": "Models without SPORT mode: Passenger's Power Seat / Rear Seat Heaters \nModels with SPORT mode: Adaptive Damper System / Rear Seat Heaters",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2.0L engine models: Cooling Fan",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "(30A)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "1.5L engine models: Cooling Fan",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "(50A)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Models with smart entry system: IG Main",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "30A",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Headlight High Beam Main",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "30A",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Battery",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "Battery",
+            "description": "125A",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "70A",
+            "ampNumeric": 70,
+            "circuitName": "",
+            "description": "EPS",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "IG Main",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "IG Main",
+            "description": "30A/50A",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Fuse Box Option",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "(40A)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Fuse Box",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "Fuse Box",
+            "description": "60A",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Front Wiper Motor",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "30A",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Headlight Low Beam Main",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "30A",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "40A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Rear Defroster",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Models with smart entry system: Starter Motor",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "30A",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Fuse Box",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "Fuse Box",
+            "description": "40A",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "ABS/VSA Motor",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "40A",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "ABS/VSA FSR",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "40A",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Blower Motor",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "40A",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Cooling Fan",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Washer",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "FI Main",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "FI Sub",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Stop Lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "(15A)",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "1.5L engine models: Injector",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "LAF",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "FI ECU",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Parking Lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Hazard",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "IG Coil",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "(15A)",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Continuously variable transmission models: Transmission",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Daytime Running Lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Back Up",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Audio",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "(30A)",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Audio AMP",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Interior Lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "(15A)",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Front Fog Lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "(10A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "A/C Compressor",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Horn",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Left Headlight Low Beam",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Right Headlight Low Beam",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "(10A)",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "1.5L engine models: VB ACT",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Left Headlight High Beam",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Right Headlight High Beam",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "(15A)",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Rear Seat Heaters",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "(20A)",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Models without SPORT mode: Passenger's Power Seat Sliding",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Models without SPORT mode: Passenger's Power Seat Reclining",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Models with SPORT mode: Adaptive Damper System",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "15A",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "34",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "36",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "12",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "FI ECU",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            }
+          ],
+          "sensorFeeds": [],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": []
+        }
+      }
+    ]
+  },
+  "ecuAndSensorsSummary": {
+    "hasDedicatedEcmFeed": true,
+    "hasSensorVrefFeed": true,
+    "hasObdDlcFeed": false,
+    "hasFuelPumpRelay": true,
+    "circuitHighlights": [
+      "Dedicated ECM / Engine Control Power Feeds",
+      "Primary Fuel Pump Control Circuit / Relay",
+      "Sensor Reference Rails & VVT / O2 Actuator Fuses"
+    ]
+  },
+  "crossVerificationStatus": {
+    "crossReferencedWithStartMyCar": true,
+    "startMyCarMatchingFile": "src/data/startmycar/honda/civic/2018.json",
+    "confirmedCavitiesCount": 376
+  }
+}

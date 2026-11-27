@@ -1,0 +1,697 @@
+{
+  "schemaVersion": "1.0.0",
+  "provenance": {
+    "source": "FuseBoxInfo",
+    "sourceUrl": "https://fuse-box.info/nissan/nissan-sentra-b17-2013-2019-fuses",
+    "wpPostId": 67840,
+    "crawledAt": "2026-11-27T13:43:53.919Z",
+    "zeroFabricationIntegrity": true,
+    "tier": "VERIFIED",
+    "deduplicationStatus": "AUGMENTED_EXISTING",
+    "matchedRepositoryRecordId": "preset-nissan-sentra"
+  },
+  "identification": {
+    "make": "Nissan",
+    "makeSlug": "nissan",
+    "model": "Sentra",
+    "modelSlug": "sentra",
+    "yearsString": "2013-2019",
+    "yearStart": 2013,
+    "yearEnd": 2019,
+    "chassisCode": "B17",
+    "rawTitle": "Nissan Sentra (B17; 2013-2019) fuses"
+  },
+  "powerDistribution": {
+    "totalBoxes": 3,
+    "totalCavities": 57,
+    "boxes": [
+      {
+        "boxIndex": 0,
+        "boxTitle": "Assignment of the fuses in the instrument panel",
+        "location": "INSTRUMENT_PANEL",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "15A/20A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Cigar lighter / power outlet",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Audio system; Power control mirror",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Audio system; Power control mirror",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "IPDM IG2",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "AC blower motor",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Air conditioning",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "AC blower motor",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Protects several circuits",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Anti-theft system",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Protects several circuits",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10A",
+            "ampRatingString": "Instrument cluster",
+            "ampNumeric": null,
+            "circuitName": "10A",
+            "description": "(Unassigned / Spare)",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Dealer OPT",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20A",
+            "ampRatingString": "Trailer",
+            "ampNumeric": null,
+            "circuitName": "20A",
+            "description": "(Unassigned / Spare)",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "10A/15A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Dome light and interior light",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Seat heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Push engine start",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Protects several circuits",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Instrument cluster",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Protects several circuits",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Protects several circuits",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Windshield washer",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Airbag",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Mirror heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [],
+          "sensorFeeds": [],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": [
+            {
+              "cavityId": "10A",
+              "ampRatingString": "Instrument cluster",
+              "ampNumeric": null,
+              "circuitName": "10A",
+              "description": "(Unassigned / Spare)",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "20A",
+              "ampRatingString": "Trailer",
+              "ampNumeric": null,
+              "circuitName": "20A",
+              "description": "(Unassigned / Spare)",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "15",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "Push engine start",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 1,
+        "boxTitle": "Assignment of the fuses in the engine compartment fuse box №1",
+        "location": "ENGINE_COMPARTMENT",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "RR DEF",
+            "description": "Rear window defogger",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "RR DEF",
+            "description": "Rear window defogger",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "EGI",
+            "description": "Engine management system",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "FRONT WIPER",
+            "description": "Front wipers",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "POS LAMPS R",
+            "description": "Right dimensions",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "POS LAMPS L",
+            "description": "Left dimensions",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "A/C CLUTCH",
+            "description": "A/C magnetic clutch",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "FR FOG LAMP",
+            "description": "Front fog lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "H/LAMP HI RH",
+            "description": "Right-hand headlight high beam",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "H/LAMP HI LH",
+            "description": "Left-hand headlight high beam",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "H/LAMP LO LH",
+            "description": "Left-hand headlight low beam",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "H/LAMP LO RH",
+            "description": "Right-hand headlight low beam",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "A/T ECU IGN",
+            "description": "Automatic transmission controller",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "REV LAMP IGN",
+            "description": "Backup lights",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "ABS ECU IGN",
+            "description": "Anti-lock braking system",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "FUEL PUMP",
+            "description": "Fuel pump",
+            "circuitRole": "FUEL_PUMP",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "IGN COIL",
+            "description": "Ignition coil",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "INJECTORS",
+            "description": "Fuel injectors",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "ETC",
+            "description": "Electronic throttle control",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "15",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "A/T ECU IGN",
+              "description": "Automatic transmission controller",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "17",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "ABS ECU IGN",
+              "description": "Anti-lock braking system",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            }
+          ],
+          "sensorFeeds": [
+            {
+              "cavityId": "24",
+              "ampRatingString": "15A",
+              "ampNumeric": 15,
+              "circuitName": "ETC",
+              "description": "Electronic throttle control",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            }
+          ],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [
+            {
+              "cavityId": "20",
+              "ampRatingString": "15A",
+              "ampNumeric": 15,
+              "circuitName": "FUEL PUMP",
+              "description": "Fuel pump",
+              "circuitRole": "FUEL_PUMP",
+              "isRelay": false
+            }
+          ],
+          "ignitionFeeds": [
+            {
+              "cavityId": "16",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "REV LAMP IGN",
+              "description": "Backup lights",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "21",
+              "ampRatingString": "15A",
+              "ampNumeric": 15,
+              "circuitName": "IGN COIL",
+              "description": "Ignition coil",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 2,
+        "boxTitle": "Assignment of the fuses in the engine compartment fuse box №2",
+        "location": "ENGINE_COMPARTMENT",
+        "cavities": [
+          {
+            "cavityId": "24",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Audio system (Bose)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Audio system (Bose)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "CVT Transmission",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Audio system",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Horn; Battery and charging system",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "CVT Transmission",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Daytime running lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Stop lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "G",
+            "ampRatingString": "40A",
+            "ampNumeric": 40,
+            "circuitName": "G",
+            "description": "Anti-lock braking system",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "H",
+            "ampRatingString": "40A",
+            "ampNumeric": 40,
+            "circuitName": "H",
+            "description": "Power windows",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "I",
+            "ampRatingString": "40A",
+            "ampNumeric": 40,
+            "circuitName": "I",
+            "description": "Ignition switch",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "J",
+            "ampRatingString": "50A",
+            "ampNumeric": 50,
+            "circuitName": "J",
+            "description": "Radiator fan",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "K",
+            "ampRatingString": "40A",
+            "ampNumeric": 40,
+            "circuitName": "K",
+            "description": "Radiator fan",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "L",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "L",
+            "description": "Anti-lock braking system",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "N",
+            "ampRatingString": "60A",
+            "ampNumeric": 60,
+            "circuitName": "N",
+            "description": "Electric power steering",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [],
+          "sensorFeeds": [],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": [
+            {
+              "cavityId": "I",
+              "ampRatingString": "40A",
+              "ampNumeric": 40,
+              "circuitName": "I",
+              "description": "Ignition switch",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "ecuAndSensorsSummary": {
+    "hasDedicatedEcmFeed": true,
+    "hasSensorVrefFeed": true,
+    "hasObdDlcFeed": false,
+    "hasFuelPumpRelay": true,
+    "circuitHighlights": [
+      "Dedicated ECM / Engine Control Power Feeds",
+      "Primary Fuel Pump Control Circuit / Relay",
+      "Sensor Reference Rails & VVT / O2 Actuator Fuses"
+    ]
+  },
+  "crossVerificationStatus": {
+    "crossReferencedWithStartMyCar": true,
+    "startMyCarMatchingFile": "src/data/startmycar/nissan/sentra/2016.json",
+    "confirmedCavitiesCount": 55
+  }
+}

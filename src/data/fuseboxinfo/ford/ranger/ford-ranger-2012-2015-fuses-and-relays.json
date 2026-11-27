@@ -1,0 +1,1572 @@
+{
+  "schemaVersion": "1.0.0",
+  "provenance": {
+    "source": "FuseBoxInfo",
+    "sourceUrl": "https://fuse-box.info/ford/ford-ranger-2012-2015-fuses-and-relays",
+    "wpPostId": 38579,
+    "crawledAt": "2026-11-27T13:43:51.802Z",
+    "zeroFabricationIntegrity": true,
+    "tier": "VERIFIED",
+    "deduplicationStatus": "MATCHED_SEED",
+    "matchedRepositoryRecordId": "ford-ranger-2016"
+  },
+  "identification": {
+    "make": "Ford",
+    "makeSlug": "ford",
+    "model": "Ranger",
+    "modelSlug": "ranger",
+    "yearsString": "2012-2015",
+    "yearStart": 2012,
+    "yearEnd": 2015,
+    "chassisCode": "PX1",
+    "rawTitle": "Ford Ranger (2012-2015) fuses and relays"
+  },
+  "powerDistribution": {
+    "totalBoxes": 3,
+    "totalCavities": 140,
+    "boxes": [
+      {
+        "boxIndex": 0,
+        "boxTitle": "Assignment of the fuses in the Passenger compartment",
+        "location": "INSTRUMENT_PANEL",
+        "cavities": [
+          {
+            "cavityId": "56",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Fuel pump",
+            "circuitRole": "FUEL_PUMP",
+            "isRelay": false
+          },
+          {
+            "cavityId": "57",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "58",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "59",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Passive anti-theft system (PATS)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "60",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Interior lamp, driver’s door switch pack, mood lights, puddle lights, Automatic shifter, footwell lamp",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "61",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "62",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Rain sensor module",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "63",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Tachograph / Not used",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "64",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "65",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "66",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Driver’s door lock, central double locking",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "67",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Stop lamp switch",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "68",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "69",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Instrument cluster, Integrated control module (ICP), Tracking and blocking module",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "70",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Central locking",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "71",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Air conditioning",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "72",
+            "ampRatingString": "7.5",
+            "ampNumeric": 7.5,
+            "circuitName": "",
+            "description": "Alarm horn",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "73",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "On-board diagnostics II",
+            "circuitRole": "OBD2_DLC",
+            "isRelay": false
+          },
+          {
+            "cavityId": "74",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Main beam",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "75",
+            "ampRatingString": "15",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Front fog lamps",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "76",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Reversing lamp, rear view mirror",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "77",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Washer pump",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "78",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Ignition switch",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "79",
+            "ampRatingString": "15",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Radio, multi-function display",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "80",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Multi-function display, Hi audio, brake valve closing (BVC) module",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "81",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Interior motion sensor",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "82",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Washer pump ground",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "83",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Central locking ground",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "84",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Driver's door unlock, central double locking ground",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "85",
+            "ampRatingString": "7.5",
+            "ampNumeric": 7.5,
+            "circuitName": "",
+            "description": "Instrument cluster, parking aid module, rear view camera, manual air conditioning, rear view mirror, tracking and blocking module",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "86",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Restraint system, passenger air-bag deactivation indicator",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "87",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Tachograph",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "88",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "89",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [],
+          "sensorFeeds": [
+            {
+              "cavityId": "62",
+              "ampRatingString": "5",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Rain sensor module",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "81",
+              "ampRatingString": "5",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Interior motion sensor",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "85",
+              "ampRatingString": "7.5",
+              "ampNumeric": 7.5,
+              "circuitName": "",
+              "description": "Instrument cluster, parking aid module, rear view camera, manual air conditioning, rear view mirror, tracking and blocking module",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            }
+          ],
+          "obdFeeds": [
+            {
+              "cavityId": "73",
+              "ampRatingString": "5",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "On-board diagnostics II",
+              "circuitRole": "OBD2_DLC",
+              "isRelay": false
+            }
+          ],
+          "fuelPumpFeeds": [
+            {
+              "cavityId": "56",
+              "ampRatingString": "20",
+              "ampNumeric": 20,
+              "circuitName": "",
+              "description": "Fuel pump",
+              "circuitRole": "FUEL_PUMP",
+              "isRelay": false
+            }
+          ],
+          "ignitionFeeds": [
+            {
+              "cavityId": "78",
+              "ampRatingString": "5",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Ignition switch",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 1,
+        "boxTitle": "Assignment of the fuses and relays in the engine compartment",
+        "location": "ENGINE_COMPARTMENT",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "60",
+            "ampNumeric": 60,
+            "circuitName": "",
+            "description": "Passenger compartment fuse box supply (battery)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "60",
+            "ampNumeric": 60,
+            "circuitName": "",
+            "description": "Passenger compartment fuse box supply (battery)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3 (Petrol)",
+            "ampRatingString": "50",
+            "ampNumeric": 50,
+            "circuitName": "",
+            "description": "Engine cooling fan",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3 (Diesel)",
+            "ampRatingString": "60",
+            "ampNumeric": 60,
+            "circuitName": "",
+            "description": "Glow plug control module",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "40",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "ABS module",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "30",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Electric windows (front and rear)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "25",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Four wheel drive (4WD) motor ground",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Electric seat",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "25",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Electric windows (front)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "30",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Blower motor",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "25",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Four wheel drive (4WD) motor power",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Starter solenoid",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Heated rear window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15 (Petrol)",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Flex-fuel pump",
+            "circuitRole": "FUEL_PUMP",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15 (Diesel)",
+            "ampRatingString": "15",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Vapouriser glow plug",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Air conditioning Clutch",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "25",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Power windows (front)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "25",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Windscreen wiper motor",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "25",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Wndscreen wiper motor ground",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Cigar lighter",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "15",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Horn",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "15",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Fuel injectors or flex-fuel valve",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Differential lock solenoid",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Auxiliary power socket (front console)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "15",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Ignition coils, Temperature and Mass Air Flow sensor, Glow plug module, Vacuum Control Valve (VCV), Electronic Vacuum Regulator Valve (EVRV)",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "7.5",
+            "ampNumeric": 7.5,
+            "circuitName": "",
+            "description": "Electronic control module (ECM)",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Transmission control module (TCM)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Heated exhaust gas oxygen, Universal Heated Exhaust Gas Oxygen-sensor, Relay coils",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": true
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "15",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Electronic control module (ECM)",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "15",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Battery monitoring sensor",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Auxiliary power socket (rear console)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "A/C pressure switch",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Transmission control module (TCM)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "34",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "PTC heater (where fitted) / Crew chief module / Spare",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Passenger compartment fuse box supply (Ignition)",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "36",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "ABS module",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "37",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Headlamp levelling",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "38",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Heated seat",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "39",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Power mirrors",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "40",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Vapouriser pump / Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "41",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Heated mirrors",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "42",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Alarm horn",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "43",
+            "ampRatingString": "30",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Heated windscreen (right)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "44",
+            "ampRatingString": "30",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Heated windscreen (left)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "45",
+            "ampRatingString": "25",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "ABS module",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "46",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Auxiliary power socket (floor console)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "47",
+            "ampRatingString": "40",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Trailer tow module",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "48",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "49",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "50",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Ignition relay, Relay coils",
+            "circuitRole": "IGNITION",
+            "isRelay": true
+          },
+          {
+            "cavityId": "51 (Brazil only)",
+            "ampRatingString": "30",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Electric windows (rear)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "51",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Trailer tow (12 or 13 pin battery feed, Permanent live)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Cavity-55",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "(Unassigned / Spare)",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Relays",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "Relays",
+            "description": "(Unassigned / Spare)",
+            "circuitRole": "IGNITION",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R1",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R1",
+            "description": "Key interlock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R2",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R2",
+            "description": "Wiper on or off",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R3",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R3",
+            "description": "Horn",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R4",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R4",
+            "description": "A/C clutch",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R5",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R5",
+            "description": "Differential lock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R6",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R6",
+            "description": "Wper Hi or Lo",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R7",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R7",
+            "description": "Engine cooling fan low",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R8",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R8",
+            "description": "Engine cooling fan high",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R9",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R9",
+            "description": "Flex-fuel pump, Vapouriser glow plug",
+            "circuitRole": "FUEL_PUMP",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R10",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R10",
+            "description": "Heated rear window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R11",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R11",
+            "description": "Heated windscreen",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R12",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R12",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R13",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R13",
+            "description": "Electronic control module (ECM) power hold",
+            "circuitRole": "ECU_POWER",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R14",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R14",
+            "description": "Ignition",
+            "circuitRole": "IGNITION",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R15",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R15",
+            "description": "4WD motor 2 (Clockwise)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R16",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R16",
+            "description": "4WD motor 1 (Counter clockwise)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R17",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R17",
+            "description": "4WD motor",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R18",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R18",
+            "description": "Security horn",
+            "circuitRole": "ECU_POWER",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R19",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R19",
+            "description": "Starter motor",
+            "circuitRole": "IGNITION",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R20",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R20",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R21",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R21",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R22",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R22",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R23",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R23",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R24",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R24",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R25",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R25",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R26",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R26",
+            "description": "Blower motor",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R27",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R27",
+            "description": "Electric seat",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "26",
+              "ampRatingString": "7.5",
+              "ampNumeric": 7.5,
+              "circuitName": "",
+              "description": "Electronic control module (ECM)",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "29",
+              "ampRatingString": "15",
+              "ampNumeric": 15,
+              "circuitName": "",
+              "description": "Electronic control module (ECM)",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "R13",
+              "ampRatingString": "Relay",
+              "ampNumeric": null,
+              "circuitName": "R13",
+              "description": "Electronic control module (ECM) power hold",
+              "circuitRole": "ECU_POWER",
+              "isRelay": true
+            },
+            {
+              "cavityId": "R18",
+              "ampRatingString": "Relay",
+              "ampNumeric": null,
+              "circuitName": "R18",
+              "description": "Security horn",
+              "circuitRole": "ECU_POWER",
+              "isRelay": true
+            }
+          ],
+          "sensorFeeds": [
+            {
+              "cavityId": "25",
+              "ampRatingString": "15",
+              "ampNumeric": 15,
+              "circuitName": "",
+              "description": "Ignition coils, Temperature and Mass Air Flow sensor, Glow plug module, Vacuum Control Valve (VCV), Electronic Vacuum Regulator Valve (EVRV)",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "28",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "Heated exhaust gas oxygen, Universal Heated Exhaust Gas Oxygen-sensor, Relay coils",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": true
+            },
+            {
+              "cavityId": "30",
+              "ampRatingString": "15",
+              "ampNumeric": 15,
+              "circuitName": "",
+              "description": "Battery monitoring sensor",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            }
+          ],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [
+            {
+              "cavityId": "15 (Petrol)",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "Flex-fuel pump",
+              "circuitRole": "FUEL_PUMP",
+              "isRelay": false
+            },
+            {
+              "cavityId": "R9",
+              "ampRatingString": "Relay",
+              "ampNumeric": null,
+              "circuitName": "R9",
+              "description": "Flex-fuel pump, Vapouriser glow plug",
+              "circuitRole": "FUEL_PUMP",
+              "isRelay": true
+            }
+          ],
+          "ignitionFeeds": [
+            {
+              "cavityId": "13",
+              "ampRatingString": "20",
+              "ampNumeric": 20,
+              "circuitName": "",
+              "description": "Starter solenoid",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "35",
+              "ampRatingString": "20",
+              "ampNumeric": 20,
+              "circuitName": "",
+              "description": "Passenger compartment fuse box supply (Ignition)",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "50",
+              "ampRatingString": "5",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Ignition relay, Relay coils",
+              "circuitRole": "IGNITION",
+              "isRelay": true
+            },
+            {
+              "cavityId": "Cavity-55",
+              "ampRatingString": "—",
+              "ampNumeric": null,
+              "circuitName": "",
+              "description": "(Unassigned / Spare)",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "Relays",
+              "ampRatingString": "Relay",
+              "ampNumeric": null,
+              "circuitName": "Relays",
+              "description": "(Unassigned / Spare)",
+              "circuitRole": "IGNITION",
+              "isRelay": true
+            },
+            {
+              "cavityId": "R14",
+              "ampRatingString": "Relay",
+              "ampNumeric": null,
+              "circuitName": "R14",
+              "description": "Ignition",
+              "circuitRole": "IGNITION",
+              "isRelay": true
+            },
+            {
+              "cavityId": "R19",
+              "ampRatingString": "Relay",
+              "ampNumeric": null,
+              "circuitName": "R19",
+              "description": "Starter motor",
+              "circuitRole": "IGNITION",
+              "isRelay": true
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 2,
+        "boxTitle": "Assignment of the fuses and relays in the Auxiliary fuse box",
+        "location": "RELAY_BLOCK",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "25",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Driving Light",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "15",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Position lamp",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "LED beacon",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "15",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Work lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Spare",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Power point",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "15",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Reversing lamp",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "15",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Direction indicators, stop lamp",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Crew chief",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Disable fuse (isolator ground)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Cavity-13",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "(Unassigned / Spare)",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Relays",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "Relays",
+            "description": "(Unassigned / Spare)",
+            "circuitRole": "IGNITION",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R1",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R1",
+            "description": "Work lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R2",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R2",
+            "description": "LED beacon",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R3",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R3",
+            "description": "Spare",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R4",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R4",
+            "description": "Position lamp",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R5",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R5",
+            "description": "Direction indicator (left)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R6",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R6",
+            "description": "Direction indicator (right)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R7",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R7",
+            "description": "Stop lamp",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R8",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R8",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R9",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R9",
+            "description": "Not used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [],
+          "sensorFeeds": [],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": [
+            {
+              "cavityId": "Cavity-13",
+              "ampRatingString": "—",
+              "ampNumeric": null,
+              "circuitName": "",
+              "description": "(Unassigned / Spare)",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "Relays",
+              "ampRatingString": "Relay",
+              "ampNumeric": null,
+              "circuitName": "Relays",
+              "description": "(Unassigned / Spare)",
+              "circuitRole": "IGNITION",
+              "isRelay": true
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "ecuAndSensorsSummary": {
+    "hasDedicatedEcmFeed": true,
+    "hasSensorVrefFeed": true,
+    "hasObdDlcFeed": true,
+    "hasFuelPumpRelay": true,
+    "circuitHighlights": [
+      "Dedicated ECM / Engine Control Power Feeds",
+      "OBD-II DLC Diagnostic Pin 16 Fused Power Feed",
+      "Primary Fuel Pump Control Circuit / Relay",
+      "Sensor Reference Rails & VVT / O2 Actuator Fuses"
+    ]
+  },
+  "crossVerificationStatus": {
+    "crossReferencedWithStartMyCar": false
+  }
+}

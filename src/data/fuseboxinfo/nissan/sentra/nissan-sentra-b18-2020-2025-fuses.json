@@ -1,0 +1,851 @@
+{
+  "schemaVersion": "1.0.0",
+  "provenance": {
+    "source": "FuseBoxInfo",
+    "sourceUrl": "https://fuse-box.info/nissan/nissan-sentra-b18-2020-2025-fuses",
+    "wpPostId": 67861,
+    "crawledAt": "2026-11-27T13:43:54.573Z",
+    "zeroFabricationIntegrity": true,
+    "tier": "VERIFIED",
+    "deduplicationStatus": "AUGMENTED_EXISTING",
+    "matchedRepositoryRecordId": "preset-nissan-sentra"
+  },
+  "identification": {
+    "make": "Nissan",
+    "makeSlug": "nissan",
+    "model": "Sentra",
+    "modelSlug": "sentra",
+    "yearsString": "2020-2025",
+    "yearStart": 2020,
+    "yearEnd": 2025,
+    "chassisCode": "B18",
+    "rawTitle": "Nissan Sentra (B18; 2020-2025) fuses"
+  },
+  "powerDistribution": {
+    "totalBoxes": 3,
+    "totalCavities": 71,
+    "boxes": [
+      {
+        "boxIndex": 0,
+        "boxTitle": "Assignment of the fuses in the instrument panel",
+        "location": "INSTRUMENT_PANEL",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "VDC CONT",
+            "description": "Vehicle Dynamic Control module (stability/traction control system)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "ADAS",
+            "description": "Advanced Driver Assistance Systems",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "STOP LAMP-1",
+            "description": "Brake light circuit (main stop lamps)",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "CLUTCH",
+            "description": "Clutch switch (manual transmission interlock, engine start circuit)",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "ELEC PARTS (AUTO ACC)",
+            "description": "Electrical parts powered in AUTO ACC mode (accessories)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "POWER WDW FR LH",
+            "description": "Power window, front left (driver side)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "SUNROOF",
+            "description": "Sunroof motor and control switch",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "USB",
+            "description": "USB charging ports / infotainment USB input",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "CONSULT",
+            "description": "Diagnostic communication (Nissan CONSULT tool interface)",
+            "circuitRole": "OBD2_DLC",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "CAN GATEWAY",
+            "description": "Controller Area Network Gateway (communication between modules)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "FOG LAMP RR",
+            "description": "Rear fog lamp",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "HEATED SEAT FR RH",
+            "description": "Heated seat, front (passenger)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "HEATED SEAT FR LH",
+            "description": "Heated seat, front (driver)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "POWER SEAT",
+            "description": "Electric seat adjustment (driver/passenger depending on trim)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "SPARE",
+            "description": "SPARE",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "DOOR LOCK FR",
+            "description": "Door lock actuator, front right",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "DOOR LOCK RR",
+            "description": "Door lock actuator, rear right",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "HAZARD LAMP",
+            "description": "Hazard warning lights (emergency flashers)",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "HFM",
+            "description": "Hands-Free Module (Bluetooth, phone system)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "BCM SIGNAL",
+            "description": "Body Control Module signal circuits",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "SPARE",
+            "description": "SPARE",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "STOP LAMP 2",
+            "description": "Secondary brake light circuit (includes high-mounted stop lamp)",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "TCU",
+            "description": "Transmission Control Unit (CVT control)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "34",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "ROOM LAMP",
+            "description": "Interior dome light / courtesy lamps",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "SPARE",
+            "description": "SPARE",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "36",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "AUDIO AMP",
+            "description": "Audio system amplifier",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "37",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "SPARE",
+            "description": "SPARE",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "38",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "AUDIO",
+            "description": "Audio system head unit",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "39",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "BCM SIGNAL",
+            "description": "Body Control Module signal circuits (secondary)",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "40",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "METER (BAT)",
+            "description": "Instrument cluster (battery supply)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "41",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "POWER SOCKET",
+            "description": "12V accessory power outlet (cigarette lighter socket)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "42",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "HEATED STRG",
+            "description": "Heated steering wheel",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "43",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "WASH PUMP",
+            "description": "Windshield washer pump",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "44",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "BLOWER",
+            "description": "HVAC blower motor",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "45",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "SPARE",
+            "description": "SPARE",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "46",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "RR DEF",
+            "description": "Rear window defogger",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "48",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "AIR BAG",
+            "description": "Supplemental Restraint System (SRS airbag control unit)",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "49",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "METER (IG1)",
+            "description": "Instrument cluster (ignition supply)",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "50",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "ELEC PARTS (IGN)",
+            "description": "General electrical parts powered with ignition ON",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "51",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "ELECT PARTS (IGN-RUN)",
+            "description": "Electrical parts powered when ignition is in RUN position",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "52",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "STRG SENSOR",
+            "description": "Steering angle sensor (VDC/ADAS input)",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "53",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "HEATED MIRROR",
+            "description": "Heated exterior mirrors",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "56",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "POWER WDW FR RH",
+            "description": "Power window, front right (passenger side)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "57",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "POWER WDW RR",
+            "description": "Power window, rear right",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [],
+          "sensorFeeds": [
+            {
+              "cavityId": "52",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "STRG SENSOR",
+              "description": "Steering angle sensor (VDC/ADAS input)",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            }
+          ],
+          "obdFeeds": [
+            {
+              "cavityId": "17",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "CONSULT",
+              "description": "Diagnostic communication (Nissan CONSULT tool interface)",
+              "circuitRole": "OBD2_DLC",
+              "isRelay": false
+            }
+          ],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": [
+            {
+              "cavityId": "5",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "CLUTCH",
+              "description": "Clutch switch (manual transmission interlock, engine start circuit)",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "30",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "BCM SIGNAL",
+              "description": "Body Control Module signal circuits",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "39",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "BCM SIGNAL",
+              "description": "Body Control Module signal circuits (secondary)",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "49",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "METER (IG1)",
+              "description": "Instrument cluster (ignition supply)",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "50",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "ELEC PARTS (IGN)",
+              "description": "General electrical parts powered with ignition ON",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "51",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "ELECT PARTS (IGN-RUN)",
+              "description": "Electrical parts powered when ignition is in RUN position",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 1,
+        "boxTitle": "Assignment of the fuses in the engine compartment fuse box №1",
+        "location": "ENGINE_COMPARTMENT",
+        "cavities": [
+          {
+            "cavityId": "F2",
+            "ampRatingString": "20A/30A",
+            "ampNumeric": 20,
+            "circuitName": "BAT ABS VALVES",
+            "description": "ABS valves",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F3",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "FUEL PUMP",
+            "description": "Fuel Pump",
+            "circuitRole": "FUEL_PUMP",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F4",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "ACTUATOR 1",
+            "description": "Actuator 1",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F5",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "ACTUATOR 3",
+            "description": "Actuator 3",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F6",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "ACTUATOR 2",
+            "description": "Actuator 2",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F7",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "ACTUATOR 4",
+            "description": "Actuator 4",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F8",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "ACTUATOR 5",
+            "description": "Actuator 5",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F9",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "WIPER",
+            "description": "Front wiper motor",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F10",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "LCS CABIN/INJECTOR",
+            "description": "LCS CABIN/INJECTOR",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F11",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "AT / LPG",
+            "description": "Alt/LPG system",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F12",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "AIR BAG / ABS",
+            "description": "Supplemental Restraint + Anti-lock system",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F13",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "REV LAMP / AC / VALVE",
+            "description": "Reverse Lamp / A/C Valve (back-up lights, A/C solenoid valve)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F15",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "ECM",
+            "description": "Engine Control Module",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "F15",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "ECM",
+              "description": "Engine Control Module",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            }
+          ],
+          "sensorFeeds": [],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [
+            {
+              "cavityId": "F3",
+              "ampRatingString": "20A",
+              "ampNumeric": 20,
+              "circuitName": "FUEL PUMP",
+              "description": "Fuel Pump",
+              "circuitRole": "FUEL_PUMP",
+              "isRelay": false
+            }
+          ],
+          "ignitionFeeds": []
+        }
+      },
+      {
+        "boxIndex": 2,
+        "boxTitle": "Assignment of the fuses in the engine compartment fuse box №2",
+        "location": "ENGINE_COMPARTMENT",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "60A",
+            "ampNumeric": 60,
+            "circuitName": "CVT OIL PUMP",
+            "description": "Oil pump for CVT lubrication and cooling.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "40A",
+            "ampRatingString": "E-VCT",
+            "ampNumeric": null,
+            "circuitName": "E-VCT",
+            "description": "E-VCT",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "STARTER CUT",
+            "description": "Controls starter motor cut-off to prevent operation in certain conditions.",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "50A",
+            "ampNumeric": 50,
+            "circuitName": "RAD FAN",
+            "description": "Radiator fan.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "40A",
+            "ampNumeric": 40,
+            "circuitName": "USM",
+            "description": "Controls electronic modules under the seat or other system modules.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "CVT CONT (BAT)",
+            "description": "CVT control unit.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "ENG CONT",
+            "description": "Engine control unit.",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "FUEL PUMP (HI)",
+            "description": "Fuel pump for fuel injection.",
+            "circuitRole": "FUEL_PUMP",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "RAD FAN",
+            "description": "Additional fuse for radiator fan.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "HORN",
+            "description": "Horn.",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "RAD FAN",
+            "description": "Additional fuse for radiator fan.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "VDC CONT",
+            "description": "Vehicle dynamic control system for stability and traction.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "INJECTOR-1",
+            "description": "Fuel injector circuit 1.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "INJECTOR-2",
+            "description": "Fuel injector circuit 2.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "6",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "ENG CONT",
+              "description": "Engine control unit.",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            }
+          ],
+          "sensorFeeds": [],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [
+            {
+              "cavityId": "7",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "FUEL PUMP (HI)",
+              "description": "Fuel pump for fuel injection.",
+              "circuitRole": "FUEL_PUMP",
+              "isRelay": false
+            }
+          ],
+          "ignitionFeeds": [
+            {
+              "cavityId": "2",
+              "ampRatingString": "30A",
+              "ampNumeric": 30,
+              "circuitName": "STARTER CUT",
+              "description": "Controls starter motor cut-off to prevent operation in certain conditions.",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "ecuAndSensorsSummary": {
+    "hasDedicatedEcmFeed": true,
+    "hasSensorVrefFeed": true,
+    "hasObdDlcFeed": true,
+    "hasFuelPumpRelay": true,
+    "circuitHighlights": [
+      "Dedicated ECM / Engine Control Power Feeds",
+      "OBD-II DLC Diagnostic Pin 16 Fused Power Feed",
+      "Primary Fuel Pump Control Circuit / Relay",
+      "Sensor Reference Rails & VVT / O2 Actuator Fuses"
+    ]
+  },
+  "crossVerificationStatus": {
+    "crossReferencedWithStartMyCar": false
+  }
+}

@@ -38,6 +38,10 @@ import {
   StartMyCarScope,
 } from '../utils/startMyCarReference';
 import { getStartMyCarProfile } from '../services/startMyCarKnowledgeService';
+import {
+  getFuseBoxInfoProfile,
+  crossVerifyWithStartMyCar,
+} from '../services/fuseBoxInfoKnowledgeService';
 
 export type GroundedSearchPanelMode = 'ECU_BENCH' | 'STARTMYCAR_FUSE';
 
@@ -130,6 +134,28 @@ export const GroundedSearchPanel: React.FC<GroundedSearchPanelProps> = ({
       getStartMyCarProfile(smcMake, smcModel, 2018) ||
       getStartMyCarProfile(smcMake, smcModel, 2016)
     );
+  }, [smcMake, smcModel, smcYear]);
+
+  const [oemSourceView, setOemSourceView] = useState<'STARTMYCAR' | 'FUSEBOXINFO'>('STARTMYCAR');
+  const [fbiSelectedBoxIndex, setFbiSelectedBoxIndex] = useState<number>(0);
+  const [fbiShowAllCavities, setFbiShowAllCavities] = useState<boolean>(false);
+
+  const fbiVehicleProfile = useMemo(() => {
+    if (!smcMake.trim() || !smcModel.trim()) return null;
+    const yr = Number(smcYear) || 2020;
+    return (
+      getFuseBoxInfoProfile(smcMake, smcModel, yr) ||
+      getFuseBoxInfoProfile(smcMake, smcModel, 2020) ||
+      getFuseBoxInfoProfile(smcMake, smcModel, 2019) ||
+      getFuseBoxInfoProfile(smcMake, smcModel, 2018) ||
+      getFuseBoxInfoProfile(smcMake, smcModel, 2016)
+    );
+  }, [smcMake, smcModel, smcYear]);
+
+  const dualOemCrossResult = useMemo(() => {
+    if (!smcMake.trim() || !smcModel.trim()) return null;
+    const yr = Number(smcYear) || 2020;
+    return crossVerifyWithStartMyCar(smcMake, smcModel, yr);
   }, [smcMake, smcModel, smcYear]);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -552,8 +578,176 @@ export const GroundedSearchPanel: React.FC<GroundedSearchPanelProps> = ({
 
             <ProvenanceBadgeBar provenance={startMyCarProvenance} compact />
 
+            {/* Dual-OEM Cross Verification Badge */}
+            {dualOemCrossResult && dualOemCrossResult.confidenceRating === 'DUAL_OEM_CONFIRMED' && (
+              <div className="flex items-center justify-between flex-wrap gap-2 bg-emerald-950/40 border border-emerald-500/40 px-3 py-2 rounded-[2px] text-xs">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2 font-bold text-emerald-300">
+                      <span>DUAL-OEM CROSS-VERIFIED CORRELATION</span>
+                      <span className="bg-emerald-500/20 text-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-mono">
+                        {dualOemCrossResult.commonCircuits.length} Correlated Circuits
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-slate-400">
+                      Synchronized across StartMyCar &amp; Fuse-Box.info OEM Factory Technical Data (Zero-Fabrication)
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setOemSourceView('STARTMYCAR')}
+                    className={`text-[10px] px-2 py-1 rounded-[2px] cursor-pointer font-bold border transition-colors ${
+                      oemSourceView === 'STARTMYCAR'
+                        ? 'bg-amber-500/20 text-amber-200 border-amber-500/70'
+                        : 'bg-slate-900 text-slate-400 border-slate-700 hover:text-slate-200'
+                    }`}
+                  >
+                    StartMyCar View
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setOemSourceView('FUSEBOXINFO')}
+                    className={`text-[10px] px-2 py-1 rounded-[2px] cursor-pointer font-bold border transition-colors ${
+                      oemSourceView === 'FUSEBOXINFO'
+                        ? 'bg-emerald-500/20 text-emerald-200 border-emerald-500/70'
+                        : 'bg-slate-900 text-slate-400 border-slate-700 hover:text-slate-200'
+                    }`}
+                  >
+                    Fuse-Box.info OEM View
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Offline Ingested Data Viewer */}
-            {offlineVehicleProfile && (
+            {oemSourceView === 'FUSEBOXINFO' && fbiVehicleProfile ? (
+              <div className="flex flex-col gap-2.5 bg-[#0e1116] border border-emerald-500/40 rounded-[2px] p-3 text-xs">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#2b313c] pb-2">
+                  <div className="flex items-center gap-2">
+                    <CircuitBoard className="w-4 h-4 text-emerald-400" />
+                    <span className="font-bold text-slate-100 text-[12px]">
+                      Fuse-Box.info OEM Factory Technical Spec ({fbiVehicleProfile.identification.yearsString} {fbiVehicleProfile.identification.make} {fbiVehicleProfile.identification.model} {fbiVehicleProfile.identification.chassisCode || ''})
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-[2px] border bg-emerald-950/60 text-emerald-300 border-emerald-500/40">
+                      Tier: {fbiVehicleProfile.provenance.tier}
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-400 bg-slate-800/60 px-2 py-0.5 rounded-[2px] border border-slate-700">
+                      {fbiVehicleProfile.powerDistribution.totalCavities} Cavities ({fbiVehicleProfile.powerDistribution.totalBoxes} Compartments)
+                    </span>
+                  </div>
+                </div>
+
+                {/* Box Selector Tabs */}
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {fbiVehicleProfile.powerDistribution.boxes.map((box, bIdx) => (
+                    <button
+                      key={bIdx}
+                      type="button"
+                      onClick={() => {
+                        setFbiSelectedBoxIndex(bIdx);
+                        setFbiShowAllCavities(false);
+                      }}
+                      className={`text-[10px] px-2.5 py-1 rounded-[2px] font-medium transition-colors cursor-pointer border ${
+                        fbiSelectedBoxIndex === bIdx
+                          ? 'bg-emerald-500/20 text-emerald-200 border-emerald-500/60 font-bold'
+                          : 'bg-slate-900/60 text-slate-400 border-slate-700/60 hover:text-slate-200'
+                      }`}
+                    >
+                      {box.boxTitle} ({box.cavities.length})
+                    </button>
+                  ))}
+                </div>
+
+                {/* Active FBI Cavity Table */}
+                {(() => {
+                  const currentBox =
+                    fbiVehicleProfile.powerDistribution.boxes[fbiSelectedBoxIndex] ||
+                    fbiVehicleProfile.powerDistribution.boxes[0];
+                  if (!currentBox) return null;
+
+                  const displayedCavities = fbiShowAllCavities
+                    ? currentBox.cavities
+                    : currentBox.cavities.filter(
+                        (c) =>
+                          c.circuitRole === 'ECU_POWER' ||
+                          c.circuitRole === 'SENSOR_VREF' ||
+                          c.circuitRole === 'OBD2_DLC' ||
+                          c.circuitRole === 'FUEL_PUMP' ||
+                          c.circuitRole === 'IGNITION' ||
+                          c.isRelay
+                      );
+
+                  const finalCavities =
+                    displayedCavities.length > 0 ? displayedCavities : currentBox.cavities.slice(0, 15);
+
+                  return (
+                    <div className="flex flex-col gap-2 pt-1">
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className="text-slate-300 font-semibold flex items-center gap-1.5">
+                          <span>{currentBox.boxTitle}</span>
+                          <span className="text-slate-500 font-normal">({currentBox.location})</span>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setFbiShowAllCavities(!fbiShowAllCavities)}
+                          className="text-[10px] text-emerald-400 hover:text-emerald-300 underline cursor-pointer"
+                        >
+                          {fbiShowAllCavities
+                            ? 'Show Key Powertrain & Sensor Feeds Only'
+                            : `View All ${currentBox.cavities.length} Cavities`}
+                        </button>
+                      </div>
+
+                      <div className="overflow-x-auto max-h-56 overflow-y-auto border border-[#2b313c] rounded-[2px]">
+                        <table className="w-full text-left text-[11px] border-collapse">
+                          <thead className="bg-[#1a202c] text-slate-400 text-[10px] uppercase font-semibold sticky top-0">
+                            <tr>
+                              <th className="py-1 px-2">№</th>
+                              <th className="py-1 px-2">Name / Acronym</th>
+                              <th className="py-1 px-2">Rating</th>
+                              <th className="py-1 px-2">OEM Circuit Description</th>
+                              <th className="py-1 px-2">Circuit Role</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-800 font-mono text-[11px]">
+                            {finalCavities.map((cav, cIdx) => (
+                              <tr key={cIdx} className="hover:bg-slate-800/40">
+                                <td className="py-1 px-2 font-bold text-amber-300">{cav.cavityId}</td>
+                                <td className="py-1 px-2 text-cyan-300 font-bold">{cav.circuitName || '—'}</td>
+                                <td className="py-1 px-2 text-emerald-400 font-bold">{cav.ampRatingString}</td>
+                                <td className="py-1 px-2 font-sans text-slate-200">{cav.description}</td>
+                                <td className="py-1 px-2">
+                                  <span
+                                    className={`text-[9px] px-1.5 py-0.5 rounded-[2px] font-bold ${
+                                      cav.circuitRole === 'ECU_POWER'
+                                        ? 'bg-blue-900/60 text-blue-300'
+                                        : cav.circuitRole === 'SENSOR_VREF'
+                                        ? 'bg-amber-900/60 text-amber-300'
+                                        : cav.circuitRole === 'FUEL_PUMP'
+                                        ? 'bg-emerald-900/60 text-emerald-300'
+                                        : cav.circuitRole === 'OBD2_DLC'
+                                        ? 'bg-purple-900/60 text-purple-300'
+                                        : 'bg-slate-800 text-slate-400'
+                                    }`}
+                                  >
+                                    {cav.circuitRole}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            ) : offlineVehicleProfile ? (
               <div className="flex flex-col gap-2.5 bg-[#0e1116] border border-amber-500/30 rounded-[2px] p-3 text-xs">
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#2b313c] pb-2">
                   <div className="flex items-center gap-2">
@@ -679,7 +873,7 @@ export const GroundedSearchPanel: React.FC<GroundedSearchPanelProps> = ({
                   );
                 })()}
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       ) : (

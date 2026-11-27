@@ -1,0 +1,169 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-11-27T13:44:16.077Z",
+  "sourceDomain": "fuse-box.info",
+  "totalProfiles": 17,
+  "totalCavitiesMapped": 2464,
+  "tierSummary": {
+    "verified": 17,
+    "communityUnverified": 0,
+    "lowRatingRestricted": 0
+  },
+  "brands": [
+    {
+      "brand": "Ford",
+      "makeSlug": "ford",
+      "models": [
+        {
+          "model": "F-150",
+          "modelSlug": "f-150",
+          "yearsString": "2015-2020",
+          "chassisCode": "13th Gen",
+          "filePath": "src/data/fuseboxinfo/ford/f-150/ford-f-150-2015-2018-fuses-and-relay.json"
+        },
+        {
+          "model": "F-150",
+          "modelSlug": "f-150",
+          "yearsString": "2021-2023",
+          "chassisCode": "14th Gen",
+          "filePath": "src/data/fuseboxinfo/ford/f-150/ford-f-150-2021-2022-fuses.json"
+        },
+        {
+          "model": "Ranger",
+          "modelSlug": "ranger",
+          "yearsString": "2012-2015",
+          "chassisCode": "PX1",
+          "filePath": "src/data/fuseboxinfo/ford/ranger/ford-ranger-2012-2015-fuses-and-relays.json"
+        },
+        {
+          "model": "Ranger",
+          "modelSlug": "ranger",
+          "yearsString": "2019-2023",
+          "chassisCode": "PX3",
+          "filePath": "src/data/fuseboxinfo/ford/ranger/ford-ranger-2019-fuses-and-relays.json"
+        }
+      ]
+    },
+    {
+      "brand": "Honda",
+      "makeSlug": "honda",
+      "models": [
+        {
+          "model": "Civic",
+          "modelSlug": "civic",
+          "yearsString": "2016-2021",
+          "chassisCode": "10th Gen",
+          "filePath": "src/data/fuseboxinfo/honda/civic/honda-civic-2016-2018-fuses.json"
+        },
+        {
+          "model": "CR-V",
+          "modelSlug": "cr-v",
+          "yearsString": "2017-2019",
+          "chassisCode": "5th Gen",
+          "filePath": "src/data/fuseboxinfo/honda/cr-v/honda-cr-v-2017-2018-fuses.json"
+        }
+      ]
+    },
+    {
+      "brand": "Isuzu",
+      "makeSlug": "isuzu",
+      "models": [
+        {
+          "model": "D-Max",
+          "modelSlug": "d-max",
+          "yearsString": "2017-2020",
+          "chassisCode": "RT85",
+          "filePath": "src/data/fuseboxinfo/isuzu/d-max/isuzu-mu-x-d-max-2017-2020-fuses-and-relays.json"
+        }
+      ]
+    },
+    {
+      "brand": "Nissan",
+      "makeSlug": "nissan",
+      "models": [
+        {
+          "model": "Navara",
+          "modelSlug": "navara",
+          "yearsString": "2015-2024",
+          "chassisCode": "D23",
+          "filePath": "src/data/fuseboxinfo/nissan/navara/nissan-navara-frontier-np300-d23-2015-2024-fuses.json"
+        },
+        {
+          "model": "Sentra",
+          "modelSlug": "sentra",
+          "yearsString": "2013-2019",
+          "chassisCode": "B17",
+          "filePath": "src/data/fuseboxinfo/nissan/sentra/nissan-sentra-b17-2013-2019-fuses.json"
+        },
+        {
+          "model": "Sentra",
+          "modelSlug": "sentra",
+          "yearsString": "2020-2025",
+          "chassisCode": "B18",
+          "filePath": "src/data/fuseboxinfo/nissan/sentra/nissan-sentra-b18-2020-2025-fuses.json"
+        }
+      ]
+    },
+    {
+      "brand": "Suzuki",
+      "makeSlug": "suzuki",
+      "models": [
+        {
+          "model": "Jimny",
+          "modelSlug": "jimny",
+          "yearsString": "2018-2020",
+          "chassisCode": "JB64/JB74",
+          "filePath": "src/data/fuseboxinfo/suzuki/jimny/suzuki-jimny-2018-2020-fuses.json"
+        },
+        {
+          "model": "Swift",
+          "modelSlug": "swift",
+          "yearsString": "2017-2019",
+          "chassisCode": "A2L",
+          "filePath": "src/data/fuseboxinfo/suzuki/swift/suzuki-swift-2017-2019-fuses.json"
+        }
+      ]
+    },
+    {
+      "brand": "Toyota",
+      "makeSlug": "toyota",
+      "models": [
+        {
+          "model": "Camry",
+          "modelSlug": "camry",
+          "yearsString": "2018-2024",
+          "chassisCode": "XV70",
+          "filePath": "src/data/fuseboxinfo/toyota/camry/toyota-camry-xv70-2018-2024-fuses.json"
+        },
+        {
+          "model": "Corolla",
+          "modelSlug": "corolla",
+          "yearsString": "2019-2022",
+          "chassisCode": "E210",
+          "filePath": "src/data/fuseboxinfo/toyota/corolla/toyota-corolla-e210-2019-2022-fuses.json"
+        },
+        {
+          "model": "Corolla",
+          "modelSlug": "corolla",
+          "yearsString": "2023-2025",
+          "chassisCode": "E210 Facelift",
+          "filePath": "src/data/fuseboxinfo/toyota/corolla/toyota-corolla-e210-2023-2025-fuses.json"
+        },
+        {
+          "model": "Hilux",
+          "modelSlug": "hilux",
+          "yearsString": "2015-2019",
+          "chassisCode": "AN120/AN130",
+          "filePath": "src/data/fuseboxinfo/toyota/hilux/toyota-hilux-an120-an130-2015-2019-fuses-and-relay.json"
+        },
+        {
+          "model": "RAV4",
+          "modelSlug": "rav4",
+          "yearsString": "2019-2025",
+          "chassisCode": "XA50",
+          "filePath": "src/data/fuseboxinfo/toyota/rav4/toyota-rav4-xa50-2019-2025-fuses.json"
+        }
+      ]
+    }
+  ]
+}

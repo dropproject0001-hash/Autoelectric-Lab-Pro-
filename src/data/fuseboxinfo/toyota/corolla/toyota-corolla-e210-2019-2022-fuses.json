@@ -1,0 +1,1491 @@
+{
+  "schemaVersion": "1.0.0",
+  "provenance": {
+    "source": "FuseBoxInfo",
+    "sourceUrl": "https://fuse-box.info/toyota/toyota-corolla-e210-2019-2022-fuses",
+    "wpPostId": 66832,
+    "crawledAt": "2026-11-27T13:43:47.633Z",
+    "zeroFabricationIntegrity": true,
+    "tier": "VERIFIED",
+    "deduplicationStatus": "AUGMENTED_EXISTING",
+    "matchedRepositoryRecordId": "preset-toyota-corolla"
+  },
+  "identification": {
+    "make": "Toyota",
+    "makeSlug": "toyota",
+    "model": "Corolla",
+    "modelSlug": "corolla",
+    "yearsString": "2019-2022",
+    "yearStart": 2019,
+    "yearEnd": 2022,
+    "chassisCode": "E210",
+    "rawTitle": "Toyota Corolla (E210; 2019-2022) fuses"
+  },
+  "powerDistribution": {
+    "totalBoxes": 3,
+    "totalCavities": 126,
+    "boxes": [
+      {
+        "boxIndex": 0,
+        "boxTitle": "Assignment of the fuses in the instrument panel",
+        "location": "INSTRUMENT_PANEL",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "FOG RR",
+            "description": "Rear fog lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "OBD",
+            "description": "On-board diagnostics",
+            "circuitRole": "OBD2_DLC",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "DOME",
+            "description": "Dome light and interior light",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "DOOR BACK",
+            "description": "DOOR BACK",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "ECU-DCC NO.2",
+            "description": "Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "ECU-DCC NO.1",
+            "description": "Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "RADIO",
+            "description": "Radio and audio system",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "DOOR R/R",
+            "description": "Rear right door",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "STRG LOCK",
+            "description": "Steering lock",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "ECU-ACC",
+            "description": "Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "ECU-IG1 NO.3",
+            "description": "Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "EPS-IG1",
+            "description": "Electric power steering",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "A/BAG-IG2",
+            "description": "Airbag",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "METER-IG2",
+            "description": "Instrument cluster",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "ECU-IG2 NO.3",
+            "description": "Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "ECU-B NO.2",
+            "description": "Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "ECU-B NO.1",
+            "description": "Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "D/L",
+            "description": "Power door lock system",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "STOP",
+            "description": "Stop lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "AM2",
+            "description": "Starter system",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "HAZ",
+            "description": "Hazard light",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "PANEL",
+            "description": "Instrument panel lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "TAIL",
+            "description": "Tail lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "DOOR",
+            "description": "Power door lock system",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "DOOR R/L",
+            "description": "Rear left door",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "P/OUTLET NO.1",
+            "description": "Cigar lighter / power outlet",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "SFT LOCK-ACC",
+            "description": "AT Shift lock control system",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "WASHER",
+            "description": "Windshield washer",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "WIPER RR",
+            "description": "Rear wiper",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "ECU-IG1 NO.4",
+            "description": "Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "34",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "BKUP LP",
+            "description": "Backup lights",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "ECU-IG1 NO.2",
+            "description": "Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "36",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "ECU-IG1 NO.1",
+            "description": "Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "6",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "ECU-DCC NO.2",
+              "description": "Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "7",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "ECU-DCC NO.1",
+              "description": "Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "13",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "ECU-ACC",
+              "description": "Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "14",
+              "ampRatingString": "7.5A",
+              "ampNumeric": 7.5,
+              "circuitName": "ECU-IG1 NO.3",
+              "description": "Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "18",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "ECU-IG2 NO.3",
+              "description": "Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "19",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "ECU-B NO.2",
+              "description": "Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "20",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "ECU-B NO.1",
+              "description": "Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "33",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "ECU-IG1 NO.4",
+              "description": "Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "35",
+              "ampRatingString": "7.5A",
+              "ampNumeric": 7.5,
+              "circuitName": "ECU-IG1 NO.2",
+              "description": "Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "36",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "ECU-IG1 NO.1",
+              "description": "Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            }
+          ],
+          "sensorFeeds": [],
+          "obdFeeds": [
+            {
+              "cavityId": "2",
+              "ampRatingString": "7.5A",
+              "ampNumeric": 7.5,
+              "circuitName": "OBD",
+              "description": "On-board diagnostics",
+              "circuitRole": "OBD2_DLC",
+              "isRelay": false
+            }
+          ],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": [
+            {
+              "cavityId": "23",
+              "ampRatingString": "7.5A",
+              "ampNumeric": 7.5,
+              "circuitName": "AM2",
+              "description": "Starter system",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 1,
+        "boxTitle": "Assignment of the fuses in the Engine Compartment",
+        "location": "ENGINE_COMPARTMENT",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "ABS-MAIN",
+            "description": "Anti-lock braking system",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "EFI NO.1",
+            "description": "Multiport fuel injection system",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "VVT",
+            "description": "VVT",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "D INJ",
+            "description": "D INJ",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "HORN",
+            "description": "Horn",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "EFI-MAIN NO.3",
+            "description": "Multiport fuel injection system",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "CM/MAYDAY",
+            "description": "Data communication module (telematics system)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "H-LP LH",
+            "description": "Left-hand headlight",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "H-LP RH",
+            "description": "Right-hand headlight",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "AMP",
+            "description": "Audio system",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "50A",
+            "ampNumeric": 50,
+            "circuitName": "J/B-B",
+            "description": "Junction box bus",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "80A",
+            "ampNumeric": 80,
+            "circuitName": "EPS",
+            "description": "Electric power steering",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "D/C CUT",
+            "description": "D/C CUT",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "DRL",
+            "description": "Daytime running lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "S-HORN",
+            "description": "Horn / anti-theft deterrent",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "H-LP HI",
+            "description": "Headlights high beam",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "25A",
+            "ampNumeric": 25,
+            "circuitName": "EFI-MAIN NO.1",
+            "description": "Multiport fuel injection system",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "ST",
+            "description": "Starter system",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "25A",
+            "ampNumeric": 25,
+            "circuitName": "EFI-MAIN NO.2",
+            "description": "Multiport fuel injection system",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "WIPER",
+            "description": "Wipers",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "IG2-MAIN",
+            "description": "Protects several circuits",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "EFI NO.5",
+            "description": "Multiport fuel injection system",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "INJ",
+            "description": "INJ",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "ECU-IG2 NO.1",
+            "description": "Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "34",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "EFI NO.2",
+            "description": "Multiport fuel injection system",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "EFI NO.3",
+            "description": "Multiport fuel injection system",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "36",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "MIR HTR",
+            "description": "Mirror heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "37",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "STRG LOCK-IG2",
+            "description": "Steering lock",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "39",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "EFI NO.4",
+            "description": "Multiport fuel injection system",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "43",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "STRG HTR",
+            "description": "Heated steering wheel",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "44",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "P/OUTLET NO.2",
+            "description": "Cigar lighter / power outlet",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "46",
+            "ampRatingString": "40A",
+            "ampNumeric": 40,
+            "circuitName": "HTR",
+            "description": "Air conditioning system",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "47",
+            "ampRatingString": "50A",
+            "ampNumeric": 50,
+            "circuitName": "ABS MTR NO.1",
+            "description": "Anti-lock braking system",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "48",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "PTC HTR NO.3",
+            "description": "Additional heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "49",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "S/HTR RR",
+            "description": "Rear seat heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "53",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "DEICER",
+            "description": "Deicer or defroster",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "54",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "DOOR DBL/L",
+            "description": "Door double locking",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "55",
+            "ampRatingString": "25A",
+            "ampNumeric": 25,
+            "circuitName": "S/HTR-MAIN",
+            "description": "Seat heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "56",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "PTC HTR NO.2",
+            "description": "Additional heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "57",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "FAN NO.2",
+            "description": "Electric cooling fan",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "58",
+            "ampRatingString": "50A",
+            "ampNumeric": 50,
+            "circuitName": "PTC HTR NO.1",
+            "description": "Additional heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "59",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "FAN NO.1",
+            "description": "Electric cooling fan",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "61",
+            "ampRatingString": "50A",
+            "ampNumeric": 50,
+            "circuitName": "DEF",
+            "description": "Rear window defogger",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "2",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "EFI NO.1",
+              "description": "Multiport fuel injection system",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "4",
+              "ampRatingString": "20A",
+              "ampNumeric": 20,
+              "circuitName": "D INJ",
+              "description": "D INJ",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "7",
+              "ampRatingString": "30A",
+              "ampNumeric": 30,
+              "circuitName": "EFI-MAIN NO.3",
+              "description": "Multiport fuel injection system",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "26",
+              "ampRatingString": "25A",
+              "ampNumeric": 25,
+              "circuitName": "EFI-MAIN NO.1",
+              "description": "Multiport fuel injection system",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "28",
+              "ampRatingString": "25A",
+              "ampNumeric": 25,
+              "circuitName": "EFI-MAIN NO.2",
+              "description": "Multiport fuel injection system",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "31",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "EFI NO.5",
+              "description": "Multiport fuel injection system",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "33",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "ECU-IG2 NO.1",
+              "description": "Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "34",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "EFI NO.2",
+              "description": "Multiport fuel injection system",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "35",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "EFI NO.3",
+              "description": "Multiport fuel injection system",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "39",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "EFI NO.4",
+              "description": "Multiport fuel injection system",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            }
+          ],
+          "sensorFeeds": [
+            {
+              "cavityId": "3",
+              "ampRatingString": "20A",
+              "ampNumeric": 20,
+              "circuitName": "VVT",
+              "description": "VVT",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            }
+          ],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": [
+            {
+              "cavityId": "27",
+              "ampRatingString": "30A",
+              "ampNumeric": 30,
+              "circuitName": "ST",
+              "description": "Starter system",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 2,
+        "boxTitle": "Assignment of the fuses in the Engine Compartment (Hybrid)",
+        "location": "ENGINE_COMPARTMENT",
+        "cavities": [
+          {
+            "cavityId": "F1",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "P/OUTLET NO.2",
+            "description": "Cigar lighter / power outlet",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F3",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "DOOR DBL/L",
+            "description": "Door double locking",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F4",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "DEICER",
+            "description": "Deicer or defroster",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F5",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "FUEL OPN",
+            "description": "Fuel lid opener",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F6",
+            "ampRatingString": "25A",
+            "ampNumeric": 25,
+            "circuitName": "S/HTR-MAIN",
+            "description": "Seat heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F7",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "STRG HTR",
+            "description": "Heated steering wheel",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F8",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "FOG FR",
+            "description": "Front fog lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F10",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "ENG W/PMP",
+            "description": "ENG W/PMP",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F11",
+            "ampRatingString": "50A",
+            "ampNumeric": 50,
+            "circuitName": "DEF-MAIN",
+            "description": "Rear window defogger",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F12",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "PTC HTR NO.3",
+            "description": "Additional heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F14",
+            "ampRatingString": "40A",
+            "ampNumeric": 40,
+            "circuitName": "HTR",
+            "description": "Air conditioning system",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F15",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "PTC HTR NO.2",
+            "description": "Additional heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F18",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "FAN NO.2",
+            "description": "Electric cooling fan",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F19",
+            "ampRatingString": "50A",
+            "ampNumeric": 50,
+            "circuitName": "PTC HTR NO.1",
+            "description": "Additional heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F20",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "FAN NO.1",
+            "description": "Electric cooling fan",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F22",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "STRG LOCK-IG2",
+            "description": "Steering lock",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F23",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "S/HTR F/L",
+            "description": "Front seat heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F24",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "S/HTR F/R",
+            "description": "Seat heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F25",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "EFI NO.2",
+            "description": "Multiport fuel injection system",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F26",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "EFI NO.3",
+            "description": "Multiport fuel injection system",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F27",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "INJ",
+            "description": "Fuel injectors",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F28",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "ECU-IG2 NO.1",
+            "description": "Engine control unit",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F29",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "PM-IGCT",
+            "description": "PM-IGCT",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F30",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "IGCT NO.2",
+            "description": "IGCT NO.2",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F31",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "BATT FAN",
+            "description": "BATT FAN",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F32",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "PCU FR",
+            "description": "PCU FR",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F33",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "INV W/PMP",
+            "description": "INV W/PMP",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F36",
+            "ampRatingString": "40A",
+            "ampNumeric": 40,
+            "circuitName": "IGCT-IG",
+            "description": "IGCT-IG",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F37",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "ABS MTR NO.3",
+            "description": "Anti-lock braking system",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F38",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "ABS MTR NO.1",
+            "description": "Anti-lock braking system",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F40",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "S-HORN",
+            "description": "Horn / anti-theft deterrent",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F41",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "WIPER",
+            "description": "Wipers",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F42",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "ETCS",
+            "description": "Electronic throttle control system",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F43",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "HORN",
+            "description": "Horn",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F44",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "EFI-MAIN",
+            "description": "Multiport fuel injection system",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F45",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "H-LP HI",
+            "description": "Headlights high beam",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F46",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "D/C CUT",
+            "description": "D/C CUT",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F47",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "IG2-MAIN",
+            "description": "Protects several circuits",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F49",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "DRL",
+            "description": "Daytime running lights",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F50",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "BATT-S",
+            "description": "Battery and charging system",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F52",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "S/HTR RR",
+            "description": "Rear seat heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F53",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "ABS NO.3",
+            "description": "Anti-lock braking system",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F54",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "ABS NO.2",
+            "description": "Anti-lock braking system",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F55",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "DCM/MAYDAY",
+            "description": "Data communication module (telematics system)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F56",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "H-LP RH",
+            "description": "Right-hand headlight",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F57",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "H-LP LH",
+            "description": "Left-hand headlight",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F58",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "ABS MTR NO.2",
+            "description": "Anti-lock braking system",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F59",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "ABS-MAIN",
+            "description": "Anti-lock braking system",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F60",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "EPB",
+            "description": "Electronic Parking Brake",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "F61",
+            "ampRatingString": "50A",
+            "ampNumeric": 50,
+            "circuitName": "J/B-B",
+            "description": "Junction box bus",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "F25",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "EFI NO.2",
+              "description": "Multiport fuel injection system",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "F26",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "EFI NO.3",
+              "description": "Multiport fuel injection system",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "F28",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "ECU-IG2 NO.1",
+              "description": "Engine control unit",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "F44",
+              "ampRatingString": "20A",
+              "ampNumeric": 20,
+              "circuitName": "EFI-MAIN",
+              "description": "Multiport fuel injection system",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            }
+          ],
+          "sensorFeeds": [
+            {
+              "cavityId": "F42",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "ETCS",
+              "description": "Electronic throttle control system",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            }
+          ],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": []
+        }
+      }
+    ]
+  },
+  "ecuAndSensorsSummary": {
+    "hasDedicatedEcmFeed": true,
+    "hasSensorVrefFeed": true,
+    "hasObdDlcFeed": true,
+    "hasFuelPumpRelay": false,
+    "circuitHighlights": [
+      "Dedicated ECM / Engine Control Power Feeds",
+      "OBD-II DLC Diagnostic Pin 16 Fused Power Feed",
+      "Sensor Reference Rails & VVT / O2 Actuator Fuses"
+    ]
+  },
+  "crossVerificationStatus": {
+    "crossReferencedWithStartMyCar": true,
+    "startMyCarMatchingFile": "src/data/startmycar/toyota/corolla/2020.json",
+    "confirmedCavitiesCount": 126
+  }
+}

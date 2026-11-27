@@ -1,0 +1,803 @@
+{
+  "schemaVersion": "1.0.0",
+  "provenance": {
+    "source": "FuseBoxInfo",
+    "sourceUrl": "https://fuse-box.info/suzuki/suzuki-jimny-2018-2020-fuses",
+    "wpPostId": 51396,
+    "crawledAt": "2026-11-27T13:43:58.677Z",
+    "zeroFabricationIntegrity": true,
+    "tier": "VERIFIED",
+    "deduplicationStatus": "NEW_RECORD"
+  },
+  "identification": {
+    "make": "Suzuki",
+    "makeSlug": "suzuki",
+    "model": "Jimny",
+    "modelSlug": "jimny",
+    "yearsString": "2018-2020",
+    "yearStart": 2018,
+    "yearEnd": 2020,
+    "chassisCode": "JB64/JB74",
+    "rawTitle": "Suzuki Jimny (2018-2020-…) fuses"
+  },
+  "powerDistribution": {
+    "totalBoxes": 2,
+    "totalCavities": 71,
+    "boxes": [
+      {
+        "boxIndex": 0,
+        "boxTitle": "Assignment of the fuses in the instrument panel fuse box",
+        "location": "INSTRUMENT_PANEL",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Power window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Meter",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Engine Control Module",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Ignition-1 signal 2",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Spare",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not Used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not Used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Door lock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Steering lock",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Hazard",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not Used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Rear fog lamp",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "ABS/ESP control module",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Seat heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Ignition-1 signal 3",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Dome light-2",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Dome light",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Radio",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "CONT",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Key 2",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Power window timer",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Key",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Horn",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Tail light (Left)",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Tail light",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Airbag",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "lgnition-1 signal",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Back-up light",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "ACC-3",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Rear defogger",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Heated mirror",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "ACC-2",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "ACC",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "34",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Rear wiper",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Ignition-2 signal",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "36",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Washer",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "37",
+            "ampRatingString": "25A",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Front wiper",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "38",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Stop light",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "3",
+              "ampRatingString": "15A",
+              "ampNumeric": 15,
+              "circuitName": "",
+              "description": "Engine Control Module",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            }
+          ],
+          "sensorFeeds": [],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": [
+            {
+              "cavityId": "4",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Ignition-1 signal 2",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "15",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Ignition-1 signal 3",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "27",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "lgnition-1 signal",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "35",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Ignition-2 signal",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 1,
+        "boxTitle": "Assignment of the fuses in the engine compartment fuse box",
+        "location": "ENGINE_COMPARTMENT",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "120A",
+            "ampNumeric": 120,
+            "circuitName": "",
+            "description": "FL1",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "100A",
+            "ampNumeric": 100,
+            "circuitName": "",
+            "description": "FL2",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "80A",
+            "ampNumeric": 80,
+            "circuitName": "",
+            "description": "FL3",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "100A",
+            "ampNumeric": 100,
+            "circuitName": "",
+            "description": "FL4",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "50A",
+            "ampNumeric": 50,
+            "circuitName": "",
+            "description": "FL5",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "50A",
+            "ampNumeric": 50,
+            "circuitName": "",
+            "description": "Ignition switch",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "40A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "ABS motor",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not Used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Blower fan",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Starter motor",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Headlight cleaner",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Headlight (Right)",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Headlight (Left)",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "25A",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "ABS/ESP control module",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not Used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Ignition coil",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "25A",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Headlight high",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Back up",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not Used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Fuel injection",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Transmission",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "50A",
+            "ampNumeric": 50,
+            "circuitName": "",
+            "description": "Ignition sw2",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "A/C compressor",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "4WD",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Front fog light",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not Used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "40A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Power steering",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not Used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "40A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Radiator fan",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not Used",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Starter motor",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Headlight high (Left)",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Headlight high (Right)",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [],
+          "sensorFeeds": [],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": [
+            {
+              "cavityId": "6",
+              "ampRatingString": "50A",
+              "ampNumeric": 50,
+              "circuitName": "",
+              "description": "Ignition switch",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "10",
+              "ampRatingString": "30A",
+              "ampNumeric": 30,
+              "circuitName": "",
+              "description": "Starter motor",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "16",
+              "ampRatingString": "15A",
+              "ampNumeric": 15,
+              "circuitName": "",
+              "description": "Ignition coil",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "22",
+              "ampRatingString": "50A",
+              "ampNumeric": 50,
+              "circuitName": "",
+              "description": "Ignition sw2",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "31",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Starter motor",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "ecuAndSensorsSummary": {
+    "hasDedicatedEcmFeed": true,
+    "hasSensorVrefFeed": false,
+    "hasObdDlcFeed": false,
+    "hasFuelPumpRelay": false,
+    "circuitHighlights": [
+      "Dedicated ECM / Engine Control Power Feeds"
+    ]
+  },
+  "crossVerificationStatus": {
+    "crossReferencedWithStartMyCar": true,
+    "startMyCarMatchingFile": "src/data/startmycar/suzuki/jimny/2020.json",
+    "confirmedCavitiesCount": 71
+  }
+}

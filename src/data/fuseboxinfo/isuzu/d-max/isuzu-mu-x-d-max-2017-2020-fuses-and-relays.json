@@ -1,0 +1,974 @@
+{
+  "schemaVersion": "1.0.0",
+  "provenance": {
+    "source": "FuseBoxInfo",
+    "sourceUrl": "https://fuse-box.info/isuzu/isuzu-mu-x-d-max-2017-2020-fuses-and-relays",
+    "wpPostId": 63506,
+    "crawledAt": "2026-11-27T13:43:57.372Z",
+    "zeroFabricationIntegrity": true,
+    "tier": "VERIFIED",
+    "deduplicationStatus": "NEW_RECORD"
+  },
+  "identification": {
+    "make": "Isuzu",
+    "makeSlug": "isuzu",
+    "model": "D-Max",
+    "modelSlug": "d-max",
+    "yearsString": "2017-2020",
+    "yearStart": 2017,
+    "yearEnd": 2020,
+    "chassisCode": "RT85",
+    "rawTitle": "Isuzu MU-X / D-Max (2017-2020) fuses and relays"
+  },
+  "powerDistribution": {
+    "totalBoxes": 2,
+    "totalCavities": 88,
+    "boxes": [
+      {
+        "boxIndex": 0,
+        "boxTitle": "Assignment of the fuses in the passenger compartment",
+        "location": "INSTRUMENT_PANEL",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Without Passive Entry and Start System: KEY INT LOCK",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "CIGAR LIGHTER",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "AUDIO",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "ELEC (IG2)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "H/LAMP LEVELING / RR WIPER",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "TURN LIGHT",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "TRAILER / H/LAMP LEVELING",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "15A/20A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "SPARE FUSE / SEAT HEATER",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "PESS",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "BACK LIGHT",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "ENGINE (IG)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "METER",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "TCM",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "4WD",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "ABS",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Without Passive Entry and Start System: FRT WIPER",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "SRS",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "DRL",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "ELEC (IG1)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "ACC SOCKET",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "DOOR LOCK",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "10A/20A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "With Passive Entry and Start System: ESC\nWithout Passive Entry and Start System: PESS (+B) / SPARE FUSE",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "10A/20A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Without Passive Entry and Start System: Starter",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "BCM",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "AUDIO (+B)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "ROOM",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "4WD (+B)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "METER (+B)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "With Passive Entry and Start System: IFL1 AUDIO & CIGAR (ACC)",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "POWER SEAT",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "RR DEFOGGER",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "POWER WINDOW",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "IR1",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "IR1",
+            "description": "ACC SOCKET",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "IR2",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "IR2",
+            "description": "RR DEFOGGER",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "IR3",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "IR3",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "IR4",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "IR4",
+            "description": "POWER WINDOW",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "IR5",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "IR5",
+            "description": "FRT WIPER",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "IR6",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "IR6",
+            "description": "IG1",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "IR7",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "IR7",
+            "description": "IG2",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "IR8",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "IR8",
+            "description": "ACC",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "IR9",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "IR9",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "IR10",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "IR10",
+            "description": "ESC",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "IR11",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "IR11",
+            "description": "RR WIPER",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "IR12",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "IR12",
+            "description": "RR COOLER",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [],
+          "sensorFeeds": [],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": [
+            {
+              "cavityId": "1",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "Without Passive Entry and Start System: KEY INT LOCK",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "16",
+              "ampRatingString": "20A",
+              "ampNumeric": 20,
+              "circuitName": "",
+              "description": "Without Passive Entry and Start System: FRT WIPER",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "22",
+              "ampRatingString": "10A/20A",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "With Passive Entry and Start System: ESC\nWithout Passive Entry and Start System: PESS (+B) / SPARE FUSE",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "23",
+              "ampRatingString": "10A/20A",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "Without Passive Entry and Start System: Starter",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "29",
+              "ampRatingString": "20A",
+              "ampNumeric": 20,
+              "circuitName": "",
+              "description": "With Passive Entry and Start System: IFL1 AUDIO & CIGAR (ACC)",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 1,
+        "boxTitle": "Assignment of the fuses in the engine compartment",
+        "location": "ENGINE_COMPARTMENT",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "H/LIGHT RH LO",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "H/LIGHT LH LO",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "PCV HEATER\nWith Passive Entry and Start System: PESS (+B)",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "10A/15A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "ENGINE",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "10A/20A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "RR FOG LIGHT\nWith Passive Entry and Start System: FRT WIPER",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "20 A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "TRAILER",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "With Passive Entry and Start System: STRG LOCK\nWithout Passive Entry and Start System: ESC",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "FRT FOG LIGHT",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "FRT WIPER / RR COOLER",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "STOP LIGHT",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "HAZARD",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "HORN",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "IBS / RR FOG LIGHT",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "10A/15A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "TCM_B / DRM B",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "H/LIGHT LH HI",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "H/LIGHT RH HI",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "TAIL LIGHT LH / ILLUMI",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "TAIL LIGHT RH",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "A/C",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "120A",
+            "ampNumeric": 120,
+            "circuitName": "",
+            "description": "MAIN",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "60A",
+            "ampNumeric": 60,
+            "circuitName": "",
+            "description": "IG-2",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "60A",
+            "ampNumeric": 60,
+            "circuitName": "",
+            "description": "GLOW",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "BLOWER",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "50A",
+            "ampNumeric": 50,
+            "circuitName": "",
+            "description": "ABS_1 / ESC_1",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "40A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "ECM",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "ABS_2 / ESC_2",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "30A/40A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "IG-1",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "SPARE FUSE",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "SPARE FUSE",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "SPARE FUSE",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "ER1",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "ER1",
+            "description": "HEATER",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "ER2",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "ER2",
+            "description": "ECM MAIN",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "ER3",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "ER3",
+            "description": "GLOW",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "ER4",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "ER4",
+            "description": "STARTER",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "ER5",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "ER5",
+            "description": "DRL1",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "ER6",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "ER6",
+            "description": "STARTER CUT",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "ER7",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "ER7",
+            "description": "DIMMER",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "ER8",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "ER8",
+            "description": "H/LIGHT",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "ER9",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "ER9",
+            "description": "TAIL LIGHT",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "ER10",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "ER10",
+            "description": "FOG LIGHT",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "ER11",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "ER11",
+            "description": "HORN",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "ER12",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "ER12",
+            "description": "A/C COMPRESSOR",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "ER13",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "ER13",
+            "description": "THERMO",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "ER14",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "ER14",
+            "description": "RR FOG LIGHT",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "25",
+              "ampRatingString": "40A",
+              "ampNumeric": 40,
+              "circuitName": "",
+              "description": "ECM",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "ER2",
+              "ampRatingString": "—",
+              "ampNumeric": null,
+              "circuitName": "ER2",
+              "description": "ECM MAIN",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            }
+          ],
+          "sensorFeeds": [],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": [
+            {
+              "cavityId": "3",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "PCV HEATER\nWith Passive Entry and Start System: PESS (+B)",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "5",
+              "ampRatingString": "10A/20A",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "RR FOG LIGHT\nWith Passive Entry and Start System: FRT WIPER",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "7",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "With Passive Entry and Start System: STRG LOCK\nWithout Passive Entry and Start System: ESC",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "ER4",
+              "ampRatingString": "—",
+              "ampNumeric": null,
+              "circuitName": "ER4",
+              "description": "STARTER",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "ER6",
+              "ampRatingString": "—",
+              "ampNumeric": null,
+              "circuitName": "ER6",
+              "description": "STARTER CUT",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "ecuAndSensorsSummary": {
+    "hasDedicatedEcmFeed": true,
+    "hasSensorVrefFeed": false,
+    "hasObdDlcFeed": false,
+    "hasFuelPumpRelay": false,
+    "circuitHighlights": [
+      "Dedicated ECM / Engine Control Power Feeds"
+    ]
+  },
+  "crossVerificationStatus": {
+    "crossReferencedWithStartMyCar": true,
+    "startMyCarMatchingFile": "src/data/startmycar/isuzu/d-max/2020.json",
+    "confirmedCavitiesCount": 62
+  }
+}

@@ -1,0 +1,2070 @@
+{
+  "schemaVersion": "1.0.0",
+  "provenance": {
+    "source": "FuseBoxInfo",
+    "sourceUrl": "https://fuse-box.info/toyota/toyota-hilux-an120-an130-2015-2019-fuses-and-relay",
+    "wpPostId": 19544,
+    "crawledAt": "2026-11-27T13:43:49.057Z",
+    "zeroFabricationIntegrity": true,
+    "tier": "VERIFIED",
+    "deduplicationStatus": "AUGMENTED_EXISTING",
+    "matchedRepositoryRecordId": "preset-toyota-hilux"
+  },
+  "identification": {
+    "make": "Toyota",
+    "makeSlug": "toyota",
+    "model": "Hilux",
+    "modelSlug": "hilux",
+    "yearsString": "2015-2019",
+    "yearStart": 2015,
+    "yearEnd": 2019,
+    "chassisCode": "AN120/AN130",
+    "rawTitle": "Toyota Hilux (AN120/AN130; 2015-2019..) fuses and relays"
+  },
+  "powerDistribution": {
+    "totalBoxes": 6,
+    "totalCavities": 151,
+    "boxes": [
+      {
+        "boxIndex": 0,
+        "boxTitle": "Assignment of the fuses in the Passenger Compartment",
+        "location": "INSTRUMENT_PANEL",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "25",
+            "ampNumeric": 25,
+            "circuitName": "DOOR NO.2",
+            "description": "Power Window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "25",
+            "ampNumeric": 25,
+            "circuitName": "DOOR R/L",
+            "description": "Power Window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "25",
+            "ampNumeric": 25,
+            "circuitName": "DOOR R/R",
+            "description": "Power Window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "30",
+            "ampNumeric": 30,
+            "circuitName": "DOOR NO.1",
+            "description": "Power Window",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "ETCS",
+            "description": "1GR-FE, 1KD-FTV, 2KD-FTV, 1TR-FE, 2TR-FE, 5L-E:  Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "25",
+            "ampNumeric": 25,
+            "circuitName": "EFI-MAIN NO.1",
+            "description": "1GD-FTV, 2GD-FTV:  ABS, Air Conditioner, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Hill-Start Assist Control, TRC, VSC",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "25",
+            "ampNumeric": 25,
+            "circuitName": "EFI-MAIN NO.1",
+            "description": "1GR-FE, 1KD-FTV, 2KD-FTV, 1TR-FE, 2TR-FE, 5L-E:  ABS, Air Conditioner, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Hill-Start Assist Control, TRC, VSC",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "25",
+            "ampNumeric": 25,
+            "circuitName": "EFI-MAIN NO.2",
+            "description": "1GD-FTV, 2GD-FTV:  Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "TURN&HAZ",
+            "description": "Turn Signal and Hazard Warning Light, Combination Meter, Door Lock Control, Entry &. Start System, Immobiliser System, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "30",
+            "ampNumeric": 30,
+            "circuitName": "AM2 NO.2",
+            "description": "Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "40",
+            "ampNumeric": 40,
+            "circuitName": "HTR",
+            "description": "Air Conditioner, Charging",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "40",
+            "ampNumeric": 40,
+            "circuitName": "AM1",
+            "description": "Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "TAIL",
+            "description": "1GR-FE, 1KD-FTV, 2KD-FTV, 1TR-FE, 2TR-FE, 5L-E:  Taillight, Illumination, Automatic Light Control, Charging, Entry & Start System, Front Fog Light, Immobiliser System, Key Reminder, Light Reminder, Rear Fog Light, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "ECU-ALT NO.2",
+            "description": "1GD-FTV, 2GD-FTV:  Door Lock Control, Power Window, Theft Deterrent",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "FOG FR/DRL",
+            "description": "Front Fog Light, Headlight, Illumination, Taillight",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "ECU-ALT NO.2",
+            "description": "1GR-FE, 1KD-FTV, 2KD-FTV, 1TR-FE, 2TR-FE, 5L-E:  Door Lock Control, Power Window, Theft Deterrent",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "TAIL",
+            "description": "1GD-FTV, 2GD-FTV:  Taillight, Illumination, Automatic Light Control, Charging, Entry &. Start System, Front Fog Light, Immobiliser System, Key Reminder, Light Reminder, Rear Fog Light, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "OBD",
+            "description": "On-Board Diagnosis System",
+            "circuitRole": "OBD2_DLC",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "EFI NO.1",
+            "description": "ABS, Air Conditioner, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Hill-Start Assist Control, Stop & Start System, TRC, VSC",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "IG2 NO.1",
+            "description": "Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "METER",
+            "description": "Combination Meter, 4WD, ABS, Air Conditioner (Automatic), Audio System, Charging, Door Lock Control, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry 8t Start System, Headlight, Headlight Beam Level Control (Automatic), Headlight Cleaner, Hill-Start Assist Control, Illumination, Immobiliser System, Interior Light, Key Reminder, Lane Departure Alert, Light Reminder, Navigation System, Pre-Collision System, Rear View Monitor System, Seat Belt Warning, SRS, Starting, Steering Lock, Stop & Start System, Taillight, Telematics System, Theft Deterrent, Tire Pressure Warning System, TRC, Turn Signal and Hazard Warning Light, VSC, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "A/BAG",
+            "description": "SRS Airbag System",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "IG2 NO.3",
+            "description": "Charging, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Immobiliser System, Multiplex Communication System, Telematics System",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "SFT LOCK-ACC",
+            "description": "Shift Lock",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "15",
+            "ampNumeric": 15,
+            "circuitName": "P/OUTLET NO.1",
+            "description": "Power Outlet",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "IG2 NO.2",
+            "description": "Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "25",
+            "ampNumeric": 25,
+            "circuitName": "WIPER",
+            "description": "Front Wiper and Washer",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "IG1 NO.1",
+            "description": "Audio System, Back-Up Light, Charging, Combination Meter, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Lane Departure Alert, Navigation System, Rear View Monitor System",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "-",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "IG1 NO.3",
+            "description": "ABS, Downhill Assist Control, Hill-Start Assist Control, Stop & Start System, TRC, VSC",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "IG1 NO.4",
+            "description": "Air Conditioner, Audio System, Automatic Light Control, Charging, Combination Meter, Door Lock Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Front Fog Light, Headlight, Headlight Beam Level Control (Automatic), Headlight Cleaner, Illumination, Immobiliser System, Interior Light, Mirror Heater, Multiplex Communication System, Navigation System, Power Outlet, Power Window, Rear Fog Light, Rear View Monitor System, Rear Window Defogger, Seat Belt Warning, SRS, Starting, Steering Lock, Stop & Start System, Taillight, Theft Deterrent, Tire Pressure Warning System, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "15",
+            "ampNumeric": 15,
+            "circuitName": "WASHER",
+            "description": "Front Wiper and Washer",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "IG1 NO.2",
+            "description": "Charging, Shift Lock",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "5",
+              "ampRatingString": "25",
+              "ampNumeric": 25,
+              "circuitName": "EFI-MAIN NO.1",
+              "description": "1GD-FTV, 2GD-FTV:  ABS, Air Conditioner, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Hill-Start Assist Control, TRC, VSC",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "6",
+              "ampRatingString": "25",
+              "ampNumeric": 25,
+              "circuitName": "EFI-MAIN NO.1",
+              "description": "1GR-FE, 1KD-FTV, 2KD-FTV, 1TR-FE, 2TR-FE, 5L-E:  ABS, Air Conditioner, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Hill-Start Assist Control, TRC, VSC",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "6",
+              "ampRatingString": "25",
+              "ampNumeric": 25,
+              "circuitName": "EFI-MAIN NO.2",
+              "description": "1GD-FTV, 2GD-FTV:  Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "11",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "ECU-ALT NO.2",
+              "description": "1GD-FTV, 2GD-FTV:  Door Lock Control, Power Window, Theft Deterrent",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "13",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "ECU-ALT NO.2",
+              "description": "1GR-FE, 1KD-FTV, 2KD-FTV, 1TR-FE, 2TR-FE, 5L-E:  Door Lock Control, Power Window, Theft Deterrent",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "15",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "EFI NO.1",
+              "description": "ABS, Air Conditioner, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Hill-Start Assist Control, Stop & Start System, TRC, VSC",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            }
+          ],
+          "sensorFeeds": [],
+          "obdFeeds": [
+            {
+              "cavityId": "14",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "OBD",
+              "description": "On-Board Diagnosis System",
+              "circuitRole": "OBD2_DLC",
+              "isRelay": false
+            }
+          ],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": [
+            {
+              "cavityId": "7",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "TURN&HAZ",
+              "description": "Turn Signal and Hazard Warning Light, Combination Meter, Door Lock Control, Entry &. Start System, Immobiliser System, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "8",
+              "ampRatingString": "30",
+              "ampNumeric": 30,
+              "circuitName": "AM2 NO.2",
+              "description": "Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "10",
+              "ampRatingString": "40",
+              "ampNumeric": 40,
+              "circuitName": "AM1",
+              "description": "Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "11",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "TAIL",
+              "description": "1GR-FE, 1KD-FTV, 2KD-FTV, 1TR-FE, 2TR-FE, 5L-E:  Taillight, Illumination, Automatic Light Control, Charging, Entry & Start System, Front Fog Light, Immobiliser System, Key Reminder, Light Reminder, Rear Fog Light, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "13",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "TAIL",
+              "description": "1GD-FTV, 2GD-FTV:  Taillight, Illumination, Automatic Light Control, Charging, Entry &. Start System, Front Fog Light, Immobiliser System, Key Reminder, Light Reminder, Rear Fog Light, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "17",
+              "ampRatingString": "5",
+              "ampNumeric": 5,
+              "circuitName": "METER",
+              "description": "Combination Meter, 4WD, ABS, Air Conditioner (Automatic), Audio System, Charging, Door Lock Control, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry 8t Start System, Headlight, Headlight Beam Level Control (Automatic), Headlight Cleaner, Hill-Start Assist Control, Illumination, Immobiliser System, Interior Light, Key Reminder, Lane Departure Alert, Light Reminder, Navigation System, Pre-Collision System, Rear View Monitor System, Seat Belt Warning, SRS, Starting, Steering Lock, Stop & Start System, Taillight, Telematics System, Theft Deterrent, Tire Pressure Warning System, TRC, Turn Signal and Hazard Warning Light, VSC, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "22",
+              "ampRatingString": "5",
+              "ampNumeric": 5,
+              "circuitName": "IG2 NO.2",
+              "description": "Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "26",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "IG1 NO.3",
+              "description": "ABS, Downhill Assist Control, Hill-Start Assist Control, Stop & Start System, TRC, VSC",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "27",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "IG1 NO.4",
+              "description": "Air Conditioner, Audio System, Automatic Light Control, Charging, Combination Meter, Door Lock Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Front Fog Light, Headlight, Headlight Beam Level Control (Automatic), Headlight Cleaner, Illumination, Immobiliser System, Interior Light, Mirror Heater, Multiplex Communication System, Navigation System, Power Outlet, Power Window, Rear Fog Light, Rear View Monitor System, Rear Window Defogger, Seat Belt Warning, SRS, Starting, Steering Lock, Stop & Start System, Taillight, Theft Deterrent, Tire Pressure Warning System, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 1,
+        "boxTitle": "Passenger Compartment Relay Box №1",
+        "location": "INSTRUMENT_PANEL",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "25",
+            "ampNumeric": 25,
+            "circuitName": "DCU NO.1",
+            "description": "Urea Pump Control ECU",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "DCU NO.2",
+            "description": "Urea Pump Control ECU",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "NOX PM",
+            "description": "Nitrogen Oxides Sensor",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "7.5",
+            "ampNumeric": 7.5,
+            "circuitName": "DCU-B",
+            "description": "Urea Pump Control ECU",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "DEF-S",
+            "description": "Mirror Heater, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "FOG RR",
+            "description": "Rear Fog Light",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "15",
+            "ampNumeric": 15,
+            "circuitName": "DEICER",
+            "description": "Windshield Wiper De-icer",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "25",
+            "ampNumeric": 25,
+            "circuitName": "DEF",
+            "description": "Rear Window Defogger, Mirror Heater, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Cavity-9",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "Cavity-9",
+            "description": "(Unassigned / Spare)",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Relay",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "Relay",
+            "description": "(Unassigned / Spare)",
+            "circuitRole": "IGNITION",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R1",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R1",
+            "description": "Urea Pump (DCU-MAIN)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R2",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R2",
+            "description": "Nitrogen Oxides Sensor (NOX PM)",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R3",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R3",
+            "description": "Windshield Wiper De-icer (DEICER)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R4",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R4",
+            "description": "Rear fog light (FOG RR)",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R5",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R5",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R6",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R6",
+            "description": "Inverter (INV)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R7",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R7",
+            "description": "Rear Window Defogger, Mirror Heater (DEF)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "1",
+              "ampRatingString": "25",
+              "ampNumeric": 25,
+              "circuitName": "DCU NO.1",
+              "description": "Urea Pump Control ECU",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "2",
+              "ampRatingString": "20",
+              "ampNumeric": 20,
+              "circuitName": "DCU NO.2",
+              "description": "Urea Pump Control ECU",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "4",
+              "ampRatingString": "7.5",
+              "ampNumeric": 7.5,
+              "circuitName": "DCU-B",
+              "description": "Urea Pump Control ECU",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            }
+          ],
+          "sensorFeeds": [
+            {
+              "cavityId": "3",
+              "ampRatingString": "20",
+              "ampNumeric": 20,
+              "circuitName": "NOX PM",
+              "description": "Nitrogen Oxides Sensor",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "R2",
+              "ampRatingString": "Relay",
+              "ampNumeric": null,
+              "circuitName": "R2",
+              "description": "Nitrogen Oxides Sensor (NOX PM)",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": true
+            }
+          ],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": [
+            {
+              "cavityId": "Cavity-9",
+              "ampRatingString": "—",
+              "ampNumeric": null,
+              "circuitName": "Cavity-9",
+              "description": "(Unassigned / Spare)",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "Relay",
+              "ampRatingString": "Relay",
+              "ampNumeric": null,
+              "circuitName": "Relay",
+              "description": "(Unassigned / Spare)",
+              "circuitRole": "IGNITION",
+              "isRelay": true
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 2,
+        "boxTitle": "Passenger Compartment Relay Box №2",
+        "location": "INSTRUMENT_PANEL",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "5",
+            "ampNumeric": 5,
+            "circuitName": "ACC",
+            "description": "4WD, ABS, Air Conditioner, Audio System, Charging, Clock, Combination Meter, Door Lock Control, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Headlight, Headlight Beam Level Control (Automatic), Headlight Cleaner, Hill-Start Assist Control, Illumination, Immobiliser System, Interior Light, Key Reminder, Lane Departure Alert, Light Reminder, Multiplex Communication System, Navigation System, Pre-Collision System, Rear View Monitor System, Remote Control Mirror, Seat Belt Warning, SRS, Starting, Steering Lock, Stop & Start System, Taillight, Telematics System, Theft Deterrent, Tire Pressure Warning System, TRC, Turn Signal and Hazard Warning Light, VSC, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "A/C",
+            "description": "Air Conditioner (Manual)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "ECU-IG2 / \nC/OPN NO.2",
+            "description": "Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "7.5",
+            "ampNumeric": 7.5,
+            "circuitName": "STA/WIPER-S",
+            "description": "Starting, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "-",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "4WD-IG",
+            "description": "4WD",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "15",
+            "ampNumeric": 15,
+            "circuitName": "S/HTR",
+            "description": "Before Aug. 2017:  Seat Heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "15",
+            "ampNumeric": 15,
+            "circuitName": "S/HTR / \nS/VENT",
+            "description": "From Aug. 2017:  Seat Heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "IG1 NO.5",
+            "description": "Air Conditioner, Lane Departure Alert, Pre-Collision System",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Cavity-10",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "(Unassigned / Spare)",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Relay",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "Relay",
+            "description": "(Unassigned / Spare)",
+            "circuitRole": "IGNITION",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R1",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R1",
+            "description": "Heater (HTR)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R2",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R2",
+            "description": "Ignition (IG1 NO.2)",
+            "circuitRole": "IGNITION",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R3",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R3",
+            "description": "Ignition (IG2)",
+            "circuitRole": "IGNITION",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R4",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R4",
+            "description": "LHD:  Heated Steering Wheel (STRG HTR)",
+            "circuitRole": "CHASSIS",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R5",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R5",
+            "description": "Air Conditioner (A/C COMP)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "3",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "ECU-IG2 / \nC/OPN NO.2",
+              "description": "Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            }
+          ],
+          "sensorFeeds": [],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": [
+            {
+              "cavityId": "1",
+              "ampRatingString": "5",
+              "ampNumeric": 5,
+              "circuitName": "ACC",
+              "description": "4WD, ABS, Air Conditioner, Audio System, Charging, Clock, Combination Meter, Door Lock Control, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Headlight, Headlight Beam Level Control (Automatic), Headlight Cleaner, Hill-Start Assist Control, Illumination, Immobiliser System, Interior Light, Key Reminder, Lane Departure Alert, Light Reminder, Multiplex Communication System, Navigation System, Pre-Collision System, Rear View Monitor System, Remote Control Mirror, Seat Belt Warning, SRS, Starting, Steering Lock, Stop & Start System, Taillight, Telematics System, Theft Deterrent, Tire Pressure Warning System, TRC, Turn Signal and Hazard Warning Light, VSC, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "4",
+              "ampRatingString": "7.5",
+              "ampNumeric": 7.5,
+              "circuitName": "STA/WIPER-S",
+              "description": "Starting, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "Cavity-10",
+              "ampRatingString": "—",
+              "ampNumeric": null,
+              "circuitName": "",
+              "description": "(Unassigned / Spare)",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "Relay",
+              "ampRatingString": "Relay",
+              "ampNumeric": null,
+              "circuitName": "Relay",
+              "description": "(Unassigned / Spare)",
+              "circuitRole": "IGNITION",
+              "isRelay": true
+            },
+            {
+              "cavityId": "R2",
+              "ampRatingString": "Relay",
+              "ampNumeric": null,
+              "circuitName": "R2",
+              "description": "Ignition (IG1 NO.2)",
+              "circuitRole": "IGNITION",
+              "isRelay": true
+            },
+            {
+              "cavityId": "R3",
+              "ampRatingString": "Relay",
+              "ampNumeric": null,
+              "circuitName": "R3",
+              "description": "Ignition (IG2)",
+              "circuitRole": "IGNITION",
+              "isRelay": true
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 3,
+        "boxTitle": "Passenger Compartment Relay Box №3",
+        "location": "INSTRUMENT_PANEL",
+        "cavities": [
+          {
+            "cavityId": "R1",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R1",
+            "description": "PTC Heater (PTC HTR NO.1)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R2",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R2",
+            "description": "PTC Heater (PTC HTR NO.3)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R3",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R3",
+            "description": "PTC Heater (PTC HTR NO.2)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R4",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R4",
+            "description": "Viscous Heater (VISCOUS)",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R5",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R5",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R6",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R6",
+            "description": "Door Lock (D/L NO.1)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R7",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R7",
+            "description": "Door Lock (D/L NO.2)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R8",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R8",
+            "description": "RHD:  Door Lock (D/L NO.2)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R9",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R9",
+            "description": "RHD: -",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [],
+          "sensorFeeds": [],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": []
+        }
+      },
+      {
+        "boxIndex": 4,
+        "boxTitle": "Passenger Compartment Relay Box №4",
+        "location": "INSTRUMENT_PANEL",
+        "cavities": [
+          {
+            "cavityId": "R1",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R1",
+            "description": "Daytime Running Light (DRL)",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R2",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R2",
+            "description": "Theft Deterrent (S-HORN)",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R3",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R3",
+            "description": "Front Fog Lights (FOG FR)",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R4",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R4",
+            "description": "Taillight (TAIL)",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R5",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R5",
+            "description": "Interior Lights (DOME CUT)",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R6",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R6",
+            "description": "Ignition (IG1 NO.1)",
+            "circuitRole": "IGNITION",
+            "isRelay": true
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [],
+          "sensorFeeds": [],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": [
+            {
+              "cavityId": "R6",
+              "ampRatingString": "Relay",
+              "ampNumeric": null,
+              "circuitName": "R6",
+              "description": "Ignition (IG1 NO.1)",
+              "circuitRole": "IGNITION",
+              "isRelay": true
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 5,
+        "boxTitle": "Assignment of the fuses in the Engine Compartment",
+        "location": "ENGINE_COMPARTMENT",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "-",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "-",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "-",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "INV",
+            "description": "Power Outlet (Voltage Inverter)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "ECU-ALT NO.1",
+            "description": "Double Locking",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "-",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "STOP",
+            "description": "From Aug. 2017:  Stop Light, ABS, TRC, VSC, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Charging, Downhill Assist Control, Entry & Start System, Hill-Start Assist Control, Immobiliser System, Shift Lock, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "STOP",
+            "description": "Before Aug. 2017:  Stop Light, ABS, TRC, VSC, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Charging, Downhill Assist Control, Entry & Start System, Hill-Start Assist Control, Immobiliser System, Shift Lock, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "STRG HTR",
+            "description": "From Aug. 2017:  Heated Steering Wheel",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "4WD-ALT",
+            "description": "4WD",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "ECU-B NO.1",
+            "description": "4WD, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, ABS, Air Conditioner (Automatic), Audio System, Charging, Clock, Combination Meter, Door Lock Control, Double Locking, Downhill Assist Control, Entry & Start System, Headlight, Headlight Beam Level Control (Automatic), Headlight Cleaner, Hill-Start Assist Control, Illumination, Immobiliser System, Interior Light, Key Reminder, Lane Departure Alert, Light Reminder, Navigation System, Pre-Collision System, Rear View Monitor System, Seat Belt Warning, SRS, Starting, Steering Lock, Stop & Start System, Taillight, Telematics System, Theft Deterrent, Tire Pressure Warning System, TRC, Turn Signal and Hazard Warning Light, VSC, Wireless Door Lock Control",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "RADIO",
+            "description": "Audio System, Navigation System, Rear View Monitor System",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "DOME",
+            "description": "Immobiliser System, Entry & Start System, Interior Light, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "H-LP RH-LO",
+            "description": "Right-Hand Headlight (Low Beam)",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "H-LP LH-LO",
+            "description": "Left-Hand Headlight (Low Beam), Headlight Beam Level Control, Headlight Cleaner",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "H-LP RH-HI",
+            "description": "Right-Hand Headlight (High Beam)",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "H-LP LH-HI",
+            "description": "Left-Hand Headlight (High Beam)",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "7.5",
+            "ampNumeric": 7.5,
+            "circuitName": "S-HORN",
+            "description": "Theft Deterrent",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "7.5",
+            "ampNumeric": 7.5,
+            "circuitName": "MAYDAY",
+            "description": "Telematics System",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "HORN",
+            "description": "Horn, Entry & Start System, Immobiliser System, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "7.5",
+            "ampNumeric": 7.5,
+            "circuitName": "EFI-B",
+            "description": "Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "7.5",
+            "ampNumeric": 7.5,
+            "circuitName": "ALT-S/ICS",
+            "description": "Charging",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "7.5",
+            "ampNumeric": 7.5,
+            "circuitName": "SMART",
+            "description": "Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "ECU-B NO.3",
+            "description": "Air Conditioner (Automatic), Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Immobiliser System, Mirror Heater, Multiplex Communication System, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "20",
+            "ampNumeric": 20,
+            "circuitName": "A/F HTR",
+            "description": "1GR-FE, 1TR-FE, 2TR-FE:  Air Fuel Ratio Sensor",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "25",
+            "ampNumeric": 25,
+            "circuitName": "EDU",
+            "description": "1GD-FTV, 2GD-FTV, 1KD-FTV, 2KD-FTV, 5L-E:  Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "STRG LOCK/ AM2 NO.1",
+            "description": "Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "15",
+            "ampNumeric": 15,
+            "circuitName": "INJ",
+            "description": "1GR-FE, 1TR-FE, 2TR-FE:  Combination Meter, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Ignition",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "30",
+            "ampNumeric": 30,
+            "circuitName": "ST NO.2",
+            "description": "2GD-FTV with Stop & Start System:  Entry 8t Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "10",
+            "ampNumeric": 10,
+            "circuitName": "ECU-B NO.2",
+            "description": "Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "25",
+            "ampNumeric": 25,
+            "circuitName": "ECU-B NO.4",
+            "description": "Automatic Light Control, Door Lock Control, Entry & Start System, Front Fog Light, Headlight, Illumination, Immobiliser System, Interior Light, Power Window, Rear Fog Light, Starting, Steering Lock, Taillight, Theft Deterrent, Wireless Door Lock Control",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "-",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "30",
+            "ampNumeric": 30,
+            "circuitName": "D/C CUT",
+            "description": "\"ECU-B NO.1\", \"RADIO\", \"DOME\" Fuses",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "7.5",
+            "ampNumeric": 7.5,
+            "circuitName": "ODS",
+            "description": "Occupant Detection ECU",
+            "circuitRole": "ECU_POWER",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "30",
+            "ampNumeric": 30,
+            "circuitName": "P/SEAT",
+            "description": "Before Aug. 2017:  Power Seat",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "30",
+            "ampNumeric": 30,
+            "circuitName": "P/SEAT(D)",
+            "description": "From Aug. 2017:  Power Seat",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "30",
+            "ampNumeric": 30,
+            "circuitName": "PTC HTR NO.2",
+            "description": "PTC Heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "34",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "-",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "50",
+            "ampNumeric": 50,
+            "circuitName": "ABS NO.1",
+            "description": "ABS, TRC, VSC, Downhill Assist Control, Hill-Start Assist Control",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "36",
+            "ampRatingString": "30",
+            "ampNumeric": 30,
+            "circuitName": "ABS NO.2",
+            "description": "ABS, TRC, VSC, Downhill Assist Control, Hill-Start Assist Control",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "37",
+            "ampRatingString": "30",
+            "ampNumeric": 30,
+            "circuitName": "R/B I/P-ALT",
+            "description": "\"IG1 NO.2\" Relay: \"4WD-IG\", \"S/HTR\", \"S/HTR/S/VENT\", \"IG1 NO.5\" Fuses",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "38",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "-",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "39",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "-",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "40",
+            "ampRatingString": "50",
+            "ampNumeric": 50,
+            "circuitName": "PTC HTR NO.1",
+            "description": "PTC Heater",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "41",
+            "ampRatingString": "80",
+            "ampNumeric": 80,
+            "circuitName": "GLOW",
+            "description": "Glow System",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "42",
+            "ampRatingString": "60",
+            "ampNumeric": 60,
+            "circuitName": "J/B-B",
+            "description": "\"EFI-MAIN NO.1\" Relay, \"EFI-MAIN NO.2\" Relay, \"EFI-MAIN NO.1\", \"EFI-MAIN NO.2\", \"TURN&HAZ\", \"ETCS\", \"EFI NO.1\", \"AM2 NO.2\" Fuses",
+            "circuitRole": "ECU_POWER",
+            "isRelay": true
+          },
+          {
+            "cavityId": "43",
+            "ampRatingString": "30",
+            "ampNumeric": 30,
+            "circuitName": "H-LP CLN",
+            "description": "Headlight Cleaner",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "45",
+            "ampRatingString": "50",
+            "ampNumeric": 50,
+            "circuitName": "R/B FLOOR-ALT",
+            "description": "\"DEF\" Relay, \"DEF\", \"FOG RR\", \"DEICER\", \"DEF-S\" Fuses",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "46",
+            "ampRatingString": "140",
+            "ampNumeric": 140,
+            "circuitName": "ALT",
+            "description": "\"P/W\" Relay, \"ACC\" Relay, \"R/B FLOOR-ALT', \"R/B I/P-ALT\", \"4WD-ALT\", \"INV\", \"ABS NO.1\", \"ABS NO.2\", \"STOP\", \"P/SEAT\", \"P/SEAT (D)\", \"H-LP CLN\", \"STRG HTR\", \"ECU-ALT NO.1\", \"PTC HTR NO.1\", \"PTC HTR NO.2\", \"CDS FAN/PTC HTR NO.3\", \"HTR\", \"DOOR R/L\", \"DOOR NO.1\", \"DOOR R/R\", \"DOOR NO.2\", \"FOG FR/DRL\", \"TAIL\", \"OBD\", \"ECU-ALT NO.2\", \"AM1\", \"P/OUTLET NO.1\", \"SFT LOCK-ACC\" Fuses",
+            "circuitRole": "ECU_POWER",
+            "isRelay": true
+          },
+          {
+            "cavityId": "47",
+            "ampRatingString": "40",
+            "ampNumeric": 40,
+            "circuitName": "BBC NO.3",
+            "description": "Stop & Start System",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "48",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "-",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "49",
+            "ampRatingString": "40",
+            "ampNumeric": 40,
+            "circuitName": "BBC NO.1",
+            "description": "Stop & Start System",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "50",
+            "ampRatingString": "30",
+            "ampNumeric": 30,
+            "circuitName": "ST NO.1",
+            "description": "1GR-FE, 1TR-FE, 2TR-FE:  Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "50",
+            "ampRatingString": "50",
+            "ampNumeric": 50,
+            "circuitName": "ST NO.1",
+            "description": "1GD-FTV, 2GD-FTV, 1KD-FTV, 2KD-FTV, 5L-E:  Entry &   Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "51",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "-",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "52",
+            "ampRatingString": "-",
+            "ampNumeric": null,
+            "circuitName": "-",
+            "description": "-",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "53",
+            "ampRatingString": "50",
+            "ampNumeric": 50,
+            "circuitName": "AIR PMP",
+            "description": "Air Pump",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "53",
+            "ampRatingString": "50",
+            "ampNumeric": 50,
+            "circuitName": "DCU-MAIN",
+            "description": "\"DCU-MAIN\" Relay, \"DCU NO.1\", \"DCU NO.2\", \"DCU-B\", \"NOX PM\" Fuses",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": true
+          },
+          {
+            "cavityId": "54",
+            "ampRatingString": "40",
+            "ampNumeric": 40,
+            "circuitName": "H-LP MAIN",
+            "description": "\"H-LP\" Relay, \"DIMMER\" Relay, \"H-LP LH-LO\", \"H-LP RH-LO\", \"H-LP LH-HI\", \"H-LP RH-HI\" Fuses",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "Cavity-60",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "(Unassigned / Spare)",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Relay",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "Relay",
+            "description": "(Unassigned / Spare)",
+            "circuitRole": "IGNITION",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R1",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R1",
+            "description": "Dimmer",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R2",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R2",
+            "description": "Headlight (H-LP)",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R3",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R3",
+            "description": "1GD-FTV, 2GD-FTV, 1KD-FTV, 2KD-FTV, 5L-E: Starter (ST NO.1)",
+            "circuitRole": "IGNITION",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R4",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R4",
+            "description": "1GR-FE, 1TR-FE, 2TR-FE: Starter (ST NO.1) \n2GD-FTV with Stop & Start System: Starter (ST NO.2)",
+            "circuitRole": "IGNITION",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R5",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R5",
+            "description": "Stop Lights / Electric cooling fan (STOP/CDS FAN)",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R6",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R6",
+            "description": "1GR-FE, 1TR-FE, 2TR-FE:  Fuel Injector (INJ) \n 1GD-FTV, 2GD-FTV, 1KD-FTV, 2KD-FTV, 5L-E:  Injector Driver (EDU)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R7",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R7",
+            "description": "Horn",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R8",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R8",
+            "description": "1GD-FTV, 2GD-FTV, 1KD-FTV, 2KD-FTV, 5L-E:  Glow System (GLOW) \n 1GR-FE, 1TR-FE, 2TR-FE:  Fuel Pump / Air Pump (FUEL PMP/AIR PMP HTR)",
+            "circuitRole": "FUEL_PUMP",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R9",
+            "ampRatingString": "Relay",
+            "ampNumeric": null,
+            "circuitName": "R9",
+            "description": "1GR-FE, 1TR-FE, 2TR-FE:  Air Fuel Ratio Sensor (A/F HTR)",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": true
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [
+            {
+              "cavityId": "5",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "ECU-ALT NO.1",
+              "description": "Double Locking",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "10",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "ECU-B NO.1",
+              "description": "4WD, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, ABS, Air Conditioner (Automatic), Audio System, Charging, Clock, Combination Meter, Door Lock Control, Double Locking, Downhill Assist Control, Entry & Start System, Headlight, Headlight Beam Level Control (Automatic), Headlight Cleaner, Hill-Start Assist Control, Illumination, Immobiliser System, Interior Light, Key Reminder, Lane Departure Alert, Light Reminder, Navigation System, Pre-Collision System, Rear View Monitor System, Seat Belt Warning, SRS, Starting, Steering Lock, Stop & Start System, Taillight, Telematics System, Theft Deterrent, Tire Pressure Warning System, TRC, Turn Signal and Hazard Warning Light, VSC, Wireless Door Lock Control",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "20",
+              "ampRatingString": "7.5",
+              "ampNumeric": 7.5,
+              "circuitName": "EFI-B",
+              "description": "Multiport Fuel Injection System/Sequential Multiport Fuel Injection System",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "23",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "ECU-B NO.3",
+              "description": "Air Conditioner (Automatic), Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Immobiliser System, Mirror Heater, Multiplex Communication System, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "27",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "ECU-B NO.2",
+              "description": "Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "28",
+              "ampRatingString": "25",
+              "ampNumeric": 25,
+              "circuitName": "ECU-B NO.4",
+              "description": "Automatic Light Control, Door Lock Control, Entry & Start System, Front Fog Light, Headlight, Illumination, Immobiliser System, Interior Light, Power Window, Rear Fog Light, Starting, Steering Lock, Taillight, Theft Deterrent, Wireless Door Lock Control",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "30",
+              "ampRatingString": "30",
+              "ampNumeric": 30,
+              "circuitName": "D/C CUT",
+              "description": "\"ECU-B NO.1\", \"RADIO\", \"DOME\" Fuses",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "31",
+              "ampRatingString": "7.5",
+              "ampNumeric": 7.5,
+              "circuitName": "ODS",
+              "description": "Occupant Detection ECU",
+              "circuitRole": "ECU_POWER",
+              "isRelay": false
+            },
+            {
+              "cavityId": "42",
+              "ampRatingString": "60",
+              "ampNumeric": 60,
+              "circuitName": "J/B-B",
+              "description": "\"EFI-MAIN NO.1\" Relay, \"EFI-MAIN NO.2\" Relay, \"EFI-MAIN NO.1\", \"EFI-MAIN NO.2\", \"TURN&HAZ\", \"ETCS\", \"EFI NO.1\", \"AM2 NO.2\" Fuses",
+              "circuitRole": "ECU_POWER",
+              "isRelay": true
+            },
+            {
+              "cavityId": "46",
+              "ampRatingString": "140",
+              "ampNumeric": 140,
+              "circuitName": "ALT",
+              "description": "\"P/W\" Relay, \"ACC\" Relay, \"R/B FLOOR-ALT', \"R/B I/P-ALT\", \"4WD-ALT\", \"INV\", \"ABS NO.1\", \"ABS NO.2\", \"STOP\", \"P/SEAT\", \"P/SEAT (D)\", \"H-LP CLN\", \"STRG HTR\", \"ECU-ALT NO.1\", \"PTC HTR NO.1\", \"PTC HTR NO.2\", \"CDS FAN/PTC HTR NO.3\", \"HTR\", \"DOOR R/L\", \"DOOR NO.1\", \"DOOR R/R\", \"DOOR NO.2\", \"FOG FR/DRL\", \"TAIL\", \"OBD\", \"ECU-ALT NO.2\", \"AM1\", \"P/OUTLET NO.1\", \"SFT LOCK-ACC\" Fuses",
+              "circuitRole": "ECU_POWER",
+              "isRelay": true
+            }
+          ],
+          "sensorFeeds": [
+            {
+              "cavityId": "24",
+              "ampRatingString": "20",
+              "ampNumeric": 20,
+              "circuitName": "A/F HTR",
+              "description": "1GR-FE, 1TR-FE, 2TR-FE:  Air Fuel Ratio Sensor",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "53",
+              "ampRatingString": "50",
+              "ampNumeric": 50,
+              "circuitName": "DCU-MAIN",
+              "description": "\"DCU-MAIN\" Relay, \"DCU NO.1\", \"DCU NO.2\", \"DCU-B\", \"NOX PM\" Fuses",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": true
+            },
+            {
+              "cavityId": "R9",
+              "ampRatingString": "Relay",
+              "ampNumeric": null,
+              "circuitName": "R9",
+              "description": "1GR-FE, 1TR-FE, 2TR-FE:  Air Fuel Ratio Sensor (A/F HTR)",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": true
+            }
+          ],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [
+            {
+              "cavityId": "R8",
+              "ampRatingString": "Relay",
+              "ampNumeric": null,
+              "circuitName": "R8",
+              "description": "1GD-FTV, 2GD-FTV, 1KD-FTV, 2KD-FTV, 5L-E:  Glow System (GLOW) \n 1GR-FE, 1TR-FE, 2TR-FE:  Fuel Pump / Air Pump (FUEL PMP/AIR PMP HTR)",
+              "circuitRole": "FUEL_PUMP",
+              "isRelay": true
+            }
+          ],
+          "ignitionFeeds": [
+            {
+              "cavityId": "7",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "STOP",
+              "description": "From Aug. 2017:  Stop Light, ABS, TRC, VSC, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Charging, Downhill Assist Control, Entry & Start System, Hill-Start Assist Control, Immobiliser System, Shift Lock, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "8",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "STOP",
+              "description": "Before Aug. 2017:  Stop Light, ABS, TRC, VSC, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Charging, Downhill Assist Control, Entry & Start System, Hill-Start Assist Control, Immobiliser System, Shift Lock, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "12",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "DOME",
+              "description": "Immobiliser System, Entry & Start System, Interior Light, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "19",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "HORN",
+              "description": "Horn, Entry & Start System, Immobiliser System, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "22",
+              "ampRatingString": "7.5",
+              "ampNumeric": 7.5,
+              "circuitName": "SMART",
+              "description": "Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "25",
+              "ampRatingString": "10",
+              "ampNumeric": 10,
+              "circuitName": "STRG LOCK/ AM2 NO.1",
+              "description": "Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "26",
+              "ampRatingString": "15",
+              "ampNumeric": 15,
+              "circuitName": "INJ",
+              "description": "1GR-FE, 1TR-FE, 2TR-FE:  Combination Meter, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Ignition",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "26",
+              "ampRatingString": "30",
+              "ampNumeric": 30,
+              "circuitName": "ST NO.2",
+              "description": "2GD-FTV with Stop & Start System:  Entry 8t Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "35",
+              "ampRatingString": "50",
+              "ampNumeric": 50,
+              "circuitName": "ABS NO.1",
+              "description": "ABS, TRC, VSC, Downhill Assist Control, Hill-Start Assist Control",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "36",
+              "ampRatingString": "30",
+              "ampNumeric": 30,
+              "circuitName": "ABS NO.2",
+              "description": "ABS, TRC, VSC, Downhill Assist Control, Hill-Start Assist Control",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "47",
+              "ampRatingString": "40",
+              "ampNumeric": 40,
+              "circuitName": "BBC NO.3",
+              "description": "Stop & Start System",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "49",
+              "ampRatingString": "40",
+              "ampNumeric": 40,
+              "circuitName": "BBC NO.1",
+              "description": "Stop & Start System",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "50",
+              "ampRatingString": "30",
+              "ampNumeric": 30,
+              "circuitName": "ST NO.1",
+              "description": "1GR-FE, 1TR-FE, 2TR-FE:  Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "50",
+              "ampRatingString": "50",
+              "ampNumeric": 50,
+              "circuitName": "ST NO.1",
+              "description": "1GD-FTV, 2GD-FTV, 1KD-FTV, 2KD-FTV, 5L-E:  Entry &   Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "Cavity-60",
+              "ampRatingString": "—",
+              "ampNumeric": null,
+              "circuitName": "",
+              "description": "(Unassigned / Spare)",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "Relay",
+              "ampRatingString": "Relay",
+              "ampNumeric": null,
+              "circuitName": "Relay",
+              "description": "(Unassigned / Spare)",
+              "circuitRole": "IGNITION",
+              "isRelay": true
+            },
+            {
+              "cavityId": "R3",
+              "ampRatingString": "Relay",
+              "ampNumeric": null,
+              "circuitName": "R3",
+              "description": "1GD-FTV, 2GD-FTV, 1KD-FTV, 2KD-FTV, 5L-E: Starter (ST NO.1)",
+              "circuitRole": "IGNITION",
+              "isRelay": true
+            },
+            {
+              "cavityId": "R4",
+              "ampRatingString": "Relay",
+              "ampNumeric": null,
+              "circuitName": "R4",
+              "description": "1GR-FE, 1TR-FE, 2TR-FE: Starter (ST NO.1) \n2GD-FTV with Stop & Start System: Starter (ST NO.2)",
+              "circuitRole": "IGNITION",
+              "isRelay": true
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "ecuAndSensorsSummary": {
+    "hasDedicatedEcmFeed": true,
+    "hasSensorVrefFeed": true,
+    "hasObdDlcFeed": true,
+    "hasFuelPumpRelay": true,
+    "circuitHighlights": [
+      "Dedicated ECM / Engine Control Power Feeds",
+      "OBD-II DLC Diagnostic Pin 16 Fused Power Feed",
+      "Primary Fuel Pump Control Circuit / Relay",
+      "Sensor Reference Rails & VVT / O2 Actuator Fuses"
+    ]
+  },
+  "crossVerificationStatus": {
+    "crossReferencedWithStartMyCar": true,
+    "startMyCarMatchingFile": "src/data/startmycar/toyota/hilux/2019.json",
+    "confirmedCavitiesCount": 148
+  }
+}

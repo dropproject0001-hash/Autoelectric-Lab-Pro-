@@ -1,0 +1,4734 @@
+{
+  "schemaVersion": "1.0.0",
+  "provenance": {
+    "source": "FuseBoxInfo",
+    "sourceUrl": "https://fuse-box.info/ford/ford-f-150-2015-2018-fuses-and-relay",
+    "wpPostId": 14345,
+    "crawledAt": "2026-11-27T13:43:52.560Z",
+    "zeroFabricationIntegrity": true,
+    "tier": "VERIFIED",
+    "deduplicationStatus": "AUGMENTED_EXISTING",
+    "matchedRepositoryRecordId": "preset-ford-f-150"
+  },
+  "identification": {
+    "make": "Ford",
+    "makeSlug": "ford",
+    "model": "F-150",
+    "modelSlug": "f-150",
+    "yearsString": "2015-2020",
+    "yearStart": 2015,
+    "yearEnd": 2020,
+    "chassisCode": "13th Gen",
+    "rawTitle": "Ford F-150 (2015-2020) fuses and relays"
+  },
+  "powerDistribution": {
+    "totalBoxes": 6,
+    "totalCavities": 457,
+    "boxes": [
+      {
+        "boxIndex": 0,
+        "boxTitle": "Assignment of the fuses in the Passenger compartment (2016)",
+        "location": "INSTRUMENT_PANEL",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Demand lamp relay. Power seats relay. Glove box. Vanity lamps. Overhead console. Dome. Courtesy. Map lamps.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": true
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "",
+            "description": "Memory module logic. Memory seat switches. Lumbar motor.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Driver door lock motor.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Trailer brake control.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Not used (spare).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Combined sensor module.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "7.5 A",
+            "ampNumeric": 7.5,
+            "circuitName": "",
+            "description": "Climate head module. Smart datalink converter.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "7.5 A",
+            "ampNumeric": 7.5,
+            "circuitName": "",
+            "description": "Cluster. SCCM.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Brake.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Smart datalink converter.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Tailgate release.",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "HUD.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Ignition switch and passive-entry passive-start start stop switch. Key inhibit solenoid.",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "7.5 A",
+            "ampNumeric": 7.5,
+            "circuitName": "",
+            "description": "Tow haul (O/D) cancel for floor or column shifter.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "7.5 A",
+            "ampNumeric": 7.5,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "HUD. In car temperature with humidity sensor.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "EPB. Power seat.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "PDRG switch. Inverter. Driver side window. Moonroof. Vista roof.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Central lock/unlock.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Driver door control module.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Passenger door control module.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Vista roof. Moonroof.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Adjustable pedal switch and motor.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Multi-function display. Global position system. Sync 1. Sync 2. Radio frequency receiver.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Radio.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "34",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Run-start relay.",
+            "circuitRole": "IGNITION",
+            "isRelay": true
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Restraints module.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "36",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "360 camera module. Heated steering wheel module. Rear-view mirror. Rear heated seats.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "37",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Power distribution box run-start fuses.",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "38",
+            "ampRatingString": "30A Circuit breaker.",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Rear window switches and motors.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [],
+          "sensorFeeds": [
+            {
+              "cavityId": "1",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "Demand lamp relay. Power seats relay. Glove box. Vanity lamps. Overhead console. Dome. Courtesy. Map lamps.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": true
+            },
+            {
+              "cavityId": "11",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Combined sensor module.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "21",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "HUD. In car temperature with humidity sensor.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "31",
+              "ampRatingString": "15A",
+              "ampNumeric": 15,
+              "circuitName": "",
+              "description": "Adjustable pedal switch and motor.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "36",
+              "ampRatingString": "15A",
+              "ampNumeric": 15,
+              "circuitName": "",
+              "description": "360 camera module. Heated steering wheel module. Rear-view mirror. Rear heated seats.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            }
+          ],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": [
+            {
+              "cavityId": "18",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Ignition switch and passive-entry passive-start start stop switch. Key inhibit solenoid.",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "34",
+              "ampRatingString": "30A",
+              "ampNumeric": 30,
+              "circuitName": "",
+              "description": "Run-start relay.",
+              "circuitRole": "IGNITION",
+              "isRelay": true
+            },
+            {
+              "cavityId": "37",
+              "ampRatingString": "20A",
+              "ampNumeric": 20,
+              "circuitName": "",
+              "description": "Power distribution box run-start fuses.",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 1,
+        "boxTitle": "Assignment of the fuses in the Power distribution box (2016)",
+        "location": "OTHER",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Telescoping side-view mirror.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "40A*",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Rear window defroster.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Telescoping side-view mirror.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "60A*",
+            "ampNumeric": 60,
+            "circuitName": "",
+            "description": "Automatic brake system motor.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "50A*",
+            "ampNumeric": 50,
+            "circuitName": "",
+            "description": "Body control module 1.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "60A*",
+            "ampNumeric": 60,
+            "circuitName": "",
+            "description": "Body control module 2.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "20A**",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Amplifier.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "25A**",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "4x4.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "10 A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Spot light module.",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "15A**",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Heated seat.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "10 A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Steering-column lock.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "10 A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Power seats.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "15A**",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Snow plow. Rear heated seats.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21A",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "21A",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21B",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "21B",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Windshield wiper motor.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "15 A*",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Rain sensor.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "25 A*",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Series fan feed.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Driver seat motors.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Passenger power seat.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Climate controlled seat.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Air conditioner clutch relay.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "50A*",
+            "ampNumeric": 50,
+            "circuitName": "",
+            "description": "Electric fan 3.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "34",
+            "ampRatingString": "25 A*",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Trailer tow park lamps.",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "20A*",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Trailer tow stop-turn relay fuse.",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "36",
+            "ampRatingString": "25 A*",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Trailer tow lamps module.",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "37",
+            "ampRatingString": "50A*",
+            "ampNumeric": 50,
+            "circuitName": "",
+            "description": "Electric fan 1.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "38",
+            "ampRatingString": "10A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Alt A sensor.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "39",
+            "ampRatingString": "10A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Integrated wheel end solenoid.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "40",
+            "ampRatingString": "15A**",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "E-locker.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "41",
+            "ampRatingString": "10A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Telescoping mirror.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "42",
+            "ampRatingString": "30A**",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Transmission fluid pump.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "43",
+            "ampRatingString": "25A**",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Horn.",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "44",
+            "ampRatingString": "10A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Air conditioner clutch.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "45",
+            "ampRatingString": "10A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Powertrain control module relay coil.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "46",
+            "ampRatingString": "10A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Wiper relay coil.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "47",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "48",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "49",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Trailer brake control module.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "50",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Power running boards.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "51",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Fuel pump relay.",
+            "circuitRole": "FUEL_PUMP",
+            "isRelay": true
+          },
+          {
+            "cavityId": "52",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "53",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "54",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Voltage quality module. Body-control-module voltage-quality-module feed.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "55",
+            "ampRatingString": "40A*",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Body control module RP2 feed.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "56",
+            "ampRatingString": "20A*",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Fuel pump.",
+            "circuitRole": "FUEL_PUMP",
+            "isRelay": false
+          },
+          {
+            "cavityId": "57",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Right-hand EPB actuator.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "58",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Left-hand EPB actuator.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "59",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Starter.",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "60",
+            "ampRatingString": "40A*",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Blower motor.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "61",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Brake control module. Automatic brake system valves.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "62",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Power seat relay.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "63",
+            "ampRatingString": "15A**",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Heated mirrors.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "64",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "65",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Starter relay.",
+            "circuitRole": "IGNITION",
+            "isRelay": true
+          },
+          {
+            "cavityId": "66",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Powertrain control module relay.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "67",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Windshield wiper relay.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "68",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Blower motor relay.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "69",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Power sliding back window relay.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "70",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Electric fan 1 relay.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "71",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "72",
+            "ampRatingString": "25 A*",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "4x4.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "73",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "74",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "PDRG motor.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "75",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Horn relay.",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "76",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "77",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Steering column lock relay.",
+            "circuitRole": "CHASSIS",
+            "isRelay": true
+          },
+          {
+            "cavityId": "78",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "79",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Trailer tow parking lamp relay.",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "80",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Rear window defroster relay.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "81",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "82",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "PDRG close relay.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "83",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "84",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "85",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "86",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "87",
+            "ampRatingString": "10A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Trailer tow backup lamps.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "88",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "89",
+            "ampRatingString": "20A*",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Cigar lighter power point 1.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "90",
+            "ampRatingString": "20A*",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Power point 2.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "91",
+            "ampRatingString": "20A*",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Power point 3.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "92",
+            "ampRatingString": "20A*",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Power point 4.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "93",
+            "ampRatingString": "25A**",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "GTDI vehicle power 1.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "93",
+            "ampRatingString": "10A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "PFI vehicle power 1.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "94",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "95",
+            "ampRatingString": "25A**",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Vehicle power 2.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "96",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "97",
+            "ampRatingString": "10A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Vehicle power 3.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "98",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "99",
+            "ampRatingString": "20A**",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Vehicle power 4 (PFI).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "99",
+            "ampRatingString": "15A**",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Vehicle power 4 (GTDI).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "100",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "101",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "102",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Snow plow relay.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "103",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "104",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Electic fan 3 relay.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "105",
+            "ampRatingString": "10A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Power steering.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "106",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "107",
+            "ampRatingString": "10 A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Anti-lock brakes.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "108",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "109",
+            "ampRatingString": "10 A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Powertrain control module.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "110",
+            "ampRatingString": "10 A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "4x4 run/start. Adaptive cruise control.",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "111",
+            "ampRatingString": "10 A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Transmission pump run-start.",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "112",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "113",
+            "ampRatingString": "7.5 A**",
+            "ampNumeric": 7.5,
+            "circuitName": "",
+            "description": "Blind spot information system. Rear view camera. Front view camera. Voltage quality module.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "114",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Electric fan 2 relay.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "115",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "116",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Cavity-120",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "* Cartridge fuses \n** Mini fuses",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [],
+          "sensorFeeds": [
+            {
+              "cavityId": "23",
+              "ampRatingString": "15 A*",
+              "ampNumeric": 15,
+              "circuitName": "",
+              "description": "Rain sensor.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "38",
+              "ampRatingString": "10A**",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "Alt A sensor.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "113",
+              "ampRatingString": "7.5 A**",
+              "ampNumeric": 7.5,
+              "circuitName": "",
+              "description": "Blind spot information system. Rear view camera. Front view camera. Voltage quality module.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            }
+          ],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [
+            {
+              "cavityId": "51",
+              "ampRatingString": "—",
+              "ampNumeric": null,
+              "circuitName": "",
+              "description": "Fuel pump relay.",
+              "circuitRole": "FUEL_PUMP",
+              "isRelay": true
+            },
+            {
+              "cavityId": "56",
+              "ampRatingString": "20A*",
+              "ampNumeric": 20,
+              "circuitName": "",
+              "description": "Fuel pump.",
+              "circuitRole": "FUEL_PUMP",
+              "isRelay": false
+            }
+          ],
+          "ignitionFeeds": [
+            {
+              "cavityId": "59",
+              "ampRatingString": "30 A*",
+              "ampNumeric": 30,
+              "circuitName": "",
+              "description": "Starter.",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "65",
+              "ampRatingString": "—",
+              "ampNumeric": null,
+              "circuitName": "",
+              "description": "Starter relay.",
+              "circuitRole": "IGNITION",
+              "isRelay": true
+            },
+            {
+              "cavityId": "110",
+              "ampRatingString": "10 A**",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "4x4 run/start. Adaptive cruise control.",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "111",
+              "ampRatingString": "10 A**",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "Transmission pump run-start.",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 2,
+        "boxTitle": "Assignment of the fuses in the Passenger compartment (2017)",
+        "location": "INSTRUMENT_PANEL",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Demand lamp relay. Power seats relay. Glove box. Vanity lamps. Overhead console. Dome. Courtesy. Map lamps.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": true
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "7.5 A",
+            "ampNumeric": 7.5,
+            "circuitName": "",
+            "description": "Memory module logic. Memory seat switches. Lumbar motor.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Driver door lock motor.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Trailer brake control.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Not used (spare).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Embedded modem module.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Combined sensor module.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "",
+            "description": "Climate head module. Smart datalink converter.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "",
+            "description": "Cluster. SCCM.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Brake.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Smart datalink converter.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Tailgate release.",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "HUD. Terrain switch.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Ignition switch and passive-entry passive-start start stop switch. Key inhibit solenoid.",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "",
+            "description": "Tow haul (O/D) cancel for floor or column shifter.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "HUD. In car temperature with humidity sensor.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "EPB. Power seat.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "PDRG switch. Inverter. Driver side window. Moonroof. Vista roof.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Central lock/unlock.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Driver door control module.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Passenger door control module.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Vista roof. Moonroof.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Adjustable pedal switch and motor.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Multi-function display. Global position system. SYNC. Radio frequency receiver.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Radio.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "34",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Run-start relay.",
+            "circuitRole": "IGNITION",
+            "isRelay": true
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Restraints module.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "36",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "360 camera module. Heated steering wheel module. Rear-view mirror. Rear heated seats.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "37",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Power distribution box run-start fuses.",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "38",
+            "ampRatingString": "30A Circuit breaker.",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Rear window switches and motors.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [],
+          "sensorFeeds": [
+            {
+              "cavityId": "1",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "Demand lamp relay. Power seats relay. Glove box. Vanity lamps. Overhead console. Dome. Courtesy. Map lamps.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": true
+            },
+            {
+              "cavityId": "11",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Combined sensor module.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "21",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "HUD. In car temperature with humidity sensor.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "31",
+              "ampRatingString": "15A",
+              "ampNumeric": 15,
+              "circuitName": "",
+              "description": "Adjustable pedal switch and motor.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "36",
+              "ampRatingString": "15A",
+              "ampNumeric": 15,
+              "circuitName": "",
+              "description": "360 camera module. Heated steering wheel module. Rear-view mirror. Rear heated seats.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            }
+          ],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": [
+            {
+              "cavityId": "18",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Ignition switch and passive-entry passive-start start stop switch. Key inhibit solenoid.",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "34",
+              "ampRatingString": "30A",
+              "ampNumeric": 30,
+              "circuitName": "",
+              "description": "Run-start relay.",
+              "circuitRole": "IGNITION",
+              "isRelay": true
+            },
+            {
+              "cavityId": "37",
+              "ampRatingString": "20A",
+              "ampNumeric": 20,
+              "circuitName": "",
+              "description": "Power distribution box run-start fuses.",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 3,
+        "boxTitle": "Assignment of the fuses in the Power distribution box (2017)",
+        "location": "OTHER",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Telescoping side-view mirror.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "40A*",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Rear window defroster.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Telescoping side-view mirror.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Fuel pump.",
+            "circuitRole": "FUEL_PUMP",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "40A*",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Charge air cooler fans (Raptor only).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "60A*",
+            "ampNumeric": 60,
+            "circuitName": "",
+            "description": "Automatic brake system motor.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "50A*",
+            "ampNumeric": 50,
+            "circuitName": "",
+            "description": "Body control module 1.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "60A*",
+            "ampNumeric": 60,
+            "circuitName": "",
+            "description": "Body control module 2.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "20A**",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Amplifier.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "25A**",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "4x4.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "10A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Spot light module.",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "15A**",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Heated seat.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "10A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Steering-column lock.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "10A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Power seats.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "15A**",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Snow plow. Rear heated seats.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21A",
+            "ampRatingString": "15A**",
+            "ampNumeric": 15,
+            "circuitName": "21A",
+            "description": "Transmission control module.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21B",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "21B",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Windshield wiper motor.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "15 A*",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Rain sensor.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "2 5 A*",
+            "ampNumeric": 2,
+            "circuitName": "",
+            "description": "Series fan feed.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Driver seat motors.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Passenger power seat.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Climate controlled seat.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "25 A*",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Upfitter fuses 94, 96, 98 and 100 (Raptor only).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Air conditioner clutch relay.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "50A*",
+            "ampNumeric": 50,
+            "circuitName": "",
+            "description": "Electric fan 3.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "34",
+            "ampRatingString": "25 A*",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Trailer tow park lamps.",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "20A*",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Trailer tow stop-turn relay fuse.",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "36",
+            "ampRatingString": "25 A*",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Trailer tow lamps module.",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "37",
+            "ampRatingString": "50A*",
+            "ampNumeric": 50,
+            "circuitName": "",
+            "description": "Electric fan 1.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "38",
+            "ampRatingString": "10 A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Alt A sensor.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "39",
+            "ampRatingString": "10 A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Integrated wheel end solenoid.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "40",
+            "ampRatingString": "15A**",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "E-locker.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "41",
+            "ampRatingString": "10 A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Telescoping mirror.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "42",
+            "ampRatingString": "30 A**",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Transmission fluid pump.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "43",
+            "ampRatingString": "25A**",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Horn.",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "44",
+            "ampRatingString": "10 A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Air conditioner clutch.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "45",
+            "ampRatingString": "10 A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Powertrain control module relay coil.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "46",
+            "ampRatingString": "10 A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Wiper relay coil.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "47",
+            "ampRatingString": "15 A*",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Upfitter 1 (Raptor only).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "48",
+            "ampRatingString": "15 A*",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Upfitter 2 (Raptor only).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "49",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Trailer brake control module.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "50",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Power running boards.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "51",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Fuel pump relay.",
+            "circuitRole": "FUEL_PUMP",
+            "isRelay": true
+          },
+          {
+            "cavityId": "52",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "53",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Upfitter 5 relay (Raptor only).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "54",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Voltage quality module. Body-control-module voltage-quality-module feed.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "55",
+            "ampRatingString": "40A*",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Body control module RP2 feed.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "56",
+            "ampRatingString": "20A*",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Fuel pump.",
+            "circuitRole": "FUEL_PUMP",
+            "isRelay": false
+          },
+          {
+            "cavityId": "57",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Right-hand electric parking brake actuator.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "58",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Left-hand electric parking brake actuator.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "59",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Starter.",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "60",
+            "ampRatingString": "40A*",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Blower motor.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "61",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Brake control module. Automatic brake system valves.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "62",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Power seat relay.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "63",
+            "ampRatingString": "15A**",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Heated mirrors.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "64",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Upfitter 6 relay (Raptor only).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "65",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Starter relay.",
+            "circuitRole": "IGNITION",
+            "isRelay": true
+          },
+          {
+            "cavityId": "66",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Powertrain control module relay.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "67",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Windshield wiper relay.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "68",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Blower motor relay.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "69",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Power sliding back window relay.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "70",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Electric fan 1 relay.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "71",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "72",
+            "ampRatingString": "25 A*",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "4x4.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "73",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "74",
+            "ampRatingString": "30 A*",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "PDRG motor.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "75",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Horn relay.",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "76",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "77",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Steering column lock relay.",
+            "circuitRole": "CHASSIS",
+            "isRelay": true
+          },
+          {
+            "cavityId": "78",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "79",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Trailer tow parking lamp relay.",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "80",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Rear window defroster relay.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "81",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Upfitter 1 relay (Raptor only).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "82",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "PDRG close relay.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "83",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Upfitter 2 relay (Raptor only).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "84",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "85",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "86",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "87",
+            "ampRatingString": "10 A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Trailer tow backup lamps.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "88",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "89",
+            "ampRatingString": "20A*",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Cigar lighter power point 1.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "90",
+            "ampRatingString": "20A*",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Power point 2.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "91",
+            "ampRatingString": "20A*",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Power point 3.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "92",
+            "ampRatingString": "20A*",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Power point 4.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "93",
+            "ampRatingString": "25A**",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "GTDI vehicle power 1.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "93",
+            "ampRatingString": "10 A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "PFI vehicle power 1.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "94",
+            "ampRatingString": "10 A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Upfitter 3 (Raptor only).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "95",
+            "ampRatingString": "25A**",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Vehicle power 2.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "96",
+            "ampRatingString": "10 A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Upfitter 4 (Raptor only).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "97",
+            "ampRatingString": "10 A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Vehicle power 3.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "98",
+            "ampRatingString": "5A**",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Upfitter 5 (Raptor only).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "99",
+            "ampRatingString": "20A**",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Vehicle power 4 (PFI).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "99",
+            "ampRatingString": "15A**",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Vehicle power 4 (GTDI).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "100",
+            "ampRatingString": "5A**",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Upfitter 6 (Raptor only).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "101",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "102",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Snow plow relay.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "103",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Charge air cooler fan (Raptor only).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "104",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Electronic fan 3 relay.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "105",
+            "ampRatingString": "10A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Power steering.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "106",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "107",
+            "ampRatingString": "10A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Anti-lock brakes.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "108",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "109",
+            "ampRatingString": "10A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Powertrain control module. Transmission control module run-start power.",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "110",
+            "ampRatingString": "10A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "4x4 run/start. Adaptive cruise control.",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "111",
+            "ampRatingString": "15A**",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Transmission pump run-start.",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "112",
+            "ampRatingString": "10A**",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Charge air cooler relay coil run-start (Raptor only).",
+            "circuitRole": "IGNITION",
+            "isRelay": true
+          },
+          {
+            "cavityId": "113",
+            "ampRatingString": "7.5A**",
+            "ampNumeric": 7.5,
+            "circuitName": "",
+            "description": "Blind spot information system. Rear view camera. Front view camera. Voltage quality module.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "114",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Electric fan 2 relay.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "115",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Upfitter 3 relay (Raptor only).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "116",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Upfitter 4 relay (Raptor only).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "Cavity-120",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "* Cartridge fuses \n** Mini fuses",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [],
+          "sensorFeeds": [
+            {
+              "cavityId": "23",
+              "ampRatingString": "15 A*",
+              "ampNumeric": 15,
+              "circuitName": "",
+              "description": "Rain sensor.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "38",
+              "ampRatingString": "10 A**",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "Alt A sensor.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "113",
+              "ampRatingString": "7.5A**",
+              "ampNumeric": 7.5,
+              "circuitName": "",
+              "description": "Blind spot information system. Rear view camera. Front view camera. Voltage quality module.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            }
+          ],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [
+            {
+              "cavityId": "9",
+              "ampRatingString": "30 A*",
+              "ampNumeric": 30,
+              "circuitName": "",
+              "description": "Fuel pump.",
+              "circuitRole": "FUEL_PUMP",
+              "isRelay": false
+            },
+            {
+              "cavityId": "51",
+              "ampRatingString": "—",
+              "ampNumeric": null,
+              "circuitName": "",
+              "description": "Fuel pump relay.",
+              "circuitRole": "FUEL_PUMP",
+              "isRelay": true
+            },
+            {
+              "cavityId": "56",
+              "ampRatingString": "20A*",
+              "ampNumeric": 20,
+              "circuitName": "",
+              "description": "Fuel pump.",
+              "circuitRole": "FUEL_PUMP",
+              "isRelay": false
+            }
+          ],
+          "ignitionFeeds": [
+            {
+              "cavityId": "59",
+              "ampRatingString": "30 A*",
+              "ampNumeric": 30,
+              "circuitName": "",
+              "description": "Starter.",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "65",
+              "ampRatingString": "—",
+              "ampNumeric": null,
+              "circuitName": "",
+              "description": "Starter relay.",
+              "circuitRole": "IGNITION",
+              "isRelay": true
+            },
+            {
+              "cavityId": "109",
+              "ampRatingString": "10A**",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "Powertrain control module. Transmission control module run-start power.",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "110",
+              "ampRatingString": "10A**",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "4x4 run/start. Adaptive cruise control.",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "111",
+              "ampRatingString": "15A**",
+              "ampNumeric": 15,
+              "circuitName": "",
+              "description": "Transmission pump run-start.",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "112",
+              "ampRatingString": "10A**",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "Charge air cooler relay coil run-start (Raptor only).",
+              "circuitRole": "IGNITION",
+              "isRelay": true
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 4,
+        "boxTitle": "Assignment of the fuses in the Passenger compartment (2018, 2019, 2020)",
+        "location": "INSTRUMENT_PANEL",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "2018: Demand lamp relay. Power seats relay. Glove box. Vanity lamps. Overhead console. Dome. Courtesy. Map lamps.\n2019-2020: Not used",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": true
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "7.5 A",
+            "ampNumeric": 7.5,
+            "circuitName": "",
+            "description": "Memory module logic. Memory seat switches. Lumbar motor.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Driver door lock motor.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Trailer brake control.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Not used (spare).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Not used (spare).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "7",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Not used (spare).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Not used (spare).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "9",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "2018: Extended power module (Raptor only).\n2019-2020: Extended power module (Base only).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Embedded modem module.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "11",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Combined sensor module.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "",
+            "description": "Climate head module. Smart datalink converter.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "",
+            "description": "Cluster. Smart climate control module.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Brake on/off switch.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Smart datalink converter.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Tailgate release.",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Heads up display. Terrain switch.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Ignition switch and passive-entry passive-start start stop switch. Key inhibit solenoid.",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "",
+            "description": "Extended power module (except Raptor).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "Cavity-20",
+            "ampRatingString": "7.5A",
+            "ampNumeric": 7.5,
+            "circuitName": "",
+            "description": "Restraint control module (Raptor only).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Heads up display. In car temperature with humidity sensor.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Passenger open control system. (Raptor only)",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Power driven rear glass switch. Inverter. Driver side window. Moonroof. Vista roof.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Central lock/unlock.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Driver door control module.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Passenger door control module.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Vista roof. Moonroof.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Not used (spare).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Not used (spare).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Not used (spare).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Adjustable pedal switch and motor.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Multi-function display. SYNC. Radio frequency receiver.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Radio.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "34",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Run-start relay.",
+            "circuitRole": "IGNITION",
+            "isRelay": true
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Selectable drive mode switch (Raptor only).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "36",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "360 camera module. Heated steering wheel module. Rear-view mirror. Rear heated seats. Lane departure warning module. Automatic high beam module. Image processing module A.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "37",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Not used (spare).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "38",
+            "ampRatingString": "30A Circuit breaker.",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Rear window switches and motors.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [],
+          "sensorFeeds": [
+            {
+              "cavityId": "1",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "2018: Demand lamp relay. Power seats relay. Glove box. Vanity lamps. Overhead console. Dome. Courtesy. Map lamps.\n2019-2020: Not used",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": true
+            },
+            {
+              "cavityId": "11",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Combined sensor module.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "21",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Heads up display. In car temperature with humidity sensor.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "31",
+              "ampRatingString": "15A",
+              "ampNumeric": 15,
+              "circuitName": "",
+              "description": "Adjustable pedal switch and motor.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "36",
+              "ampRatingString": "15A",
+              "ampNumeric": 15,
+              "circuitName": "",
+              "description": "360 camera module. Heated steering wheel module. Rear-view mirror. Rear heated seats. Lane departure warning module. Automatic high beam module. Image processing module A.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            }
+          ],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [],
+          "ignitionFeeds": [
+            {
+              "cavityId": "18",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Ignition switch and passive-entry passive-start start stop switch. Key inhibit solenoid.",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "34",
+              "ampRatingString": "30A",
+              "ampNumeric": 30,
+              "circuitName": "",
+              "description": "Run-start relay.",
+              "circuitRole": "IGNITION",
+              "isRelay": true
+            }
+          ]
+        }
+      },
+      {
+        "boxIndex": 5,
+        "boxTitle": "Assignment of the fuses in the Power distribution box (2018, 2019, 2020)",
+        "location": "OTHER",
+        "cavities": [
+          {
+            "cavityId": "1",
+            "ampRatingString": "25A",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Horn.",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "2",
+            "ampRatingString": "50A",
+            "ampNumeric": 50,
+            "circuitName": "",
+            "description": "Electric fan 1.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "3",
+            "ampRatingString": "30 A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Windshield wiper motor.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "4",
+            "ampRatingString": "60A",
+            "ampNumeric": 60,
+            "circuitName": "",
+            "description": "Body control module.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "5",
+            "ampRatingString": "30 A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Starter relay.",
+            "circuitRole": "IGNITION",
+            "isRelay": true
+          },
+          {
+            "cavityId": "6",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Cigar lighter power point 1.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "8",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Cigar lighter power point 2.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "10",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Rain sensor.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "12",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Upfitter 1 relay (Raptor).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "13",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "4x4 run/start. Adaptive cruise control run/start.",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "14",
+            "ampRatingString": "- / 15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Not used (spare).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "15",
+            "ampRatingString": "7.5A / 15A(Raptor)",
+            "ampNumeric": 7.5,
+            "circuitName": "",
+            "description": "2018: Front view camera. Voltage quality module. Headlamp leveling run/start.\n2019-2020: Front view camera. Voltage quality module. \nVoltage quality module. (15A, Raptor)",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "16",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "2018: Powertrain control module.\n2019-2020: Powertrain control module. Transmission control module run/start.",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "17",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Anti-lock brakes run/start.",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "18",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Electric power steering run/start.",
+            "circuitRole": "IGNITION",
+            "isRelay": false
+          },
+          {
+            "cavityId": "19",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Upfitter 5 relay (Raptor).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "20",
+            "ampRatingString": "40A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Blower motor.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "21",
+            "ampRatingString": "30 A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Passenger seat motors.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "22",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Radio amplifier.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "23",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Alt A sensor.",
+            "circuitRole": "SENSOR_VREF",
+            "isRelay": false
+          },
+          {
+            "cavityId": "24",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Trailer brake control module",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "25",
+            "ampRatingString": "50A",
+            "ampNumeric": 50,
+            "circuitName": "",
+            "description": "Body control module 1.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "26",
+            "ampRatingString": "50A",
+            "ampNumeric": 50,
+            "circuitName": "",
+            "description": "Electric fan.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "27",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Driver seat motors/memory module.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "28",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Heated seat.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "29",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "4x4 solenoid.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "30",
+            "ampRatingString": "25 A",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Trailer tow battery charge.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "31",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "32",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "A/C clutch.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "33",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "34",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Vehicle power 5 (Diesel).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Vehicle power 4 (Gas).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "35",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Vehicle power 4 (Diesel).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "36",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Vehicle power 3.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "37",
+            "ampRatingString": "25A",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Vehicle power 2 (Gas).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "37",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Vehicle power 2 (Diesel).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "38",
+            "ampRatingString": "25A",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Vehicle power 1 (Gas).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "38",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Vehicle power 1 (Diesel).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "39",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "41",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Body-control-module voltage-quality-module feed.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "43",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Trailer tow lamps module.",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "45",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "46",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Steering-column lock.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "47",
+            "ampRatingString": "50A",
+            "ampNumeric": 50,
+            "circuitName": "",
+            "description": "Powertrain control heater 3 (Diesel).",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "48",
+            "ampRatingString": "30 A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Fuel filter heater.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "49",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "50",
+            "ampRatingString": "30 A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Fuel pump.",
+            "circuitRole": "FUEL_PUMP",
+            "isRelay": false
+          },
+          {
+            "cavityId": "51",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Power point 3.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "52",
+            "ampRatingString": "50A",
+            "ampNumeric": 50,
+            "circuitName": "",
+            "description": "Powertrain control heater 2 (Diesel).",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "53",
+            "ampRatingString": "25A",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Trailer tow park lamps.",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "54",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "55",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Upfitter 2 relay (Raptor).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "56",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "58",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "USB smart charger.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "59",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "60",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "61",
+            "ampRatingString": "- / 15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "2018: LH HID headlamp (Raptor).\n2019-2020: Not used (spare).",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "62",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Upfitter 6 relay (Raptor).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "63",
+            "ampRatingString": "25A",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "4x4 2.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "64",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "E-locker.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "65",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "66",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "67",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "69",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "70",
+            "ampRatingString": "40A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "2018: Electric parking brake.\n2019-2020: Anti-lock brake system (ABS) valves. Electric parking brake.",
+            "circuitRole": "CHASSIS",
+            "isRelay": false
+          },
+          {
+            "cavityId": "71",
+            "ampRatingString": "25 A",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "4x4.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "72",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "73",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "74",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Trailer tow backup lamps.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "75",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "76",
+            "ampRatingString": "40A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Body control module 2.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "77",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Climate controlled seat.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "78",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Spot light module.",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "79",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "80",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Heated windshield wiper. Upfitter 4 relay (Raptor).",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "81",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "82",
+            "ampRatingString": "30A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Transmission fluid pump.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "82",
+            "ampRatingString": "5A",
+            "ampNumeric": 5,
+            "circuitName": "",
+            "description": "Powertrain control module (Diesel).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "83",
+            "ampRatingString": "15 A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Transmission control module.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "84",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "85",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "86",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "87",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "88",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Multi-Contour Seats Relay. Upfitter 3 relay (Raptor).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "89",
+            "ampRatingString": "30 A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Power running boards.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "91",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "93",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Heated mirrors.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "94",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Rear heated seat module (Raptor, Diesel).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "95",
+            "ampRatingString": "- / 15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "2018: RH HID lamp (Raptor).\n2019-2020: Not used/Spare.",
+            "circuitRole": "LIGHTING",
+            "isRelay": false
+          },
+          {
+            "cavityId": "96",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "",
+            "description": "Not used.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "97",
+            "ampRatingString": "40A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Electric fan (Raptor).",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "97",
+            "ampRatingString": "50A",
+            "ampNumeric": 50,
+            "circuitName": "",
+            "description": "Powertrain control heater 1 (Diesel).",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "98",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "10R transmission module r/s. 3.3L transmission fluid pump.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "99",
+            "ampRatingString": "40A",
+            "ampNumeric": 40,
+            "circuitName": "",
+            "description": "Heated rear window.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "100",
+            "ampRatingString": "25A",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Diesel exhaust fluid (DEF) heater relay (Diesel).",
+            "circuitRole": "ACCESSORY",
+            "isRelay": true
+          },
+          {
+            "cavityId": "101",
+            "ampRatingString": "25A",
+            "ampNumeric": 25,
+            "circuitName": "",
+            "description": "Electric fan.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "102",
+            "ampRatingString": "30 A",
+            "ampNumeric": 30,
+            "circuitName": "",
+            "description": "Power sliding back window.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "103",
+            "ampRatingString": "20A",
+            "ampNumeric": 20,
+            "circuitName": "",
+            "description": "Trailer tow stop-turn relay fuse.",
+            "circuitRole": "LIGHTING",
+            "isRelay": true
+          },
+          {
+            "cavityId": "104",
+            "ampRatingString": "15A",
+            "ampNumeric": 15,
+            "circuitName": "",
+            "description": "Snowplow switch. Rear heated seats.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": false
+          },
+          {
+            "cavityId": "105",
+            "ampRatingString": "10A",
+            "ampNumeric": 10,
+            "circuitName": "",
+            "description": "Telescoping mirror.",
+            "circuitRole": "ACCESSORY",
+            "isRelay": false
+          },
+          {
+            "cavityId": "R02",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "R02",
+            "description": "Powertrain control module relay.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          },
+          {
+            "cavityId": "R05",
+            "ampRatingString": "—",
+            "ampNumeric": null,
+            "circuitName": "R05",
+            "description": "Electric fan relay.",
+            "circuitRole": "UNKNOWN",
+            "isRelay": true
+          }
+        ],
+        "keyCircuits": {
+          "ecuFeeds": [],
+          "sensorFeeds": [
+            {
+              "cavityId": "10",
+              "ampRatingString": "5A",
+              "ampNumeric": 5,
+              "circuitName": "",
+              "description": "Rain sensor.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "15",
+              "ampRatingString": "7.5A / 15A(Raptor)",
+              "ampNumeric": 7.5,
+              "circuitName": "",
+              "description": "2018: Front view camera. Voltage quality module. Headlamp leveling run/start.\n2019-2020: Front view camera. Voltage quality module. \nVoltage quality module. (15A, Raptor)",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            },
+            {
+              "cavityId": "23",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "Alt A sensor.",
+              "circuitRole": "SENSOR_VREF",
+              "isRelay": false
+            }
+          ],
+          "obdFeeds": [],
+          "fuelPumpFeeds": [
+            {
+              "cavityId": "50",
+              "ampRatingString": "30 A",
+              "ampNumeric": 30,
+              "circuitName": "",
+              "description": "Fuel pump.",
+              "circuitRole": "FUEL_PUMP",
+              "isRelay": false
+            }
+          ],
+          "ignitionFeeds": [
+            {
+              "cavityId": "5",
+              "ampRatingString": "30 A",
+              "ampNumeric": 30,
+              "circuitName": "",
+              "description": "Starter relay.",
+              "circuitRole": "IGNITION",
+              "isRelay": true
+            },
+            {
+              "cavityId": "13",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "4x4 run/start. Adaptive cruise control run/start.",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "16",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "2018: Powertrain control module.\n2019-2020: Powertrain control module. Transmission control module run/start.",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "17",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "Anti-lock brakes run/start.",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            },
+            {
+              "cavityId": "18",
+              "ampRatingString": "10A",
+              "ampNumeric": 10,
+              "circuitName": "",
+              "description": "Electric power steering run/start.",
+              "circuitRole": "IGNITION",
+              "isRelay": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "ecuAndSensorsSummary": {
+    "hasDedicatedEcmFeed": false,
+    "hasSensorVrefFeed": true,
+    "hasObdDlcFeed": false,
+    "hasFuelPumpRelay": true,
+    "circuitHighlights": [
+      "Primary Fuel Pump Control Circuit / Relay",
+      "Sensor Reference Rails & VVT / O2 Actuator Fuses"
+    ]
+  },
+  "crossVerificationStatus": {
+    "crossReferencedWithStartMyCar": true,
+    "startMyCarMatchingFile": "src/data/startmycar/ford/f-150/2016.json",
+    "confirmedCavitiesCount": 452
+  }
+}
