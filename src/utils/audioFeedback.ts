@@ -7,6 +7,57 @@ let audioCtx: AudioContext | null = null;
 let beepOscillator: OscillatorNode | null = null;
 let gainNode: GainNode | null = null;
 
+const UI_SFX_STORAGE_KEY = 'autolab_ui_sfx_enabled_v1';
+let uiSoundEnabledCache: boolean | null = null;
+const uiSoundListeners = new Set<(enabled: boolean) => void>();
+
+export function isUiSoundEnabled(): boolean {
+  if (uiSoundEnabledCache !== null) return uiSoundEnabledCache;
+  if (typeof window === 'undefined') return true;
+  try {
+    const raw = window.localStorage?.getItem(UI_SFX_STORAGE_KEY);
+    uiSoundEnabledCache = raw === null ? true : raw !== 'false';
+    return uiSoundEnabledCache;
+  } catch {
+    uiSoundEnabledCache = true;
+    return true;
+  }
+}
+
+export function setUiSoundEnabled(enabled: boolean): void {
+  uiSoundEnabledCache = enabled;
+  if (typeof window !== 'undefined') {
+    try {
+      window.localStorage?.setItem(UI_SFX_STORAGE_KEY, enabled ? 'true' : 'false');
+    } catch {
+      // Ignore storage quota / privacy mode errors
+    }
+  }
+  for (const listener of uiSoundListeners) {
+    try {
+      listener(enabled);
+    } catch {
+      // Ignore listener errors
+    }
+  }
+}
+
+export function toggleUiSoundEnabled(): boolean {
+  const next = !isUiSoundEnabled();
+  setUiSoundEnabled(next);
+  if (next) {
+    playCockpitTabDetent();
+  }
+  return next;
+}
+
+export function subscribeUiSoundPreference(listener: (enabled: boolean) => void): () => void {
+  uiSoundListeners.add(listener);
+  return () => {
+    uiSoundListeners.delete(listener);
+  };
+}
+
 function getOrCreateAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null;
   const AudioContextClass =
@@ -60,7 +111,7 @@ export function playContinuityBeep(shouldBeep: boolean) {
 }
 
 export function playProbeTapSound() {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined' || !isUiSoundEnabled()) return;
   try {
     const ctx = getOrCreateAudioContext();
     if (!ctx) return;
@@ -806,5 +857,170 @@ export function playTutorialCueTone(kind: 'step' | 'probe' | 'complete' = 'step'
     // Audio policy ignore
   }
 }
+
+/**
+ * Machined anodized-aluminum automotive cockpit detent click when switching modules or panes.
+ */
+export function playCockpitTabDetent() {
+  if (typeof window === 'undefined' || !isUiSoundEnabled()) return;
+  try {
+    const ctx = getOrCreateAudioContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+
+    // 1. Crisp metallic micro-switch transient
+    const snapOsc = ctx.createOscillator();
+    const snapFilter = ctx.createBiquadFilter();
+    const snapGain = ctx.createGain();
+    snapOsc.type = 'triangle';
+    snapOsc.frequency.setValueAtTime(2150, now);
+    snapOsc.frequency.exponentialRampToValueAtTime(580, now + 0.022);
+    snapFilter.type = 'bandpass';
+    snapFilter.frequency.setValueAtTime(1450, now);
+    snapFilter.Q.setValueAtTime(1.4, now);
+    snapGain.gain.setValueAtTime(0.042, now);
+    snapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.024);
+    snapOsc.connect(snapFilter);
+    snapFilter.connect(snapGain);
+    snapGain.connect(ctx.destination);
+    snapOsc.start(now);
+    snapOsc.stop(now + 0.026);
+
+    // 2. Warm low-end chassis body resonance
+    const bodyOsc = ctx.createOscillator();
+    const bodyGain = ctx.createGain();
+    bodyOsc.type = 'sine';
+    bodyOsc.frequency.setValueAtTime(195, now);
+    bodyOsc.frequency.exponentialRampToValueAtTime(92, now + 0.028);
+    bodyGain.gain.setValueAtTime(0.036, now);
+    bodyGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.03);
+    bodyOsc.connect(bodyGain);
+    bodyGain.connect(ctx.destination);
+    bodyOsc.start(now);
+    bodyOsc.stop(now + 0.032);
+  } catch {
+    // Audio policy ignore
+  }
+}
+
+/**
+ * Precision optical rotary encoder tick for voltage presets and DMM selector modes.
+ */
+export function playRotaryEncoderTick() {
+  if (typeof window === 'undefined' || !isUiSoundEnabled()) return;
+  try {
+    const ctx = getOrCreateAudioContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(1880, now);
+    osc.frequency.exponentialRampToValueAtTime(680, now + 0.015);
+    gain.gain.setValueAtTime(0.034, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.016);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.018);
+  } catch {
+    // Audio policy ignore
+  }
+}
+
+/**
+ * Authentic 30A automotive cube relay armature pull-in & contact snap when energizing/de-energizing KL30.
+ */
+export function playAutomotiveRelayClunk(engaged: boolean) {
+  if (typeof window === 'undefined' || !isUiSoundEnabled()) return;
+  try {
+    const ctx = getOrCreateAudioContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+
+    // Primary armature thud
+    const armOsc = ctx.createOscillator();
+    const armGain = ctx.createGain();
+    armOsc.type = 'triangle';
+    armOsc.frequency.setValueAtTime(engaged ? 155 : 210, now);
+    armOsc.frequency.exponentialRampToValueAtTime(engaged ? 78 : 95, now + 0.055);
+    armGain.gain.setValueAtTime(0.065, now);
+    armGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+    armOsc.connect(armGain);
+    armGain.connect(ctx.destination);
+    armOsc.start(now);
+    armOsc.stop(now + 0.065);
+
+    // Secondary silver-contact snap (delayed 14ms for physical relay travel)
+    const contactOsc = ctx.createOscillator();
+    const contactGain = ctx.createGain();
+    contactOsc.type = 'sine';
+    contactOsc.frequency.setValueAtTime(engaged ? 2850 : 1920, now + 0.014);
+    contactOsc.frequency.exponentialRampToValueAtTime(engaged ? 940 : 480, now + 0.042);
+    contactGain.gain.setValueAtTime(0.048, now + 0.014);
+    contactGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
+    contactOsc.connect(contactGain);
+    contactGain.connect(ctx.destination);
+    contactOsc.start(now + 0.014);
+    contactOsc.stop(now + 0.048);
+
+    if (engaged) {
+      // Subtle 880 Hz bus-ready harmonic confirmation
+      const chimeOsc = ctx.createOscillator();
+      const chimeGain = ctx.createGain();
+      chimeOsc.type = 'sine';
+      chimeOsc.frequency.setValueAtTime(880, now + 0.025);
+      chimeOsc.frequency.exponentialRampToValueAtTime(1174.66, now + 0.11);
+      chimeGain.gain.setValueAtTime(0.0001, now + 0.025);
+      chimeGain.gain.linearRampToValueAtTime(0.028, now + 0.04);
+      chimeGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+      chimeOsc.connect(chimeGain);
+      chimeGain.connect(ctx.destination);
+      chimeOsc.start(now + 0.025);
+      chimeOsc.stop(now + 0.15);
+    }
+  } catch {
+    // Audio policy ignore
+  }
+}
+
+/**
+ * Smooth servo-assisted diagnostic drawer slide cue.
+ */
+export function playDrawerPneumaticSlide(opening: boolean) {
+  if (typeof window === 'undefined' || !isUiSoundEnabled()) return;
+  try {
+    const ctx = getOrCreateAudioContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const filter = ctx.createBiquadFilter();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(opening ? 360 : 720, now);
+    osc.frequency.exponentialRampToValueAtTime(opening ? 760 : 330, now + 0.085);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(1600, now);
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(0.026, now + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.095);
+  } catch {
+    // Audio policy ignore
+  }
+}
+
 
 

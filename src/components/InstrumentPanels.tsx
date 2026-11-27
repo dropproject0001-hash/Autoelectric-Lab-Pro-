@@ -29,6 +29,7 @@ import {
   GaugeMonitorState,
 } from '../simulation/telemetry/telemetryTypes';
 import { LabDrawerIcon } from './icons/LabDrawerIcons';
+import { playCockpitTabDetent } from '../utils/audioFeedback';
 
 interface InstrumentPanelsProps {
   visibleOnMobile: boolean;
@@ -187,26 +188,29 @@ export const InstrumentPanels: React.FC<InstrumentPanelsProps> = ({
       aria-label="Bench Instrument Panels"
       className={`w-full ${
         compactWidth
-          ? 'lg:w-[292px] xl:w-[316px]'
-          : 'lg:w-[336px] xl:w-[356px] 2xl:w-[380px]'
+          ? 'xl:w-[340px] 2xl:w-[364px]'
+          : 'xl:w-[362px] 2xl:w-[386px]'
       } flex-col ${
         isShortViewport ? 'gap-1.5' : 'gap-2'
-      } shrink-0 overflow-hidden flex-1 lg:flex-initial min-h-0 transition-[width] duration-150 ${
-        visibleOnMobile ? 'flex' : 'hidden lg:flex'
+      } shrink-0 overflow-hidden flex-1 xl:flex-initial min-h-0 transition-[width] duration-150 animate-cockpit-module ${
+        visibleOnMobile ? 'flex' : 'hidden xl:flex'
       }`}
     >
       {moveControls}
-      {/* Hardware Segmented Rack Filter Strip — aligned 44px desktop rail */}
+      {/* Hardware Segmented Rack Filter Strip — aligned 42px desktop rail */}
       <div
         role="tablist"
         aria-label="Instrument Rack Filter"
-        className="grid grid-cols-3 items-stretch gap-1 hud-panel h-[44px] p-1 rounded-xl text-[10px] xl:text-[10.5px] font-mono shrink-0"
+        className="grid grid-cols-3 items-stretch gap-1 hud-panel h-[42px] p-1 rounded-xl text-[10px] xl:text-[10.5px] font-mono shrink-0"
       >
         <button
           type="button"
           role="tab"
           aria-selected={rackFilter === 'ALL'}
-          onClick={() => onChangeRackFilter('ALL')}
+          onClick={() => {
+            if (rackFilter !== 'ALL') playCockpitTabDetent();
+            onChangeRackFilter('ALL');
+          }}
           className={`h-full px-1.5 xl:px-2 rounded-lg inline-flex items-center justify-center gap-1 text-center uppercase tracking-wider transition whitespace-nowrap cursor-pointer ${
             rackFilter === 'ALL'
               ? 'hw-btn-blue font-bold text-white'
@@ -221,7 +225,10 @@ export const InstrumentPanels: React.FC<InstrumentPanelsProps> = ({
           type="button"
           role="tab"
           aria-selected={rackFilter === 'DMM_POWER'}
-          onClick={() => onChangeRackFilter('DMM_POWER')}
+          onClick={() => {
+            if (rackFilter !== 'DMM_POWER') playCockpitTabDetent();
+            onChangeRackFilter('DMM_POWER');
+          }}
           className={`h-full px-1.5 xl:px-2 rounded-lg inline-flex items-center justify-center gap-1 text-center uppercase tracking-wider transition whitespace-nowrap cursor-pointer ${
             rackFilter === 'DMM_POWER'
               ? 'hw-btn-blue font-bold text-white'
@@ -236,7 +243,10 @@ export const InstrumentPanels: React.FC<InstrumentPanelsProps> = ({
           type="button"
           role="tab"
           aria-selected={rackFilter === 'FAULT_MATRIX'}
-          onClick={() => onChangeRackFilter('FAULT_MATRIX')}
+          onClick={() => {
+            if (rackFilter !== 'FAULT_MATRIX') playCockpitTabDetent();
+            onChangeRackFilter('FAULT_MATRIX');
+          }}
           className={`h-full px-1.5 xl:px-2 rounded-lg inline-flex items-center justify-center gap-1 text-center uppercase tracking-wider transition whitespace-nowrap cursor-pointer ${
             rackFilter === 'FAULT_MATRIX'
               ? 'hw-btn-blue font-bold text-white'
@@ -249,8 +259,13 @@ export const InstrumentPanels: React.FC<InstrumentPanelsProps> = ({
         </button>
       </div>
 
-      {/* Scrollable Instrument Rack */}
-      <div className={`flex-1 overflow-y-auto pr-0.5 flex flex-col ${isShortViewport ? 'gap-2' : 'gap-2.5'} min-h-0`}>
+      {/* Scrollable Instrument Rack — 1-Col Mobile · 2-Col Diagnostic Tablet · 1-Col Desktop Rail */}
+      <div className="flex-1 overflow-y-auto pr-0.5 min-h-0">
+        <div
+          className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 items-start ${
+            isShortViewport ? 'gap-2' : 'gap-2.5'
+          }`}
+        >
         {(rackFilter === 'ALL' || rackFilter === 'DMM_POWER') && (
           <>
             {onSelectVehicleEcu && onChangeRpmEmulator && (
@@ -346,7 +361,7 @@ export const InstrumentPanels: React.FC<InstrumentPanelsProps> = ({
         {(onOpenOfflineBot || onOpenLookupDrawer || onOpenGroundedSearch || onOpenWorkflowPanel || onOpenEcuPinouts) && (
           <section
             aria-label="AI Technician Assistant shortcuts"
-            className="hud-panel rounded-xl p-3 flex flex-col gap-2 shrink-0"
+            className="hud-panel md:col-span-2 xl:col-span-1 rounded-xl p-3 flex flex-col gap-2 shrink-0"
           >
             <div className="flex items-center justify-between gap-2 border-b border-[#203653] pb-2">
               <div className="flex items-center gap-2 min-w-0">
@@ -425,6 +440,7 @@ export const InstrumentPanels: React.FC<InstrumentPanelsProps> = ({
             </div>
           </section>
         )}
+        </div>
       </div>
     </section>
   );

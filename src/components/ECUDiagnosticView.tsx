@@ -33,6 +33,7 @@ import { DiagnosticWorkflowPanel } from './DiagnosticWorkflowPanel';
 import { LogicCheckPanel, type LogicCheckIncidentEntry } from './LogicCheckPanel';
 import { LabTab } from './LabTopNav';
 import { LabDrawerIcon } from './icons/LabDrawerIcons';
+import { playCockpitTabDetent } from '../utils/audioFeedback';
 
 interface ECUDiagnosticViewProps {
   visibleOnMobile: boolean;
@@ -325,8 +326,8 @@ export const ECUDiagnosticView: React.FC<ECUDiagnosticViewProps> = ({
   }
 
   const widthClass = compactWidth
-    ? 'w-full lg:w-[274px] xl:w-[294px]'
-    : 'w-full lg:w-[304px] xl:w-[322px] 2xl:w-[340px]';
+    ? 'w-full xl:w-[304px] 2xl:w-[330px]'
+    : 'w-full xl:w-[324px] 2xl:w-[348px]';
 
   const logicAlertCount =
     activeLogicSnapshot.criticalCount + activeLogicSnapshot.warningCount;
@@ -334,10 +335,10 @@ export const ECUDiagnosticView: React.FC<ECUDiagnosticViewProps> = ({
   return (
     <section
       aria-label="ECU Diagnostic View"
-      className={`${widthClass} flex-1 lg:flex-initial lg:shrink-0 min-h-0 flex-col ${
+      className={`${widthClass} flex-1 xl:flex-initial xl:shrink-0 min-h-0 flex-col ${
         isShortViewport ? 'gap-1.5' : 'gap-2'
-      } overflow-hidden transition-[width] duration-150 ${
-        visibleOnMobile ? 'flex' : 'hidden lg:flex'
+      } overflow-hidden transition-[width] duration-150 animate-cockpit-module ${
+        visibleOnMobile ? 'flex' : 'hidden xl:flex'
       }`}
     >
       {moveControls}
@@ -345,14 +346,17 @@ export const ECUDiagnosticView: React.FC<ECUDiagnosticViewProps> = ({
       <div
         role="tablist"
         aria-label="Diagnostic panel view"
-        className="w-full hud-panel rounded-xl h-[44px] p-1 grid grid-cols-3 items-stretch gap-1 shrink-0"
+        className="w-full hud-panel rounded-xl h-[42px] p-1 grid grid-cols-3 items-stretch gap-1 shrink-0"
       >
         <button
           type="button"
           role="tab"
           aria-selected={activeMode === 'WORKFLOW'}
           data-testid="diagnostic-tab-workflow"
-          onClick={() => handleModeChange('WORKFLOW')}
+          onClick={() => {
+            if (activeMode !== 'WORKFLOW') playCockpitTabDetent();
+            handleModeChange('WORKFLOW');
+          }}
           className={`h-full flex items-center justify-center gap-1 rounded-lg px-1.5 text-[10px] xl:text-[10.5px] font-mono transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#19c8f5] cursor-pointer ${
             activeMode === 'WORKFLOW'
               ? 'hw-btn-blue font-bold text-white'
@@ -360,7 +364,8 @@ export const ECUDiagnosticView: React.FC<ECUDiagnosticViewProps> = ({
           }`}
         >
           <LabDrawerIcon name="tray-stack" size={24} className="w-3.5 h-3.5 shrink-0" />
-          <span className="truncate">Workflow</span>
+          <span className="2xl:hidden">Flow</span>
+          <span className="hidden 2xl:inline">Workflow</span>
           <span className="tabular-nums text-[9.5px] opacity-90 shrink-0">
             {workflowProgress.mandatoryChecked}/{workflowProgress.mandatoryTotal}
           </span>
@@ -371,7 +376,10 @@ export const ECUDiagnosticView: React.FC<ECUDiagnosticViewProps> = ({
           role="tab"
           aria-selected={activeMode === 'LOGIC_CHECK'}
           data-testid="diagnostic-tab-logic-check"
-          onClick={() => handleModeChange('LOGIC_CHECK')}
+          onClick={() => {
+            if (activeMode !== 'LOGIC_CHECK') playCockpitTabDetent();
+            handleModeChange('LOGIC_CHECK');
+          }}
           className={`h-full flex items-center justify-center gap-1 rounded-lg px-1.5 text-[10px] xl:text-[10.5px] font-mono transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#19c8f5] cursor-pointer ${
             activeMode === 'LOGIC_CHECK'
               ? activeLogicSnapshot.overallStatus === 'CRITICAL'
@@ -400,7 +408,10 @@ export const ECUDiagnosticView: React.FC<ECUDiagnosticViewProps> = ({
           role="tab"
           aria-selected={activeMode === 'MNA_GUIDE'}
           data-testid="diagnostic-tab-mna-guide"
-          onClick={() => handleModeChange('MNA_GUIDE')}
+          onClick={() => {
+            if (activeMode !== 'MNA_GUIDE') playCockpitTabDetent();
+            handleModeChange('MNA_GUIDE');
+          }}
           className={`h-full flex items-center justify-center gap-1 rounded-lg px-1.5 text-[10px] xl:text-[10.5px] font-mono transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#19c8f5] cursor-pointer ${
             activeMode === 'MNA_GUIDE'
               ? 'hw-btn-blue font-bold text-white'

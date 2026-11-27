@@ -23,6 +23,8 @@ import {
   RefreshCw,
   RotateCcw,
   Unlock,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import { generateSystemBlueprintPdf } from '../services/systemBlueprintPdfService';
 import {
@@ -39,9 +41,13 @@ import {
   RamtiVectorEmblem,
 } from './icons/RamtiBrandAssets';
 import {
+  isUiSoundEnabled,
   playAccessGrantedChime,
+  playCockpitTabDetent,
   playPinKeypadClick,
   playSystemLockSound,
+  subscribeUiSoundPreference,
+  toggleUiSoundEnabled,
 } from '../utils/audioFeedback';
 import { useAuth } from '../context/AuthContext';
 import { useTrialAccess } from '../context/TrialAccessContext';
@@ -190,13 +196,26 @@ export const IntroductionPinLandingPage: React.FC = () => {
     }
   }, [isAdminUnlocked]);
 
+  const [uiSfxEnabled, setUiSfxEnabledState] = useState<boolean>(() => isUiSoundEnabled());
+
+  useEffect(() => {
+    return subscribeUiSoundPreference(setUiSfxEnabledState);
+  }, []);
+
   useEffect(() => {
     void loadAdminConfigAndList();
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }
   }, [loadAdminConfigAndList]);
 
   useEffect(() => {
-    if (activeTab === 'PIN_ENTRY') {
-      pinInputRef.current?.focus();
+    if (
+      activeTab === 'PIN_ENTRY' &&
+      typeof window !== 'undefined' &&
+      window.matchMedia('(min-width: 1024px)').matches
+    ) {
+      pinInputRef.current?.focus({ preventScroll: true });
     }
   }, [activeTab]);
 
@@ -417,15 +436,21 @@ export const IntroductionPinLandingPage: React.FC = () => {
         <div className="hud-cover-backdrop-scrim" />
       </div>
 
-      {/* Strict 3-Zone Top Bar */}
-      <header className="w-full border-b border-[#203653] bg-[#0A1220]/88 backdrop-blur-[20px]">
-        <div className="mx-auto flex max-w-[1220px] items-center justify-between gap-8 px-4 sm:px-6 py-3.5">
+      {/* Strict 3-Zone Top Bar — Responsive Mobile, Tablet & Desktop Alignment */}
+      <header className="sticky top-0 z-30 w-full border-b border-[#203653] bg-[#0A1220]/90 backdrop-blur-[20px]">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-[1.5px] overflow-hidden"
+        >
+          <div className="h-full w-1/2 bg-gradient-to-r from-transparent via-[#19C8F5]/80 to-transparent animate-hud-laser-sweep" />
+        </div>
+        <div className="mx-auto flex max-w-[1220px] min-w-0 items-center justify-between gap-2 sm:gap-4 lg:gap-8 px-3 sm:px-6 py-2.5 sm:py-3.5">
           {/* Zone 1: Clean single-line RAMTi brand wordmark */}
           <a
             href="#pin-verification-gate"
-            className="flex items-center gap-3 text-[#EAF3FF] whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-[#19C8F5]"
+            className="flex min-w-0 items-center gap-2 sm:gap-3 text-[#EAF3FF] focus-visible:outline-2 focus-visible:outline-[#19C8F5]"
           >
-            <div className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg border border-[#19C8F5]/55 bg-[#050A12]">
+            <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-[#19C8F5]/55 bg-[#050A12] shadow-[0_0_14px_rgba(25,200,245,0.2)]">
               {!logoFailed && (
                 <img
                   src={APP_LOGO_SRC}
@@ -438,29 +463,35 @@ export const IntroductionPinLandingPage: React.FC = () => {
               )}
               <RamtiVectorEmblem size={26} variant="flat-white" className="relative z-10" />
             </div>
-            <div className="leading-none">
-              <div className="flex items-baseline gap-1.5">
-                <span className="font-hud text-sm font-extrabold tracking-[0.18em] text-[#19C8F5]">
+            <div className="min-w-0 leading-none">
+              <div className="flex min-w-0 items-baseline gap-1 sm:gap-1.5">
+                <span className="font-hud text-xs sm:text-sm font-extrabold tracking-[0.18em] text-[#19C8F5] shrink-0">
                   RAMTi
                 </span>
-                <span className="font-hud text-lg font-bold tracking-wide text-[#EAF3FF]">
+                <span className="sm:hidden font-hud text-[14px] font-bold tracking-wide text-[#EAF3FF] truncate">
+                  AutoElec PRO
+                </span>
+                <span className="hidden sm:inline font-hud text-lg font-bold tracking-wide text-[#EAF3FF] truncate">
                   AutoElectric Lab PRO
                 </span>
               </div>
-              <span className="hidden sm:block mt-0.5 font-body text-[10px] tracking-[0.12em] text-[#BCCDEF]">
+              <span className="hidden md:block mt-0.5 font-body text-[10px] tracking-[0.12em] text-[#BCCDEF] truncate">
                 {RAMTI_SUBTITLE_INLINE}
               </span>
             </div>
           </a>
 
-          {/* Zone 2: Concise single-line navigation links */}
+          {/* Zone 2: Concise single-line navigation links (Desktop lg+) */}
           <nav
             aria-label="Landing sections"
-            className="hidden md:flex items-center gap-6 text-sm font-medium text-[#91A4BD]"
+            className="hidden lg:flex items-center gap-6 text-sm font-medium text-[#91A4BD]"
           >
             <button
               type="button"
-              onClick={() => setActiveTab('PIN_ENTRY')}
+              onClick={() => {
+                playCockpitTabDetent();
+                setActiveTab('PIN_ENTRY');
+              }}
               className={`whitespace-nowrap shrink-0 transition-colors hover:text-[#EAF3FF] hover:underline underline-offset-4 cursor-pointer ${
                 activeTab === 'PIN_ENTRY' ? 'text-[#EAF3FF] underline' : ''
               }`}
@@ -469,13 +500,17 @@ export const IntroductionPinLandingPage: React.FC = () => {
             </button>
             <a
               href="#bench-modules"
+              onClick={() => playCockpitTabDetent()}
               className="whitespace-nowrap shrink-0 transition-colors hover:text-[#EAF3FF] hover:underline underline-offset-4"
             >
               Studios &amp; Modules
             </a>
             <button
               type="button"
-              onClick={() => setActiveTab('ADMIN_MASTER')}
+              onClick={() => {
+                playCockpitTabDetent();
+                setActiveTab('ADMIN_MASTER');
+              }}
               className={`whitespace-nowrap shrink-0 transition-colors hover:text-[#EAF3FF] hover:underline underline-offset-4 cursor-pointer ${
                 activeTab === 'ADMIN_MASTER' ? 'text-[#FFB020] underline' : ''
               }`}
@@ -484,14 +519,29 @@ export const IntroductionPinLandingPage: React.FC = () => {
             </button>
           </nav>
 
-          {/* Zone 3: Single primary action */}
-          <div className="flex items-center shrink-0">
+          {/* Zone 3: Tactile Cockpit SFX Switch + Primary Action */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <button
               type="button"
-              onClick={() =>
-                setActiveTab((prev) => (prev === 'ADMIN_MASTER' ? 'PIN_ENTRY' : 'ADMIN_MASTER'))
-              }
-              className="whitespace-nowrap shrink-0 rounded-md border border-[#203653] bg-[#0E192A] px-4 py-2 text-xs font-semibold text-[#EAF3FF] transition-colors hover:border-[#19C8F5]/70 hover:text-white cursor-pointer min-h-[40px]"
+              onClick={() => toggleUiSoundEnabled()}
+              aria-pressed={uiSfxEnabled}
+              aria-label={uiSfxEnabled ? 'Mute cockpit tactile sound effects' : 'Enable cockpit tactile sound effects'}
+              title={uiSfxEnabled ? 'Cockpit Tactile Audio: ON (Click to mute)' : 'Cockpit Tactile Audio: MUTED (Click to enable)'}
+              className={`inline-flex h-10 w-10 items-center justify-center rounded-md border transition-colors cursor-pointer ${
+                uiSfxEnabled
+                  ? 'border-[#19C8F5]/45 bg-[#0E192A] text-[#19C8F5] hover:border-[#19C8F5]'
+                  : 'border-[#203653] bg-[#08101C] text-[#6F849F] hover:text-[#EAF3FF]'
+              }`}
+            >
+              {uiSfxEnabled ? <Volume2 className="h-4 w-4" aria-hidden="true" /> : <VolumeX className="h-4 w-4" aria-hidden="true" />}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                playCockpitTabDetent();
+                setActiveTab((prev) => (prev === 'ADMIN_MASTER' ? 'PIN_ENTRY' : 'ADMIN_MASTER'));
+              }}
+              className="whitespace-nowrap shrink-0 rounded-md border border-[#203653] bg-[#0E192A] px-2.5 sm:px-4 py-2 text-xs font-semibold text-[#EAF3FF] transition-colors hover:border-[#19C8F5]/70 hover:text-white cursor-pointer min-h-[40px]"
             >
               {activeTab === 'ADMIN_MASTER' ? 'Technician PIN' : 'Admin Master'}
             </button>

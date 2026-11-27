@@ -6,7 +6,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MultimeterState, MultimeterMode, EcuPin, BenchComponent } from '../types/ecu';
 import { Volume2, VolumeX, AlertTriangle, ArrowLeftRight, X, Disc, PauseCircle } from 'lucide-react';
-import { playContinuityBeep, playHoldBeep } from '../utils/audioFeedback';
+import { playContinuityBeep, playHoldBeep, playRotaryEncoderTick } from '../utils/audioFeedback';
 import { recordRenderCycle } from '../utils/perfMonitor';
 import { RackCornerScrews } from './HardwareControls';
 
@@ -153,6 +153,9 @@ export const DigitalMultimeter: React.FC<DigitalMultimeterProps> = React.memo(({
     multimeter.holdValue && heldReading ? heldReading : reading;
 
   const setMode = (mode: MultimeterMode) => {
+    if (multimeter.mode !== mode) {
+      playRotaryEncoderTick();
+    }
     onClearManualRange?.();
     onChange({ ...multimeter, mode, rangeAuto: true, holdValue: false });
   };

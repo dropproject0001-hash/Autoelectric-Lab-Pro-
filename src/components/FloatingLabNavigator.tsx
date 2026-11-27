@@ -65,6 +65,7 @@ import {
 import { voiceMacroService } from '../services/voiceMacroService';
 import { LabTab, MobileBenchPane } from './LabTopNav';
 import { LabDrawerIcon } from './icons/LabDrawerIcons';
+import { playCockpitTabDetent, playDrawerPneumaticSlide } from '../utils/audioFeedback';
 
 export type FloatingOpacityLevel = 0.25 | 0.5 | 0.75 | 1;
 
@@ -157,6 +158,8 @@ export interface FloatingLabNavigatorProps {
   /** Unified AI Coach drawer toggle & open state. */
   isAiCoachOpen?: boolean;
   onOpenAiCoach?: () => void;
+  /** Optional inline-docked Voice & Knowledge DB pod rendered directly inside the cockpit command rail. */
+  voiceKnowledgeSlot?: React.ReactNode;
 }
 
 export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
@@ -217,6 +220,7 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
   onProbeScenarioFocusPin,
   isAiCoachOpen = false,
   onOpenAiCoach,
+  voiceKnowledgeSlot,
 }) => {
   const [internalVoiceNavEnabled, setInternalVoiceNavEnabled] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -1638,15 +1642,20 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
         </div>
       )}
 
-      {/* Non-Floating Docked Hardware Console Bar */}
-      <div className="hud-panel rounded-xl border-[#203653] px-2 lg:px-2.5 py-1.5 lg:py-1 flex flex-wrap lg:flex-nowrap items-center justify-between gap-1.5">
-        <div className="flex items-center gap-1.5 flex-wrap lg:flex-nowrap min-w-0">
+      {/* Non-Floating Docked Hardware Console Bar — Single-Row Cockpit Command Rail */}
+      <div className="hud-panel rounded-xl border-[#203653] px-2 lg:px-2.5 py-1 flex flex-nowrap items-center justify-between gap-1.5 overflow-x-auto scrollbar-none">
+        <div className="flex items-center gap-1.5 flex-nowrap shrink-0">
           <button
             type="button"
-            onClick={() => setIsExpanded((prev) => !prev)}
+            onClick={() => {
+              setIsExpanded((prev) => {
+                playDrawerPneumaticSlide(!prev);
+                return !prev;
+              });
+            }}
             aria-expanded={isExpanded}
             title="Open quick bench container & voice drawer"
-            className={`hw-btn min-h-[36px] lg:min-h-[30px] flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider whitespace-nowrap cursor-pointer ${
+            className={`hw-btn min-h-[36px] lg:min-h-[30px] flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider whitespace-nowrap shrink-0 cursor-pointer ${
               isExpanded || isContainerMoveMode ? 'hw-btn-blue' : 'text-[#eaf3ff]'
             }`}
           >
@@ -1658,10 +1667,13 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
           {showPinScopeButton && onTogglePinScope && (
             <button
               type="button"
-              onClick={onTogglePinScope}
+              onClick={() => {
+                playCockpitTabDetent();
+                onTogglePinScope();
+              }}
               aria-expanded={isPinScopeOpen}
               aria-label="Toggle pin oscilloscope inspector"
-              className={`hw-btn min-h-[36px] lg:min-h-[30px] flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider whitespace-nowrap cursor-pointer ${
+              className={`hw-btn min-h-[36px] lg:min-h-[30px] flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider whitespace-nowrap shrink-0 cursor-pointer ${
                 isPinScopeOpen ? 'hw-btn-green' : 'text-[#eaf3ff]'
               }`}
             >
@@ -1669,7 +1681,7 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
               <span className="sm:hidden">Scope</span>
               <span className="hidden sm:inline">Pin Scope</span>
               {pinScopeSummary && (
-                <span className="hidden sm:inline text-[#19c8f5] tabular-nums">{pinScopeSummary}</span>
+                <span className="hidden md:inline text-[#19c8f5] tabular-nums">{pinScopeSummary}</span>
               )}
             </button>
           )}
@@ -1677,13 +1689,14 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
           <button
             type="button"
             onClick={() => {
+              playCockpitTabDetent();
               const curIdx = paneOrder.indexOf(mobileBenchPane);
               const nextPane = paneOrder[(curIdx + 1) % paneOrder.length];
               onNavigateTab('BENCH_LAB');
               onSelectMobilePane(nextPane);
             }}
-            className="hw-btn flex lg:hidden min-h-[36px] items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-mono text-[#eaf3ff] cursor-pointer"
-            title="Switch next mobile bench container"
+            className="hw-btn flex xl:hidden min-h-[36px] lg:min-h-[30px] items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg text-[10px] font-mono text-[#eaf3ff] whitespace-nowrap shrink-0 cursor-pointer"
+            title="Switch next bench container"
             aria-label="Next bench container"
           >
             <ArrowLeftRight className="w-3.5 h-3.5 text-[#19c8f5] shrink-0" />
@@ -1694,39 +1707,49 @@ export const FloatingLabNavigator: React.FC<FloatingLabNavigatorProps> = ({
           </button>
         </div>
 
-        <div className="flex items-center gap-1.5 flex-wrap lg:flex-nowrap shrink-0">
+        <div className="flex items-center gap-1.5 flex-nowrap shrink-0">
           <button
             type="button"
             data-testid="floating-voice-lang-toggle"
-            onClick={handleToggleLanguage}
+            onClick={() => {
+              playCockpitTabDetent();
+              handleToggleLanguage();
+            }}
             title="Toggle shared voice language between Taglish (TL) and English (EN)"
-            className="hw-btn min-h-[36px] lg:min-h-[30px] flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-mono font-bold text-[#19c8f5] whitespace-nowrap cursor-pointer"
+            className="hw-btn min-h-[36px] lg:min-h-[30px] flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-mono font-bold text-[#19c8f5] whitespace-nowrap shrink-0 cursor-pointer"
           >
             <Globe className="w-3 h-3 shrink-0" />
             <span>{voiceState.language}</span>
           </button>
 
-          <button
-            type="button"
-            data-testid="floating-voice-fab"
-            aria-pressed={onOpenAiCoach ? isAiCoachOpen : voiceNavEnabled}
-            onClick={onOpenAiCoach ?? handleToggleVoiceNav}
-            className={`hw-btn min-h-[36px] lg:min-h-[30px] flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider whitespace-nowrap cursor-pointer ${
-              (onOpenAiCoach ? isAiCoachOpen : voiceNavEnabled) ? 'hw-btn-green' : 'text-[#d4e3f6]'
-            }`}
-            title="Open Unified AI Coach (Natural Taglish Voice Coach & Diagnostic Assistant)"
-          >
-            <Headphones className="w-3.5 h-3.5 shrink-0 text-[#19c8f5]" />
-            <span>AI Coach</span>
-          </button>
+          {voiceKnowledgeSlot ? (
+            voiceKnowledgeSlot
+          ) : (
+            <button
+              type="button"
+              data-testid="floating-voice-fab"
+              aria-pressed={onOpenAiCoach ? isAiCoachOpen : voiceNavEnabled}
+              onClick={onOpenAiCoach ?? handleToggleVoiceNav}
+              className={`hw-btn min-h-[36px] lg:min-h-[30px] flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider whitespace-nowrap shrink-0 cursor-pointer ${
+                (onOpenAiCoach ? isAiCoachOpen : voiceNavEnabled) ? 'hw-btn-green' : 'text-[#d4e3f6]'
+              }`}
+              title="Open Unified AI Coach (Natural Taglish Voice Coach & Diagnostic Assistant)"
+            >
+              <Headphones className="w-3.5 h-3.5 shrink-0 text-[#19c8f5]" />
+              <span>AI Coach</span>
+            </button>
+          )}
 
           {onToggleVoiceLog && (
             <button
               type="button"
-              onClick={onToggleVoiceLog}
+              onClick={() => {
+                playCockpitTabDetent();
+                onToggleVoiceLog();
+              }}
               aria-pressed={isVoiceLogOpen}
               aria-label="Toggle voice command log sidebar"
-              className={`hw-btn min-h-[36px] lg:min-h-[30px] flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-mono font-semibold whitespace-nowrap cursor-pointer ${
+              className={`hw-btn min-h-[36px] lg:min-h-[30px] flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg text-[10px] font-mono font-semibold whitespace-nowrap shrink-0 cursor-pointer ${
                 isVoiceLogOpen ? 'hw-btn-blue' : 'text-[#d4e3f6]'
               }`}
             >

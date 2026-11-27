@@ -1753,6 +1753,16 @@ function AuthorizedBenchLabWorkspace({
           setUnifiedAiSubTab('VOICE');
           setShowUnifiedAiDrawer((prev) => !prev);
         }}
+        voiceKnowledgeSlot={
+          <FloatingVoiceKnowledgeFab
+            dockedInline={true}
+            isDrawerOpen={showUnifiedAiDrawer}
+            lang={bilingualLang}
+            isTelemetryStreaming={Boolean(circuitSolution && circuitSolution.solverStatus !== 'NON_FINITE')}
+            onOpenDrawer={handleOpenDrawerFromFab}
+            onVoiceTranscript={handleTopBarVoiceTranscript}
+          />
+        }
         benchVoiceActionRequest={benchVoiceActionRequest}
         simulationSpeed={simulationSpeed}
         powerSupply={powerSupply}
@@ -2235,15 +2245,6 @@ function AuthorizedBenchLabWorkspace({
       <AdminPinManagerModal
         isOpen={showAdminBillingModal}
         onClose={() => setShowAdminBillingModal(false)}
-      />
-
-      {/* Global Floating Corner Button for Voice Interaction & End-to-End Knowledge DB */}
-      <FloatingVoiceKnowledgeFab
-        isDrawerOpen={showUnifiedAiDrawer}
-        lang={bilingualLang}
-        isTelemetryStreaming={Boolean(circuitSolution && circuitSolution.solverStatus !== 'NON_FINITE')}
-        onOpenDrawer={handleOpenDrawerFromFab}
-        onVoiceTranscript={handleTopBarVoiceTranscript}
       />
 
       {/* Unified AI Assistant Drawer (Voice Coach · Diagnostic Assistant · Knowledge DB) */}

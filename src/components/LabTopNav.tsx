@@ -4,6 +4,7 @@
  */
 
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { motion } from 'motion/react';
 import {
   Activity,
   BookOpen,
@@ -15,6 +16,8 @@ import {
   Menu,
   RefreshCw,
   ScanLine,
+  Volume2,
+  VolumeX,
   Wrench,
   type LucideIcon,
 } from 'lucide-react';
@@ -30,6 +33,13 @@ import { NavigationDrawer, type DrawerNavTabItem } from './NavigationDrawer';
 import { RamtiVectorEmblem } from './icons/RamtiBrandAssets';
 import { formatTrialCountdown, useTrialAccess } from '../context/TrialAccessContext';
 import { useAuth } from '../context/AuthContext';
+import {
+  isUiSoundEnabled,
+  playCockpitTabDetent,
+  playDrawerPneumaticSlide,
+  subscribeUiSoundPreference,
+  toggleUiSoundEnabled,
+} from '../utils/audioFeedback';
 
 export type LabTab =
   | 'BENCH_LAB'
@@ -161,13 +171,19 @@ export const LabTopNav: React.FC<LabTopNavProps> = ({
   const drawerId = useId();
   const [isNavDrawerOpen, setIsNavDrawerOpen] = useState(false);
   const [isCredentialsModalOpen, setIsCredentialsModalOpen] = useState(false);
+  const [uiSfxEnabled, setUiSfxEnabledState] = useState<boolean>(() => isUiSoundEnabled());
   const {
     user: googleUser,
     syncStatus,
     retryCloudSync,
   } = useAuth();
 
+  useEffect(() => {
+    return subscribeUiSoundPreference(setUiSfxEnabledState);
+  }, []);
+
   const handleCloseDrawer = useCallback((restoreFocus = true) => {
+    playDrawerPneumaticSlide(false);
     setIsNavDrawerOpen(false);
     if (restoreFocus) {
       window.requestAnimationFrame(() => {
@@ -235,19 +251,26 @@ export const LabTopNav: React.FC<LabTopNavProps> = ({
 
   return (
     <header className="hud-header relative z-40 w-full min-w-0 shrink-0 text-[#eaf3ff]">
-      {/* Subtle Electric Cyan Top Edge Highlight */}
+      {/* Subtle Electric Cyan Top Edge Highlight + Animated Optical HUD Sweep */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#19c8f5]/60 to-transparent"
-      />
+        className="pointer-events-none absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#19c8f5]/60 to-transparent overflow-hidden"
+      >
+        <div className="h-full w-1/3 bg-gradient-to-r from-transparent via-white/75 to-transparent animate-hud-laser-sweep" />
+      </div>
 
       {/* Row 1: Single NavigationDrawer Toggle + Brand Lockup + Passive Live Bus Telemetry */}
-      <div className="flex min-w-0 items-center justify-between gap-2 px-2.5 py-2 sm:px-4 lg:py-1.5">
-        <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
+      <div className="flex min-w-0 items-center justify-between gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 lg:py-1.5">
+        <div className="flex min-w-0 items-center gap-1.5 sm:gap-2.5">
           <button
             ref={drawerTriggerRef}
             type="button"
-            onClick={() => setIsNavDrawerOpen((prev) => !prev)}
+            onClick={() => {
+              setIsNavDrawerOpen((prev) => {
+                playDrawerPneumaticSlide(!prev);
+                return !prev;
+              });
+            }}
             aria-expanded={isNavDrawerOpen}
             aria-controls={drawerId}
             aria-label={isNavDrawerOpen ? 'Close navigation drawer' : 'Open navigation drawer'}
@@ -256,7 +279,7 @@ export const LabTopNav: React.FC<LabTopNavProps> = ({
                 ? 'Close Navigation Drawer'
                 : 'Open Diagnostic Tools, Workspace Views & Configuration Drawer'
             }
-            className={`hw-btn relative inline-flex h-10 w-10 lg:h-9 lg:w-9 shrink-0 items-center justify-center rounded-lg text-[#19c8f5] hover:border-[#19c8f5]/65 hover:text-white cursor-pointer ${FOCUS_STYLES}`}
+            className={`hw-btn relative inline-flex h-9 w-9 sm:h-10 sm:w-10 lg:h-9 lg:w-9 shrink-0 items-center justify-center rounded-lg text-[#19c8f5] hover:border-[#19c8f5]/65 hover:text-white cursor-pointer ${FOCUS_STYLES}`}
           >
             <Menu className="h-4 w-4" aria-hidden="true" />
             {activeAudioAlertCount > 0 && (
@@ -271,33 +294,48 @@ export const LabTopNav: React.FC<LabTopNavProps> = ({
 
           <button
             type="button"
-            onClick={() => onSelectTab('BENCH_LAB')}
-            className="flex min-w-0 items-center gap-2 text-left cursor-pointer"
+            onClick={() => {
+              playCockpitTabDetent();
+              onSelectTab('BENCH_LAB');
+            }}
+            className="flex min-w-0 items-center gap-1.5 sm:gap-2 text-left cursor-pointer"
           >
             <BrandAppIcon />
             <div className="min-w-0 leading-none">
               <div className="flex items-baseline gap-1 min-w-0">
-                <span className="font-hud text-[11px] sm:text-[12px] font-extrabold tracking-[0.16em] text-[#19C8F5] shrink-0">
+                <span className="font-hud text-[10.5px] sm:text-[12px] font-extrabold tracking-[0.15em] text-[#19C8F5] shrink-0">
                   RAMTi
                 </span>
-                <span className="font-body text-[14px] sm:text-[18px] lg:text-[19px] font-bold italic tracking-tight brand-wordmark-silver truncate">
+                <span className="xs:hidden font-body text-[13.5px] font-bold italic tracking-tight brand-wordmark-silver shrink-0">
+                  LAB
+                </span>
+                <span className="hidden xs:inline sm:hidden font-body text-[13.5px] font-bold italic tracking-tight brand-wordmark-silver truncate">
+                  AutoElec
+                </span>
+                <span className="hidden sm:inline font-body text-[17px] lg:text-[19px] font-bold italic tracking-tight brand-wordmark-silver truncate">
                   AutoElectric Lab
                 </span>
-                <span className="font-body text-[14px] sm:text-[18px] lg:text-[19px] font-bold italic tracking-tight brand-wordmark-amber shrink-0">
+                <span className="font-body text-[13.5px] sm:text-[17px] lg:text-[19px] font-bold italic tracking-tight brand-wordmark-amber shrink-0">
                   PRO
                 </span>
               </div>
-              <p className="mt-0.5 hidden sm:block font-body text-[9.5px] font-medium tracking-[0.1em] text-[#BCCDEF] truncate">
+              <p className="mt-0.5 hidden md:block font-body text-[9.5px] font-medium tracking-[0.1em] text-[#BCCDEF] truncate">
                 {RAMTI_SUBTITLE_INLINE}
               </p>
             </div>
           </button>
         </div>
 
-        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
           {/* Compact Mobile/Tablet Live Bus Status (Read-Only Telemetry) */}
-          <div className="flex lg:hidden h-10 items-center rounded-lg border border-[#203653] bg-[#0A1220]/90 divide-x divide-[#203653] font-mono text-[10.5px] tabular-nums">
-            <div className="flex items-center gap-1.5 px-2.5">
+          <div
+            className={`flex lg:hidden h-9 sm:h-10 items-center rounded-lg border bg-[#0A1220]/90 divide-x divide-[#203653] font-mono text-[10px] sm:text-[10.5px] tabular-nums ${
+              isPowerOn && dtcCount === 0
+                ? 'border-[#20D889]/45 animate-bus-energized'
+                : 'border-[#203653]'
+            }`}
+          >
+            <div className="flex items-center gap-1.5 px-2 sm:px-2.5">
               <span
                 aria-hidden="true"
                 className={`h-2 w-2 rounded-full shrink-0 ${
@@ -317,10 +355,10 @@ export const LabTopNav: React.FC<LabTopNavProps> = ({
                       : 'font-semibold text-[#91A4BD]'
                 }
               >
-                {dtcCount > 0 ? `${dtcCount} DTC` : isPowerOn ? `${busVolts.toFixed(1)}V` : 'PSU OFF'}
+                {dtcCount > 0 ? `${dtcCount} DTC` : isPowerOn ? `${busVolts.toFixed(1)}V` : 'OFF'}
               </span>
             </div>
-            <div className="hidden xs:flex items-center px-2.5 text-[#91A4BD]">
+            <div className="hidden sm:flex items-center px-2.5 text-[#91A4BD]">
               <strong
                 className={
                   circuitSolution.isSupplyCurrentTripped ? 'text-[#FF4D62]' : 'text-[#EAF3FF]'
@@ -333,10 +371,28 @@ export const LabTopNav: React.FC<LabTopNavProps> = ({
 
           <button
             type="button"
-            onClick={() => openAccessModal()}
+            onClick={() => toggleUiSoundEnabled()}
+            aria-pressed={uiSfxEnabled}
+            aria-label={uiSfxEnabled ? 'Mute cockpit tactile sound effects' : 'Enable cockpit tactile sound effects'}
+            title={uiSfxEnabled ? 'Cockpit Tactile Audio: ON (Click to mute)' : 'Cockpit Tactile Audio: MUTED (Click to enable)'}
+            className={`hw-btn inline-flex h-9 w-9 sm:h-10 sm:w-10 lg:h-9 lg:w-9 shrink-0 items-center justify-center rounded-lg transition cursor-pointer ${
+              uiSfxEnabled
+                ? 'border-[#19C8F5]/50 text-[#19C8F5] hover:border-[#19C8F5]'
+                : 'border-[#203653] text-[#6F849F] hover:text-[#EAF3FF]'
+            } ${FOCUS_STYLES}`}
+          >
+            {uiSfxEnabled ? <Volume2 className="h-3.5 w-3.5" aria-hidden="true" /> : <VolumeX className="h-3.5 w-3.5" aria-hidden="true" />}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              playCockpitTabDetent();
+              openAccessModal();
+            }}
             aria-label={`Access status: ${accessBadgeText}. Open Trial PIN console`}
             title="Enter 8-digit Trial PIN or open Admin Trial Generator"
-            className={`flex lg:hidden h-10 items-center gap-1 rounded-lg border bg-[#0A1220]/95 px-2.5 font-mono text-[10.5px] font-bold tabular-nums transition cursor-pointer ${accessBadgeToneClass} ${FOCUS_STYLES}`}
+            className={`flex lg:hidden h-9 sm:h-10 items-center gap-1 rounded-lg border bg-[#0A1220]/95 px-2 sm:px-2.5 font-mono text-[10px] sm:text-[10.5px] font-bold tabular-nums transition cursor-pointer ${accessBadgeToneClass} ${FOCUS_STYLES}`}
           >
             <span>
               {accessMode === 'TRIAL_EXPIRED' || accessMode === 'TRIAL_REVOKED'
@@ -456,12 +512,12 @@ export const LabTopNav: React.FC<LabTopNavProps> = ({
         </div>
       </div>
 
-      {/* Row 2: High-Level Workspace Tab Navigation */}
+      {/* Row 2: High-Level Workspace Tab Navigation — Aligned 8-Column Single Ribbon on lg+ */}
       <div className="flex min-w-0 items-stretch border-t border-[#203653] bg-[#0A1220]/74 px-2 sm:px-3.5 lg:px-4 py-1.5 lg:py-1">
         <nav
           ref={navigationRef}
           aria-label="AutoElectric Lab Pro sections"
-          className="flex min-w-0 flex-1 items-stretch gap-1.5 overflow-x-auto scrollbar-none overscroll-x-contain lg:grid lg:grid-cols-7 lg:overflow-visible"
+          className="flex min-w-0 flex-1 items-stretch gap-1.5 overflow-x-auto scrollbar-none overscroll-x-contain lg:grid lg:grid-cols-8 lg:overflow-visible"
         >
           {NAV_TABS.map((tab) => {
             const isActive = activeTab === tab.id;
@@ -472,12 +528,15 @@ export const LabTopNav: React.FC<LabTopNavProps> = ({
                 key={tab.id}
                 ref={isActive ? activeButtonRef : undefined}
                 type="button"
-                onClick={() => onSelectTab(tab.id)}
+                onClick={() => {
+                  if (!isActive) playCockpitTabDetent();
+                  onSelectTab(tab.id);
+                }}
                 aria-current={isActive ? 'page' : undefined}
                 className={[
-                  'relative inline-flex min-h-[40px] lg:min-h-[34px] shrink-0 min-w-[82px] sm:min-w-[116px] lg:min-w-0 items-center justify-center gap-1.5 xl:gap-2 whitespace-nowrap',
-                  'rounded-lg border px-2.5 sm:px-3 lg:px-2 xl:px-3 py-1.5 lg:py-1 text-[12px] lg:text-[11.5px] xl:text-[12.5px] font-semibold cursor-pointer',
-                  'transition-all motion-reduce:transition-none',
+                  'relative inline-flex min-h-[40px] lg:min-h-[34px] shrink-0 min-w-[82px] sm:min-w-[112px] lg:min-w-0 items-center justify-center gap-1.5 xl:gap-2 whitespace-nowrap',
+                  'rounded-lg border px-2.5 sm:px-3 lg:px-1.5 xl:px-2.5 py-1.5 lg:py-1 text-[12px] lg:text-[11px] xl:text-[12px] font-semibold cursor-pointer',
+                  'transition-all motion-reduce:transition-none active:scale-[0.985]',
                   FOCUS_STYLES,
                   isActive ? 'diag-tab-active' : 'diag-tab-idle',
                 ].join(' ')}
@@ -487,12 +546,14 @@ export const LabTopNav: React.FC<LabTopNavProps> = ({
                   className={`h-4 w-4 lg:h-3.5 lg:w-3.5 shrink-0 ${isActive ? 'text-white' : 'text-[#19c8f5]/80'}`}
                   strokeWidth={1.9}
                 />
-                <span className="sm:hidden">{tab.shortLabel}</span>
-                <span className="hidden sm:inline truncate">{tab.label}</span>
+                <span className="sm:hidden lg:inline xl:hidden truncate">{tab.shortLabel}</span>
+                <span className="hidden sm:inline lg:hidden xl:inline truncate">{tab.label}</span>
                 {isActive && (
-                  <span
+                  <motion.span
+                    layoutId="labTopNavActiveLaser"
                     aria-hidden="true"
-                    className="absolute inset-x-2.5 bottom-0 h-[2px] rounded-full bg-[#19c8f5] shadow-[0_0_8px_rgba(25,200,245,0.8)]"
+                    transition={{ type: 'spring', stiffness: 460, damping: 34 }}
+                    className="absolute inset-x-2.5 bottom-0 h-[2px] rounded-full bg-[#19c8f5] shadow-[0_0_8px_rgba(25,200,245,0.85)]"
                   />
                 )}
               </button>

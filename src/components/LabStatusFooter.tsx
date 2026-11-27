@@ -19,6 +19,7 @@ import {
 } from '../services/benchStorageService';
 import { formatCloudSyncError } from '../utils/cloudSyncErrorUtils';
 import { LabDrawerIcon } from './icons/LabDrawerIcons';
+import { playCockpitTabDetent, playProbeTapSound } from '../utils/audioFeedback';
 
 export interface FooterSyncIndicatorDescriptor {
   visible: boolean;
@@ -333,9 +334,9 @@ export const LabStatusFooter: React.FC<LabStatusFooterProps> = ({
       : formatTrialCountdown(remainingSeconds);
 
   return (
-    <footer className="relative min-h-[36px] bg-gradient-to-b from-[#0b1526]/84 to-[#060c17]/90 backdrop-blur-md border-t border-[#203653] px-2.5 sm:px-3.5 lg:px-4 py-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] flex flex-wrap lg:flex-nowrap items-center justify-between gap-2 text-[10.5px] font-mono shrink-0 text-[#d9e8fa] overflow-x-auto scrollbar-none">
+    <footer className="relative min-h-[36px] bg-gradient-to-b from-[#0b1526]/88 to-[#060c17]/94 backdrop-blur-md border-t border-[#203653] px-2.5 sm:px-3.5 lg:px-4 py-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] flex flex-nowrap items-center justify-between gap-3 text-[10.5px] font-mono shrink-0 text-[#d9e8fa] overflow-x-auto scrollbar-none">
       {/* Left Existing Bench Telemetry Strip */}
-      <div className="flex items-center gap-1.5 sm:gap-2 flex-nowrap min-w-0 flex-1 overflow-x-auto scrollbar-none">
+      <div className="flex items-center gap-1.5 sm:gap-2 flex-nowrap shrink-0">
         <span className="inline-flex items-center gap-1.5 text-[#eaf3ff] whitespace-nowrap shrink-0">
           <span
             aria-hidden="true"
@@ -478,11 +479,14 @@ export const LabStatusFooter: React.FC<LabStatusFooterProps> = ({
       </div>
 
       {/* Right Existing Bench Utility Controls */}
-      <div className="flex flex-wrap lg:flex-nowrap items-center gap-1.5 shrink-0">
+      <div className="flex flex-nowrap items-center gap-1.5 shrink-0">
         {onToggleVoiceLog && (
           <button
             type="button"
-            onClick={onToggleVoiceLog}
+            onClick={() => {
+              playCockpitTabDetent();
+              onToggleVoiceLog();
+            }}
             aria-expanded={isVoiceLogOpen}
             className={`hidden 2xl:flex hw-btn text-[10px] items-center gap-1 px-2 py-1 rounded-md whitespace-nowrap tabular-nums cursor-pointer ${
               isVoiceLogOpen ? 'hw-btn-blue' : 'text-[#d9e8fa]'
@@ -496,7 +500,10 @@ export const LabStatusFooter: React.FC<LabStatusFooterProps> = ({
         {onSelectDiagnosticPanel && (
           <button
             type="button"
-            onClick={() => onSelectDiagnosticPanel('WORKFLOW')}
+            onClick={() => {
+              playCockpitTabDetent();
+              onSelectDiagnosticPanel('WORKFLOW');
+            }}
             aria-pressed={activeTab === 'BENCH_LAB' && isWorkflowActive}
             className={`hw-btn text-[10px] flex items-center gap-1 px-2 py-1 rounded-md whitespace-nowrap tabular-nums cursor-pointer ${
               activeTab === 'BENCH_LAB' && isWorkflowActive ? 'hw-btn-blue' : 'text-[#d9e8fa]'
@@ -516,7 +523,10 @@ export const LabStatusFooter: React.FC<LabStatusFooterProps> = ({
           <button
             type="button"
             data-testid="footer-logic-check-btn"
-            onClick={() => onSelectDiagnosticPanel('LOGIC_CHECK')}
+            onClick={() => {
+              playCockpitTabDetent();
+              onSelectDiagnosticPanel('LOGIC_CHECK');
+            }}
             aria-pressed={activeTab === 'BENCH_LAB' && isLogicCheckActive}
             className={`hw-btn text-[10px] flex items-center gap-1 px-2 py-1 rounded-md whitespace-nowrap tabular-nums cursor-pointer ${
               isLogicCheckCritical
@@ -540,9 +550,11 @@ export const LabStatusFooter: React.FC<LabStatusFooterProps> = ({
         {activeTab === 'BENCH_LAB' && (
           <button
             type="button"
-            onClick={() =>
-              onSelectDiagnosticPanel ? onSelectDiagnosticPanel('MNA_GUIDE') : onToggleDiagnosticGuide()
-            }
+            onClick={() => {
+              playCockpitTabDetent();
+              if (onSelectDiagnosticPanel) onSelectDiagnosticPanel('MNA_GUIDE');
+              else onToggleDiagnosticGuide();
+            }}
             aria-pressed={isMnaGuideActive}
             className={`hw-btn text-[10px] flex items-center gap-1 px-2 py-1 rounded-md whitespace-nowrap cursor-pointer ${
               isMnaGuideActive ? 'hw-btn-amber' : 'text-[#d9e8fa]'
@@ -554,14 +566,20 @@ export const LabStatusFooter: React.FC<LabStatusFooterProps> = ({
         )}
         <button
           type="button"
-          onClick={onQuickAttachRedProbe}
+          onClick={() => {
+            playProbeTapSound();
+            onQuickAttachRedProbe();
+          }}
           className="hw-btn text-[10px] text-rose-300 hover:text-white flex items-center gap-1 border-[#ff4d62]/45 px-2 py-1 rounded-md whitespace-nowrap cursor-pointer"
         >
           Red (+)
         </button>
         <button
           type="button"
-          onClick={onQuickAttachBlackProbe}
+          onClick={() => {
+            playProbeTapSound();
+            onQuickAttachBlackProbe();
+          }}
           className="hw-btn text-[10px] text-[#d9e8fa] hover:text-white flex items-center gap-1 px-2 py-1 rounded-md whitespace-nowrap cursor-pointer"
         >
           COM (-)
@@ -589,8 +607,12 @@ export const LabStatusFooter: React.FC<LabStatusFooterProps> = ({
             <span>{formattedFooterCountdown} · New PIN</span>
           </button>
         )}
-        <ConnectionHealthWidget />
-        <PerformanceMonitorWidget />
+        <div className="hidden md:flex items-center gap-1.5 shrink-0">
+          <ConnectionHealthWidget />
+        </div>
+        <div className="hidden 2xl:flex items-center shrink-0">
+          <PerformanceMonitorWidget />
+        </div>
         <div
           aria-hidden="true"
           className="hidden xl:flex items-center gap-1 pl-1 opacity-85 shrink-0"

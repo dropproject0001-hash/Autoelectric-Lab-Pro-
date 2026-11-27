@@ -41,7 +41,11 @@ import type {
   SavedBenchSession,
   SavedDiagnosticLog,
 } from "../services/benchStorageService";
-import { playModuleActivationSound } from "../utils/audioFeedback";
+import {
+  playCockpitTabDetent,
+  playDrawerPneumaticSlide,
+  playModuleActivationSound,
+} from "../utils/audioFeedback";
 import { ECUDiagnosticView } from "./ECUDiagnosticView";
 import {
   FloatingLabNavigator,
@@ -226,6 +230,7 @@ export interface LabNavigationProps {
   onActiveUniversityModuleChange?: (moduleId: string | null) => void;
   isAiCoachOpen?: boolean;
   onOpenAiCoach?: () => void;
+  voiceKnowledgeSlot?: React.ReactNode;
   benchVoiceActionRequest?: {
     action: BenchVoiceSimulationAction;
     nonce: number;
@@ -2119,7 +2124,7 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
       {content}
     </LazyModule>
   );
-  const fullPaneClass = "flex-1 min-h-0 min-w-0 flex overflow-hidden w-full";
+  const fullPaneClass = "flex-1 min-h-0 min-w-0 flex overflow-hidden w-full animate-cockpit-module";
   const isEmbeddedPinScope =
     activeTab === "OSCILLOSCOPE" &&
     (oscilloscopeViewMode === "RECHARTS_PIN" ||
@@ -2139,7 +2144,7 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
       {activeTab === "BENCH_LAB" && (
         <section
           aria-label="Bench Lab trouble scenario emulator and pulse monitor"
-          className={`hud-panel flex shrink-0 flex-wrap lg:flex-nowrap items-center justify-between gap-2 rounded-xl border px-2.5 lg:px-3 py-1.5 text-[11px] font-mono ${
+          className={`hud-panel flex shrink-0 flex-nowrap items-center justify-between gap-2 rounded-xl border px-2 sm:px-2.5 lg:px-3 py-1.5 text-[11px] font-mono overflow-x-auto scrollbar-none ${
             benchPulseEval.headlineStatus === "ALL_SIGNALS_ACTIVE"
               ? "border-[#203653]"
               : !benchPulseEval.isPsuOn && faults.length === 0 && cutWireCount === 0 && !isCkpSignalLost
@@ -2147,10 +2152,13 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
                 : "border-[#ff4d62]/55 bg-[#200c14]/70"
           }`}
         >
-          <div className="flex min-w-0 flex-1 flex-wrap lg:flex-nowrap items-center gap-2">
+          <div className="flex min-w-0 flex-nowrap items-center gap-1.5 sm:gap-2 shrink-0 xl:flex-1">
             <button
               type="button"
-              onClick={() => setIsTroubleDrawerOpen(true)}
+              onClick={() => {
+                playDrawerPneumaticSlide(true);
+                setIsTroubleDrawerOpen(true);
+              }}
               aria-expanded={isTroubleDrawerOpen}
               className={`hw-btn inline-flex min-h-[36px] lg:min-h-[32px] shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-wide whitespace-nowrap cursor-pointer ${
                 benchPulseEval.headlineStatus === "ALL_SIGNALS_ACTIVE"
@@ -2170,7 +2178,10 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
             </button>
             <button
               type="button"
-              onClick={() => setIsFaultBuilderOpen(true)}
+              onClick={() => {
+                playDrawerPneumaticSlide(true);
+                setIsFaultBuilderOpen(true);
+              }}
               className="hw-btn hw-btn-blue inline-flex min-h-[36px] lg:min-h-[32px] shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-wide whitespace-nowrap cursor-pointer"
             >
               <Layers className="h-3.5 w-3.5 text-[#19c8f5] shrink-0" aria-hidden="true" />
@@ -2201,7 +2212,7 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
             </span>
 
             <span
-              className={`min-w-0 truncate text-[10.5px] ${
+              className={`hidden md:inline min-w-0 truncate text-[10.5px] ${
                 benchPulseEval.headlineStatus === "ALL_SIGNALS_ACTIVE"
                   ? "text-[#91a4bd]"
                   : !benchPulseEval.isPsuOn && faults.length === 0 && cutWireCount === 0 && !isCkpSignalLost
@@ -2214,7 +2225,7 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
             </span>
           </div>
 
-          <div className="flex shrink-0 flex-wrap lg:flex-nowrap items-center gap-1.5 text-[10px]">
+          <div className="flex shrink-0 flex-nowrap items-center gap-1.5 text-[10px]">
             <span
               className={`hidden sm:inline-flex items-center rounded-md border px-2 py-1 tabular-nums whitespace-nowrap ${
                 benchPulseEval.isBatteryKl30Ok
@@ -2239,7 +2250,10 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
             </span>
             <button
               type="button"
-              onClick={() => setShowPinScopeOverlay(true)}
+              onClick={() => {
+                playCockpitTabDetent();
+                setShowPinScopeOverlay(true);
+              }}
               className="hw-btn inline-flex min-h-[34px] lg:min-h-[32px] items-center gap-1.5 rounded-lg px-2.5 py-1 text-[#19c8f5] hover:text-white whitespace-nowrap cursor-pointer"
             >
               <LabDrawerIcon name="active-drawer" size={24} className="h-3.5 w-3.5 shrink-0" />
@@ -2248,7 +2262,10 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
             {(activeTroubleScenarioId || activeFaultSequence || faults.length > 0 || isCkpSignalLost || cutWireCount > 0) && (
               <button
                 type="button"
-                onClick={handleClearTroubleScenarios}
+                onClick={() => {
+                  playCockpitTabDetent();
+                  handleClearTroubleScenarios();
+                }}
                 className="hw-btn min-h-[34px] lg:min-h-[32px] rounded-lg border-[#20d889]/45 px-2.5 py-1 text-[#20d889] hover:text-emerald-100 whitespace-nowrap cursor-pointer"
               >
                 Restore Nominal
@@ -2351,7 +2368,7 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
           />
         </Suspense>
       )}
-      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden lg:flex-row lg:items-stretch lg:gap-2.5">
+      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden xl:flex-row xl:items-stretch xl:gap-2.5">
       <ModuleErrorBoundary
         label="Workspace view"
         resetKey={activeTab}
@@ -2361,15 +2378,18 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
           <>
             <nav
               aria-label="Mobile workspace panes"
-              className="hud-panel flex shrink-0 items-center gap-1 rounded-xl p-1 text-[10.5px] font-mono lg:hidden"
+              className="hud-panel flex shrink-0 items-center gap-1 rounded-xl p-1 text-[10.5px] font-mono xl:hidden"
             >
               {paneOrder.map((pane) => (
                 <button
                   key={pane}
                   type="button"
                   aria-pressed={mobileBenchPane === pane}
-                  onClick={() => selectMobilePane(pane)}
-                  className={`min-h-[42px] min-w-0 flex-1 inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-lg border px-1.5 sm:px-2.5 py-1.5 text-center uppercase tracking-wide sm:tracking-wider cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#19c8f5] ${
+                  onClick={() => {
+                    if (mobileBenchPane !== pane) playCockpitTabDetent();
+                    selectMobilePane(pane);
+                  }}
+                  className={`min-h-[40px] min-w-0 flex-1 inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-lg border px-1.5 sm:px-2.5 py-1.5 text-center uppercase tracking-wide sm:tracking-wider transition-all active:scale-[0.985] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#19c8f5] ${
                     mobileBenchPane === pane
                       ? "hw-btn-blue font-bold text-white"
                       : "border-transparent text-[#91a4bd] hover:text-[#eaf3ff]"
@@ -2472,13 +2492,13 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
                     key={pane}
                     id={paneId(pane)}
                     aria-label="Bench harness and 3D EMS viewport"
-                    className={`min-h-0 min-w-0 flex-1 flex-col gap-1.5 overflow-hidden ${mobileBenchPane === pane ? "flex" : "hidden lg:flex"}`}
+                    className={`min-h-0 min-w-0 flex-1 flex-col gap-1.5 overflow-hidden animate-cockpit-module ${mobileBenchPane === pane ? "flex" : "hidden xl:flex"}`}
                   >
                     {moveControls(pane)}
                     {/* Compact BENCH_LAB Center Workspace Mode Bar (2D Harness | Split 2D+3D | 3D EMS) */}
-                    <div className="flex items-center justify-between gap-2 rounded-[3px] border border-[#203653] bg-[#0a1322] px-2 py-1 shrink-0">
+                    <div className="flex items-center justify-between gap-2 rounded-lg border border-[#203653] bg-[#0a1322] px-2.5 py-1 shrink-0">
                       <div className="flex items-center gap-1.5 min-w-0">
-                        <span className="font-hud text-[10px] font-bold uppercase tracking-wider text-[#91a4bd] truncate">
+                        <span className="font-hud text-[10px] font-bold uppercase tracking-wider text-[#91a4bd] shrink-0">
                           Bench Stage
                         </span>
                         <span className="hidden sm:inline text-[9.5px] font-mono text-sky-300/90 truncate">
@@ -2488,13 +2508,16 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
                       <div
                         role="group"
                         aria-label="Bench viewport layout mode"
-                        className="flex items-center gap-1 bg-[#050a12] p-0.5 rounded-[2px] border border-[#203653]"
+                        className="flex items-center gap-1 bg-[#050a12] p-0.5 rounded-md border border-[#203653] shrink-0"
                       >
                         <button
                           type="button"
-                          onClick={() => setBenchViewportMode("2D_HARNESS")}
+                          onClick={() => {
+                            playCockpitTabDetent();
+                            setBenchViewportMode("2D_HARNESS");
+                          }}
                           aria-pressed={benchViewportMode === "2D_HARNESS"}
-                          className={`hw-btn px-2 py-0.5 rounded-[2px] text-[10px] font-mono flex items-center gap-1 cursor-pointer whitespace-nowrap ${
+                          className={`hw-btn px-2 py-0.5 rounded-[4px] text-[10px] font-mono flex items-center gap-1 cursor-pointer whitespace-nowrap ${
                             benchViewportMode === "2D_HARNESS"
                               ? "hw-btn-amber font-bold"
                               : "text-slate-300 hover:text-white"
@@ -2505,9 +2528,12 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
                         </button>
                         <button
                           type="button"
-                          onClick={() => setBenchViewportMode("SPLIT")}
+                          onClick={() => {
+                            playCockpitTabDetent();
+                            setBenchViewportMode("SPLIT");
+                          }}
                           aria-pressed={benchViewportMode === "SPLIT"}
-                          className={`hw-btn px-2 py-0.5 rounded-[2px] text-[10px] font-mono flex items-center gap-1 cursor-pointer whitespace-nowrap ${
+                          className={`hw-btn px-2 py-0.5 rounded-[4px] text-[10px] font-mono flex items-center gap-1 cursor-pointer whitespace-nowrap ${
                             benchViewportMode === "SPLIT"
                               ? "hw-btn-green font-bold"
                               : "text-slate-300 hover:text-white"
@@ -2518,9 +2544,12 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
                         </button>
                         <button
                           type="button"
-                          onClick={() => setBenchViewportMode("3D_EMS")}
+                          onClick={() => {
+                            playCockpitTabDetent();
+                            setBenchViewportMode("3D_EMS");
+                          }}
                           aria-pressed={benchViewportMode === "3D_EMS"}
-                          className={`hw-btn px-2 py-0.5 rounded-[2px] text-[10px] font-mono flex items-center gap-1 cursor-pointer whitespace-nowrap ${
+                          className={`hw-btn px-2 py-0.5 rounded-[4px] text-[10px] font-mono flex items-center gap-1 cursor-pointer whitespace-nowrap ${
                             benchViewportMode === "3D_EMS"
                               ? "hw-btn-amber font-bold"
                               : "text-slate-300 hover:text-white"
@@ -2977,6 +3006,7 @@ function WorkspaceContent(props: LabWorkspaceLayoutProps) {
           onProbeScenarioFocusPin={handleVoiceProbeScenarioFocusPin}
           isAiCoachOpen={props.isAiCoachOpen}
           onOpenAiCoach={props.onOpenAiCoach}
+          voiceKnowledgeSlot={props.voiceKnowledgeSlot}
         />
       </ModuleErrorBoundary>
       <VoiceCommandLogSidebar

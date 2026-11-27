@@ -10,6 +10,7 @@ import { recordRenderCycle } from '../utils/perfMonitor';
 import { canEnergizeWithPreBenchGate } from '../utils/diagnosticWorkflow';
 import type { PinoutSafetyEvaluation } from '../utils/automotiveSafetyGuard';
 import { RackCornerScrews, RotaryEncoderDial } from './HardwareControls';
+import { playAutomotiveRelayClunk, playRotaryEncoderTick } from '../utils/audioFeedback';
 
 interface BenchPowerSupplyProps {
   powerSupply: PowerSupplyState;
@@ -84,6 +85,7 @@ export const BenchPowerSupply: React.FC<BenchPowerSupplyProps> = React.memo(({
   };
 
   const setPreset = (preset: PowerSupplyState['preset'], volts: number, current: number = 3.0) => {
+    playRotaryEncoderTick();
     onChange({
       ...powerSupply,
       preset,
@@ -231,7 +233,9 @@ export const BenchPowerSupply: React.FC<BenchPowerSupplyProps> = React.memo(({
             disabled={!powerSupply.isOutputEnabled && isEnergizeBlocked}
             onClick={() => {
               if (!powerSupply.isOutputEnabled && isEnergizeBlocked) return;
-              onChange({ ...powerSupply, isOutputEnabled: !powerSupply.isOutputEnabled });
+              const nextEnabled = !powerSupply.isOutputEnabled;
+              playAutomotiveRelayClunk(nextEnabled);
+              onChange({ ...powerSupply, isOutputEnabled: nextEnabled });
             }}
             aria-label={
               powerSupply.isOutputEnabled
@@ -251,9 +255,9 @@ export const BenchPowerSupply: React.FC<BenchPowerSupplyProps> = React.memo(({
                 ? 'INTERLOCKED: COMPLETE PRE-BENCH WORKFLOW'
                 : 'ENABLE POWER SUPPLY (OUTPUT ON)'
             }
-            className={`hw-btn w-full flex-1 min-h-[44px] rounded-lg flex flex-col items-center justify-center gap-0.5 font-mono text-[9px] font-bold uppercase tracking-wider cursor-pointer disabled:cursor-not-allowed ${
+            className={`hw-btn w-full flex-1 min-h-[44px] rounded-lg flex flex-col items-center justify-center gap-0.5 font-mono text-[9px] font-bold uppercase tracking-wider cursor-pointer disabled:cursor-not-allowed transition-all active:scale-[0.98] ${
               powerSupply.isOutputEnabled
-                ? 'hw-btn-green'
+                ? 'hw-btn-green animate-bus-energized'
                 : isPinoutSafetyBlocked
                 ? 'border-[#ff4d62]/70 bg-[#2a1019]/75 text-[#ff8594] opacity-90'
                 : isInterlocked

@@ -11,6 +11,7 @@ import {
 } from '../../services/ai/localKnowledgeDB';
 import type { BilingualLang } from '../../types/aiAssistant';
 import type { UnifiedAiSubTab } from './UnifiedAiAssistantDrawer';
+import { playCockpitTabDetent, playDrawerPneumaticSlide } from '../../utils/audioFeedback';
 
 interface BrowserSpeechRecognitionEvent {
   results: {
@@ -52,6 +53,7 @@ export interface FloatingVoiceKnowledgeFabProps {
   onOpenDrawer: (subTab: UnifiedAiSubTab) => void;
   onVoiceTranscript: (transcript: string) => void;
   isTelemetryStreaming?: boolean;
+  dockedInline?: boolean;
 }
 
 export const FloatingVoiceKnowledgeFab: React.FC<FloatingVoiceKnowledgeFabProps> = ({
@@ -60,6 +62,7 @@ export const FloatingVoiceKnowledgeFab: React.FC<FloatingVoiceKnowledgeFabProps>
   onOpenDrawer,
   onVoiceTranscript,
   isTelemetryStreaming = true,
+  dockedInline = false,
 }) => {
   const [knowledgeCount, setKnowledgeCount] = useState(0);
   const [isListening, setIsListening] = useState(false);
@@ -150,21 +153,33 @@ export const FloatingVoiceKnowledgeFab: React.FC<FloatingVoiceKnowledgeFabProps>
   }, [isListening, lang, onOpenDrawer, onVoiceTranscript]);
 
   // Hide corner FAB while the right-side drawer covers the corner so nothing collides
-  if (isDrawerOpen) {
+  if (isDrawerOpen && !dockedInline) {
     return null;
   }
+
+  const buttonHeightClass = dockedInline
+    ? 'min-h-[36px] lg:min-h-[30px]'
+    : 'min-h-[44px]';
 
   return (
     <div
       data-testid="floating-voice-knowledge-container"
-      className="fixed bottom-48 right-3 sm:bottom-24 sm:right-4 z-40 max-w-[calc(100vw-24px)] flex flex-col items-end gap-1.5 pointer-events-none"
+      className={
+        dockedInline
+          ? 'relative z-20 flex items-center gap-1.5 shrink-0'
+          : 'fixed bottom-48 right-3 sm:bottom-24 sm:right-4 z-40 max-w-[calc(100vw-24px)] flex flex-col items-end gap-1.5 pointer-events-none'
+      }
       role="region"
       aria-label="Floating Voice and End-to-End Knowledge Database Controls"
     >
       {micFallbackNotice && (
         <div
           role="status"
-          className="pointer-events-auto max-w-[280px] rounded border border-amber-500/60 bg-[#0B1528] px-2.5 py-1.5 font-mono text-[10px] text-amber-200 shadow-lg flex items-center justify-between gap-2"
+          className={
+            dockedInline
+              ? 'pointer-events-auto absolute bottom-full right-0 mb-2 w-[260px] rounded-lg border border-amber-500/60 bg-[#0B1528] px-2.5 py-1.5 font-mono text-[10px] text-amber-200 shadow-xl flex items-center justify-between gap-2 z-50'
+              : 'pointer-events-auto max-w-[280px] rounded border border-amber-500/60 bg-[#0B1528] px-2.5 py-1.5 font-mono text-[10px] text-amber-200 shadow-lg flex items-center justify-between gap-2'
+          }
         >
           <span>{micFallbackNotice}</span>
           <button
@@ -178,11 +193,14 @@ export const FloatingVoiceKnowledgeFab: React.FC<FloatingVoiceKnowledgeFabProps>
         </div>
       )}
 
-      <div className="pointer-events-auto flex items-center rounded-lg border border-cyan-500/60 bg-[#070E1B]/95 shadow-2xl overflow-hidden">
+      <div className="pointer-events-auto flex items-center rounded-lg border border-cyan-500/55 bg-[#070E1B]/95 shadow-[0_0_14px_rgba(25,200,245,0.14)] overflow-hidden">
         <button
           type="button"
           data-testid="floating-fab-quick-mic"
-          onClick={handleQuickMicClick}
+          onClick={() => {
+            playCockpitTabDetent();
+            handleQuickMicClick();
+          }}
           aria-pressed={isListening}
           aria-label={isListening ? 'Stop voice capture' : 'Start voice query'}
           title={
@@ -190,25 +208,28 @@ export const FloatingVoiceKnowledgeFab: React.FC<FloatingVoiceKnowledgeFabProps>
               ? 'Magsalita para magtanong sa AI at Knowledge DB'
               : 'Speak to query Voice Coach & Knowledge DB'
           }
-          className={`min-h-[44px] px-2.5 sm:px-3 flex items-center justify-center border-r border-slate-800 transition-colors cursor-pointer whitespace-nowrap ${
+          className={`${buttonHeightClass} px-2 sm:px-2.5 flex items-center justify-center border-r border-slate-800 transition-colors cursor-pointer whitespace-nowrap ${
             isListening
               ? 'bg-rose-950/80 text-rose-200'
               : 'bg-[#0B1528] text-cyan-300 hover:bg-cyan-950/60 hover:text-cyan-100'
           }`}
         >
-          {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+          {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
         </button>
 
         <button
           type="button"
           data-testid="floating-voice-knowledge-fab"
-          onClick={() => onOpenDrawer('VOICE')}
+          onClick={() => {
+            playDrawerPneumaticSlide(!isDrawerOpen);
+            onOpenDrawer('VOICE');
+          }}
           aria-label="Open Voice Coach and End-to-End Knowledge Database"
           title="Open Unified Voice Coach, Diagnostic AI & Knowledge DB"
-          className="min-h-[44px] px-3 sm:px-3.5 flex items-center gap-2 bg-[#070E1B] hover:bg-[#0D1A30] text-slate-100 transition-colors cursor-pointer whitespace-nowrap"
+          className={`${buttonHeightClass} px-2.5 sm:px-3 flex items-center gap-1.5 bg-[#070E1B] hover:bg-[#0D1A30] text-slate-100 transition-colors cursor-pointer whitespace-nowrap`}
         >
           <div className="relative flex items-center justify-center shrink-0">
-            <Headphones className="w-4 h-4 text-cyan-400 shrink-0" />
+            <Headphones className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
             {isTelemetryStreaming && (
               <span
                 data-testid="fab-telemetry-streaming-indicator"
@@ -224,7 +245,7 @@ export const FloatingVoiceKnowledgeFab: React.FC<FloatingVoiceKnowledgeFabProps>
               </span>
             )}
           </div>
-          <span className="font-mono text-[11px] font-semibold tracking-tight">
+          <span className="font-mono text-[10px] sm:text-[10.5px] font-semibold tracking-tight">
             {lang === 'TL' ? 'Voice & AI' : 'Voice & AI'}
           </span>
         </button>
@@ -232,14 +253,17 @@ export const FloatingVoiceKnowledgeFab: React.FC<FloatingVoiceKnowledgeFabProps>
         <button
           type="button"
           data-testid="floating-fab-knowledge-btn"
-          onClick={() => onOpenDrawer('KNOWLEDGE_DB')}
+          onClick={() => {
+            playDrawerPneumaticSlide(!isDrawerOpen);
+            onOpenDrawer('KNOWLEDGE_DB');
+          }}
           aria-label="Open End-to-End Knowledge Database"
           title="Open End-to-End Verified Knowledge DB & Safety Audit"
-          className="min-h-[44px] px-2.5 sm:px-3 flex items-center gap-1.5 border-l border-slate-800 bg-[#0B1528] hover:bg-cyan-950/60 text-emerald-300 hover:text-emerald-200 transition-colors cursor-pointer whitespace-nowrap"
+          className={`${buttonHeightClass} px-2 sm:px-2.5 flex items-center gap-1 border-l border-slate-800 bg-[#0B1528] hover:bg-cyan-950/60 text-emerald-300 hover:text-emerald-200 transition-colors cursor-pointer whitespace-nowrap`}
         >
-          <Database className="w-3.5 h-3.5 shrink-0" />
-          <span className="font-mono text-[10.5px] font-semibold tabular-nums">
-            DB · {knowledgeCount}
+          <Database className="w-3 h-3 shrink-0" />
+          <span className="font-mono text-[10px] font-semibold tabular-nums">
+            DB·{knowledgeCount}
           </span>
         </button>
       </div>
