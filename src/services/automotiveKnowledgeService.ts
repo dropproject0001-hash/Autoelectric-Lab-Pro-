@@ -52,11 +52,20 @@ function buildEnrichedDefaultCatalog(): AutomotiveKnowledgeCatalog {
     }
   }
 
+  const verifiedCount = mergedRefs.filter((r) => r.verified).length;
+
   return {
     ...INITIAL_AUTOMOTIVE_CATALOG,
     manufacturers: mergedManufacturers,
     vehicles: mergedVehicles,
     repairReferences: mergedRefs,
+    statistics: {
+      manufacturerCount: mergedManufacturers.length,
+      vehicleCount: mergedVehicles.length,
+      referenceCount: mergedRefs.length,
+      verifiedCount,
+      unverifiedCount: mergedRefs.length - verifiedCount,
+    },
   };
 }
 

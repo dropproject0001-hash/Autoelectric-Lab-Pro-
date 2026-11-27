@@ -25,6 +25,7 @@ import {
 import { SYSTEM_CATEGORIES } from '../data/automotiveKnowledgeSeed';
 import { SystemCategoryId } from '../types/automotiveKnowledge';
 import { VEHICLE_CATALOG } from '../utils/vehicleEcuRegistry';
+import { playCockpitTabDetent, playRotaryEncoderTick } from '../utils/audioFeedback';
 
 interface KnowledgeCenterPanelProps {
   onSelectVehicleContext?: (make: string, model: string) => void;
@@ -102,21 +103,24 @@ export const KnowledgeCenterPanel: React.FC<KnowledgeCenterPanelProps> = ({
             OEM Metadata & Service Knowledge Center
           </h1>
           <p className="text-sm text-[#91A4BD] mt-1 max-w-2xl">
-            Search indexed service manuals, wiring metadata, and ECU diagnostics for Ford, Toyota, Nissan, Suzuki, and Isuzu with verified provenance.
+            Search indexed service manuals, Dual-OEM fuse/relay layouts, and ECU diagnostics for Ford, Toyota, Nissan, Honda, Suzuki, and Isuzu with verified provenance.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 shrink-0">
           <button
             type="button"
-            onClick={handleExport}
-            className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-[#0A1220] border border-[#203653] text-[#19C8F5] hover:bg-[#121E33] transition"
+            onClick={() => {
+              playCockpitTabDetent();
+              handleExport();
+            }}
+            className="flex min-h-[38px] items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-[#0A1220] border border-[#203653] text-[#19C8F5] hover:bg-[#121E33] transition cursor-pointer whitespace-nowrap"
           >
             <Download className="h-3.5 w-3.5" />
             <span>Export JSON</span>
           </button>
 
-          <label className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-[#0A1220] border border-[#203653] text-[#20D889] hover:bg-[#121E33] transition cursor-pointer">
+          <label className="flex min-h-[38px] items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-[#0A1220] border border-[#203653] text-[#20D889] hover:bg-[#121E33] transition cursor-pointer whitespace-nowrap">
             <Upload className="h-3.5 w-3.5" />
             <span>Import JSON</span>
             <input type="file" accept=".json" onChange={handleImportFile} className="hidden" />
@@ -197,12 +201,15 @@ export const KnowledgeCenterPanel: React.FC<KnowledgeCenterPanelProps> = ({
       </div>
 
       {/* Category Pills & Verified Toggle */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+      <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 mb-6 min-w-0">
+        <div className="flex min-w-0 max-w-full items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
           <button
             type="button"
-            onClick={() => setSelectedCategory('all')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition ${
+            onClick={() => {
+              playRotaryEncoderTick();
+              setSelectedCategory('all');
+            }}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition whitespace-nowrap shrink-0 cursor-pointer ${
               selectedCategory === 'all'
                 ? 'bg-[#19C8F5] text-slate-950 font-bold'
                 : 'bg-[#0A1220] border border-[#203653] text-[#91A4BD] hover:text-white'
@@ -214,8 +221,11 @@ export const KnowledgeCenterPanel: React.FC<KnowledgeCenterPanelProps> = ({
             <button
               key={cat.id}
               type="button"
-              onClick={() => setSelectedCategory(cat.id)}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition whitespace-nowrap ${
+              onClick={() => {
+                playRotaryEncoderTick();
+                setSelectedCategory(cat.id);
+              }}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition whitespace-nowrap shrink-0 cursor-pointer ${
                 selectedCategory === cat.id
                   ? 'bg-[#19C8F5] text-slate-950 font-bold'
                   : 'bg-[#0A1220] border border-[#203653] text-[#91A4BD] hover:text-white'

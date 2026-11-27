@@ -350,7 +350,7 @@ function main() {
       skipBuild ? 'Skipped via CLI flag' : null
     ),
     runNpmGate(
-      '7. Full 21-Suite Simulation & Security Tests',
+      '7. Full 22-Suite Simulation & Security Tests',
       'test',
       skipTests ? 'Skipped via CLI flag' : null
     ),
