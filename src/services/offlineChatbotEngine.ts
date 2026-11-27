@@ -4,8 +4,8 @@
  */
 
 import MiniSearch from 'minisearch';
-import { ECU_BRAND_PROFILES } from '../components/EcuConnectorPinouts';
-import { REPAIR_KNOWLEDGE_BASE } from '../components/EcuRepairKnowledgeBase';
+import { ECU_BRAND_PROFILES } from '../components/ecuPinoutData';
+import { REPAIR_KNOWLEDGE_BASE } from '../data/ecuRepairKnowledgeBaseData';
 import {
   DiagnosticTroubleCode,
   EcuPin,

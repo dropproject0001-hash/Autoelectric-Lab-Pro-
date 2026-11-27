@@ -151,20 +151,28 @@ function gate2GitTrackingAndBranchGuard() {
     'firebase-applet-config.json',
     '.data',
     '.aistudio',
-    'public/assets/aistudio',
   ];
 
-  const trackedRun = runProcess('git', ['ls-files', '--', ...forbiddenTracked], { capture: true });
-  const stagedRun = runProcess('git', ['diff', '--cached', '--name-only', '--', ...forbiddenTracked], { capture: true });
+  const allowedAistudioBranding = new Set([
+    'public/assets/aistudio/1795727293849_0b38d1ff.jpg',
+    'public/assets/aistudio/1795699079803_96e28eb3.jpg',
+    'public/assets/aistudio/1795699656648_ba33be6d.jpg',
+    'public/assets/aistudio/1795701476178_14294533.jpg',
+    'public/assets/aistudio/1795701471877_2efeb92c.jpg',
+    'public/assets/aistudio/1795701467304_07225485.jpg',
+  ]);
+
+  const trackedRun = runProcess('git', ['ls-files', '--', ...forbiddenTracked, 'public/assets/aistudio'], { capture: true });
+  const stagedRun = runProcess('git', ['diff', '--cached', '--name-only', '--', ...forbiddenTracked, 'public/assets/aistudio'], { capture: true });
 
   const trackedLeaks = String(trackedRun.stdout || '')
     .split(/\r?\n/)
     .map((s) => s.trim())
-    .filter(Boolean);
+    .filter((file) => file && !allowedAistudioBranding.has(file));
   const stagedLeaks = String(stagedRun.stdout || '')
     .split(/\r?\n/)
     .map((s) => s.trim())
-    .filter(Boolean);
+    .filter((file) => file && !allowedAistudioBranding.has(file));
 
   const leaks = Array.from(new Set([...trackedLeaks, ...stagedLeaks]));
   if (leaks.length > 0) {
@@ -342,7 +350,7 @@ function main() {
       skipBuild ? 'Skipped via CLI flag' : null
     ),
     runNpmGate(
-      '7. Full 17-Suite Simulation & Security Tests',
+      '7. Full 19-Suite Simulation & Security Tests',
       'test',
       skipTests ? 'Skipped via CLI flag' : null
     ),

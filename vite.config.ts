@@ -114,11 +114,26 @@ export default defineConfig(({command}) => {
             if (id.includes('node_modules/firebase') || id.includes('node_modules/@firebase')) {
               return 'vendor-firebase';
             }
-            if (id.includes('node_modules/jspdf')) {
+            if (id.includes('node_modules/jspdf') || id.includes('node_modules/html2canvas')) {
               return 'vendor-pdf';
+            }
+            if (id.includes('node_modules/lucide-react')) {
+              return 'vendor-icons';
+            }
+            if (id.includes('node_modules/motion') || id.includes('node_modules/framer-motion')) {
+              return 'vendor-motion';
             }
             if (id.includes('phTroubleScenarios') && id.endsWith('.json')) {
               return 'data-ph-scenarios';
+            }
+            if (id.includes('saej1979') && id.endsWith('.json')) {
+              return 'data-obdb';
+            }
+            if (id.includes('ecuPinoutData')) {
+              return 'data-ecu-pinouts';
+            }
+            if (id.includes('oemKnowledgeDatabase')) {
+              return 'data-oem-knowledge';
             }
             return undefined;
           },
