@@ -177,7 +177,8 @@ async function main() {
   // 1 & 2. Firebase Auth & Unauthorized Access
   await runTest('Firebase auth middleware accepts verified RS256 Bearer token and rejects unauthorized access', async () => {
     const prevProjectId = process.env.FIREBASE_PROJECT_ID;
-    process.env.FIREBASE_PROJECT_ID = projectId;
+    const activeProjectId = resolveFirebaseProjectId() || projectId;
+    process.env.FIREBASE_PROJECT_ID = activeProjectId;
     try {
       setJwksFetcherForTests(async () => ({
         keys: [{ kid: testKid, kty: publicJwk.kty, alg: 'RS256', use: 'sig', n: publicJwk.n, e: publicJwk.e }],
@@ -186,8 +187,8 @@ async function main() {
 
       const now = Math.floor(Date.now() / 1000);
       const validToken = signTestJwt(privateKey, testKid, {
-        iss: `https://securetoken.google.com/${projectId}`,
-        aud: projectId,
+        iss: `https://securetoken.google.com/${activeProjectId}`,
+        aud: activeProjectId,
         sub: 'uid_vehicle_tester',
         email: 'eng@autoelectric.test',
         email_verified: true,

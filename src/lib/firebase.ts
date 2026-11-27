@@ -64,29 +64,34 @@ export function resolveFirebaseClientConfig(
   fileCfg: FirebaseAppletConfigShape,
   env: Record<string, string | undefined>
 ) {
-  const hasProvisionedFileConfig = Boolean(fileCfg.projectId && fileCfg.apiKey);
+  const fileProjectId = (fileCfg.projectId || '').trim();
+  const fileApiKey = (fileCfg.apiKey || '').trim();
+  const hasProvisionedFileConfig = Boolean(fileProjectId && fileApiKey);
   if (hasProvisionedFileConfig) {
     return {
-      projectId: fileCfg.projectId || '',
-      appId: fileCfg.appId || '',
-      apiKey: fileCfg.apiKey || '',
-      authDomain: fileCfg.authDomain || '',
+      projectId: fileProjectId,
+      appId: (fileCfg.appId || '').trim(),
+      apiKey: fileApiKey,
+      authDomain: (fileCfg.authDomain || '').trim(),
       firestoreDatabaseId: sanitizeFirestoreDatabaseId(fileCfg.firestoreDatabaseId),
-      storageBucket: fileCfg.storageBucket || '',
-      messagingSenderId: fileCfg.messagingSenderId || '',
+      storageBucket: (fileCfg.storageBucket || '').trim(),
+      messagingSenderId: (fileCfg.messagingSenderId || '').trim(),
     };
   }
 
   return {
-    projectId: env.VITE_FIREBASE_PROJECT_ID || fileCfg.projectId || '',
-    appId: env.VITE_FIREBASE_APP_ID || fileCfg.appId || '',
-    apiKey: env.VITE_FIREBASE_API_KEY || fileCfg.apiKey || '',
-    authDomain: env.VITE_FIREBASE_AUTH_DOMAIN || fileCfg.authDomain || '',
+    projectId: (env.VITE_FIREBASE_PROJECT_ID || '').trim() || fileProjectId || '',
+    appId: (env.VITE_FIREBASE_APP_ID || '').trim() || (fileCfg.appId || '').trim() || '',
+    apiKey: (env.VITE_FIREBASE_API_KEY || '').trim() || fileApiKey || '',
+    authDomain: (env.VITE_FIREBASE_AUTH_DOMAIN || '').trim() || (fileCfg.authDomain || '').trim() || '',
     firestoreDatabaseId: sanitizeFirestoreDatabaseId(
       env.VITE_FIREBASE_DATABASE_ID || fileCfg.firestoreDatabaseId
     ),
-    storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET || fileCfg.storageBucket || '',
-    messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID || fileCfg.messagingSenderId || '',
+    storageBucket: (env.VITE_FIREBASE_STORAGE_BUCKET || '').trim() || (fileCfg.storageBucket || '').trim() || '',
+    messagingSenderId:
+      (env.VITE_FIREBASE_MESSAGING_SENDER_ID || '').trim() ||
+      (fileCfg.messagingSenderId || '').trim() ||
+      '',
   };
 }
 

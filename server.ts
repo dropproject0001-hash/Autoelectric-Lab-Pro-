@@ -1,6 +1,7 @@
 import express from 'express';
 import { createServer as createViteServer, type ViteDevServer } from 'vite';
 import { createAutoelectricApiApp } from './src/server/createApiApp';
+import { logFirebaseAuthStartupDiagnostics } from './src/server/services/firebaseAuthMiddleware';
 import { attachGeminiLiveVoiceWebSocket } from './src/server/services/geminiLiveVoiceServer';
 import dotenv from 'dotenv';
 import fs from 'node:fs';
@@ -51,6 +52,7 @@ function resolveListenHost(): string {
 }
 
 async function startServer() {
+  logFirebaseAuthStartupDiagnostics();
   const app = createAutoelectricApiApp();
   const httpServer = http.createServer(app);
   const liveVoiceWs = attachGeminiLiveVoiceWebSocket(httpServer);

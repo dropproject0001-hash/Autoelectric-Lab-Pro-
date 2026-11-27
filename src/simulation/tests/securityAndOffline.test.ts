@@ -10,8 +10,10 @@ import path from 'node:path';
 import type { Request, Response } from 'express';
 import {
   FirebaseTokenVerificationError,
+  logFirebaseAuthStartupDiagnostics,
   requireFirebaseAuth,
   resetFirebaseAuthCacheForTests,
+  resolveFirebaseProjectId,
   setJwksFetcherForTests,
   verifyFirebaseIdToken,
 } from '../../server/services/firebaseAuthMiddleware';
@@ -340,12 +342,33 @@ async function main() {
       exp: now + 3600,
     });
 
-    await assert.rejects(
-      () => verifyFirebaseIdToken(wrongAudToken, projectId),
-      (err: unknown) =>
-        err instanceof FirebaseTokenVerificationError &&
-        err.code === 'INVALID_TOKEN' &&
-        err.statusCode === 401
+    const capturedWarnings: string[] = [];
+    const origWarn = console.warn;
+    console.warn = (...args: unknown[]) => {
+      capturedWarnings.push(args.map((a) => String(a)).join(' '));
+    };
+    try {
+      await assert.rejects(
+        () => verifyFirebaseIdToken(wrongAudToken, projectId),
+        (err: unknown) =>
+          err instanceof FirebaseTokenVerificationError &&
+          err.code === 'INVALID_TOKEN' &&
+          err.statusCode === 401 &&
+          !err.message.includes(projectId) &&
+          !err.message.includes('malicious-project')
+      );
+    } finally {
+      console.warn = origWarn;
+    }
+    assert.equal(
+      capturedWarnings.some(
+        (w) =>
+          w.includes(projectId) &&
+          w.includes('malicious-project') &&
+          w.includes('expectedProjectId')
+      ),
+      true,
+      'Audience mismatch must log expectedProjectId and received aud/iss on the server console without leaking into HTTP error message'
     );
 
     const validToken = signTestJwt(privateKey, testKid, {
@@ -368,6 +391,54 @@ async function main() {
     resetFirebaseAuthCacheForTests();
   });
 
+  await runTest('resolveFirebaseProjectId matches resolveFirebaseClientConfig and logFirebaseAuthStartupDiagnostics warns on env mismatch', () => {
+    const provisionedFile = {
+      projectId: 'infra-firefly-1mln4',
+      apiKey: 'AIzaProvisionedTestKey',
+    };
+    const staleEnv = {
+      FIREBASE_PROJECT_ID: 'stale-server-proj',
+      VITE_FIREBASE_PROJECT_ID: 'stale-client-proj',
+    };
+
+    const clientCfg = resolveFirebaseClientConfig(provisionedFile, staleEnv);
+    const serverProjectId = resolveFirebaseProjectId(provisionedFile, staleEnv);
+    assert.equal(clientCfg.projectId, 'infra-firefly-1mln4');
+    assert.equal(serverProjectId, clientCfg.projectId);
+
+    // Fallback when not provisioned
+    assert.equal(
+      resolveFirebaseProjectId({}, { FIREBASE_PROJECT_ID: 'srv-only', VITE_FIREBASE_PROJECT_ID: 'cli-only' }),
+      'srv-only'
+    );
+    assert.equal(
+      resolveFirebaseProjectId({}, { VITE_FIREBASE_PROJECT_ID: 'cli-only' }),
+      'cli-only'
+    );
+
+    const warns: string[] = [];
+    const infos: string[] = [];
+    const origWarn = console.warn;
+    const origInfo = console.info;
+    console.warn = (...args: unknown[]) => warns.push(args.map(String).join(' '));
+    console.info = (...args: unknown[]) => infos.push(args.map(String).join(' '));
+    try {
+      const result = logFirebaseAuthStartupDiagnostics(provisionedFile, staleEnv);
+      assert.equal(result.resolvedProjectId, 'infra-firefly-1mln4');
+      assert.equal(
+        warns.some((w) => w.includes('VITE_FIREBASE_PROJECT_ID') && w.includes('FIREBASE_PROJECT_ID')),
+        true
+      );
+      assert.equal(
+        infos.some((i) => i.includes('infra-firefly-1mln4')),
+        true
+      );
+    } finally {
+      console.warn = origWarn;
+      console.info = origInfo;
+    }
+  });
+
   await runTest('requireFirebaseAuth returns 401 JSON when Authorization header is missing', async () => {
     const mock = makeMockResponse();
     let calledNext = false;
@@ -385,7 +456,8 @@ async function main() {
 
   await runTest('requireFirebaseAuth rejects unverified email token with 403 EMAIL_NOT_VERIFIED', async () => {
     const prevProjectId = process.env.FIREBASE_PROJECT_ID;
-    process.env.FIREBASE_PROJECT_ID = projectId;
+    const activeProjectId = resolveFirebaseProjectId() || projectId;
+    process.env.FIREBASE_PROJECT_ID = activeProjectId;
     try {
       setJwksFetcherForTests(async () => ({
         keys: [{ kid: testKid, kty: publicJwk.kty, alg: 'RS256', use: 'sig', n: publicJwk.n, e: publicJwk.e }],
@@ -394,8 +466,8 @@ async function main() {
 
       const now = Math.floor(Date.now() / 1000);
       const unverifiedToken = signTestJwt(privateKey, testKid, {
-        iss: `https://securetoken.google.com/${projectId}`,
-        aud: projectId,
+        iss: `https://securetoken.google.com/${activeProjectId}`,
+        aud: activeProjectId,
         sub: 'user_tech_002',
         email: 'spoof@autoelectric.test',
         email_verified: false,

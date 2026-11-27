@@ -166,24 +166,88 @@ function parseJsonSegment<T>(segment: string): T {
   return JSON.parse(raw) as T;
 }
 
-function readLocalFirebaseConfig(): { projectId?: string } | null {
+export interface LocalFirebaseAppletConfig {
+  projectId?: string;
+  apiKey?: string;
+}
+
+function readLocalFirebaseConfig(): LocalFirebaseAppletConfig | null {
   try {
     const configPath = path.resolve(process.cwd(), 'firebase-applet-config.json');
     if (!fs.existsSync(configPath)) return null;
     const raw = fs.readFileSync(configPath, 'utf8');
-    return JSON.parse(raw) as { projectId?: string };
+    return JSON.parse(raw) as LocalFirebaseAppletConfig;
   } catch {
     return null;
   }
 }
 
-export function resolveFirebaseProjectId(): string {
+export function resolveFirebaseProjectId(
+  fileCfg: LocalFirebaseAppletConfig | null = readLocalFirebaseConfig(),
+  env: Record<string, string | undefined> = process.env
+): string {
+  const fileProjectId = (fileCfg?.projectId || '').trim();
+  const fileApiKey = (fileCfg?.apiKey || '').trim();
+  const hasProvisionedFileConfig = Boolean(fileProjectId && fileApiKey);
+  if (hasProvisionedFileConfig) {
+    return fileProjectId;
+  }
+
   return (
-    process.env.FIREBASE_PROJECT_ID ||
-    readLocalFirebaseConfig()?.projectId ||
-    process.env.VITE_FIREBASE_PROJECT_ID ||
+    (env.FIREBASE_PROJECT_ID || '').trim() ||
+    (env.VITE_FIREBASE_PROJECT_ID || '').trim() ||
+    fileProjectId ||
     ''
   );
+}
+
+export interface FirebaseStartupDiagnosticsResult {
+  resolvedProjectId: string;
+  warnings: string[];
+}
+
+export function logFirebaseAuthStartupDiagnostics(
+  fileCfg: LocalFirebaseAppletConfig | null = readLocalFirebaseConfig(),
+  env: Record<string, string | undefined> = process.env
+): FirebaseStartupDiagnosticsResult {
+  const resolvedProjectId = resolveFirebaseProjectId(fileCfg, env);
+  const serverEnvProjectId = (env.FIREBASE_PROJECT_ID || '').trim();
+  const clientEnvProjectId = (env.VITE_FIREBASE_PROJECT_ID || '').trim();
+  const fileProjectId = (fileCfg?.projectId || '').trim();
+  const fileApiKey = (fileCfg?.apiKey || '').trim();
+  const hasProvisionedFileConfig = Boolean(fileProjectId && fileApiKey);
+  const warnings: string[] = [];
+
+  if (serverEnvProjectId && clientEnvProjectId && serverEnvProjectId !== clientEnvProjectId) {
+    const msg = `[FirebaseAuth] WARNING: VITE_FIREBASE_PROJECT_ID ("${clientEnvProjectId}") differs from FIREBASE_PROJECT_ID ("${serverEnvProjectId}"). Server will verify Firebase ID tokens against "${resolvedProjectId || '(unset)'}".`;
+    warnings.push(msg);
+    console.warn(msg);
+  }
+
+  if (hasProvisionedFileConfig && serverEnvProjectId && serverEnvProjectId !== fileProjectId) {
+    const msg = `[FirebaseAuth] WARNING: FIREBASE_PROJECT_ID ("${serverEnvProjectId}") differs from provisioned firebase-applet-config.json projectId ("${fileProjectId}"). Using provisioned projectId "${resolvedProjectId}".`;
+    warnings.push(msg);
+    console.warn(msg);
+  }
+
+  if (hasProvisionedFileConfig && clientEnvProjectId && clientEnvProjectId !== fileProjectId) {
+    const msg = `[FirebaseAuth] WARNING: VITE_FIREBASE_PROJECT_ID ("${clientEnvProjectId}") differs from provisioned firebase-applet-config.json projectId ("${fileProjectId}"). Client and server both use provisioned projectId "${resolvedProjectId}".`;
+    warnings.push(msg);
+    console.warn(msg);
+  }
+
+  if (resolvedProjectId) {
+    console.info(
+      `[FirebaseAuth] Verifying Firebase ID tokens against project "${resolvedProjectId}".`
+    );
+  } else {
+    const msg =
+      '[FirebaseAuth] WARNING: No Firebase project ID configured (firebase-applet-config.json, FIREBASE_PROJECT_ID, or VITE_FIREBASE_PROJECT_ID).';
+    warnings.push(msg);
+    console.warn(msg);
+  }
+
+  return { resolvedProjectId, warnings };
 }
 
 export async function verifyFirebaseIdToken(
@@ -248,6 +312,13 @@ export async function verifyFirebaseIdToken(
     claims.iss === 'https://securetoken.google.com/valued-zoo-9mvz5';
 
   if (!isDirectMatch && !isFallbackMatch) {
+    const receivedAud =
+      typeof claims.aud === 'string' ? claims.aud : JSON.stringify(claims.aud ?? null);
+    const receivedIss =
+      typeof claims.iss === 'string' ? claims.iss : JSON.stringify(claims.iss ?? null);
+    console.warn(
+      `[FirebaseAuth] Token audience or issuer mismatch: expectedProjectId="${expectedProjectId}", expectedIssuer="${expectedIssuer}", receivedAud="${receivedAud}", receivedIss="${receivedIss}".`
+    );
     throw new FirebaseTokenVerificationError(
       'Token audience or issuer mismatch. Please sign out and sign back in to refresh your authentication session.',
       401,
