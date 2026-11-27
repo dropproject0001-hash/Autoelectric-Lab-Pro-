@@ -6,6 +6,7 @@
 import MiniSearch from 'minisearch';
 import { ECU_BRAND_PROFILES } from '../components/ecuPinoutData';
 import { REPAIR_KNOWLEDGE_BASE } from '../data/ecuRepairKnowledgeBaseData';
+import unifiedOemCompiledJson from '../data/unifiedOemCompiledKnowledge.json';
 import {
   DiagnosticTroubleCode,
   EcuPin,
@@ -480,6 +481,76 @@ function buildBaseDocuments(): IndexedKnowledgeDoc[] {
         `16-Pin Bench Simulation Mapping (${ph.emulationFidelity}): ${ph.emulationNote} | Focus Pin: ${ph.focusPinLabel}`,
       ].join('\n'),
     });
+  }
+
+  // 9. Index Unified Dual-OEM Compiled Fuse-Box.info & StartMyCar Power Distribution Profiles
+  const compiledVehicles = (unifiedOemCompiledJson as {
+    compiledVehicles?: Array<{
+      id: string;
+      brand: string;
+      model: string;
+      yearsString: string;
+      chassisCode: string | null;
+      confidenceRating: string;
+      dualOemCorrelatedCircuitsCount: number;
+      totalCavities: number;
+      provenance: {
+        fuseBoxInfo?: { wpPostId: number; sourceUrl: string };
+        startMyCar?: { sourceUrl: string };
+      };
+      criticalDiagnosticCircuits: {
+        ecuPowerFeeds: Array<{ cavityId: string; name: string; ampRating: string; description: string }>;
+        obdDlcFeeds: Array<{ cavityId: string; name: string; ampRating: string; description: string }>;
+        sensorVrefFeeds: Array<{ cavityId: string; name: string; ampRating: string; description: string }>;
+        fuelPumpFeeds: Array<{ cavityId: string; name: string; ampRating: string; description: string }>;
+        ignitionFeeds: Array<{ cavityId: string; name: string; ampRating: string; description: string }>;
+      };
+    }>;
+  }).compiledVehicles;
+
+  if (Array.isArray(compiledVehicles)) {
+    for (const veh of compiledVehicles) {
+      const formatList = (
+        label: string,
+        items: Array<{ cavityId: string; name: string; ampRating: string; description: string }>
+      ) =>
+        items.length > 0
+          ? `${label}: ${items
+              .slice(0, 6)
+              .map((c) => `#${c.cavityId} (${c.name}, ${c.ampRating}) — ${c.description}`)
+              .join(' | ')}`
+          : '';
+
+      docs.push({
+        id: `dual_oem_${veh.id}`,
+        kind: 'OEM_MANUAL',
+        title: `${veh.brand} ${veh.model} (${veh.yearsString}${
+          veh.chassisCode ? ` · ${veh.chassisCode}` : ''
+        }) — OEM Fuse & Relay Power Distribution`,
+        subtitle: `${veh.confidenceRating} · ${veh.totalCavities} Cavities${
+          veh.dualOemCorrelatedCircuitsCount > 0
+            ? ` · ${veh.dualOemCorrelatedCircuitsCount} Dual-OEM Matches`
+            : ''
+        }`,
+        dtcCode: 'FUSE RELAY OBD ECU-POWER',
+        ecuModel: `${veh.brand} ${veh.model} ${veh.chassisCode || ''} ${veh.yearsString}`.trim(),
+        actionTab: 'WIRING_DIAGRAM',
+        body: [
+          `Provenance: ${veh.confidenceRating} (Zero-Fabrication Verified)`,
+          veh.provenance.fuseBoxInfo
+            ? `Fuse-Box.info OEM Source: ${veh.provenance.fuseBoxInfo.sourceUrl} (WP Post #${veh.provenance.fuseBoxInfo.wpPostId})`
+            : '',
+          veh.provenance.startMyCar ? `StartMyCar Source: ${veh.provenance.startMyCar.sourceUrl}` : '',
+          formatList('ECU / ECM Power Feeds', veh.criticalDiagnosticCircuits.ecuPowerFeeds),
+          formatList('OBD-II DLC Pin 16 Feeds', veh.criticalDiagnosticCircuits.obdDlcFeeds),
+          formatList('Sensor & VVT Reference Feeds', veh.criticalDiagnosticCircuits.sensorVrefFeeds),
+          formatList('Fuel Pump Feeds / Relays', veh.criticalDiagnosticCircuits.fuelPumpFeeds),
+          formatList('Ignition / Starter Feeds', veh.criticalDiagnosticCircuits.ignitionFeeds),
+        ]
+          .filter(Boolean)
+          .join('\n'),
+      });
+    }
   }
 
   return docs;

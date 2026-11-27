@@ -1,0 +1,4147 @@
+{
+  "schemaVersion": "1.0.0",
+  "databaseName": "AutoElectric Lab Pro — Unified Dual-OEM Compiled Knowledge Base",
+  "generatedAt": "2026-11-27T14:00:28.772Z",
+  "zeroFabricationIntegrity": true,
+  "sources": [
+    "fuse-box.info",
+    "startmycar.com"
+  ],
+  "summary": {
+    "totalCompiledVehicles": 17,
+    "fuseBoxInfoProfilesCount": 17,
+    "startMyCarProfilesCount": 14,
+    "totalCavitiesCompiled": 4254,
+    "dualOemConfirmedVehiclesCount": 13
+  },
+  "manufacturers": [
+    {
+      "id": "m-toyota",
+      "make": "Toyota",
+      "slug": "toyota",
+      "catalogUrl": "https://fuse-box.info/toyota",
+      "verified": true
+    },
+    {
+      "id": "m-ford",
+      "make": "Ford",
+      "slug": "ford",
+      "catalogUrl": "https://fuse-box.info/ford",
+      "verified": true
+    },
+    {
+      "id": "m-nissan",
+      "make": "Nissan",
+      "slug": "nissan",
+      "catalogUrl": "https://fuse-box.info/nissan",
+      "verified": true
+    },
+    {
+      "id": "m-honda",
+      "make": "Honda",
+      "slug": "honda",
+      "catalogUrl": "https://fuse-box.info/honda",
+      "verified": true
+    },
+    {
+      "id": "m-isuzu",
+      "make": "Isuzu",
+      "slug": "isuzu",
+      "catalogUrl": "https://fuse-box.info/isuzu",
+      "verified": true
+    },
+    {
+      "id": "m-suzuki",
+      "make": "Suzuki",
+      "slug": "suzuki",
+      "catalogUrl": "https://fuse-box.info/suzuki",
+      "verified": true
+    }
+  ],
+  "vehicleModelRecords": [
+    {
+      "id": "veh-toyota-corolla-e210-2019-2022-fuses",
+      "makeSlug": "toyota",
+      "make": "Toyota",
+      "model": "Corolla",
+      "generation": "E210",
+      "yearStart": 2019,
+      "yearEnd": 2022,
+      "market": "Global / OEM Factory Reference",
+      "engine": {
+        "engineCode": "M20A-FKS, 2ZR-FAE motors",
+        "displacement": null,
+        "fuelType": "Unknown",
+        "configuration": null
+      },
+      "transmission": {
+        "type": "Unknown",
+        "code": null
+      },
+      "systems": [
+        "electrical_charging",
+        "engine_management_ecu",
+        "diagnostics_obd_dtc",
+        "fuel_system"
+      ],
+      "sourceUrls": [
+        "https://fuse-box.info/toyota/toyota-corolla-e210-2019-2022-fuses",
+        "https://www.startmycar.com/toyota/corolla/info/fusebox/2020/12th-gen-pre-facelift"
+      ]
+    },
+    {
+      "id": "veh-toyota-corolla-e210-2023-2025-fuses",
+      "makeSlug": "toyota",
+      "make": "Toyota",
+      "model": "Corolla",
+      "generation": "E210 Facelift",
+      "yearStart": 2023,
+      "yearEnd": 2025,
+      "market": "Global / OEM Factory Reference",
+      "engine": {
+        "engineCode": null,
+        "displacement": null,
+        "fuelType": "Unknown",
+        "configuration": null
+      },
+      "transmission": {
+        "type": "Unknown",
+        "code": null
+      },
+      "systems": [
+        "electrical_charging",
+        "engine_management_ecu",
+        "diagnostics_obd_dtc",
+        "fuel_system"
+      ],
+      "sourceUrls": [
+        "https://fuse-box.info/toyota/toyota-corolla-e210-2023-2025-fuses"
+      ]
+    },
+    {
+      "id": "veh-toyota-hilux-an120-an130-2015-2019-fuses-and-relay",
+      "makeSlug": "toyota",
+      "make": "Toyota",
+      "model": "Hilux",
+      "generation": "AN120/AN130",
+      "yearStart": 2015,
+      "yearEnd": 2019,
+      "market": "Global / OEM Factory Reference",
+      "engine": {
+        "engineCode": null,
+        "displacement": null,
+        "fuelType": "Unknown",
+        "configuration": null
+      },
+      "transmission": {
+        "type": "Unknown",
+        "code": null
+      },
+      "systems": [
+        "electrical_charging",
+        "engine_management_ecu",
+        "diagnostics_obd_dtc",
+        "fuel_system"
+      ],
+      "sourceUrls": [
+        "https://fuse-box.info/toyota/toyota-hilux-an120-an130-2015-2019-fuses-and-relay",
+        "https://www.startmycar.com/toyota/hilux/info/fusebox/2019"
+      ]
+    },
+    {
+      "id": "veh-toyota-camry-xv70-2018-2024-fuses",
+      "makeSlug": "toyota",
+      "make": "Toyota",
+      "model": "Camry",
+      "generation": "XV70",
+      "yearStart": 2018,
+      "yearEnd": 2024,
+      "market": "Global / OEM Factory Reference",
+      "engine": {
+        "engineCode": null,
+        "displacement": null,
+        "fuelType": "Unknown",
+        "configuration": null
+      },
+      "transmission": {
+        "type": "Unknown",
+        "code": null
+      },
+      "systems": [
+        "electrical_charging",
+        "engine_management_ecu",
+        "diagnostics_obd_dtc",
+        "fuel_system"
+      ],
+      "sourceUrls": [
+        "https://fuse-box.info/toyota/toyota-camry-xv70-2018-2024-fuses",
+        "https://www.startmycar.com/toyota/camry/info/fusebox/2020"
+      ]
+    },
+    {
+      "id": "veh-toyota-rav4-xa50-2019-2025-fuses",
+      "makeSlug": "toyota",
+      "make": "Toyota",
+      "model": "RAV4",
+      "generation": "XA50",
+      "yearStart": 2019,
+      "yearEnd": 2025,
+      "market": "Global / OEM Factory Reference",
+      "engine": {
+        "engineCode": null,
+        "displacement": null,
+        "fuelType": "Unknown",
+        "configuration": null
+      },
+      "transmission": {
+        "type": "Unknown",
+        "code": null
+      },
+      "systems": [
+        "electrical_charging",
+        "engine_management_ecu",
+        "diagnostics_obd_dtc",
+        "fuel_system"
+      ],
+      "sourceUrls": [
+        "https://fuse-box.info/toyota/toyota-rav4-xa50-2019-2025-fuses",
+        "https://www.startmycar.com/toyota/rav4/info/fusebox/2019/5th-gen"
+      ]
+    },
+    {
+      "id": "veh-ford-ranger-2019-fuses-and-relays",
+      "makeSlug": "ford",
+      "make": "Ford",
+      "model": "Ranger",
+      "generation": "PX3",
+      "yearStart": 2019,
+      "yearEnd": 2023,
+      "market": "Global / OEM Factory Reference",
+      "engine": {
+        "engineCode": null,
+        "displacement": null,
+        "fuelType": "Unknown",
+        "configuration": null
+      },
+      "transmission": {
+        "type": "Unknown",
+        "code": null
+      },
+      "systems": [
+        "electrical_charging",
+        "engine_management_ecu",
+        "diagnostics_obd_dtc",
+        "fuel_system"
+      ],
+      "sourceUrls": [
+        "https://fuse-box.info/ford/ford-ranger-2019-fuses-and-relays",
+        "https://www.startmycar.com/ford/ranger/info/fusebox/2019"
+      ]
+    },
+    {
+      "id": "veh-ford-ranger-2012-2015-fuses-and-relays",
+      "makeSlug": "ford",
+      "make": "Ford",
+      "model": "Ranger",
+      "generation": "PX1",
+      "yearStart": 2012,
+      "yearEnd": 2015,
+      "market": "Global / OEM Factory Reference",
+      "engine": {
+        "engineCode": null,
+        "displacement": null,
+        "fuelType": "Unknown",
+        "configuration": null
+      },
+      "transmission": {
+        "type": "Unknown",
+        "code": null
+      },
+      "systems": [
+        "electrical_charging",
+        "engine_management_ecu",
+        "diagnostics_obd_dtc",
+        "fuel_system"
+      ],
+      "sourceUrls": [
+        "https://fuse-box.info/ford/ford-ranger-2012-2015-fuses-and-relays"
+      ]
+    },
+    {
+      "id": "veh-ford-f-150-2015-2018-fuses-and-relay",
+      "makeSlug": "ford",
+      "make": "Ford",
+      "model": "F-150",
+      "generation": "13th Gen",
+      "yearStart": 2015,
+      "yearEnd": 2020,
+      "market": "Global / OEM Factory Reference",
+      "engine": {
+        "engineCode": null,
+        "displacement": null,
+        "fuelType": "Unknown",
+        "configuration": null
+      },
+      "transmission": {
+        "type": "Unknown",
+        "code": null
+      },
+      "systems": [
+        "electrical_charging",
+        "engine_management_ecu",
+        "diagnostics_obd_dtc",
+        "fuel_system"
+      ],
+      "sourceUrls": [
+        "https://fuse-box.info/ford/ford-f-150-2015-2018-fuses-and-relay",
+        "https://www.startmycar.com/ford/f-150/info/fusebox/2016"
+      ]
+    },
+    {
+      "id": "veh-ford-f-150-2021-2022-fuses",
+      "makeSlug": "ford",
+      "make": "Ford",
+      "model": "F-150",
+      "generation": "14th Gen",
+      "yearStart": 2021,
+      "yearEnd": 2023,
+      "market": "Global / OEM Factory Reference",
+      "engine": {
+        "engineCode": null,
+        "displacement": null,
+        "fuelType": "Unknown",
+        "configuration": null
+      },
+      "transmission": {
+        "type": "Unknown",
+        "code": null
+      },
+      "systems": [
+        "electrical_charging",
+        "engine_management_ecu",
+        "diagnostics_obd_dtc",
+        "fuel_system"
+      ],
+      "sourceUrls": [
+        "https://fuse-box.info/ford/ford-f-150-2021-2022-fuses"
+      ]
+    },
+    {
+      "id": "veh-nissan-sentra-b17-2013-2019-fuses",
+      "makeSlug": "nissan",
+      "make": "Nissan",
+      "model": "Sentra",
+      "generation": "B17",
+      "yearStart": 2013,
+      "yearEnd": 2019,
+      "market": "Global / OEM Factory Reference",
+      "engine": {
+        "engineCode": null,
+        "displacement": null,
+        "fuelType": "Unknown",
+        "configuration": null
+      },
+      "transmission": {
+        "type": "Unknown",
+        "code": null
+      },
+      "systems": [
+        "electrical_charging",
+        "engine_management_ecu",
+        "diagnostics_obd_dtc",
+        "fuel_system"
+      ],
+      "sourceUrls": [
+        "https://fuse-box.info/nissan/nissan-sentra-b17-2013-2019-fuses",
+        "https://www.startmycar.com/nissan/sentra/info/fusebox/2018"
+      ]
+    },
+    {
+      "id": "veh-nissan-sentra-b18-2020-2025-fuses",
+      "makeSlug": "nissan",
+      "make": "Nissan",
+      "model": "Sentra",
+      "generation": "B18",
+      "yearStart": 2020,
+      "yearEnd": 2025,
+      "market": "Global / OEM Factory Reference",
+      "engine": {
+        "engineCode": null,
+        "displacement": null,
+        "fuelType": "Unknown",
+        "configuration": null
+      },
+      "transmission": {
+        "type": "Unknown",
+        "code": null
+      },
+      "systems": [
+        "electrical_charging",
+        "engine_management_ecu",
+        "diagnostics_obd_dtc",
+        "fuel_system"
+      ],
+      "sourceUrls": [
+        "https://fuse-box.info/nissan/nissan-sentra-b18-2020-2025-fuses"
+      ]
+    },
+    {
+      "id": "veh-nissan-navara-frontier-np300-d23-2015-2024-fuses",
+      "makeSlug": "nissan",
+      "make": "Nissan",
+      "model": "Navara",
+      "generation": "D23",
+      "yearStart": 2015,
+      "yearEnd": 2024,
+      "market": "Global / OEM Factory Reference",
+      "engine": {
+        "engineCode": null,
+        "displacement": null,
+        "fuelType": "Unknown",
+        "configuration": null
+      },
+      "transmission": {
+        "type": "Unknown",
+        "code": null
+      },
+      "systems": [
+        "electrical_charging",
+        "engine_management_ecu",
+        "diagnostics_obd_dtc",
+        "fuel_system"
+      ],
+      "sourceUrls": [
+        "https://fuse-box.info/nissan/nissan-navara-frontier-np300-d23-2015-2024-fuses",
+        "https://www.startmycar.com/nissan/navara/info/fusebox/2020"
+      ]
+    },
+    {
+      "id": "veh-honda-civic-2016-2018-fuses",
+      "makeSlug": "honda",
+      "make": "Honda",
+      "model": "Civic",
+      "generation": "10th Gen",
+      "yearStart": 2016,
+      "yearEnd": 2021,
+      "market": "Global / OEM Factory Reference",
+      "engine": {
+        "engineCode": null,
+        "displacement": null,
+        "fuelType": "Unknown",
+        "configuration": null
+      },
+      "transmission": {
+        "type": "Unknown",
+        "code": null
+      },
+      "systems": [
+        "electrical_charging",
+        "engine_management_ecu",
+        "diagnostics_obd_dtc",
+        "fuel_system"
+      ],
+      "sourceUrls": [
+        "https://fuse-box.info/honda/honda-civic-2016-2018-fuses",
+        "https://www.startmycar.com/honda/civic/info/fusebox/2018/trims-sedan"
+      ]
+    },
+    {
+      "id": "veh-honda-cr-v-2017-2018-fuses",
+      "makeSlug": "honda",
+      "make": "Honda",
+      "model": "CR-V",
+      "generation": "5th Gen",
+      "yearStart": 2017,
+      "yearEnd": 2019,
+      "market": "Global / OEM Factory Reference",
+      "engine": {
+        "engineCode": null,
+        "displacement": null,
+        "fuelType": "Unknown",
+        "configuration": null
+      },
+      "transmission": {
+        "type": "Unknown",
+        "code": null
+      },
+      "systems": [
+        "electrical_charging",
+        "engine_management_ecu",
+        "diagnostics_obd_dtc",
+        "fuel_system"
+      ],
+      "sourceUrls": [
+        "https://fuse-box.info/honda/honda-cr-v-2017-2018-fuses",
+        "https://www.startmycar.com/honda/cr-v/info/fusebox/2019"
+      ]
+    },
+    {
+      "id": "veh-isuzu-mu-x-d-max-2017-2020-fuses-and-relays",
+      "makeSlug": "isuzu",
+      "make": "Isuzu",
+      "model": "D-Max",
+      "generation": "RT85",
+      "yearStart": 2017,
+      "yearEnd": 2020,
+      "market": "Global / OEM Factory Reference",
+      "engine": {
+        "engineCode": null,
+        "displacement": null,
+        "fuelType": "Unknown",
+        "configuration": null
+      },
+      "transmission": {
+        "type": "Unknown",
+        "code": null
+      },
+      "systems": [
+        "electrical_charging",
+        "engine_management_ecu",
+        "diagnostics_obd_dtc",
+        "fuel_system"
+      ],
+      "sourceUrls": [
+        "https://fuse-box.info/isuzu/isuzu-mu-x-d-max-2017-2020-fuses-and-relays",
+        "https://www.startmycar.com/isuzu/d-max/info/fusebox/2020/2nd-gen"
+      ]
+    },
+    {
+      "id": "veh-suzuki-swift-2017-2019-fuses",
+      "makeSlug": "suzuki",
+      "make": "Suzuki",
+      "model": "Swift",
+      "generation": "A2L",
+      "yearStart": 2017,
+      "yearEnd": 2019,
+      "market": "Global / OEM Factory Reference",
+      "engine": {
+        "engineCode": null,
+        "displacement": null,
+        "fuelType": "Unknown",
+        "configuration": null
+      },
+      "transmission": {
+        "type": "Unknown",
+        "code": null
+      },
+      "systems": [
+        "electrical_charging",
+        "engine_management_ecu",
+        "diagnostics_obd_dtc",
+        "fuel_system"
+      ],
+      "sourceUrls": [
+        "https://fuse-box.info/suzuki/suzuki-swift-2017-2019-fuses",
+        "https://www.startmycar.com/suzuki/swift/info/fusebox/2018/third-global-generation_japan"
+      ]
+    },
+    {
+      "id": "veh-suzuki-jimny-2018-2020-fuses",
+      "makeSlug": "suzuki",
+      "make": "Suzuki",
+      "model": "Jimny",
+      "generation": "JB64/JB74",
+      "yearStart": 2018,
+      "yearEnd": 2020,
+      "market": "Global / OEM Factory Reference",
+      "engine": {
+        "engineCode": null,
+        "displacement": null,
+        "fuelType": "Unknown",
+        "configuration": null
+      },
+      "transmission": {
+        "type": "Unknown",
+        "code": null
+      },
+      "systems": [
+        "electrical_charging",
+        "engine_management_ecu",
+        "diagnostics_obd_dtc",
+        "fuel_system"
+      ],
+      "sourceUrls": [
+        "https://fuse-box.info/suzuki/suzuki-jimny-2018-2020-fuses",
+        "https://www.startmycar.com/suzuki/jimny/info/fusebox/2020"
+      ]
+    }
+  ],
+  "knowledgeIndexEntries": [
+    {
+      "id": "ref-fbi-toyota-corolla-e210-2019-2022-fuses",
+      "vehicleId": "veh-toyota-corolla-e210-2019-2022-fuses",
+      "make": "Toyota",
+      "model": "Corolla",
+      "years": "2019-2022",
+      "systemCategoryId": "electrical_charging",
+      "title": "Toyota Corolla (2019-2022 · E210) — OEM Fuse, Relay & ECU Power Distribution",
+      "referenceType": "electrical_system",
+      "summary": "Verified OEM Power Distribution (126 cavities across 3 compartments; WP Post #66832; DUAL_OEM_CONFIRMED). ECU/ECM Feeds: [#6 ECU-DCC NO.2 10A: Engine control unit]; [#7 ECU-DCC NO.1 5A: Engine control unit]; [#13 ECU-ACC 5A: Engine control unit]; [#14 ECU-IG1 NO.3 7.5A: Engine control unit]; [#18 ECU-IG2 NO.3 5A: Engine control unit]. OBD-II DLC Feeds: [#2 OBD 7.5A: On-board diagnostics]. Sensor/VVT Feeds: [#3 VVT 20A: VVT]; [#F42 ETCS 10A: Electronic throttle control system].",
+      "source": {
+        "sourceName": "Fuse-Box.info + StartMyCar Dual-OEM Verified Archive",
+        "originalUrl": "https://fuse-box.info/toyota/toyota-corolla-e210-2019-2022-fuses",
+        "sourceType": "OEM Fuse & Relay Technical Specification",
+        "collectedAt": "2026-11-27T13:43:47.633Z",
+        "language": "en",
+        "verificationStatus": "verified_source",
+        "confidenceScore": 0.98
+      },
+      "tags": [
+        "toyota",
+        "corolla",
+        "e210",
+        "fuse",
+        "relay",
+        "power distribution",
+        "ecu feed",
+        "obd2",
+        "dual_oem_confirmed"
+      ],
+      "verified": true
+    },
+    {
+      "id": "ref-fbi-toyota-corolla-e210-2023-2025-fuses",
+      "vehicleId": "veh-toyota-corolla-e210-2023-2025-fuses",
+      "make": "Toyota",
+      "model": "Corolla",
+      "years": "2023-2025",
+      "systemCategoryId": "electrical_charging",
+      "title": "Toyota Corolla (2023-2025 · E210 Facelift) — OEM Fuse, Relay & ECU Power Distribution",
+      "referenceType": "electrical_system",
+      "summary": "Verified OEM Power Distribution (121 cavities across 3 compartments; WP Post #66853; SINGLE_SOURCE_VERIFIED). ECU/ECM Feeds: [#1 ECU-B NO.1 10A: Engine control unit]; [#4 ECU-B NO.2 10A: Engine control unit]; [#6 ECU-DCC NO.1 10A: Engine control unit]; [#7 ECU-DCC NO.2 10A: Engine control unit]; [#12 ECU-IGR NO.2 10A: Engine control unit]. OBD-II DLC Feeds: [#21 OBD 7.5A: On-board diagnostics]. Sensor/VVT Feeds: [#F19 VVT 20A: VVT].",
+      "source": {
+        "sourceName": "Fuse-Box.info OEM Technical Archive",
+        "originalUrl": "https://fuse-box.info/toyota/toyota-corolla-e210-2023-2025-fuses",
+        "sourceType": "OEM Fuse & Relay Technical Specification",
+        "collectedAt": "2026-11-27T13:43:48.325Z",
+        "language": "en",
+        "verificationStatus": "verified_source",
+        "confidenceScore": 0.92
+      },
+      "tags": [
+        "toyota",
+        "corolla",
+        "e210 facelift",
+        "fuse",
+        "relay",
+        "power distribution",
+        "ecu feed",
+        "obd2",
+        "single_source_verified"
+      ],
+      "verified": true
+    },
+    {
+      "id": "ref-fbi-toyota-hilux-an120-an130-2015-2019-fuses-and-relay",
+      "vehicleId": "veh-toyota-hilux-an120-an130-2015-2019-fuses-and-relay",
+      "make": "Toyota",
+      "model": "Hilux",
+      "years": "2015-2019",
+      "systemCategoryId": "electrical_charging",
+      "title": "Toyota Hilux (2015-2019 · AN120/AN130) — OEM Fuse, Relay & ECU Power Distribution",
+      "referenceType": "electrical_system",
+      "summary": "Verified OEM Power Distribution (151 cavities across 6 compartments; WP Post #19544; DUAL_OEM_CONFIRMED). ECU/ECM Feeds: [#5 EFI-MAIN NO.1 25: 1GD-FTV, 2GD-FTV:  ABS, Air Conditioner, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Hill-Start Assist Control, TRC, VSC]; [#6 EFI-MAIN NO.1 25: 1GR-FE, 1KD-FTV, 2KD-FTV, 1TR-FE, 2TR-FE, 5L-E:  ABS, Air Conditioner, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Hill-Start Assist Control, TRC, VSC]; [#6 EFI-MAIN NO.2 25: 1GD-FTV, 2GD-FTV:  Multiport Fuel Injection System/Sequential Multiport Fuel Injection System]; [#11 ECU-ALT NO.2 10: 1GD-FTV, 2GD-FTV:  Door Lock Control, Power Window, Theft Deterrent]; [#13 ECU-ALT NO.2 10: 1GR-FE, 1KD-FTV, 2KD-FTV, 1TR-FE, 2TR-FE, 5L-E:  Door Lock Control, Power Window, Theft Deterrent]. OBD-II DLC Feeds: [#14 OBD 10: On-Board Diagnosis System]. Sensor/VVT Feeds: [#3 NOX PM 20: Nitrogen Oxides Sensor]; [#R2 R2 Relay: Nitrogen Oxides Sensor (NOX PM)]; [#24 A/F HTR 20: 1GR-FE, 1TR-FE, 2TR-FE:  Air Fuel Ratio Sensor]; [#53 DCU-MAIN 50: \"DCU-MAIN\" Relay, \"DCU NO.1\", \"DCU NO.2\", \"DCU-B\", \"NOX PM\" Fuses].",
+      "source": {
+        "sourceName": "Fuse-Box.info + StartMyCar Dual-OEM Verified Archive",
+        "originalUrl": "https://fuse-box.info/toyota/toyota-hilux-an120-an130-2015-2019-fuses-and-relay",
+        "sourceType": "OEM Fuse & Relay Technical Specification",
+        "collectedAt": "2026-11-27T13:43:49.057Z",
+        "language": "en",
+        "verificationStatus": "verified_source",
+        "confidenceScore": 0.98
+      },
+      "tags": [
+        "toyota",
+        "hilux",
+        "an120/an130",
+        "fuse",
+        "relay",
+        "power distribution",
+        "ecu feed",
+        "obd2",
+        "dual_oem_confirmed"
+      ],
+      "verified": true
+    },
+    {
+      "id": "ref-fbi-toyota-camry-xv70-2018-2024-fuses",
+      "vehicleId": "veh-toyota-camry-xv70-2018-2024-fuses",
+      "make": "Toyota",
+      "model": "Camry",
+      "years": "2018-2024",
+      "systemCategoryId": "electrical_charging",
+      "title": "Toyota Camry (2018-2024 · XV70) — OEM Fuse, Relay & ECU Power Distribution",
+      "referenceType": "electrical_system",
+      "summary": "Verified OEM Power Distribution (89 cavities across 2 compartments; WP Post #66964; DUAL_OEM_CONFIRMED). ECU/ECM Feeds: [#6 ECU-DCC NO.2 10A: Engine control unit]; [#7 ECU-DCC NO.1 5A: Engine control unit]; [#13 ECU-ACC 5A: Engine control unit]; [#14 ECU-IG1 NO.3 7.5A: Engine control unit]; [#18 ECU-IG2 NO.3 5A: Engine control unit]. OBD-II DLC Feeds: [#2 OBD 7.5A: On-board diagnostics].",
+      "source": {
+        "sourceName": "Fuse-Box.info + StartMyCar Dual-OEM Verified Archive",
+        "originalUrl": "https://fuse-box.info/toyota/toyota-camry-xv70-2018-2024-fuses",
+        "sourceType": "OEM Fuse & Relay Technical Specification",
+        "collectedAt": "2026-11-27T13:43:49.719Z",
+        "language": "en",
+        "verificationStatus": "verified_source",
+        "confidenceScore": 0.98
+      },
+      "tags": [
+        "toyota",
+        "camry",
+        "xv70",
+        "fuse",
+        "relay",
+        "power distribution",
+        "ecu feed",
+        "obd2",
+        "dual_oem_confirmed"
+      ],
+      "verified": true
+    },
+    {
+      "id": "ref-fbi-toyota-rav4-xa50-2019-2025-fuses",
+      "vehicleId": "veh-toyota-rav4-xa50-2019-2025-fuses",
+      "make": "Toyota",
+      "model": "RAV4",
+      "years": "2019-2025",
+      "systemCategoryId": "electrical_charging",
+      "title": "Toyota RAV4 (2019-2025 · XA50) — OEM Fuse, Relay & ECU Power Distribution",
+      "referenceType": "electrical_system",
+      "summary": "Verified OEM Power Distribution (110 cavities across 3 compartments; WP Post #66784; DUAL_OEM_CONFIRMED). ECU/ECM Feeds: [#6 ECU-DCC NO.2 10A: Engine control unit]; [#7 ECU-DCC NO.1 5A: Engine control unit]; [#13 ECU-ACC 5A: Engine control unit]; [#14 ECU-IG1 NO.3 7.5A: Engine control unit]; [#18 ECU-IG2 NO.3 5A: Engine control unit]. OBD-II DLC Feeds: [#2 OBD 7.5A: On-board diagnostics]. Sensor/VVT Feeds: [#21 VVT 20A: VVT].",
+      "source": {
+        "sourceName": "Fuse-Box.info + StartMyCar Dual-OEM Verified Archive",
+        "originalUrl": "https://fuse-box.info/toyota/toyota-rav4-xa50-2019-2025-fuses",
+        "sourceType": "OEM Fuse & Relay Technical Specification",
+        "collectedAt": "2026-11-27T13:43:50.412Z",
+        "language": "en",
+        "verificationStatus": "verified_source",
+        "confidenceScore": 0.98
+      },
+      "tags": [
+        "toyota",
+        "rav4",
+        "xa50",
+        "fuse",
+        "relay",
+        "power distribution",
+        "ecu feed",
+        "obd2",
+        "dual_oem_confirmed"
+      ],
+      "verified": true
+    },
+    {
+      "id": "ref-fbi-ford-ranger-2019-fuses-and-relays",
+      "vehicleId": "veh-ford-ranger-2019-fuses-and-relays",
+      "make": "Ford",
+      "model": "Ranger",
+      "years": "2019-2023",
+      "systemCategoryId": "electrical_charging",
+      "title": "Ford Ranger (2019-2023 · PX3) — OEM Fuse, Relay & ECU Power Distribution",
+      "referenceType": "electrical_system",
+      "summary": "Verified OEM Power Distribution (132 cavities across 5 compartments; WP Post #32451; DUAL_OEM_CONFIRMED). ECU/ECM Feeds: [#8 8 10A: Security horn]. Sensor/VVT Feeds: [#21 21 5A: Humidity and in-car temperature sensor]; [#3 3 5 A: Rain sensor]; [#8 8 20 A: Cannister vent solenoid \nFuel vapor shutoff valve \nCanister purge valve\nVariable cam timing valve 1 and 2 \nHeated oxygen sensors]; [#47 47 10 A: Brake pedal switch].",
+      "source": {
+        "sourceName": "Fuse-Box.info + StartMyCar Dual-OEM Verified Archive",
+        "originalUrl": "https://fuse-box.info/ford/ford-ranger-2019-fuses-and-relays",
+        "sourceType": "OEM Fuse & Relay Technical Specification",
+        "collectedAt": "2026-11-27T13:43:51.119Z",
+        "language": "en",
+        "verificationStatus": "verified_source",
+        "confidenceScore": 0.98
+      },
+      "tags": [
+        "ford",
+        "ranger",
+        "px3",
+        "fuse",
+        "relay",
+        "power distribution",
+        "ecu feed",
+        "obd2",
+        "dual_oem_confirmed"
+      ],
+      "verified": true
+    },
+    {
+      "id": "ref-fbi-ford-ranger-2012-2015-fuses-and-relays",
+      "vehicleId": "veh-ford-ranger-2012-2015-fuses-and-relays",
+      "make": "Ford",
+      "model": "Ranger",
+      "years": "2012-2015",
+      "systemCategoryId": "electrical_charging",
+      "title": "Ford Ranger (2012-2015 · PX1) — OEM Fuse, Relay & ECU Power Distribution",
+      "referenceType": "electrical_system",
+      "summary": "Verified OEM Power Distribution (140 cavities across 3 compartments; WP Post #38579; SINGLE_SOURCE_VERIFIED). ECU/ECM Feeds: [#26 26 7.5: Electronic control module (ECM)]; [#29 29 15: Electronic control module (ECM)]; [#R13 R13 Relay: Electronic control module (ECM) power hold]; [#R18 R18 Relay: Security horn]. OBD-II DLC Feeds: [#73 73 5: On-board diagnostics II]. Sensor/VVT Feeds: [#62 62 5: Rain sensor module]; [#81 81 5: Interior motion sensor]; [#85 85 7.5: Instrument cluster, parking aid module, rear view camera, manual air conditioning, rear view mirror, tracking and blocking module]; [#25 25 15: Ignition coils, Temperature and Mass Air Flow sensor, Glow plug module, Vacuum Control Valve (VCV), Electronic Vacuum Regulator Valve (EVRV)].",
+      "source": {
+        "sourceName": "Fuse-Box.info OEM Technical Archive",
+        "originalUrl": "https://fuse-box.info/ford/ford-ranger-2012-2015-fuses-and-relays",
+        "sourceType": "OEM Fuse & Relay Technical Specification",
+        "collectedAt": "2026-11-27T13:43:51.802Z",
+        "language": "en",
+        "verificationStatus": "verified_source",
+        "confidenceScore": 0.92
+      },
+      "tags": [
+        "ford",
+        "ranger",
+        "px1",
+        "fuse",
+        "relay",
+        "power distribution",
+        "ecu feed",
+        "obd2",
+        "single_source_verified"
+      ],
+      "verified": true
+    },
+    {
+      "id": "ref-fbi-ford-f-150-2015-2018-fuses-and-relay",
+      "vehicleId": "veh-ford-f-150-2015-2018-fuses-and-relay",
+      "make": "Ford",
+      "model": "F-150",
+      "years": "2015-2020",
+      "systemCategoryId": "electrical_charging",
+      "title": "Ford F-150 (2015-2020 · 13th Gen) — OEM Fuse, Relay & ECU Power Distribution",
+      "referenceType": "electrical_system",
+      "summary": "Verified OEM Power Distribution (457 cavities across 6 compartments; WP Post #14345; DUAL_OEM_CONFIRMED). Sensor/VVT Feeds: [#1 1 10A: Demand lamp relay. Power seats relay. Glove box. Vanity lamps. Overhead console. Dome. Courtesy. Map lamps.]; [#11 11 5A: Combined sensor module.]; [#21 21 5A: HUD. In car temperature with humidity sensor.]; [#31 31 15A: Adjustable pedal switch and motor.].",
+      "source": {
+        "sourceName": "Fuse-Box.info + StartMyCar Dual-OEM Verified Archive",
+        "originalUrl": "https://fuse-box.info/ford/ford-f-150-2015-2018-fuses-and-relay",
+        "sourceType": "OEM Fuse & Relay Technical Specification",
+        "collectedAt": "2026-11-27T13:43:52.560Z",
+        "language": "en",
+        "verificationStatus": "verified_source",
+        "confidenceScore": 0.98
+      },
+      "tags": [
+        "ford",
+        "f-150",
+        "13th gen",
+        "fuse",
+        "relay",
+        "power distribution",
+        "ecu feed",
+        "obd2",
+        "dual_oem_confirmed"
+      ],
+      "verified": true
+    },
+    {
+      "id": "ref-fbi-ford-f-150-2021-2022-fuses",
+      "vehicleId": "veh-ford-f-150-2021-2022-fuses",
+      "make": "Ford",
+      "model": "F-150",
+      "years": "2021-2023",
+      "systemCategoryId": "electrical_charging",
+      "title": "Ford F-150 (2021-2023 · 14th Gen) — OEM Fuse, Relay & ECU Power Distribution",
+      "referenceType": "electrical_system",
+      "summary": "Verified OEM Power Distribution (120 cavities across 2 compartments; WP Post #53217; SINGLE_SOURCE_VERIFIED). Sensor/VVT Feeds: [#9 9 5 A: Combined sensor module.]; [#25 25 10 A: Center high-mounted stop lamp camera. \nTráiler camera. 2 kW inverter. \n24 V alternator - run/start feed. \nAnalog rear video camera.]; [#124 124 5 A: Rain sensor module.].",
+      "source": {
+        "sourceName": "Fuse-Box.info OEM Technical Archive",
+        "originalUrl": "https://fuse-box.info/ford/ford-f-150-2021-2022-fuses",
+        "sourceType": "OEM Fuse & Relay Technical Specification",
+        "collectedAt": "2026-11-27T13:43:53.235Z",
+        "language": "en",
+        "verificationStatus": "verified_source",
+        "confidenceScore": 0.92
+      },
+      "tags": [
+        "ford",
+        "f-150",
+        "14th gen",
+        "fuse",
+        "relay",
+        "power distribution",
+        "ecu feed",
+        "obd2",
+        "single_source_verified"
+      ],
+      "verified": true
+    },
+    {
+      "id": "ref-fbi-nissan-sentra-b17-2013-2019-fuses",
+      "vehicleId": "veh-nissan-sentra-b17-2013-2019-fuses",
+      "make": "Nissan",
+      "model": "Sentra",
+      "years": "2013-2019",
+      "systemCategoryId": "electrical_charging",
+      "title": "Nissan Sentra (2013-2019 · B17) — OEM Fuse, Relay & ECU Power Distribution",
+      "referenceType": "electrical_system",
+      "summary": "Verified OEM Power Distribution (57 cavities across 3 compartments; WP Post #67840; DUAL_OEM_CONFIRMED). ECU/ECM Feeds: [#15 A/T ECU IGN 10A: Automatic transmission controller]; [#17 ABS ECU IGN 10A: Anti-lock braking system]. Sensor/VVT Feeds: [#24 ETC 15A: Electronic throttle control].",
+      "source": {
+        "sourceName": "Fuse-Box.info + StartMyCar Dual-OEM Verified Archive",
+        "originalUrl": "https://fuse-box.info/nissan/nissan-sentra-b17-2013-2019-fuses",
+        "sourceType": "OEM Fuse & Relay Technical Specification",
+        "collectedAt": "2026-11-27T13:43:53.919Z",
+        "language": "en",
+        "verificationStatus": "verified_source",
+        "confidenceScore": 0.98
+      },
+      "tags": [
+        "nissan",
+        "sentra",
+        "b17",
+        "fuse",
+        "relay",
+        "power distribution",
+        "ecu feed",
+        "obd2",
+        "dual_oem_confirmed"
+      ],
+      "verified": true
+    },
+    {
+      "id": "ref-fbi-nissan-sentra-b18-2020-2025-fuses",
+      "vehicleId": "veh-nissan-sentra-b18-2020-2025-fuses",
+      "make": "Nissan",
+      "model": "Sentra",
+      "years": "2020-2025",
+      "systemCategoryId": "electrical_charging",
+      "title": "Nissan Sentra (2020-2025 · B18) — OEM Fuse, Relay & ECU Power Distribution",
+      "referenceType": "electrical_system",
+      "summary": "Verified OEM Power Distribution (71 cavities across 3 compartments; WP Post #67861; SINGLE_SOURCE_VERIFIED). ECU/ECM Feeds: [#F15 ECM 5A: Engine Control Module]; [#6 ENG CONT 10A: Engine control unit.]. OBD-II DLC Feeds: [#17 CONSULT 10A: Diagnostic communication (Nissan CONSULT tool interface)]. Sensor/VVT Feeds: [#52 STRG SENSOR 10A: Steering angle sensor (VDC/ADAS input)].",
+      "source": {
+        "sourceName": "Fuse-Box.info OEM Technical Archive",
+        "originalUrl": "https://fuse-box.info/nissan/nissan-sentra-b18-2020-2025-fuses",
+        "sourceType": "OEM Fuse & Relay Technical Specification",
+        "collectedAt": "2026-11-27T13:43:54.573Z",
+        "language": "en",
+        "verificationStatus": "verified_source",
+        "confidenceScore": 0.92
+      },
+      "tags": [
+        "nissan",
+        "sentra",
+        "b18",
+        "fuse",
+        "relay",
+        "power distribution",
+        "ecu feed",
+        "obd2",
+        "single_source_verified"
+      ],
+      "verified": true
+    },
+    {
+      "id": "ref-fbi-nissan-navara-frontier-np300-d23-2015-2024-fuses",
+      "vehicleId": "veh-nissan-navara-frontier-np300-d23-2015-2024-fuses",
+      "make": "Nissan",
+      "model": "Navara",
+      "years": "2015-2024",
+      "systemCategoryId": "electrical_charging",
+      "title": "Nissan Navara (2015-2024 · D23) — OEM Fuse, Relay & ECU Power Distribution",
+      "referenceType": "electrical_system",
+      "summary": "Verified OEM Power Distribution (65 cavities across 3 compartments; WP Post #67679; DUAL_OEM_CONFIRMED). ECU/ECM Feeds: [#46 ABS ECU 10A: Anti-lock braking system]; [#47 A/T ECU 10A: Automatic transmission controller]. Sensor/VVT Feeds: [#55 THROTTLE MTR 15A: Electronic throttle control].",
+      "source": {
+        "sourceName": "Fuse-Box.info + StartMyCar Dual-OEM Verified Archive",
+        "originalUrl": "https://fuse-box.info/nissan/nissan-navara-frontier-np300-d23-2015-2024-fuses",
+        "sourceType": "OEM Fuse & Relay Technical Specification",
+        "collectedAt": "2026-11-27T13:43:55.228Z",
+        "language": "en",
+        "verificationStatus": "verified_source",
+        "confidenceScore": 0.98
+      },
+      "tags": [
+        "nissan",
+        "navara",
+        "d23",
+        "fuse",
+        "relay",
+        "power distribution",
+        "ecu feed",
+        "obd2",
+        "dual_oem_confirmed"
+      ],
+      "verified": true
+    },
+    {
+      "id": "ref-fbi-honda-civic-2016-2018-fuses",
+      "vehicleId": "veh-honda-civic-2016-2018-fuses",
+      "make": "Honda",
+      "model": "Civic",
+      "years": "2016-2021",
+      "systemCategoryId": "electrical_charging",
+      "title": "Honda Civic (2016-2021 · 10th Gen) — OEM Fuse, Relay & ECU Power Distribution",
+      "referenceType": "electrical_system",
+      "summary": "Verified OEM Power Distribution (391 cavities across 8 compartments; WP Post #12869; DUAL_OEM_CONFIRMED). ECU/ECM Feeds: [#11 11 5 A: Engine Control]; [#12 12 10 A: FI ECU]; [#11 11 5 A: Engine Control]; [#12 12 10 A: FI ECU]; [#11 11 5 A: Engine Control]. Sensor/VVT Feeds: [#4 4 (5 A) \n(10 A): Front Sensor Camera (with smart entry system) \nTransmission (without smart entry system) (Continuously variable transmission models)]; [#17 17 (10 A) \n(5 A): Transmission (with smart entry system) (Continuously variable transmission models)  \nFront Sensor Camera (without smart entry system)]; [#24 24 (5 A): Front Sensor Camera (option)]; [#4 4 (5 A) \n(10 A): Front Sensor Camera (with smart entry system)  \nTransmission (without smart entry system) (Continuously variable transmission\nmodels)].",
+      "source": {
+        "sourceName": "Fuse-Box.info + StartMyCar Dual-OEM Verified Archive",
+        "originalUrl": "https://fuse-box.info/honda/honda-civic-2016-2018-fuses",
+        "sourceType": "OEM Fuse & Relay Technical Specification",
+        "collectedAt": "2026-11-27T13:43:56.012Z",
+        "language": "en",
+        "verificationStatus": "verified_source",
+        "confidenceScore": 0.98
+      },
+      "tags": [
+        "honda",
+        "civic",
+        "10th gen",
+        "fuse",
+        "relay",
+        "power distribution",
+        "ecu feed",
+        "obd2",
+        "dual_oem_confirmed"
+      ],
+      "verified": true
+    },
+    {
+      "id": "ref-fbi-honda-cr-v-2017-2018-fuses",
+      "vehicleId": "veh-honda-cr-v-2017-2018-fuses",
+      "make": "Honda",
+      "model": "CR-V",
+      "years": "2017-2019",
+      "systemCategoryId": "electrical_charging",
+      "title": "Honda CR-V (2017-2019 · 5th Gen) — OEM Fuse, Relay & ECU Power Distribution",
+      "referenceType": "electrical_system",
+      "summary": "Verified OEM Power Distribution (212 cavities across 4 compartments; WP Post #12764; DUAL_OEM_CONFIRMED). ECU/ECM Feeds: [#11 11 5 A: Engine Control’ 3]; [#12 12 10 A: FI ECU (1.5L)]; [#11 11 5 A: Engine Control]; [#12 12 10 A: FI ECU (with smart entry system)]. Sensor/VVT Feeds: [#23 23 (10 A): Steering Wheel Heater (Canadian models with steering heater)   ; Handsfree Power Tailgate Sensor (option)].",
+      "source": {
+        "sourceName": "Fuse-Box.info + StartMyCar Dual-OEM Verified Archive",
+        "originalUrl": "https://fuse-box.info/honda/honda-cr-v-2017-2018-fuses",
+        "sourceType": "OEM Fuse & Relay Technical Specification",
+        "collectedAt": "2026-11-27T13:43:56.719Z",
+        "language": "en",
+        "verificationStatus": "verified_source",
+        "confidenceScore": 0.98
+      },
+      "tags": [
+        "honda",
+        "cr-v",
+        "5th gen",
+        "fuse",
+        "relay",
+        "power distribution",
+        "ecu feed",
+        "obd2",
+        "dual_oem_confirmed"
+      ],
+      "verified": true
+    },
+    {
+      "id": "ref-fbi-isuzu-mu-x-d-max-2017-2020-fuses-and-relays",
+      "vehicleId": "veh-isuzu-mu-x-d-max-2017-2020-fuses-and-relays",
+      "make": "Isuzu",
+      "model": "D-Max",
+      "years": "2017-2020",
+      "systemCategoryId": "electrical_charging",
+      "title": "Isuzu D-Max (2017-2020 · RT85) — OEM Fuse, Relay & ECU Power Distribution",
+      "referenceType": "electrical_system",
+      "summary": "Verified OEM Power Distribution (88 cavities across 2 compartments; WP Post #63506; DUAL_OEM_CONFIRMED). ECU/ECM Feeds: [#25 25 40A: ECM]; [#ER2 ER2 —: ECM MAIN].",
+      "source": {
+        "sourceName": "Fuse-Box.info + StartMyCar Dual-OEM Verified Archive",
+        "originalUrl": "https://fuse-box.info/isuzu/isuzu-mu-x-d-max-2017-2020-fuses-and-relays",
+        "sourceType": "OEM Fuse & Relay Technical Specification",
+        "collectedAt": "2026-11-27T13:43:57.372Z",
+        "language": "en",
+        "verificationStatus": "verified_source",
+        "confidenceScore": 0.98
+      },
+      "tags": [
+        "isuzu",
+        "d-max",
+        "rt85",
+        "fuse",
+        "relay",
+        "power distribution",
+        "ecu feed",
+        "obd2",
+        "dual_oem_confirmed"
+      ],
+      "verified": true
+    },
+    {
+      "id": "ref-fbi-suzuki-swift-2017-2019-fuses",
+      "vehicleId": "veh-suzuki-swift-2017-2019-fuses",
+      "make": "Suzuki",
+      "model": "Swift",
+      "years": "2017-2019",
+      "systemCategoryId": "electrical_charging",
+      "title": "Suzuki Swift (2017-2019 · A2L) — OEM Fuse, Relay & ECU Power Distribution",
+      "referenceType": "electrical_system",
+      "summary": "Verified OEM Power Distribution (63 cavities across 2 compartments; WP Post #30134; DUAL_OEM_CONFIRMED). ECU/ECM Feeds: [#11 A-STOP 5A: Engine controller]; [#18 ST SIG 5A: Engine controller]. Sensor/VVT Feeds: [#15 IG1 SIG3 5A: Camera].",
+      "source": {
+        "sourceName": "Fuse-Box.info + StartMyCar Dual-OEM Verified Archive",
+        "originalUrl": "https://fuse-box.info/suzuki/suzuki-swift-2017-2019-fuses",
+        "sourceType": "OEM Fuse & Relay Technical Specification",
+        "collectedAt": "2026-11-27T13:43:58.031Z",
+        "language": "en",
+        "verificationStatus": "verified_source",
+        "confidenceScore": 0.98
+      },
+      "tags": [
+        "suzuki",
+        "swift",
+        "a2l",
+        "fuse",
+        "relay",
+        "power distribution",
+        "ecu feed",
+        "obd2",
+        "dual_oem_confirmed"
+      ],
+      "verified": true
+    },
+    {
+      "id": "ref-fbi-suzuki-jimny-2018-2020-fuses",
+      "vehicleId": "veh-suzuki-jimny-2018-2020-fuses",
+      "make": "Suzuki",
+      "model": "Jimny",
+      "years": "2018-2020",
+      "systemCategoryId": "electrical_charging",
+      "title": "Suzuki Jimny (2018-2020 · JB64/JB74) — OEM Fuse, Relay & ECU Power Distribution",
+      "referenceType": "electrical_system",
+      "summary": "Verified OEM Power Distribution (71 cavities across 2 compartments; WP Post #51396; DUAL_OEM_CONFIRMED). ECU/ECM Feeds: [#3 3 15A: Engine Control Module].",
+      "source": {
+        "sourceName": "Fuse-Box.info + StartMyCar Dual-OEM Verified Archive",
+        "originalUrl": "https://fuse-box.info/suzuki/suzuki-jimny-2018-2020-fuses",
+        "sourceType": "OEM Fuse & Relay Technical Specification",
+        "collectedAt": "2026-11-27T13:43:58.677Z",
+        "language": "en",
+        "verificationStatus": "verified_source",
+        "confidenceScore": 0.98
+      },
+      "tags": [
+        "suzuki",
+        "jimny",
+        "jb64/jb74",
+        "fuse",
+        "relay",
+        "power distribution",
+        "ecu feed",
+        "obd2",
+        "dual_oem_confirmed"
+      ],
+      "verified": true
+    }
+  ],
+  "compiledVehicles": [
+    {
+      "id": "oem-fbi-ford-f-150-2015-2018-fuses-and-relay",
+      "brand": "Ford",
+      "makeSlug": "ford",
+      "model": "F-150",
+      "modelSlug": "f-150",
+      "yearsString": "2015-2020",
+      "yearStart": 2015,
+      "yearEnd": 2020,
+      "chassisCode": "13th Gen",
+      "confidenceRating": "DUAL_OEM_CONFIRMED",
+      "dualOemCorrelatedCircuitsCount": 452,
+      "totalCavities": 457,
+      "provenance": {
+        "fuseBoxInfo": {
+          "wpPostId": 14345,
+          "sourceUrl": "https://fuse-box.info/ford/ford-f-150-2015-2018-fuses-and-relay",
+          "crawledAt": "2026-11-27T13:43:52.560Z",
+          "tier": "VERIFIED"
+        },
+        "startMyCar": {
+          "sourceUrl": "https://www.startmycar.com/ford/f-150/info/fusebox/2016",
+          "crawledAt": "2026-11-27T10:11:20.572Z",
+          "tier": "VERIFIED"
+        }
+      },
+      "criticalDiagnosticCircuits": {
+        "ecuPowerFeeds": [],
+        "obdDlcFeeds": [],
+        "sensorVrefFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment (2016)",
+            "cavityId": "1",
+            "name": "1",
+            "ampRating": "10A",
+            "description": "Demand lamp relay. Power seats relay. Glove box. Vanity lamps. Overhead console. Dome. Courtesy. Map lamps."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment (2016)",
+            "cavityId": "11",
+            "name": "11",
+            "ampRating": "5A",
+            "description": "Combined sensor module."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment (2016)",
+            "cavityId": "21",
+            "name": "21",
+            "ampRating": "5A",
+            "description": "HUD. In car temperature with humidity sensor."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment (2016)",
+            "cavityId": "31",
+            "name": "31",
+            "ampRating": "15A",
+            "description": "Adjustable pedal switch and motor."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment (2016)",
+            "cavityId": "36",
+            "name": "36",
+            "ampRating": "15A",
+            "description": "360 camera module. Heated steering wheel module. Rear-view mirror. Rear heated seats."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Power distribution box (2016)",
+            "cavityId": "23",
+            "name": "23",
+            "ampRating": "15 A*",
+            "description": "Rain sensor."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Power distribution box (2016)",
+            "cavityId": "38",
+            "name": "38",
+            "ampRating": "10A**",
+            "description": "Alt A sensor."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Power distribution box (2016)",
+            "cavityId": "113",
+            "name": "113",
+            "ampRating": "7.5 A**",
+            "description": "Blind spot information system. Rear view camera. Front view camera. Voltage quality module."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment (2017)",
+            "cavityId": "1",
+            "name": "1",
+            "ampRating": "10A",
+            "description": "Demand lamp relay. Power seats relay. Glove box. Vanity lamps. Overhead console. Dome. Courtesy. Map lamps."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment (2017)",
+            "cavityId": "11",
+            "name": "11",
+            "ampRating": "5A",
+            "description": "Combined sensor module."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment (2017)",
+            "cavityId": "21",
+            "name": "21",
+            "ampRating": "5A",
+            "description": "HUD. In car temperature with humidity sensor."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment (2017)",
+            "cavityId": "31",
+            "name": "31",
+            "ampRating": "15A",
+            "description": "Adjustable pedal switch and motor."
+          }
+        ],
+        "fuelPumpFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Power distribution box (2016)",
+            "cavityId": "51",
+            "name": "51",
+            "ampRating": "—",
+            "description": "Fuel pump relay."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Power distribution box (2016)",
+            "cavityId": "56",
+            "name": "56",
+            "ampRating": "20A*",
+            "description": "Fuel pump."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Power distribution box (2017)",
+            "cavityId": "9",
+            "name": "9",
+            "ampRating": "30 A*",
+            "description": "Fuel pump."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Power distribution box (2017)",
+            "cavityId": "51",
+            "name": "51",
+            "ampRating": "—",
+            "description": "Fuel pump relay."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Power distribution box (2017)",
+            "cavityId": "56",
+            "name": "56",
+            "ampRating": "20A*",
+            "description": "Fuel pump."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Power distribution box (2018, 2019, 2020)",
+            "cavityId": "50",
+            "name": "50",
+            "ampRating": "30 A",
+            "description": "Fuel pump."
+          }
+        ],
+        "ignitionFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment (2016)",
+            "cavityId": "18",
+            "name": "18",
+            "ampRating": "5A",
+            "description": "Ignition switch and passive-entry passive-start start stop switch. Key inhibit solenoid."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment (2016)",
+            "cavityId": "34",
+            "name": "34",
+            "ampRating": "30A",
+            "description": "Run-start relay."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment (2016)",
+            "cavityId": "37",
+            "name": "37",
+            "ampRating": "20A",
+            "description": "Power distribution box run-start fuses."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Power distribution box (2016)",
+            "cavityId": "59",
+            "name": "59",
+            "ampRating": "30 A*",
+            "description": "Starter."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Power distribution box (2016)",
+            "cavityId": "65",
+            "name": "65",
+            "ampRating": "—",
+            "description": "Starter relay."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Power distribution box (2016)",
+            "cavityId": "110",
+            "name": "110",
+            "ampRating": "10 A**",
+            "description": "4x4 run/start. Adaptive cruise control."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Power distribution box (2016)",
+            "cavityId": "111",
+            "name": "111",
+            "ampRating": "10 A**",
+            "description": "Transmission pump run-start."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment (2017)",
+            "cavityId": "18",
+            "name": "18",
+            "ampRating": "5A",
+            "description": "Ignition switch and passive-entry passive-start start stop switch. Key inhibit solenoid."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment (2017)",
+            "cavityId": "34",
+            "name": "34",
+            "ampRating": "30A",
+            "description": "Run-start relay."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment (2017)",
+            "cavityId": "37",
+            "name": "37",
+            "ampRating": "20A",
+            "description": "Power distribution box run-start fuses."
+          }
+        ]
+      }
+    },
+    {
+      "id": "oem-fbi-ford-f-150-2021-2022-fuses",
+      "brand": "Ford",
+      "makeSlug": "ford",
+      "model": "F-150",
+      "modelSlug": "f-150",
+      "yearsString": "2021-2023",
+      "yearStart": 2021,
+      "yearEnd": 2023,
+      "chassisCode": "14th Gen",
+      "confidenceRating": "SINGLE_SOURCE_VERIFIED",
+      "dualOemCorrelatedCircuitsCount": 0,
+      "totalCavities": 120,
+      "provenance": {
+        "fuseBoxInfo": {
+          "wpPostId": 53217,
+          "sourceUrl": "https://fuse-box.info/ford/ford-f-150-2021-2022-fuses",
+          "crawledAt": "2026-11-27T13:43:53.235Z",
+          "tier": "VERIFIED"
+        }
+      },
+      "criticalDiagnosticCircuits": {
+        "ecuPowerFeeds": [],
+        "obdDlcFeeds": [],
+        "sensorVrefFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment",
+            "cavityId": "9",
+            "name": "9",
+            "ampRating": "5 A",
+            "description": "Combined sensor module."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "25",
+            "name": "25",
+            "ampRating": "10 A",
+            "description": "Center high-mounted stop lamp camera. \nTráiler camera. 2 kW inverter. \n24 V alternator - run/start feed. \nAnalog rear video camera."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "124",
+            "name": "124",
+            "ampRating": "5 A",
+            "description": "Rain sensor module."
+          }
+        ],
+        "fuelPumpFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "4",
+            "name": "4",
+            "ampRating": "30 A",
+            "description": "Fuel pump."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "72",
+            "name": "72",
+            "ampRating": "30 A",
+            "description": "Fuel pump 2 (Raptor R)."
+          }
+        ],
+        "ignitionFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment",
+            "cavityId": "20",
+            "name": "20",
+            "ampRating": "5 A",
+            "description": "Passive start. \nIgnition switch. \nKey inhibit solenoid."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment",
+            "cavityId": "34",
+            "name": "34",
+            "ampRating": "30 A",
+            "description": "Run/start relay."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment",
+            "cavityId": "35",
+            "name": "35",
+            "ampRating": "5 A",
+            "description": "400 watt inverter run/start."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment",
+            "cavityId": "36",
+            "name": "36",
+            "ampRating": "15 A",
+            "description": "Auto-dimming interior mirror. \nRear heat seat run/start. \nAdaptive front steering run/start. \nHeated wheel (vehicles without adaptive front steering)."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "10 A",
+            "name": "10 A",
+            "ampRating": "Powertrain control module power (gas, diesel, Raptor, Tremor).",
+            "description": "(Unassigned / Spare)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "11",
+            "name": "11",
+            "ampRating": "30 A",
+            "description": "Starter motor."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "21",
+            "name": "21",
+            "ampRating": "10 A",
+            "description": "Headlamp run/start feed."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "67",
+            "name": "67",
+            "ampRating": "20 A",
+            "description": "Transmission run/start."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "210",
+            "name": "210",
+            "ampRating": "30 A",
+            "description": "Body control module start stop."
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "Cavity-77",
+            "name": "Cavity-77",
+            "ampRating": "—",
+            "description": "(Unassigned / Spare)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "oem-fbi-ford-ranger-2012-2015-fuses-and-relays",
+      "brand": "Ford",
+      "makeSlug": "ford",
+      "model": "Ranger",
+      "modelSlug": "ranger",
+      "yearsString": "2012-2015",
+      "yearStart": 2012,
+      "yearEnd": 2015,
+      "chassisCode": "PX1",
+      "confidenceRating": "SINGLE_SOURCE_VERIFIED",
+      "dualOemCorrelatedCircuitsCount": 0,
+      "totalCavities": 140,
+      "provenance": {
+        "fuseBoxInfo": {
+          "wpPostId": 38579,
+          "sourceUrl": "https://fuse-box.info/ford/ford-ranger-2012-2015-fuses-and-relays",
+          "crawledAt": "2026-11-27T13:43:51.802Z",
+          "tier": "VERIFIED"
+        }
+      },
+      "criticalDiagnosticCircuits": {
+        "ecuPowerFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the engine compartment",
+            "cavityId": "26",
+            "name": "26",
+            "ampRating": "7.5",
+            "description": "Electronic control module (ECM)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the engine compartment",
+            "cavityId": "29",
+            "name": "29",
+            "ampRating": "15",
+            "description": "Electronic control module (ECM)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the engine compartment",
+            "cavityId": "R13",
+            "name": "R13",
+            "ampRating": "Relay",
+            "description": "Electronic control module (ECM) power hold"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the engine compartment",
+            "cavityId": "R18",
+            "name": "R18",
+            "ampRating": "Relay",
+            "description": "Security horn"
+          }
+        ],
+        "obdDlcFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment",
+            "cavityId": "73",
+            "name": "73",
+            "ampRating": "5",
+            "description": "On-board diagnostics II"
+          }
+        ],
+        "sensorVrefFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment",
+            "cavityId": "62",
+            "name": "62",
+            "ampRating": "5",
+            "description": "Rain sensor module"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment",
+            "cavityId": "81",
+            "name": "81",
+            "ampRating": "5",
+            "description": "Interior motion sensor"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment",
+            "cavityId": "85",
+            "name": "85",
+            "ampRating": "7.5",
+            "description": "Instrument cluster, parking aid module, rear view camera, manual air conditioning, rear view mirror, tracking and blocking module"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the engine compartment",
+            "cavityId": "25",
+            "name": "25",
+            "ampRating": "15",
+            "description": "Ignition coils, Temperature and Mass Air Flow sensor, Glow plug module, Vacuum Control Valve (VCV), Electronic Vacuum Regulator Valve (EVRV)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the engine compartment",
+            "cavityId": "28",
+            "name": "28",
+            "ampRating": "10",
+            "description": "Heated exhaust gas oxygen, Universal Heated Exhaust Gas Oxygen-sensor, Relay coils"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the engine compartment",
+            "cavityId": "30",
+            "name": "30",
+            "ampRating": "15",
+            "description": "Battery monitoring sensor"
+          }
+        ],
+        "fuelPumpFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment",
+            "cavityId": "56",
+            "name": "56",
+            "ampRating": "20",
+            "description": "Fuel pump"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the engine compartment",
+            "cavityId": "15 (Petrol)",
+            "name": "15 (Petrol)",
+            "ampRating": "10",
+            "description": "Flex-fuel pump"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the engine compartment",
+            "cavityId": "R9",
+            "name": "R9",
+            "ampRating": "Relay",
+            "description": "Flex-fuel pump, Vapouriser glow plug"
+          }
+        ],
+        "ignitionFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment",
+            "cavityId": "78",
+            "name": "78",
+            "ampRating": "5",
+            "description": "Ignition switch"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the engine compartment",
+            "cavityId": "13",
+            "name": "13",
+            "ampRating": "20",
+            "description": "Starter solenoid"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the engine compartment",
+            "cavityId": "35",
+            "name": "35",
+            "ampRating": "20",
+            "description": "Passenger compartment fuse box supply (Ignition)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the engine compartment",
+            "cavityId": "50",
+            "name": "50",
+            "ampRating": "5",
+            "description": "Ignition relay, Relay coils"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the engine compartment",
+            "cavityId": "Cavity-55",
+            "name": "Cavity-55",
+            "ampRating": "—",
+            "description": "(Unassigned / Spare)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the engine compartment",
+            "cavityId": "Relays",
+            "name": "Relays",
+            "ampRating": "Relay",
+            "description": "(Unassigned / Spare)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the engine compartment",
+            "cavityId": "R14",
+            "name": "R14",
+            "ampRating": "Relay",
+            "description": "Ignition"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the engine compartment",
+            "cavityId": "R19",
+            "name": "R19",
+            "ampRating": "Relay",
+            "description": "Starter motor"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the Auxiliary fuse box",
+            "cavityId": "Cavity-13",
+            "name": "Cavity-13",
+            "ampRating": "—",
+            "description": "(Unassigned / Spare)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the Auxiliary fuse box",
+            "cavityId": "Relays",
+            "name": "Relays",
+            "ampRating": "Relay",
+            "description": "(Unassigned / Spare)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "oem-fbi-ford-ranger-2019-fuses-and-relays",
+      "brand": "Ford",
+      "makeSlug": "ford",
+      "model": "Ranger",
+      "modelSlug": "ranger",
+      "yearsString": "2019-2023",
+      "yearStart": 2019,
+      "yearEnd": 2023,
+      "chassisCode": "PX3",
+      "confidenceRating": "DUAL_OEM_CONFIRMED",
+      "dualOemCorrelatedCircuitsCount": 132,
+      "totalCavities": 132,
+      "provenance": {
+        "fuseBoxInfo": {
+          "wpPostId": 32451,
+          "sourceUrl": "https://fuse-box.info/ford/ford-ranger-2019-fuses-and-relays",
+          "crawledAt": "2026-11-27T13:43:51.119Z",
+          "tier": "VERIFIED"
+        },
+        "startMyCar": {
+          "sourceUrl": "https://www.startmycar.com/ford/ranger/info/fusebox/2019",
+          "crawledAt": "2026-11-27T10:11:20.104Z",
+          "tier": "VERIFIED"
+        }
+      },
+      "criticalDiagnosticCircuits": {
+        "ecuPowerFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment fuse box",
+            "cavityId": "8",
+            "name": "8",
+            "ampRating": "10A",
+            "description": "Security horn"
+          }
+        ],
+        "obdDlcFeeds": [],
+        "sensorVrefFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment fuse box",
+            "cavityId": "21",
+            "name": "21",
+            "ampRating": "5A",
+            "description": "Humidity and in-car temperature sensor"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the Power Distribution Box",
+            "cavityId": "3",
+            "name": "3",
+            "ampRating": "5 A",
+            "description": "Rain sensor"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the Power Distribution Box",
+            "cavityId": "8",
+            "name": "8",
+            "ampRating": "20 A",
+            "description": "Cannister vent solenoid \nFuel vapor shutoff valve \nCanister purge valve\nVariable cam timing valve 1 and 2 \nHeated oxygen sensors"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the Power Distribution Box",
+            "cavityId": "47",
+            "name": "47",
+            "ampRating": "10 A",
+            "description": "Brake pedal switch"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Fuse Box 5",
+            "cavityId": "3",
+            "name": "3",
+            "ampRating": "50A",
+            "description": "Voltage quality module (supplies rear lamp blind spot, rear view camera, head up display, 4x4 switch, image processing module and adaptive cruise control radar)"
+          }
+        ],
+        "fuelPumpFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the Power Distribution Box",
+            "cavityId": "32",
+            "name": "32",
+            "ampRating": "-",
+            "description": "Fuel pump relay"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the Power distribution box (Bottom)",
+            "cavityId": "60",
+            "name": "60",
+            "ampRating": "30A",
+            "description": "Fuel pump control module"
+          }
+        ],
+        "ignitionFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment fuse box",
+            "cavityId": "18",
+            "name": "18",
+            "ampRating": "5A",
+            "description": "Ignition switch \nLock solenoid \nPush button start"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment fuse box",
+            "cavityId": "34",
+            "name": "34",
+            "ampRating": "30A",
+            "description": "Run/start relay"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the Power Distribution Box",
+            "cavityId": "2",
+            "name": "2",
+            "ampRating": "-",
+            "description": "Starter motor solenoid relay"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the Power Distribution Box",
+            "cavityId": "11",
+            "name": "11",
+            "ampRating": "15 A",
+            "description": "Ignition coils"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the Power Distribution Box",
+            "cavityId": "15",
+            "name": "15",
+            "ampRating": "-",
+            "description": "Run/start relay"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the Power Distribution Box",
+            "cavityId": "21",
+            "name": "21",
+            "ampRating": "5 A",
+            "description": "Transmission Run/Start relay"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses and relays in the Power distribution box (Bottom)",
+            "cavityId": "84",
+            "name": "84",
+            "ampRating": "30A",
+            "description": "Starter motor solenoid"
+          }
+        ]
+      }
+    },
+    {
+      "id": "oem-fbi-honda-civic-2016-2018-fuses",
+      "brand": "Honda",
+      "makeSlug": "honda",
+      "model": "Civic",
+      "modelSlug": "civic",
+      "yearsString": "2016-2021",
+      "yearStart": 2016,
+      "yearEnd": 2021,
+      "chassisCode": "10th Gen",
+      "confidenceRating": "DUAL_OEM_CONFIRMED",
+      "dualOemCorrelatedCircuitsCount": 376,
+      "totalCavities": 391,
+      "provenance": {
+        "fuseBoxInfo": {
+          "wpPostId": 12869,
+          "sourceUrl": "https://fuse-box.info/honda/honda-civic-2016-2018-fuses",
+          "crawledAt": "2026-11-27T13:43:56.012Z",
+          "tier": "VERIFIED"
+        },
+        "startMyCar": {
+          "sourceUrl": "https://www.startmycar.com/honda/civic/info/fusebox/2018/trims-sedan",
+          "crawledAt": "2026-11-27T10:11:22.288Z",
+          "tier": "COMMUNITY_UNVERIFIED"
+        }
+      },
+      "criticalDiagnosticCircuits": {
+        "ecuPowerFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2016, 2017)",
+            "cavityId": "11",
+            "name": "11",
+            "ampRating": "5 A",
+            "description": "Engine Control"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment (2016, 2017)",
+            "cavityId": "12",
+            "name": "12",
+            "ampRating": "10 A",
+            "description": "FI ECU"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2018)",
+            "cavityId": "11",
+            "name": "11",
+            "ampRating": "5 A",
+            "description": "Engine Control"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment (2018)",
+            "cavityId": "12",
+            "name": "12",
+            "ampRating": "10 A",
+            "description": "FI ECU"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2019)",
+            "cavityId": "11",
+            "name": "11",
+            "ampRating": "5 A",
+            "description": "Engine Control"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment (2019)",
+            "cavityId": "12",
+            "name": "12",
+            "ampRating": "10 A",
+            "description": "FI ECU"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment (2020-2021)",
+            "cavityId": "11",
+            "name": "11",
+            "ampRating": "5A",
+            "description": "Engine Control"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine compartment (2020-2021)",
+            "cavityId": "12",
+            "name": "12",
+            "ampRating": "10A",
+            "description": "FI ECU"
+          }
+        ],
+        "obdDlcFeeds": [],
+        "sensorVrefFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2016, 2017)",
+            "cavityId": "4",
+            "name": "4",
+            "ampRating": "(5 A) \n(10 A)",
+            "description": "Front Sensor Camera (with smart entry system) \nTransmission (without smart entry system) (Continuously variable transmission models)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2016, 2017)",
+            "cavityId": "17",
+            "name": "17",
+            "ampRating": "(10 A) \n(5 A)",
+            "description": "Transmission (with smart entry system) (Continuously variable transmission models)  \nFront Sensor Camera (without smart entry system)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2016, 2017)",
+            "cavityId": "24",
+            "name": "24",
+            "ampRating": "(5 A)",
+            "description": "Front Sensor Camera (option)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2018)",
+            "cavityId": "4",
+            "name": "4",
+            "ampRating": "(5 A) \n(10 A)",
+            "description": "Front Sensor Camera (with smart entry system)  \nTransmission (without smart entry system) (Continuously variable transmission\nmodels)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2018)",
+            "cavityId": "17",
+            "name": "17",
+            "ampRating": "(10 A) \n(5 A)",
+            "description": "Transmission (with smart entry system) (Continuously variable transmission\nmodels)  /\nFront Sensor Camera (without smart entry system)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2018)",
+            "cavityId": "24",
+            "name": "24",
+            "ampRating": "(5 A)",
+            "description": "Front Sensor Camera (option)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2019)",
+            "cavityId": "4",
+            "name": "4",
+            "ampRating": "(5 A)",
+            "description": "Front Sensor Camera (Models with smart entry system)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2019)",
+            "cavityId": "17",
+            "name": "17",
+            "ampRating": "(5 A)",
+            "description": "Front Sensor Camera (Models without smart entry system)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2019)",
+            "cavityId": "24",
+            "name": "24",
+            "ampRating": "(5 A)",
+            "description": "Front Sensor Camera"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment (2020-2021)",
+            "cavityId": "4",
+            "name": "4",
+            "ampRating": "(5A)",
+            "description": "Models with smart entry system: Front Sensor Camera"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment (2020-2021)",
+            "cavityId": "24",
+            "name": "24",
+            "ampRating": "(5A)",
+            "description": "Front Sensor Camera"
+          }
+        ],
+        "fuelPumpFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2016, 2017)",
+            "cavityId": "8",
+            "name": "8",
+            "ampRating": "15 A",
+            "description": "Fuel Pump"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2018)",
+            "cavityId": "8",
+            "name": "8",
+            "ampRating": "15 A",
+            "description": "Fuel Pump"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2019)",
+            "cavityId": "8",
+            "name": "8",
+            "ampRating": "15 A",
+            "description": "Fuel Pump"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment (2020-2021)",
+            "cavityId": "8",
+            "name": "8",
+            "ampRating": "15A",
+            "description": "Fuel Pump"
+          }
+        ],
+        "ignitionFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment (2016, 2017)",
+            "cavityId": "3",
+            "name": "3",
+            "ampRating": "30 A \n-",
+            "description": "Starter Motor (with smart entry system)   \nNot Used  (without smart entry system)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment (2018)",
+            "cavityId": "3",
+            "name": "3",
+            "ampRating": "30 A\n-",
+            "description": "Starter Motor (with smart entry system) \nNot Used (without smart entry system)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2019)",
+            "cavityId": "20",
+            "name": "20",
+            "ampRating": "(10 A)",
+            "description": "Not Used (Models without detachable towing hook)\n Starter (Models with detachable towing hook)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment (2019)",
+            "cavityId": "3",
+            "name": "3",
+            "ampRating": "(30 A)",
+            "description": "Starter Motor (Models with smart entry system)\n- (Models without smart entry system)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger compartment (2020-2021)",
+            "cavityId": "20",
+            "name": "20",
+            "ampRating": "(10A)",
+            "description": "Models with detachable towing hook: Starter"
+          }
+        ]
+      }
+    },
+    {
+      "id": "oem-fbi-honda-cr-v-2017-2018-fuses",
+      "brand": "Honda",
+      "makeSlug": "honda",
+      "model": "CR-V",
+      "modelSlug": "cr-v",
+      "yearsString": "2017-2019",
+      "yearStart": 2017,
+      "yearEnd": 2019,
+      "chassisCode": "5th Gen",
+      "confidenceRating": "DUAL_OEM_CONFIRMED",
+      "dualOemCorrelatedCircuitsCount": 212,
+      "totalCavities": 212,
+      "provenance": {
+        "fuseBoxInfo": {
+          "wpPostId": 12764,
+          "sourceUrl": "https://fuse-box.info/honda/honda-cr-v-2017-2018-fuses",
+          "crawledAt": "2026-11-27T13:43:56.719Z",
+          "tier": "VERIFIED"
+        },
+        "startMyCar": {
+          "sourceUrl": "https://www.startmycar.com/honda/cr-v/info/fusebox/2019",
+          "crawledAt": "2026-11-27T10:11:22.755Z",
+          "tier": "COMMUNITY_UNVERIFIED"
+        }
+      },
+      "criticalDiagnosticCircuits": {
+        "ecuPowerFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2017)",
+            "cavityId": "11",
+            "name": "11",
+            "ampRating": "5 A",
+            "description": "Engine Control’ 3"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment (2017)",
+            "cavityId": "12",
+            "name": "12",
+            "ampRating": "10 A",
+            "description": "FI ECU (1.5L)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2018, 2019)",
+            "cavityId": "11",
+            "name": "11",
+            "ampRating": "5 A",
+            "description": "Engine Control"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment (2018, 2019)",
+            "cavityId": "12",
+            "name": "12",
+            "ampRating": "10 A",
+            "description": "FI ECU (with smart entry system)"
+          }
+        ],
+        "obdDlcFeeds": [],
+        "sensorVrefFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2017)",
+            "cavityId": "23",
+            "name": "23",
+            "ampRating": "(10 A)",
+            "description": "Steering Wheel Heater (Canadian models with steering heater)   ; Handsfree Power Tailgate Sensor (option)"
+          }
+        ],
+        "fuelPumpFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2017)",
+            "cavityId": "8",
+            "name": "8",
+            "ampRating": "15 A",
+            "description": "Fuel Pump"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2018, 2019)",
+            "cavityId": "8",
+            "name": "8",
+            "ampRating": "15 A",
+            "description": "Fuel Pump"
+          }
+        ],
+        "ignitionFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2017)",
+            "cavityId": "20",
+            "name": "20",
+            "ampRating": "10 A",
+            "description": "Starter"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment (2017)",
+            "cavityId": "3",
+            "name": "3",
+            "ampRating": "30 A",
+            "description": "Starter Motor"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment (2018, 2019)",
+            "cavityId": "20",
+            "name": "20",
+            "ampRating": "10 A",
+            "description": "Starter"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment (2018, 2019)",
+            "cavityId": "3",
+            "name": "3",
+            "ampRating": "30 A",
+            "description": "Starter Motor"
+          }
+        ]
+      }
+    },
+    {
+      "id": "oem-fbi-isuzu-mu-x-d-max-2017-2020-fuses-and-relays",
+      "brand": "Isuzu",
+      "makeSlug": "isuzu",
+      "model": "D-Max",
+      "modelSlug": "d-max",
+      "yearsString": "2017-2020",
+      "yearStart": 2017,
+      "yearEnd": 2020,
+      "chassisCode": "RT85",
+      "confidenceRating": "DUAL_OEM_CONFIRMED",
+      "dualOemCorrelatedCircuitsCount": 62,
+      "totalCavities": 88,
+      "provenance": {
+        "fuseBoxInfo": {
+          "wpPostId": 63506,
+          "sourceUrl": "https://fuse-box.info/isuzu/isuzu-mu-x-d-max-2017-2020-fuses-and-relays",
+          "crawledAt": "2026-11-27T13:43:57.372Z",
+          "tier": "VERIFIED"
+        },
+        "startMyCar": {
+          "sourceUrl": "https://www.startmycar.com/isuzu/d-max/info/fusebox/2020/2nd-gen",
+          "crawledAt": "2026-11-27T10:11:23.199Z",
+          "tier": "VERIFIED"
+        }
+      },
+      "criticalDiagnosticCircuits": {
+        "ecuPowerFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "25",
+            "name": "25",
+            "ampRating": "40A",
+            "description": "ECM"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "ER2",
+            "name": "ER2",
+            "ampRating": "—",
+            "description": "ECM MAIN"
+          }
+        ],
+        "obdDlcFeeds": [],
+        "sensorVrefFeeds": [],
+        "fuelPumpFeeds": [],
+        "ignitionFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment",
+            "cavityId": "1",
+            "name": "1",
+            "ampRating": "10A",
+            "description": "Without Passive Entry and Start System: KEY INT LOCK"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment",
+            "cavityId": "16",
+            "name": "16",
+            "ampRating": "20A",
+            "description": "Without Passive Entry and Start System: FRT WIPER"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment",
+            "cavityId": "22",
+            "name": "22",
+            "ampRating": "10A/20A",
+            "description": "With Passive Entry and Start System: ESC\nWithout Passive Entry and Start System: PESS (+B) / SPARE FUSE"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment",
+            "cavityId": "23",
+            "name": "23",
+            "ampRating": "10A/20A",
+            "description": "Without Passive Entry and Start System: Starter"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the passenger compartment",
+            "cavityId": "29",
+            "name": "29",
+            "ampRating": "20A",
+            "description": "With Passive Entry and Start System: IFL1 AUDIO & CIGAR (ACC)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "3",
+            "name": "3",
+            "ampRating": "10A",
+            "description": "PCV HEATER\nWith Passive Entry and Start System: PESS (+B)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "5",
+            "name": "5",
+            "ampRating": "10A/20A",
+            "description": "RR FOG LIGHT\nWith Passive Entry and Start System: FRT WIPER"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "7",
+            "name": "7",
+            "ampRating": "10A",
+            "description": "With Passive Entry and Start System: STRG LOCK\nWithout Passive Entry and Start System: ESC"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "ER4",
+            "name": "ER4",
+            "ampRating": "—",
+            "description": "STARTER"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "ER6",
+            "name": "ER6",
+            "ampRating": "—",
+            "description": "STARTER CUT"
+          }
+        ]
+      }
+    },
+    {
+      "id": "oem-fbi-nissan-navara-frontier-np300-d23-2015-2024-fuses",
+      "brand": "Nissan",
+      "makeSlug": "nissan",
+      "model": "Navara",
+      "modelSlug": "navara",
+      "yearsString": "2015-2024",
+      "yearStart": 2015,
+      "yearEnd": 2024,
+      "chassisCode": "D23",
+      "confidenceRating": "DUAL_OEM_CONFIRMED",
+      "dualOemCorrelatedCircuitsCount": 57,
+      "totalCavities": 65,
+      "provenance": {
+        "fuseBoxInfo": {
+          "wpPostId": 67679,
+          "sourceUrl": "https://fuse-box.info/nissan/nissan-navara-frontier-np300-d23-2015-2024-fuses",
+          "crawledAt": "2026-11-27T13:43:55.228Z",
+          "tier": "VERIFIED"
+        },
+        "startMyCar": {
+          "sourceUrl": "https://www.startmycar.com/nissan/navara/info/fusebox/2020",
+          "crawledAt": "2026-11-27T10:11:21.851Z",
+          "tier": "VERIFIED"
+        }
+      },
+      "criticalDiagnosticCircuits": {
+        "ecuPowerFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box №1",
+            "cavityId": "46",
+            "name": "ABS ECU",
+            "ampRating": "10A",
+            "description": "Anti-lock braking system"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box №1",
+            "cavityId": "47",
+            "name": "A/T ECU",
+            "ampRating": "10A",
+            "description": "Automatic transmission controller"
+          }
+        ],
+        "obdDlcFeeds": [],
+        "sensorVrefFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box №1",
+            "cavityId": "55",
+            "name": "THROTTLE MTR",
+            "ampRating": "15A",
+            "description": "Electronic throttle control"
+          }
+        ],
+        "fuelPumpFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box №1",
+            "cavityId": "34",
+            "name": "FUEL PUMP",
+            "ampRating": "15A",
+            "description": "Fuel pump"
+          }
+        ],
+        "ignitionFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "7",
+            "name": "7",
+            "ampRating": "EXTENDED STORAGE SW",
+            "description": "(Unassigned / Spare)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "9",
+            "name": "PUSH START",
+            "ampRating": "5A",
+            "description": "PUSH START"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "18",
+            "name": "ELECTRIC PARTS (IGN)",
+            "ampRating": "10A",
+            "description": "Protects several circuits"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "20",
+            "name": "METER (IGN)",
+            "ampRating": "5A",
+            "description": "Instrument cluster"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "21",
+            "name": "ELECTRIC PARTS (IGN POWER)",
+            "ampRating": "10A",
+            "description": "ELECTRIC PARTS (IGN POWER)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "22",
+            "name": "ELECTRIC PARTS (IGN SIGNAL)",
+            "ampRating": "5A",
+            "description": "ELECTRIC PARTS (IGN SIGNAL)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "25",
+            "name": "TOWING (IGN)",
+            "ampRating": "20A",
+            "description": "Trailer lights"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box №1",
+            "cavityId": "40",
+            "name": "IGN COIL",
+            "ampRating": "15A",
+            "description": "Ignition coil"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box №2",
+            "cavityId": "J",
+            "name": "IGN SW",
+            "ampRating": "40A",
+            "description": "Ignition switch"
+          }
+        ]
+      }
+    },
+    {
+      "id": "oem-fbi-nissan-sentra-b17-2013-2019-fuses",
+      "brand": "Nissan",
+      "makeSlug": "nissan",
+      "model": "Sentra",
+      "modelSlug": "sentra",
+      "yearsString": "2013-2019",
+      "yearStart": 2013,
+      "yearEnd": 2019,
+      "chassisCode": "B17",
+      "confidenceRating": "DUAL_OEM_CONFIRMED",
+      "dualOemCorrelatedCircuitsCount": 55,
+      "totalCavities": 57,
+      "provenance": {
+        "fuseBoxInfo": {
+          "wpPostId": 67840,
+          "sourceUrl": "https://fuse-box.info/nissan/nissan-sentra-b17-2013-2019-fuses",
+          "crawledAt": "2026-11-27T13:43:53.919Z",
+          "tier": "VERIFIED"
+        },
+        "startMyCar": {
+          "sourceUrl": "https://www.startmycar.com/nissan/sentra/info/fusebox/2018",
+          "crawledAt": "2026-11-27T10:11:20.999Z",
+          "tier": "VERIFIED"
+        }
+      },
+      "criticalDiagnosticCircuits": {
+        "ecuPowerFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box №1",
+            "cavityId": "15",
+            "name": "A/T ECU IGN",
+            "ampRating": "10A",
+            "description": "Automatic transmission controller"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box №1",
+            "cavityId": "17",
+            "name": "ABS ECU IGN",
+            "ampRating": "10A",
+            "description": "Anti-lock braking system"
+          }
+        ],
+        "obdDlcFeeds": [],
+        "sensorVrefFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box №1",
+            "cavityId": "24",
+            "name": "ETC",
+            "ampRating": "15A",
+            "description": "Electronic throttle control"
+          }
+        ],
+        "fuelPumpFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box №1",
+            "cavityId": "20",
+            "name": "FUEL PUMP",
+            "ampRating": "15A",
+            "description": "Fuel pump"
+          }
+        ],
+        "ignitionFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "10A",
+            "name": "10A",
+            "ampRating": "Instrument cluster",
+            "description": "(Unassigned / Spare)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "20A",
+            "name": "20A",
+            "ampRating": "Trailer",
+            "description": "(Unassigned / Spare)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "15",
+            "name": "15",
+            "ampRating": "10A",
+            "description": "Push engine start"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box №1",
+            "cavityId": "16",
+            "name": "REV LAMP IGN",
+            "ampRating": "10A",
+            "description": "Backup lights"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box №1",
+            "cavityId": "21",
+            "name": "IGN COIL",
+            "ampRating": "15A",
+            "description": "Ignition coil"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box №2",
+            "cavityId": "I",
+            "name": "I",
+            "ampRating": "40A",
+            "description": "Ignition switch"
+          }
+        ]
+      }
+    },
+    {
+      "id": "oem-fbi-nissan-sentra-b18-2020-2025-fuses",
+      "brand": "Nissan",
+      "makeSlug": "nissan",
+      "model": "Sentra",
+      "modelSlug": "sentra",
+      "yearsString": "2020-2025",
+      "yearStart": 2020,
+      "yearEnd": 2025,
+      "chassisCode": "B18",
+      "confidenceRating": "SINGLE_SOURCE_VERIFIED",
+      "dualOemCorrelatedCircuitsCount": 0,
+      "totalCavities": 71,
+      "provenance": {
+        "fuseBoxInfo": {
+          "wpPostId": 67861,
+          "sourceUrl": "https://fuse-box.info/nissan/nissan-sentra-b18-2020-2025-fuses",
+          "crawledAt": "2026-11-27T13:43:54.573Z",
+          "tier": "VERIFIED"
+        }
+      },
+      "criticalDiagnosticCircuits": {
+        "ecuPowerFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box №1",
+            "cavityId": "F15",
+            "name": "ECM",
+            "ampRating": "5A",
+            "description": "Engine Control Module"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box №2",
+            "cavityId": "6",
+            "name": "ENG CONT",
+            "ampRating": "10A",
+            "description": "Engine control unit."
+          }
+        ],
+        "obdDlcFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "17",
+            "name": "CONSULT",
+            "ampRating": "10A",
+            "description": "Diagnostic communication (Nissan CONSULT tool interface)"
+          }
+        ],
+        "sensorVrefFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "52",
+            "name": "STRG SENSOR",
+            "ampRating": "10A",
+            "description": "Steering angle sensor (VDC/ADAS input)"
+          }
+        ],
+        "fuelPumpFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box №1",
+            "cavityId": "F3",
+            "name": "FUEL PUMP",
+            "ampRating": "20A",
+            "description": "Fuel Pump"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box №2",
+            "cavityId": "7",
+            "name": "FUEL PUMP (HI)",
+            "ampRating": "10A",
+            "description": "Fuel pump for fuel injection."
+          }
+        ],
+        "ignitionFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "5",
+            "name": "CLUTCH",
+            "ampRating": "5A",
+            "description": "Clutch switch (manual transmission interlock, engine start circuit)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "30",
+            "name": "BCM SIGNAL",
+            "ampRating": "10A",
+            "description": "Body Control Module signal circuits"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "39",
+            "name": "BCM SIGNAL",
+            "ampRating": "5A",
+            "description": "Body Control Module signal circuits (secondary)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "49",
+            "name": "METER (IG1)",
+            "ampRating": "5A",
+            "description": "Instrument cluster (ignition supply)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "50",
+            "name": "ELEC PARTS (IGN)",
+            "ampRating": "10A",
+            "description": "General electrical parts powered with ignition ON"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "51",
+            "name": "ELECT PARTS (IGN-RUN)",
+            "ampRating": "10A",
+            "description": "Electrical parts powered when ignition is in RUN position"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box №2",
+            "cavityId": "2",
+            "name": "STARTER CUT",
+            "ampRating": "30A",
+            "description": "Controls starter motor cut-off to prevent operation in certain conditions."
+          }
+        ]
+      }
+    },
+    {
+      "id": "oem-fbi-suzuki-jimny-2018-2020-fuses",
+      "brand": "Suzuki",
+      "makeSlug": "suzuki",
+      "model": "Jimny",
+      "modelSlug": "jimny",
+      "yearsString": "2018-2020",
+      "yearStart": 2018,
+      "yearEnd": 2020,
+      "chassisCode": "JB64/JB74",
+      "confidenceRating": "DUAL_OEM_CONFIRMED",
+      "dualOemCorrelatedCircuitsCount": 71,
+      "totalCavities": 71,
+      "provenance": {
+        "fuseBoxInfo": {
+          "wpPostId": 51396,
+          "sourceUrl": "https://fuse-box.info/suzuki/suzuki-jimny-2018-2020-fuses",
+          "crawledAt": "2026-11-27T13:43:58.677Z",
+          "tier": "VERIFIED"
+        },
+        "startMyCar": {
+          "sourceUrl": "https://www.startmycar.com/suzuki/jimny/info/fusebox/2020",
+          "crawledAt": "2026-11-27T10:11:24.057Z",
+          "tier": "VERIFIED"
+        }
+      },
+      "criticalDiagnosticCircuits": {
+        "ecuPowerFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel fuse box",
+            "cavityId": "3",
+            "name": "3",
+            "ampRating": "15A",
+            "description": "Engine Control Module"
+          }
+        ],
+        "obdDlcFeeds": [],
+        "sensorVrefFeeds": [],
+        "fuelPumpFeeds": [],
+        "ignitionFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel fuse box",
+            "cavityId": "4",
+            "name": "4",
+            "ampRating": "5A",
+            "description": "Ignition-1 signal 2"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel fuse box",
+            "cavityId": "15",
+            "name": "15",
+            "ampRating": "5A",
+            "description": "Ignition-1 signal 3"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel fuse box",
+            "cavityId": "27",
+            "name": "27",
+            "ampRating": "10A",
+            "description": "lgnition-1 signal"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel fuse box",
+            "cavityId": "35",
+            "name": "35",
+            "ampRating": "5A",
+            "description": "Ignition-2 signal"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box",
+            "cavityId": "6",
+            "name": "6",
+            "ampRating": "50A",
+            "description": "Ignition switch"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box",
+            "cavityId": "10",
+            "name": "10",
+            "ampRating": "30A",
+            "description": "Starter motor"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box",
+            "cavityId": "16",
+            "name": "16",
+            "ampRating": "15A",
+            "description": "Ignition coil"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box",
+            "cavityId": "22",
+            "name": "22",
+            "ampRating": "50A",
+            "description": "Ignition sw2"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment fuse box",
+            "cavityId": "31",
+            "name": "31",
+            "ampRating": "5A",
+            "description": "Starter motor"
+          }
+        ]
+      }
+    },
+    {
+      "id": "oem-fbi-suzuki-swift-2017-2019-fuses",
+      "brand": "Suzuki",
+      "makeSlug": "suzuki",
+      "model": "Swift",
+      "modelSlug": "swift",
+      "yearsString": "2017-2019",
+      "yearStart": 2017,
+      "yearEnd": 2019,
+      "chassisCode": "A2L",
+      "confidenceRating": "DUAL_OEM_CONFIRMED",
+      "dualOemCorrelatedCircuitsCount": 63,
+      "totalCavities": 63,
+      "provenance": {
+        "fuseBoxInfo": {
+          "wpPostId": 30134,
+          "sourceUrl": "https://fuse-box.info/suzuki/suzuki-swift-2017-2019-fuses",
+          "crawledAt": "2026-11-27T13:43:58.031Z",
+          "tier": "VERIFIED"
+        },
+        "startMyCar": {
+          "sourceUrl": "https://www.startmycar.com/suzuki/swift/info/fusebox/2018/third-global-generation_japan",
+          "crawledAt": "2026-11-27T10:11:23.635Z",
+          "tier": "VERIFIED"
+        }
+      },
+      "criticalDiagnosticCircuits": {
+        "ecuPowerFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "11",
+            "name": "A-STOP",
+            "ampRating": "5A",
+            "description": "Engine controller"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "18",
+            "name": "ST SIG",
+            "ampRating": "5A",
+            "description": "Engine controller"
+          }
+        ],
+        "obdDlcFeeds": [],
+        "sensorVrefFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "15",
+            "name": "IG1 SIG3",
+            "ampRating": "5A",
+            "description": "Camera"
+          }
+        ],
+        "fuelPumpFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "17",
+            "name": "F/P",
+            "ampRating": "20A (1.0L)",
+            "description": "Fuel pump"
+          }
+        ],
+        "ignitionFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "3",
+            "name": "IG",
+            "ampRating": "15A",
+            "description": "ignition"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "20",
+            "name": "KEY2",
+            "ampRating": "5A",
+            "description": "Ignition switch"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "22",
+            "name": "KEY",
+            "ampRating": "5A",
+            "description": "Ignition switch"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "1",
+            "name": "ST",
+            "ampRating": "30A",
+            "description": "Starter"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "5",
+            "name": "IGN",
+            "ampRating": "40A",
+            "description": "Ignition"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "14",
+            "name": "IGN2",
+            "ampRating": "50A",
+            "description": "Ignition 2"
+          }
+        ]
+      }
+    },
+    {
+      "id": "oem-fbi-toyota-camry-xv70-2018-2024-fuses",
+      "brand": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Camry",
+      "modelSlug": "camry",
+      "yearsString": "2018-2024",
+      "yearStart": 2018,
+      "yearEnd": 2024,
+      "chassisCode": "XV70",
+      "confidenceRating": "DUAL_OEM_CONFIRMED",
+      "dualOemCorrelatedCircuitsCount": 80,
+      "totalCavities": 89,
+      "provenance": {
+        "fuseBoxInfo": {
+          "wpPostId": 66964,
+          "sourceUrl": "https://fuse-box.info/toyota/toyota-camry-xv70-2018-2024-fuses",
+          "crawledAt": "2026-11-27T13:43:49.719Z",
+          "tier": "VERIFIED"
+        },
+        "startMyCar": {
+          "sourceUrl": "https://www.startmycar.com/toyota/camry/info/fusebox/2020",
+          "crawledAt": "2026-11-27T10:11:19.235Z",
+          "tier": "VERIFIED"
+        }
+      },
+      "criticalDiagnosticCircuits": {
+        "ecuPowerFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "6",
+            "name": "ECU-DCC NO.2",
+            "ampRating": "10A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "7",
+            "name": "ECU-DCC NO.1",
+            "ampRating": "5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "13",
+            "name": "ECU-ACC",
+            "ampRating": "5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "14",
+            "name": "ECU-IG1 NO.3",
+            "ampRating": "7.5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "18",
+            "name": "ECU-IG2 NO.3",
+            "ampRating": "5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "19",
+            "name": "ECU-B NO.2",
+            "ampRating": "10A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "20",
+            "name": "ECU-B NO.1",
+            "ampRating": "5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "33",
+            "name": "ECU-IG1 NO.4",
+            "ampRating": "10A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "35",
+            "name": "ECU-IG1 NO.2",
+            "ampRating": "5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "36",
+            "name": "ECU-IG1 NO.1",
+            "ampRating": "5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "7",
+            "name": "EFI-MAIN NO.4",
+            "ampRating": "10A",
+            "description": "Multiport fuel injection system"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "11",
+            "name": "D INJ",
+            "ampRating": "20A",
+            "description": "D INJ"
+          }
+        ],
+        "obdDlcFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "2",
+            "name": "OBD",
+            "ampRating": "7.5A",
+            "description": "On-board diagnostics"
+          }
+        ],
+        "sensorVrefFeeds": [],
+        "fuelPumpFeeds": [],
+        "ignitionFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "23",
+            "name": "AM2",
+            "ampRating": "7.5A",
+            "description": "Starter system"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "12",
+            "name": "ST NO.2",
+            "ampRating": "7.5A/30A",
+            "description": "Starter system"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "24",
+            "name": "BBC NO.4",
+            "ampRating": "7.5A/30A",
+            "description": "Stop & Start system"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "G/SHUTTER",
+            "name": "G/SHUTTER",
+            "ampRating": "G/SHUTTER",
+            "description": "(Unassigned / Spare)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "30",
+            "name": "ST NO.1",
+            "ampRating": "30A",
+            "description": "Starter system"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "39",
+            "name": "BBC NO.1",
+            "ampRating": "30A",
+            "description": "Stop & Start system (Some models)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "40",
+            "name": "BBC NO.2",
+            "ampRating": "30A",
+            "description": "Stop & Start system (Some models)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the engine compartment",
+            "cavityId": "41",
+            "name": "BBC NO.3",
+            "ampRating": "50A",
+            "description": "Stop & Start system (Some models)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "oem-fbi-toyota-corolla-e210-2019-2022-fuses",
+      "brand": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Corolla",
+      "modelSlug": "corolla",
+      "yearsString": "2019-2022",
+      "yearStart": 2019,
+      "yearEnd": 2022,
+      "chassisCode": "E210",
+      "confidenceRating": "DUAL_OEM_CONFIRMED",
+      "dualOemCorrelatedCircuitsCount": 126,
+      "totalCavities": 126,
+      "provenance": {
+        "fuseBoxInfo": {
+          "wpPostId": 66832,
+          "sourceUrl": "https://fuse-box.info/toyota/toyota-corolla-e210-2019-2022-fuses",
+          "crawledAt": "2026-11-27T13:43:47.633Z",
+          "tier": "VERIFIED"
+        },
+        "startMyCar": {
+          "sourceUrl": "https://www.startmycar.com/toyota/corolla/info/fusebox/2020/12th-gen-pre-facelift",
+          "crawledAt": "2026-11-27T10:11:18.314Z",
+          "tier": "VERIFIED"
+        }
+      },
+      "criticalDiagnosticCircuits": {
+        "ecuPowerFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "6",
+            "name": "ECU-DCC NO.2",
+            "ampRating": "10A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "7",
+            "name": "ECU-DCC NO.1",
+            "ampRating": "5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "13",
+            "name": "ECU-ACC",
+            "ampRating": "5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "14",
+            "name": "ECU-IG1 NO.3",
+            "ampRating": "7.5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "18",
+            "name": "ECU-IG2 NO.3",
+            "ampRating": "5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "19",
+            "name": "ECU-B NO.2",
+            "ampRating": "10A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "20",
+            "name": "ECU-B NO.1",
+            "ampRating": "5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "33",
+            "name": "ECU-IG1 NO.4",
+            "ampRating": "10A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "35",
+            "name": "ECU-IG1 NO.2",
+            "ampRating": "7.5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "36",
+            "name": "ECU-IG1 NO.1",
+            "ampRating": "5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment",
+            "cavityId": "2",
+            "name": "EFI NO.1",
+            "ampRating": "10A",
+            "description": "Multiport fuel injection system"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment",
+            "cavityId": "4",
+            "name": "D INJ",
+            "ampRating": "20A",
+            "description": "D INJ"
+          }
+        ],
+        "obdDlcFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "2",
+            "name": "OBD",
+            "ampRating": "7.5A",
+            "description": "On-board diagnostics"
+          }
+        ],
+        "sensorVrefFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment",
+            "cavityId": "3",
+            "name": "VVT",
+            "ampRating": "20A",
+            "description": "VVT"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment (Hybrid)",
+            "cavityId": "F42",
+            "name": "ETCS",
+            "ampRating": "10A",
+            "description": "Electronic throttle control system"
+          }
+        ],
+        "fuelPumpFeeds": [],
+        "ignitionFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "23",
+            "name": "AM2",
+            "ampRating": "7.5A",
+            "description": "Starter system"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment",
+            "cavityId": "27",
+            "name": "ST",
+            "ampRating": "30A",
+            "description": "Starter system"
+          }
+        ]
+      }
+    },
+    {
+      "id": "oem-fbi-toyota-corolla-e210-2023-2025-fuses",
+      "brand": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Corolla",
+      "modelSlug": "corolla",
+      "yearsString": "2023-2025",
+      "yearStart": 2023,
+      "yearEnd": 2025,
+      "chassisCode": "E210 Facelift",
+      "confidenceRating": "SINGLE_SOURCE_VERIFIED",
+      "dualOemCorrelatedCircuitsCount": 0,
+      "totalCavities": 121,
+      "provenance": {
+        "fuseBoxInfo": {
+          "wpPostId": 66853,
+          "sourceUrl": "https://fuse-box.info/toyota/toyota-corolla-e210-2023-2025-fuses",
+          "crawledAt": "2026-11-27T13:43:48.325Z",
+          "tier": "VERIFIED"
+        }
+      },
+      "criticalDiagnosticCircuits": {
+        "ecuPowerFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "1",
+            "name": "ECU-B NO.1",
+            "ampRating": "10A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "4",
+            "name": "ECU-B NO.2",
+            "ampRating": "10A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "6",
+            "name": "ECU-DCC NO.1",
+            "ampRating": "10A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "7",
+            "name": "ECU-DCC NO.2",
+            "ampRating": "10A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "12",
+            "name": "ECU-IGR NO.2",
+            "ampRating": "10A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "13",
+            "name": "ECU-ACC",
+            "ampRating": "10A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "16",
+            "name": "ECU-IGR NO.4",
+            "ampRating": "10A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "35",
+            "name": "ECU-IGR NO.3",
+            "ampRating": "10A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "36",
+            "name": "ECU-IGR NO.1",
+            "ampRating": "10A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment",
+            "cavityId": "F2",
+            "name": "EFI NO.1",
+            "ampRating": "5A",
+            "description": "Multiport fuel injection system"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment",
+            "cavityId": "F6",
+            "name": "EFI-MAIN NO.3",
+            "ampRating": "25A",
+            "description": "Multiport fuel injection system"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment",
+            "cavityId": "F8",
+            "name": "D INJ",
+            "ampRating": "25A",
+            "description": "D INJ"
+          }
+        ],
+        "obdDlcFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "21",
+            "name": "OBD",
+            "ampRating": "7.5A",
+            "description": "On-board diagnostics"
+          }
+        ],
+        "sensorVrefFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment",
+            "cavityId": "F19",
+            "name": "VVT",
+            "ampRating": "20A",
+            "description": "VVT"
+          }
+        ],
+        "fuelPumpFeeds": [],
+        "ignitionFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "25",
+            "name": "AM2",
+            "ampRating": "7.5A",
+            "description": "Starter system"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "27",
+            "name": "AM1",
+            "ampRating": "5A",
+            "description": "w/o Smart Key System: Starter system"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment",
+            "cavityId": "F11",
+            "name": "IGP-MAIN",
+            "ampRating": "25A",
+            "description": "Ignition"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment",
+            "cavityId": "F27",
+            "name": "ST",
+            "ampRating": "30A",
+            "description": "Starter system"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment",
+            "cavityId": "F39",
+            "name": "IGN",
+            "ampRating": "10A",
+            "description": "Ignition"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment (Hybrid)",
+            "cavityId": "12",
+            "name": "IGN",
+            "ampRating": "7.5A",
+            "description": "Ignition"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment (Hybrid)",
+            "cavityId": "40",
+            "name": "IGP-MAIN",
+            "ampRating": "25A",
+            "description": "Ignition"
+          }
+        ]
+      }
+    },
+    {
+      "id": "oem-fbi-toyota-hilux-an120-an130-2015-2019-fuses-and-relay",
+      "brand": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Hilux",
+      "modelSlug": "hilux",
+      "yearsString": "2015-2019",
+      "yearStart": 2015,
+      "yearEnd": 2019,
+      "chassisCode": "AN120/AN130",
+      "confidenceRating": "DUAL_OEM_CONFIRMED",
+      "dualOemCorrelatedCircuitsCount": 148,
+      "totalCavities": 151,
+      "provenance": {
+        "fuseBoxInfo": {
+          "wpPostId": 19544,
+          "sourceUrl": "https://fuse-box.info/toyota/toyota-hilux-an120-an130-2015-2019-fuses-and-relay",
+          "crawledAt": "2026-11-27T13:43:49.057Z",
+          "tier": "VERIFIED"
+        },
+        "startMyCar": {
+          "sourceUrl": "https://www.startmycar.com/toyota/hilux/info/fusebox/2019",
+          "crawledAt": "2026-11-27T10:11:18.808Z",
+          "tier": "VERIFIED"
+        }
+      },
+      "criticalDiagnosticCircuits": {
+        "ecuPowerFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger Compartment",
+            "cavityId": "5",
+            "name": "EFI-MAIN NO.1",
+            "ampRating": "25",
+            "description": "1GD-FTV, 2GD-FTV:  ABS, Air Conditioner, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Hill-Start Assist Control, TRC, VSC"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger Compartment",
+            "cavityId": "6",
+            "name": "EFI-MAIN NO.1",
+            "ampRating": "25",
+            "description": "1GR-FE, 1KD-FTV, 2KD-FTV, 1TR-FE, 2TR-FE, 5L-E:  ABS, Air Conditioner, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Hill-Start Assist Control, TRC, VSC"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger Compartment",
+            "cavityId": "6",
+            "name": "EFI-MAIN NO.2",
+            "ampRating": "25",
+            "description": "1GD-FTV, 2GD-FTV:  Multiport Fuel Injection System/Sequential Multiport Fuel Injection System"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger Compartment",
+            "cavityId": "11",
+            "name": "ECU-ALT NO.2",
+            "ampRating": "10",
+            "description": "1GD-FTV, 2GD-FTV:  Door Lock Control, Power Window, Theft Deterrent"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger Compartment",
+            "cavityId": "13",
+            "name": "ECU-ALT NO.2",
+            "ampRating": "10",
+            "description": "1GR-FE, 1KD-FTV, 2KD-FTV, 1TR-FE, 2TR-FE, 5L-E:  Door Lock Control, Power Window, Theft Deterrent"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger Compartment",
+            "cavityId": "15",
+            "name": "EFI NO.1",
+            "ampRating": "10",
+            "description": "ABS, Air Conditioner, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Hill-Start Assist Control, Stop & Start System, TRC, VSC"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Passenger Compartment Relay Box №1",
+            "cavityId": "1",
+            "name": "DCU NO.1",
+            "ampRating": "25",
+            "description": "Urea Pump Control ECU"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Passenger Compartment Relay Box №1",
+            "cavityId": "2",
+            "name": "DCU NO.2",
+            "ampRating": "20",
+            "description": "Urea Pump Control ECU"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Passenger Compartment Relay Box №1",
+            "cavityId": "4",
+            "name": "DCU-B",
+            "ampRating": "7.5",
+            "description": "Urea Pump Control ECU"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Passenger Compartment Relay Box №2",
+            "cavityId": "3",
+            "name": "ECU-IG2 / \nC/OPN NO.2",
+            "ampRating": "10",
+            "description": "Multiport Fuel Injection System/Sequential Multiport Fuel Injection System"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment",
+            "cavityId": "5",
+            "name": "ECU-ALT NO.1",
+            "ampRating": "10",
+            "description": "Double Locking"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment",
+            "cavityId": "10",
+            "name": "ECU-B NO.1",
+            "ampRating": "10",
+            "description": "4WD, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, ABS, Air Conditioner (Automatic), Audio System, Charging, Clock, Combination Meter, Door Lock Control, Double Locking, Downhill Assist Control, Entry & Start System, Headlight, Headlight Beam Level Control (Automatic), Headlight Cleaner, Hill-Start Assist Control, Illumination, Immobiliser System, Interior Light, Key Reminder, Lane Departure Alert, Light Reminder, Navigation System, Pre-Collision System, Rear View Monitor System, Seat Belt Warning, SRS, Starting, Steering Lock, Stop & Start System, Taillight, Telematics System, Theft Deterrent, Tire Pressure Warning System, TRC, Turn Signal and Hazard Warning Light, VSC, Wireless Door Lock Control"
+          }
+        ],
+        "obdDlcFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger Compartment",
+            "cavityId": "14",
+            "name": "OBD",
+            "ampRating": "10",
+            "description": "On-Board Diagnosis System"
+          }
+        ],
+        "sensorVrefFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Passenger Compartment Relay Box №1",
+            "cavityId": "3",
+            "name": "NOX PM",
+            "ampRating": "20",
+            "description": "Nitrogen Oxides Sensor"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Passenger Compartment Relay Box №1",
+            "cavityId": "R2",
+            "name": "R2",
+            "ampRating": "Relay",
+            "description": "Nitrogen Oxides Sensor (NOX PM)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment",
+            "cavityId": "24",
+            "name": "A/F HTR",
+            "ampRating": "20",
+            "description": "1GR-FE, 1TR-FE, 2TR-FE:  Air Fuel Ratio Sensor"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment",
+            "cavityId": "53",
+            "name": "DCU-MAIN",
+            "ampRating": "50",
+            "description": "\"DCU-MAIN\" Relay, \"DCU NO.1\", \"DCU NO.2\", \"DCU-B\", \"NOX PM\" Fuses"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment",
+            "cavityId": "R9",
+            "name": "R9",
+            "ampRating": "Relay",
+            "description": "1GR-FE, 1TR-FE, 2TR-FE:  Air Fuel Ratio Sensor (A/F HTR)"
+          }
+        ],
+        "fuelPumpFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment",
+            "cavityId": "R8",
+            "name": "R8",
+            "ampRating": "Relay",
+            "description": "1GD-FTV, 2GD-FTV, 1KD-FTV, 2KD-FTV, 5L-E:  Glow System (GLOW) \n 1GR-FE, 1TR-FE, 2TR-FE:  Fuel Pump / Air Pump (FUEL PMP/AIR PMP HTR)"
+          }
+        ],
+        "ignitionFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger Compartment",
+            "cavityId": "7",
+            "name": "TURN&HAZ",
+            "ampRating": "10",
+            "description": "Turn Signal and Hazard Warning Light, Combination Meter, Door Lock Control, Entry &. Start System, Immobiliser System, Starting, Steering Lock, Theft Deterrent, Wireless Door Lock Control"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger Compartment",
+            "cavityId": "8",
+            "name": "AM2 NO.2",
+            "ampRating": "30",
+            "description": "Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger Compartment",
+            "cavityId": "10",
+            "name": "AM1",
+            "ampRating": "40",
+            "description": "Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger Compartment",
+            "cavityId": "11",
+            "name": "TAIL",
+            "ampRating": "10",
+            "description": "1GR-FE, 1KD-FTV, 2KD-FTV, 1TR-FE, 2TR-FE, 5L-E:  Taillight, Illumination, Automatic Light Control, Charging, Entry & Start System, Front Fog Light, Immobiliser System, Key Reminder, Light Reminder, Rear Fog Light, Starting, Steering Lock, Wireless Door Lock Control"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger Compartment",
+            "cavityId": "13",
+            "name": "TAIL",
+            "ampRating": "10",
+            "description": "1GD-FTV, 2GD-FTV:  Taillight, Illumination, Automatic Light Control, Charging, Entry &. Start System, Front Fog Light, Immobiliser System, Key Reminder, Light Reminder, Rear Fog Light, Starting, Steering Lock, Wireless Door Lock Control"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger Compartment",
+            "cavityId": "17",
+            "name": "METER",
+            "ampRating": "5",
+            "description": "Combination Meter, 4WD, ABS, Air Conditioner (Automatic), Audio System, Charging, Door Lock Control, Downhill Assist Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry 8t Start System, Headlight, Headlight Beam Level Control (Automatic), Headlight Cleaner, Hill-Start Assist Control, Illumination, Immobiliser System, Interior Light, Key Reminder, Lane Departure Alert, Light Reminder, Navigation System, Pre-Collision System, Rear View Monitor System, Seat Belt Warning, SRS, Starting, Steering Lock, Stop & Start System, Taillight, Telematics System, Theft Deterrent, Tire Pressure Warning System, TRC, Turn Signal and Hazard Warning Light, VSC, Wireless Door Lock Control"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger Compartment",
+            "cavityId": "22",
+            "name": "IG2 NO.2",
+            "ampRating": "5",
+            "description": "Entry & Start System, Immobiliser System, Starting, Steering Lock, Wireless Door Lock Control"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger Compartment",
+            "cavityId": "26",
+            "name": "IG1 NO.3",
+            "ampRating": "10",
+            "description": "ABS, Downhill Assist Control, Hill-Start Assist Control, Stop & Start System, TRC, VSC"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Passenger Compartment",
+            "cavityId": "27",
+            "name": "IG1 NO.4",
+            "ampRating": "10",
+            "description": "Air Conditioner, Audio System, Automatic Light Control, Charging, Combination Meter, Door Lock Control, Multiport Fuel Injection System/Sequential Multiport Fuel Injection System, Entry & Start System, Front Fog Light, Headlight, Headlight Beam Level Control (Automatic), Headlight Cleaner, Illumination, Immobiliser System, Interior Light, Mirror Heater, Multiplex Communication System, Navigation System, Power Outlet, Power Window, Rear Fog Light, Rear View Monitor System, Rear Window Defogger, Seat Belt Warning, SRS, Starting, Steering Lock, Stop & Start System, Taillight, Theft Deterrent, Tire Pressure Warning System, Wireless Door Lock Control"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Passenger Compartment Relay Box №1",
+            "cavityId": "Cavity-9",
+            "name": "Cavity-9",
+            "ampRating": "—",
+            "description": "(Unassigned / Spare)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "oem-fbi-toyota-rav4-xa50-2019-2025-fuses",
+      "brand": "Toyota",
+      "makeSlug": "toyota",
+      "model": "RAV4",
+      "modelSlug": "rav4",
+      "yearsString": "2019-2025",
+      "yearStart": 2019,
+      "yearEnd": 2025,
+      "chassisCode": "XA50",
+      "confidenceRating": "DUAL_OEM_CONFIRMED",
+      "dualOemCorrelatedCircuitsCount": 101,
+      "totalCavities": 110,
+      "provenance": {
+        "fuseBoxInfo": {
+          "wpPostId": 66784,
+          "sourceUrl": "https://fuse-box.info/toyota/toyota-rav4-xa50-2019-2025-fuses",
+          "crawledAt": "2026-11-27T13:43:50.412Z",
+          "tier": "VERIFIED"
+        },
+        "startMyCar": {
+          "sourceUrl": "https://www.startmycar.com/toyota/rav4/info/fusebox/2019/5th-gen",
+          "crawledAt": "2026-11-27T10:11:19.669Z",
+          "tier": "VERIFIED"
+        }
+      },
+      "criticalDiagnosticCircuits": {
+        "ecuPowerFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "6",
+            "name": "ECU-DCC NO.2",
+            "ampRating": "10A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "7",
+            "name": "ECU-DCC NO.1",
+            "ampRating": "5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "13",
+            "name": "ECU-ACC",
+            "ampRating": "5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "14",
+            "name": "ECU-IG1 NO.3",
+            "ampRating": "7.5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "18",
+            "name": "ECU-IG2 NO.3",
+            "ampRating": "5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "19",
+            "name": "ECU-B NO.2",
+            "ampRating": "10A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "20",
+            "name": "ECU-B NO.1",
+            "ampRating": "5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "33",
+            "name": "ECU-IG1 NO.4",
+            "ampRating": "10A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "35",
+            "name": "ECU-IG1 NO.2",
+            "ampRating": "7.5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "36",
+            "name": "ECU-IG1 NO.1",
+            "ampRating": "5A",
+            "description": "Engine control unit"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment Fuse Box #1",
+            "cavityId": "19",
+            "name": "EFI-MAIN NO.4",
+            "ampRating": "10A",
+            "description": "Multiport fuel injection system"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment Fuse Box #1",
+            "cavityId": "23",
+            "name": "D INJ",
+            "ampRating": "20A",
+            "description": "D INJ"
+          }
+        ],
+        "obdDlcFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "2",
+            "name": "OBD",
+            "ampRating": "7.5A",
+            "description": "On-board diagnostics"
+          }
+        ],
+        "sensorVrefFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment Fuse Box #1",
+            "cavityId": "21",
+            "name": "VVT",
+            "ampRating": "20A",
+            "description": "VVT"
+          }
+        ],
+        "fuelPumpFeeds": [],
+        "ignitionFeeds": [
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the instrument panel",
+            "cavityId": "23",
+            "name": "AM2",
+            "ampRating": "7.5A",
+            "description": "Starter system"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment Fuse Box #1",
+            "cavityId": "5A",
+            "name": "5A",
+            "ampRating": "Left-hand headlight high beam (A25A-FKS Engine)",
+            "description": "(Unassigned / Spare)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment Fuse Box #1",
+            "cavityId": "5A",
+            "name": "5A",
+            "ampRating": "Right-hand headlight high beam (A25A-FKS Engine)",
+            "description": "(Unassigned / Spare)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment Fuse Box #1",
+            "cavityId": "10A",
+            "name": "10A",
+            "ampRating": "Front fog lights (A25A-FKS Engine)",
+            "description": "(Unassigned / Spare)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment Fuse Box #1",
+            "cavityId": "30A",
+            "name": "30A",
+            "ampRating": "Audio system (A25A-FKS Engine)",
+            "description": "(Unassigned / Spare)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment Fuse Box #1",
+            "cavityId": "10A",
+            "name": "10A",
+            "ampRating": "Right-hand headlight (A25A-FKS Engine)",
+            "description": "(Unassigned / Spare)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment Fuse Box #1",
+            "cavityId": "30A",
+            "name": "30A",
+            "ampRating": "Audio system (A25A-FKS Engine)",
+            "description": "(Unassigned / Spare)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment Fuse Box #1",
+            "cavityId": "10A",
+            "name": "10A",
+            "ampRating": "Left-hand headlight (A25A-FKS Engine)",
+            "description": "(Unassigned / Spare)"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment Fuse Box #1",
+            "cavityId": "31",
+            "name": "ST NO.2",
+            "ampRating": "30A",
+            "description": "Starter system"
+          },
+          {
+            "source": "FuseBoxInfo",
+            "box": "Assignment of the fuses in the Engine Compartment Fuse Box #1",
+            "cavityId": "33",
+            "name": "ST NO.1",
+            "ampRating": "30A",
+            "description": "Starter system"
+          }
+        ]
+      }
+    }
+  ]
+}

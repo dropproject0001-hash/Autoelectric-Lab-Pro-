@@ -135,6 +135,13 @@ export default defineConfig(({command}) => {
             if (id.includes('oemKnowledgeDatabase')) {
               return 'data-oem-knowledge';
             }
+            if (
+              id.includes('src/data/fuseboxinfo/') ||
+              id.includes('src/data/startmycar/') ||
+              id.includes('unifiedOemCompiledKnowledge.json')
+            ) {
+              return 'data-oem-fusebox';
+            }
             return undefined;
           },
         },

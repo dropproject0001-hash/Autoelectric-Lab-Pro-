@@ -106,6 +106,13 @@ export function crossVerifyWithStartMyCar(
 ```
 This utility compares cavity IDs, factory acronyms (`EFI NO.1`, `OBD`, `VVT`, `DCU NO.1`), and numerical amp values across both independent datasets. When cavity correlation exceeds 5 common circuits, the system flags the vehicle with **`DUAL_OEM_CONFIRMED`**, granting the highest confidence level in automotive diagnostics.
 
+### 3.3 Unified Master Compiled JSON & Spoon-Feeding Pipeline
+To ensure every offline AI and search subsystem consumes the verified OEM data with zero runtime overhead, `scripts/ingestion/compileUnifiedOemJson.ts` compiles both **Fuse-Box.info** (17 profiles / 2,464 cavities) and **StartMyCar** (14 profiles / 1,790 cavities) into a single deduplicated master JSON artifact:
+- **Compiled Master JSON**: `src/data/unifiedOemCompiledKnowledge.json` (17 deduplicated vehicle architectures, **4,254 total cavities**, 13 Dual-OEM confirmed records).
+- **Unified Knowledge Hub (`src/services/automotiveKnowledgeService.ts`)**: Automatically merges the compiled vehicles, manufacturers (including Honda), and verified `RepairReferenceRecord` entries into `loadAutomotiveKnowledgeCatalog()`, making them searchable and exportable in `KnowledgeCenterPanel.tsx` and accessible to `getRelevantReferencesForAiContext()`.
+- **Offline Diagnostic Chatbot (`src/services/offlineChatbotEngine.ts`)**: Indexes all 17 Dual-OEM compiled profiles and their critical `ECU_POWER`, `OBD2_DLC`, `SENSOR_VREF`, `FUEL_PUMP`, and `IGNITION` circuits into `MiniSearch` for 100% offline diagnostic retrieval.
+- **Bundle Splitting (`vite.config.ts`)**: Isolates all Fuse-Box.info, StartMyCar, and unified compiled JSON files into a dedicated `data-oem-fusebox` chunk.
+
 ---
 
 ## 4. UI Integration & Grounded Search Panel
@@ -122,6 +129,6 @@ The `src/components/GroundedSearchPanel.tsx` component has been upgraded with:
 All release gates and test suites pass with 100% compliance:
 - **`tsc --noEmit`**: 0 errors
 - **`rules:verify`**: 16 firestore blueprint rules verified
-- **`test`**: 21/21 suites passing (including `circuitEngine`, `automotiveIntegration`, `startMyCarIngestion`, and `fuseBoxInfoIngestion`)
+- **`test`**: 21/21 suites passing (including 8/8 tests in `fuseBoxInfoIngestion.test.ts`)
 - **`npm run release:check:quick`**: READY TO MERGE & PUBLISH
-- **`vite build`**: Successful production bundle in 2.06s
+- **`vite build`**: Successful production bundle with dedicated `data-oem-fusebox` chunking

@@ -4,8 +4,10 @@
  */
 
 import { INITIAL_AUTOMOTIVE_CATALOG, SYSTEM_CATEGORIES } from '../data/automotiveKnowledgeSeed';
+import unifiedOemCompiledJson from '../data/unifiedOemCompiledKnowledge.json';
 import {
   AutomotiveKnowledgeCatalog,
+  ManufacturerRecord,
   RepairReferenceRecord,
   SystemCategoryId,
   VehicleModelRecord,
@@ -15,6 +17,48 @@ import { normalizeSystemCategory } from '../utils/automotiveTaxonomy';
 const STORAGE_KEY = 'autolab_automotive_knowledge_index_v1';
 
 let cachedCatalog: AutomotiveKnowledgeCatalog | null = null;
+
+function buildEnrichedDefaultCatalog(): AutomotiveKnowledgeCatalog {
+  const compiled = unifiedOemCompiledJson as unknown as {
+    manufacturers: ManufacturerRecord[];
+    vehicleModelRecords: VehicleModelRecord[];
+    knowledgeIndexEntries: RepairReferenceRecord[];
+  };
+
+  const manufacturerSlugs = new Set(INITIAL_AUTOMOTIVE_CATALOG.manufacturers.map((m) => m.slug.toLowerCase()));
+  const mergedManufacturers: ManufacturerRecord[] = [...INITIAL_AUTOMOTIVE_CATALOG.manufacturers];
+  for (const m of compiled.manufacturers || []) {
+    if (!manufacturerSlugs.has(m.slug.toLowerCase())) {
+      mergedManufacturers.push(m);
+      manufacturerSlugs.add(m.slug.toLowerCase());
+    }
+  }
+
+  const vehicleIds = new Set(INITIAL_AUTOMOTIVE_CATALOG.vehicles.map((v) => v.id));
+  const mergedVehicles: VehicleModelRecord[] = [...INITIAL_AUTOMOTIVE_CATALOG.vehicles];
+  for (const v of compiled.vehicleModelRecords || []) {
+    if (!vehicleIds.has(v.id)) {
+      mergedVehicles.push(v);
+      vehicleIds.add(v.id);
+    }
+  }
+
+  const refIds = new Set(INITIAL_AUTOMOTIVE_CATALOG.repairReferences.map((r) => r.id));
+  const mergedRefs: RepairReferenceRecord[] = [...INITIAL_AUTOMOTIVE_CATALOG.repairReferences];
+  for (const r of compiled.knowledgeIndexEntries || []) {
+    if (!refIds.has(r.id)) {
+      mergedRefs.push(r);
+      refIds.add(r.id);
+    }
+  }
+
+  return {
+    ...INITIAL_AUTOMOTIVE_CATALOG,
+    manufacturers: mergedManufacturers,
+    vehicles: mergedVehicles,
+    repairReferences: mergedRefs,
+  };
+}
 
 export function loadAutomotiveKnowledgeCatalog(): AutomotiveKnowledgeCatalog {
   if (cachedCatalog) return cachedCatalog;
@@ -34,8 +78,8 @@ export function loadAutomotiveKnowledgeCatalog(): AutomotiveKnowledgeCatalog {
     // Fallback to initial seed on corruption/error
   }
 
-  cachedCatalog = INITIAL_AUTOMOTIVE_CATALOG;
-  return INITIAL_AUTOMOTIVE_CATALOG;
+  cachedCatalog = buildEnrichedDefaultCatalog();
+  return cachedCatalog;
 }
 
 export function saveAutomotiveKnowledgeCatalog(catalog: AutomotiveKnowledgeCatalog): void {

@@ -17,6 +17,12 @@ import {
   classifyCircuitRole,
   determineVerificationTier,
 } from '../../../scripts/ingestion/fuseBoxInfoIngestionEngine';
+import unifiedOemCompiledJson from '../../data/unifiedOemCompiledKnowledge.json';
+import {
+  loadAutomotiveKnowledgeCatalog,
+  searchAutomotiveKnowledge,
+} from '../../services/automotiveKnowledgeService';
+import { OfflineDiagnosticChatbot } from '../../services/offlineChatbotEngine';
 
 let passed = 0;
 let failed = 0;
@@ -145,6 +151,24 @@ async function main() {
     assert.equal(unknownCross.verified, false);
     assert.equal(unknownCross.confidenceRating, 'COMMUNITY_UNVERIFIED');
     assert.equal(unknownCross.commonCircuits.length, 0);
+  });
+
+  await runTest('8. Unified compiled OEM JSON spoon-feeds Automotive Knowledge Index and OfflineDiagnosticChatbot', () => {
+    assert.equal(unifiedOemCompiledJson.schemaVersion, '1.0.0');
+    assert.equal(unifiedOemCompiledJson.zeroFabricationIntegrity, true);
+    assert.ok(unifiedOemCompiledJson.summary.totalCompiledVehicles >= 17);
+    assert.ok(unifiedOemCompiledJson.summary.totalCavitiesCompiled >= 4254);
+    assert.equal(unifiedOemCompiledJson.summary.dualOemConfirmedVehiclesCount, 13);
+
+    const catalog = loadAutomotiveKnowledgeCatalog();
+    assert.ok(catalog.manufacturers.some((m) => m.slug === 'honda'), 'Unified catalog includes Honda');
+    const corollaRefs = searchAutomotiveKnowledge({ query: 'Corolla E210 fuse OBD', make: 'toyota' });
+    assert.ok(corollaRefs.length > 0, 'Unified Knowledge Index serves Fuse-Box.info Corolla E210 reference');
+    assert.equal(corollaRefs[0].reference.verified, true);
+
+    const bot = new OfflineDiagnosticChatbot();
+    const reply = bot.ask('Toyota Corolla E210 OEM Fuse Power Distribution');
+    assert.ok(reply.citations.length > 0, 'OfflineDiagnosticChatbot retrieves Dual-OEM fuse distribution citations');
   });
 
   console.log(`\nFuse-Box.info Ingestion Tests Summary: ${passed} passed, ${failed} failed\n`);
