@@ -37,6 +37,7 @@ import {
   STARTMYCAR_PRESET_VEHICLES,
   StartMyCarScope,
 } from '../utils/startMyCarReference';
+import { getStartMyCarProfile } from '../services/startMyCarKnowledgeService';
 
 export type GroundedSearchPanelMode = 'ECU_BENCH' | 'STARTMYCAR_FUSE';
 
@@ -116,6 +117,20 @@ export const GroundedSearchPanel: React.FC<GroundedSearchPanelProps> = ({
   const [smcScope, setSmcScope] = useState<StartMyCarScope>('FUSE_BOX');
   const [smcFocus, setSmcFocus] = useState<string>(STARTMYCAR_CIRCUIT_FOCUSES[0]);
   const [smcSiteRestricted, setSmcSiteRestricted] = useState(true);
+  const [smcSelectedBoxIndex, setSmcSelectedBoxIndex] = useState<number>(0);
+  const [smcShowAllCavities, setSmcShowAllCavities] = useState<boolean>(false);
+
+  const offlineVehicleProfile = useMemo(() => {
+    if (!smcMake.trim() || !smcModel.trim()) return null;
+    const yr = Number(smcYear) || 2020;
+    return (
+      getStartMyCarProfile(smcMake, smcModel, yr) ||
+      getStartMyCarProfile(smcMake, smcModel, 2020) ||
+      getStartMyCarProfile(smcMake, smcModel, 2019) ||
+      getStartMyCarProfile(smcMake, smcModel, 2018) ||
+      getStartMyCarProfile(smcMake, smcModel, 2016)
+    );
+  }, [smcMake, smcModel, smcYear]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<GroundedSearchResult | null>(null);
@@ -536,6 +551,135 @@ export const GroundedSearchPanel: React.FC<GroundedSearchPanelProps> = ({
             </div>
 
             <ProvenanceBadgeBar provenance={startMyCarProvenance} compact />
+
+            {/* Offline Ingested Data Viewer */}
+            {offlineVehicleProfile && (
+              <div className="flex flex-col gap-2.5 bg-[#0e1116] border border-amber-500/30 rounded-[2px] p-3 text-xs">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#2b313c] pb-2">
+                  <div className="flex items-center gap-2">
+                    <CircuitBoard className="w-4 h-4 text-amber-400" />
+                    <span className="font-bold text-slate-100 text-[12px]">
+                      Offline Ingested Fuse &amp; Relay Directory ({offlineVehicleProfile.identification.year} {offlineVehicleProfile.identification.make} {offlineVehicleProfile.identification.model})
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-[2px] border ${
+                      offlineVehicleProfile.provenance.tier === 'VERIFIED'
+                        ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/40'
+                        : 'bg-blue-950/60 text-blue-300 border-blue-500/40'
+                    }`}>
+                      Tier: {offlineVehicleProfile.provenance.tier}
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-400 bg-slate-800/60 px-2 py-0.5 rounded-[2px] border border-slate-700">
+                      {offlineVehicleProfile.powerDistribution.totalCavities} Cavities ({offlineVehicleProfile.powerDistribution.totalBoxes} Boxes)
+                    </span>
+                  </div>
+                </div>
+
+                {offlineVehicleProfile.identification.enginesDetected.length > 0 && (
+                  <div className="text-[11px] text-slate-400 flex items-center gap-1.5 flex-wrap">
+                    <span className="text-slate-500 uppercase text-[9px] font-semibold">Engines Detected:</span>
+                    {offlineVehicleProfile.identification.enginesDetected.map((eng, idx) => (
+                      <span key={idx} className="bg-slate-800/80 text-amber-200/90 px-1.5 py-0.5 rounded-[2px] text-[10px] font-mono">
+                        {eng}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Box Selector Tabs */}
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {offlineVehicleProfile.powerDistribution.boxes.map((box, bIdx) => (
+                    <button
+                      key={bIdx}
+                      type="button"
+                      onClick={() => {
+                        setSmcSelectedBoxIndex(bIdx);
+                        setSmcShowAllCavities(false);
+                      }}
+                      className={`text-[10px] px-2.5 py-1 rounded-[2px] font-medium transition-colors cursor-pointer border ${
+                        smcSelectedBoxIndex === bIdx
+                          ? 'bg-amber-500/20 text-amber-200 border-amber-500/60 font-bold'
+                          : 'bg-slate-900/60 text-slate-400 border-slate-700/60 hover:text-slate-200'
+                      }`}
+                    >
+                      {box.boxName} ({box.fuses.length})
+                    </button>
+                  ))}
+                </div>
+
+                {/* Active Box Cavity Table */}
+                {(() => {
+                  const currentBox = offlineVehicleProfile.powerDistribution.boxes[smcSelectedBoxIndex] || offlineVehicleProfile.powerDistribution.boxes[0];
+                  if (!currentBox) return null;
+
+                  const displayedFuses = smcShowAllCavities
+                    ? currentBox.fuses
+                    : currentBox.fuses.filter(f => f.circuitRole === 'ECU_POWER' || f.circuitRole === 'SENSOR_VREF' || f.circuitRole === 'OBD2_DLC' || f.circuitRole === 'FUEL_PUMP' || f.circuitRole === 'IGNITION');
+
+                  const finalFuses = displayedFuses.length > 0 ? displayedFuses : currentBox.fuses.slice(0, 10);
+
+                  return (
+                    <div className="flex flex-col gap-2 pt-1">
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className="text-slate-300 font-semibold flex items-center gap-1.5">
+                          <span>{currentBox.boxName}</span>
+                          <span className="text-slate-500 font-normal">({currentBox.location})</span>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setSmcShowAllCavities(!smcShowAllCavities)}
+                          className="text-[10px] text-amber-400 hover:text-amber-300 underline cursor-pointer"
+                        >
+                          {smcShowAllCavities
+                            ? 'Show Key Powertrain & Sensor Feeds Only'
+                            : `View All ${currentBox.fuses.length} Cavities`}
+                        </button>
+                      </div>
+
+                      <div className="overflow-x-auto max-h-56 overflow-y-auto border border-[#2b313c] rounded-[2px]">
+                        <table className="w-full text-left text-[11px] border-collapse">
+                          <thead className="bg-[#1a202c] text-slate-400 text-[10px] uppercase font-semibold sticky top-0">
+                            <tr>
+                              <th className="py-1 px-2">No.</th>
+                              <th className="py-1 px-2">Type</th>
+                              <th className="py-1 px-2">Rating</th>
+                              <th className="py-1 px-2">Description</th>
+                              <th className="py-1 px-2">Circuit Role</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-800 font-mono text-[11px]">
+                            {finalFuses.map((fuse) => (
+                              <tr key={fuse.id} className="hover:bg-slate-800/40">
+                                <td className="py-1 px-2 font-bold text-amber-300">{fuse.id}</td>
+                                <td className="py-1 px-2 text-slate-400 text-[10px] uppercase">{fuse.type}</td>
+                                <td className="py-1 px-2 text-emerald-400 font-bold">{fuse.amp ? `${fuse.amp}A` : '—'}</td>
+                                <td className="py-1 px-2 font-sans text-slate-200">{fuse.description}</td>
+                                <td className="py-1 px-2">
+                                  <span className={`text-[9px] px-1.5 py-0.5 rounded-[2px] font-bold ${
+                                    fuse.circuitRole === 'ECU_POWER'
+                                      ? 'bg-blue-900/60 text-blue-300'
+                                      : fuse.circuitRole === 'SENSOR_VREF'
+                                      ? 'bg-amber-900/60 text-amber-300'
+                                      : fuse.circuitRole === 'FUEL_PUMP'
+                                      ? 'bg-emerald-900/60 text-emerald-300'
+                                      : fuse.circuitRole === 'OBD2_DLC'
+                                      ? 'bg-purple-900/60 text-purple-300'
+                                      : 'bg-slate-800 text-slate-400'
+                                  }`}>
+                                    {fuse.circuitRole}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
           </div>
         </div>
       ) : (
