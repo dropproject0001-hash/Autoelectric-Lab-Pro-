@@ -161,6 +161,13 @@ export const OemCountingMonitor: React.FC<OemCountingMonitorProps> = ({
             <strong className="text-white">{snapshot.smcProfilesCount}</strong>
           </span>
           <span aria-hidden="true">·</span>
+          <span data-testid="oem-directory-manufacturer-count">
+            OEM Directory:{' '}
+            <strong className="text-white">
+              {snapshot.catalogManufacturerCount.toLocaleString()} Makes
+            </strong>
+          </span>
+          <span aria-hidden="true">·</span>
           <span>
             Indexed References:{' '}
             <strong className="text-white">

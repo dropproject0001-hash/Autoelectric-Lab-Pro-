@@ -1014,6 +1014,13 @@ export const AdminLicenseModal: React.FC<AdminLicenseModalProps> = ({
                     <p className="font-mono text-xs text-[#91A4BD]">
                       Enter the server Master Admin PIN to issue 3h–1y trial PINs, reset device locks, or revoke active trials.
                     </p>
+                    {adminConfig.envPinPolicyError && (
+                      <div className="rounded-md border border-[#FFB020]/55 bg-[#1B1408] p-2.5 font-mono text-[11px] text-[#FFE0A3] leading-relaxed">
+                        {adminConfig.envPinPolicyError === 'ADMIN_ENV_PIN_TOO_WEAK'
+                          ? 'Strict mode requires VECL_ADMIN_MASTER_PIN to be at least 10 characters (or set VECL_STRICT_PRODUCTION_SECRETS=false).'
+                          : 'Strict mode requires VECL_LICENSE_HMAC_SECRET (32+ chars) in Settings → Secrets (or set VECL_STRICT_PRODUCTION_SECRETS=false).'}
+                      </div>
+                    )}
                     <div>
                       <label className="mb-1 block font-mono text-[10px] uppercase text-[#91A4BD]">
                         Master Admin PIN
@@ -1021,6 +1028,8 @@ export const AdminLicenseModal: React.FC<AdminLicenseModalProps> = ({
                       <div className="relative">
                         <input
                           type={showMasterPin ? 'text' : 'password'}
+                          autoComplete="off"
+                          spellCheck={false}
                           value={masterPinInput}
                           onChange={(e) => setMasterPinInput(e.target.value)}
                           placeholder="Enter Master Admin PIN"

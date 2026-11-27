@@ -19,7 +19,14 @@ import {
   resetFirebaseAuthCacheForTests,
   setJwksFetcherForTests,
 } from '../../server/services/firebaseAuthMiddleware';
-import { deriveOverallHealthTone } from '../../services/connectionHealthClient';
+import {
+  buildFirebaseFixGuideItems,
+  deriveOverallHealthTone,
+} from '../../services/connectionHealthClient';
+import {
+  getFirebaseTargetSummary,
+  getVerifiedAuthUser,
+} from '../../lib/firebase';
 
 let passed = 0;
 let failed = 0;
@@ -150,8 +157,8 @@ async function main() {
   await runTest('GET /api/autoelectric/diagnostics/connection-health enforces 401 auth and verifies RS256 Firebase ID tokens', async () => {
     const cfgPath = path.join(process.cwd(), 'firebase-applet-config.json');
     const projectId = fs.existsSync(cfgPath)
-      ? (JSON.parse(fs.readFileSync(cfgPath, 'utf8')).projectId as string) || 'infra-firefly-1mln4'
-      : 'infra-firefly-1mln4';
+      ? (JSON.parse(fs.readFileSync(cfgPath, 'utf8')).projectId as string) || 'gen-lang-client-0822907731'
+      : 'gen-lang-client-0822907731';
 
     const prevProjectId = process.env.FIREBASE_PROJECT_ID;
     process.env.FIREBASE_PROJECT_ID = projectId;
@@ -241,7 +248,7 @@ async function main() {
       },
       {
         configured: true,
-        databaseId: 'ai-studio-autoelectriclabp-25d98605-c678-411c-adce-09263788ae82',
+        databaseId: 'ai-studio-virtualeculaboem-a394a24c-3180-4bd9-8d2e-ad856ade7828',
         status: 'CONNECTED',
         profileReadVerified: true,
         latencyMs: 42,
@@ -301,6 +308,72 @@ async function main() {
       false,
       'ID tokens must stay in memory and never be written to browser storage'
     );
+  });
+
+  await runTest('getFirebaseTargetSummary, getVerifiedAuthUser, and buildFirebaseFixGuideItems report accurate target and fix guidance', () => {
+    const target = getFirebaseTargetSummary('preview.example.run.app');
+    assert.equal(target.configured, true);
+    assert.equal(target.projectId, 'gen-lang-client-0822907731');
+    assert.equal(
+      target.firestoreDatabaseId,
+      'ai-studio-virtualeculaboem-a394a24c-3180-4bd9-8d2e-ad856ade7828'
+    );
+    assert.equal(target.currentHostname, 'preview.example.run.app');
+    assert.equal(
+      target.consoleAuthorizedDomainsUrl,
+      'https://console.firebase.google.com/project/gen-lang-client-0822907731/authentication/settings'
+    );
+
+    assert.equal(getVerifiedAuthUser({ currentUser: null }).reason, 'UNAUTHENTICATED');
+    assert.equal(
+      getVerifiedAuthUser({ currentUser: { uid: 'u1', emailVerified: false } }).reason,
+      'EMAIL_NOT_VERIFIED'
+    );
+    const verified = getVerifiedAuthUser({ currentUser: { uid: 'u1', emailVerified: true } });
+    assert.equal(verified.authenticated, true);
+    assert.equal(verified.emailVerified, true);
+
+    const fixItems = buildFirebaseFixGuideItems(
+      {
+        overall: 'PARTIAL',
+        checkedAtIso: new Date().toISOString(),
+        firebaseTarget: target,
+        firebaseAuth: {
+          configured: true,
+          authReady: true,
+          signedIn: false,
+          emailVerified: false,
+          email: null,
+          uidMasked: null,
+          serverTokenVerified: false,
+          serverAuthKind: 'UNVERIFIED',
+          detail: 'signed out',
+        },
+        cloudSqlPostgres: {
+          configured: false,
+          status: 'AUTH_REQUIRED',
+          latencyMs: 0,
+          probeMethod: 'NONE',
+          detail: 'auth required',
+        },
+        firestore: {
+          configured: true,
+          databaseId: target.firestoreDatabaseId,
+          status: 'CONNECTED',
+          profileReadVerified: false,
+          latencyMs: 25,
+          detail: 'reachable',
+        },
+      },
+      {
+        code: 'auth/unauthorized-domain',
+        message: 'Unauthorized domain',
+        hostname: 'preview.example.run.app',
+        consoleAuthorizedDomainsUrl: target.consoleAuthorizedDomainsUrl,
+      }
+    );
+    assert.equal(fixItems[0]?.id, 'unauthorized-domain');
+    assert.equal(fixItems[0]?.actionKind, 'OPEN_AUTH_DOMAINS');
   });
 
   console.log(`\nConnection Health Summary: ${passed} passed, ${failed} failed`);

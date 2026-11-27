@@ -64,7 +64,10 @@ import {
   resetLicenseDevices,
   setLicenseRevocation,
 } from './services/licenseService';
-import { requireExclusiveMasterAdminPin } from './services/adminMasterPinService';
+import {
+  requireExclusiveMasterAdminPin,
+  verifyMasterAdminPinAgainstEnvHash,
+} from './services/adminMasterPinService';
 import {
   changeClaimedAdminPin,
   checkAdminPinRateLimit,
@@ -581,7 +584,8 @@ export function createAutoelectricApiApp(): express.Express {
     if (token.startsWith('vecl_admin_v1.')) {
       const check = verifyAdminSessionToken(token);
       if (!check.valid) {
-        return res.status(401).json({
+        const status = check.code === 'LICENSE_HMAC_SECRET_MISSING_OR_WEAK' ? 503 : 401;
+        return res.status(status).json({
           error: check.error || 'Admin session token invalid or expired.',
           code: check.code || 'INVALID_TOKEN',
         });
@@ -830,6 +834,8 @@ export function createAutoelectricApiApp(): express.Express {
       setupEnabled: cfg.setupEnabled,
       adminClaimed: cfg.adminClaimed,
       pinInitialized: cfg.pinInitialized,
+      strictMode: cfg.strictMode,
+      envPinPolicyError: cfg.envPinPolicyError,
     });
   });
 
@@ -921,8 +927,16 @@ export function createAutoelectricApiApp(): express.Express {
       }
       if (code === 'ADMIN_ENV_PIN_TOO_WEAK') {
         return res.status(409).json({
-          error: 'Server Master Admin PIN is too weak for strict production mode. Use at least 10 characters in VECL_ADMIN_MASTER_PIN.',
+          error:
+            'Server Master Admin PIN is too weak for strict production mode. Use at least 10 characters in VECL_ADMIN_MASTER_PIN (or set VECL_STRICT_PRODUCTION_SECRETS=false in Settings → Secrets).',
           code,
+        });
+      }
+      if (code.startsWith('LICENSE_HMAC_SECRET_MISSING_OR_WEAK')) {
+        return res.status(503).json({
+          error:
+            'Server signing secret (VECL_LICENSE_HMAC_SECRET) is missing or under 32 characters in strict production mode. Add a 32+ character VECL_LICENSE_HMAC_SECRET in Settings → Secrets (or set VECL_STRICT_PRODUCTION_SECRETS=false) and restart.',
+          code: 'LICENSE_HMAC_SECRET_MISSING_OR_WEAK',
         });
       }
       return res.status(401).json({
@@ -2876,7 +2890,8 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
         next();
         return;
       }
-      return res.status(401).json({
+      const status = check.code === 'LICENSE_HMAC_SECRET_MISSING_OR_WEAK' ? 503 : 401;
+      return res.status(status).json({
         error: check.error || 'Admin session token invalid or expired.',
         code: check.code || 'INVALID_TOKEN',
       });
@@ -2885,6 +2900,30 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
     const headerPin =
       typeof req.headers['x-admin-pin'] === 'string' ? req.headers['x-admin-pin'].trim() : '';
     if (headerPin) {
+      const cfg = getAdminPinConfigStatus();
+      if (cfg.masterEnvConfigured) {
+        // Verify directly against the scrypt env hash without requiring an HMAC token mint
+        const ipKey = `billing-admin-pin:${req.ip || 'unknown'}`;
+        const verified = verifyMasterAdminPinAgainstEnvHash(headerPin, {
+          ipKey,
+          source: 'x-admin-pin',
+          route: `${req.method} ${req.path}`,
+        });
+        if (!verified.valid) {
+          if (verified.statusCode === 429 && verified.retryAfterSec) {
+            res.setHeader('Retry-After', String(verified.retryAfterSec));
+          }
+          return res.status(verified.statusCode || 401).json({
+            error: verified.error || 'Invalid Master Admin PIN.',
+            code: verified.code || 'INVALID_MASTER_PIN',
+          });
+        }
+        req.isPinAdmin = true;
+        req.authUser = { uid: 'pin-admin:master', email: null, emailVerified: true };
+        next();
+        return;
+      }
+
       const rateKey = `billing-admin-pin:${req.ip || 'unknown'}`;
       const limit = checkAdminPinRateLimit(rateKey);
       if (!limit.allowed) {
@@ -2899,7 +2938,22 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
         req.authUser = { uid: 'pin-admin:master', email: null, emailVerified: true };
         next();
         return;
-      } catch {
+      } catch (err: unknown) {
+        const code = err instanceof Error ? err.message : 'INVALID_MASTER_PIN';
+        if (code.startsWith('LICENSE_HMAC_SECRET_MISSING_OR_WEAK')) {
+          return res.status(503).json({
+            error:
+              'Server signing secret (VECL_LICENSE_HMAC_SECRET) is missing or under 32 characters in strict production mode.',
+            code: 'LICENSE_HMAC_SECRET_MISSING_OR_WEAK',
+          });
+        }
+        if (code === 'ADMIN_ENV_PIN_TOO_WEAK') {
+          return res.status(503).json({
+            error:
+              'Server Master Admin PIN is too weak for strict production mode (minimum 10 characters required).',
+            code,
+          });
+        }
         return res.status(401).json({
           error: 'Invalid Master Admin PIN.',
           code: 'INVALID_MASTER_PIN',
@@ -2989,10 +3043,18 @@ ${cleanBenchContext ? `Live Bench Context: ${cleanBenchContext}` : ''}`;
           publicKeyJwk: getPublicVerificationKeyJwk(),
         });
       } catch (err: unknown) {
-        console.error(
-          '[AdminBilling] Offline license generation failed:',
-          err instanceof Error ? err.message : 'Unknown error'
-        );
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        console.error('[AdminBilling] Offline license generation failed:', msg);
+        if (
+          msg.startsWith('OFFLINE_LICENSE_JWK_MISSING') ||
+          msg.startsWith('OFFLINE_LICENSE_JWK_INVALID')
+        ) {
+          return res.status(503).json({
+            error:
+              'Offline license ECDSA signing key (AELP_LICENSE_SIGNING_PRIVATE_KEY_JWK) is missing or invalid in strict production mode. Configure a valid P-256 JWK or set VECL_STRICT_PRODUCTION_SECRETS=false.',
+            code: 'OFFLINE_LICENSE_KEY_UNAVAILABLE',
+          });
+        }
         return res.status(500).json({
           error: 'Failed to generate offline license record.',
           code: 'OFFLINE_LICENSE_GENERATION_FAILED',

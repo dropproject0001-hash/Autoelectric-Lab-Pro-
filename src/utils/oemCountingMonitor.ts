@@ -49,6 +49,19 @@ export interface OemBrandCountSummary {
   smcCavities: number;
 }
 
+export interface OemTimestampSourceEntry {
+  label: string;
+  iso: string;
+}
+
+export interface OemDatabaseTimestampMetadata {
+  latestIso: string | null;
+  latestEpochMs: number | null;
+  sourceLabel: string;
+  formattedUtc: string;
+  sources: OemTimestampSourceEntry[];
+}
+
 export interface OemCountingMonitorSnapshot {
   oemProfilesCount: number;
   brandCount: number;
@@ -70,6 +83,7 @@ export interface OemCountingMonitorSnapshot {
   catalogVehicleCount: number;
   catalogManufacturerCount: number;
   generatedAtIso: string;
+  lastUpdatedMeta: OemDatabaseTimestampMetadata;
   rows: OemCorrelationMonitorRow[];
 }
 
@@ -112,8 +126,95 @@ function formatShortChassis(chassisCode: string): string {
   return cleaned || '—';
 }
 
+const UTC_MONTH_SHORT = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+] as const;
+
+export function formatOemLastUpdatedTimestamp(isoString: string | null | undefined): string {
+  if (!isoString) return 'Unavailable';
+  const parsedMs = Date.parse(isoString);
+  if (!Number.isFinite(parsedMs)) return 'Unavailable';
+  const d = new Date(parsedMs);
+  const mon = UTC_MONTH_SHORT[d.getUTCMonth()];
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  const year = d.getUTCFullYear();
+  const hh = String(d.getUTCHours()).padStart(2, '0');
+  const mm = String(d.getUTCMinutes()).padStart(2, '0');
+  return `${mon} ${day}, ${year} · ${hh}:${mm} UTC`;
+}
+
+export function resolveLatestOemKnowledgeTimestamp(overrides?: {
+  unifiedGeneratedAt?: string;
+  fuseBoxInfoGeneratedAt?: string;
+  startMyCarGeneratedAt?: string;
+  catalogGeneratedAt?: string;
+}): OemDatabaseTimestampMetadata {
+  const compiled = unifiedOemCompiledJson as unknown as UnifiedOemCompiledFile;
+  const fbiManifest = getFuseBoxInfoManifest();
+  const smcManifest = getStartMyCarManifest();
+
+  const candidates: Array<{ label: string; iso?: string }> = [
+    {
+      label: 'Unified OEM Compiled',
+      iso: overrides?.unifiedGeneratedAt ?? compiled.generatedAt,
+    },
+    {
+      label: 'Fuse-Box.info Catalog',
+      iso: overrides?.fuseBoxInfoGeneratedAt ?? fbiManifest.generatedAt,
+    },
+    {
+      label: 'StartMyCar Catalog',
+      iso: overrides?.startMyCarGeneratedAt ?? smcManifest.generatedAt,
+    },
+  ];
+
+  if (overrides?.catalogGeneratedAt) {
+    candidates.push({
+      label: 'Active Knowledge Catalog',
+      iso: overrides.catalogGeneratedAt,
+    });
+  }
+
+  const validSources: OemTimestampSourceEntry[] = [];
+  let latestEpochMs: number | null = null;
+  let latestIso: string | null = null;
+  let sourceLabel = 'Compiled OEM Metadata';
+
+  for (const item of candidates) {
+    if (!item.iso || typeof item.iso !== 'string') continue;
+    const trimmed = item.iso.trim();
+    const parsedMs = Date.parse(trimmed);
+    if (!Number.isFinite(parsedMs)) continue;
+    validSources.push({ label: item.label, iso: trimmed });
+    if (latestEpochMs === null || parsedMs > latestEpochMs) {
+      latestEpochMs = parsedMs;
+      latestIso = trimmed;
+      sourceLabel = item.label;
+    }
+  }
+
+  return {
+    latestIso,
+    latestEpochMs,
+    sourceLabel,
+    formattedUtc: formatOemLastUpdatedTimestamp(latestIso),
+    sources: validSources,
+  };
+}
+
 export function buildOemCountingMonitorSnapshot(
-  catalog?: Pick<AutomotiveKnowledgeCatalog, 'statistics'> | null
+  catalog?: Pick<AutomotiveKnowledgeCatalog, 'statistics'> & { generatedAt?: string } | null
 ): OemCountingMonitorSnapshot {
   const compiled = unifiedOemCompiledJson as unknown as UnifiedOemCompiledFile;
   const compiledVehicles = compiled.compiledVehicles ?? [];
@@ -260,6 +361,13 @@ export function buildOemCountingMonitorSnapshot(
   const integrityPolicyPercent =
     oemProfilesCount > 0 ? Math.round((zeroFabValidCount / oemProfilesCount) * 100) : 0;
 
+  const lastUpdatedMeta = resolveLatestOemKnowledgeTimestamp({
+    unifiedGeneratedAt: compiled.generatedAt,
+    fuseBoxInfoGeneratedAt: fbiManifest.generatedAt,
+    startMyCarGeneratedAt: smcManifest.generatedAt,
+    catalogGeneratedAt: catalog?.generatedAt,
+  });
+
   return {
     oemProfilesCount,
     brandCount: brandMap.size,
@@ -281,7 +389,8 @@ export function buildOemCountingMonitorSnapshot(
     catalogVerifiedCount: catalog?.statistics.verifiedCount ?? 0,
     catalogVehicleCount: catalog?.statistics.vehicleCount ?? oemProfilesCount,
     catalogManufacturerCount: catalog?.statistics.manufacturerCount ?? brandMap.size,
-    generatedAtIso: compiled.generatedAt || fbiManifest.generatedAt,
+    generatedAtIso: lastUpdatedMeta.latestIso || compiled.generatedAt || fbiManifest.generatedAt,
+    lastUpdatedMeta,
     rows,
   };
 }

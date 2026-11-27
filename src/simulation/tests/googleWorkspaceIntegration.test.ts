@@ -229,7 +229,11 @@ async function main() {
       projects: { default: string };
     };
 
-    assert.equal(appletConfig.projectId, 'infra-firefly-1mln4');
+    assert.equal(appletConfig.projectId, 'gen-lang-client-0822907731');
+    assert.equal(
+      appletConfig.firestoreDatabaseId,
+      'ai-studio-virtualeculaboem-a394a24c-3180-4bd9-8d2e-ad856ade7828'
+    );
     assert.equal(firebaserc.projects.default, appletConfig.projectId);
     assert.equal(firebaseJson.firestore.database, appletConfig.firestoreDatabaseId);
     assert.ok(appletConfig.oAuthClientId && appletConfig.oAuthClientId.includes('.apps.googleusercontent.com'));

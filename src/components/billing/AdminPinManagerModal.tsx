@@ -162,10 +162,12 @@ export const AdminPinManagerModal: React.FC<AdminPinManagerModalProps> = ({
   }, []);
 
   useEffect(() => {
-    if (isOpen && isAdminUnlocked) {
-      void fetchLedger();
+    if (isOpen) {
       void loadMasterPinConfig();
-    } else if (!isOpen) {
+      if (isAdminUnlocked) {
+        void fetchLedger();
+      }
+    } else {
       resetMasterPinFormState(true);
     }
   }, [isOpen, isAdminUnlocked, fetchLedger, loadMasterPinConfig, resetMasterPinFormState]);
@@ -392,6 +394,22 @@ export const AdminPinManagerModal: React.FC<AdminPinManagerModalProps> = ({
             <p className="text-xs text-slate-400 max-w-md mx-auto">
               Signing offline ECDSA P-256 license keys and publishing official GCash/Maya QR codes require an authenticated Master Admin PIN session.
             </p>
+            {adminPinConfig?.envPinPolicyError && (
+              <div
+                data-testid="admin-pin-manager-policy-warning"
+                className="max-w-lg mx-auto rounded-lg border border-amber-500/60 bg-amber-950/40 px-3.5 py-2.5 text-left font-mono text-[11px] text-amber-200 space-y-1"
+              >
+                <div className="flex items-center gap-1.5 font-bold uppercase text-amber-300">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                  <span>Server Secret Policy Blocker Detected</span>
+                </div>
+                <p className="text-amber-100/90 leading-relaxed">
+                  {adminPinConfig.envPinPolicyError === 'ADMIN_ENV_PIN_TOO_WEAK'
+                    ? 'VECL_ADMIN_MASTER_PIN is detected, but strict production mode requires at least 10 characters. Update the PIN to 10+ characters or set VECL_STRICT_PRODUCTION_SECRETS=false in Settings → Secrets.'
+                    : 'VECL_ADMIN_MASTER_PIN is detected and valid, but strict production mode requires a 32+ character VECL_LICENSE_HMAC_SECRET to mint admin sessions. Add VECL_LICENSE_HMAC_SECRET or set VECL_STRICT_PRODUCTION_SECRETS=false in Settings → Secrets.'}
+                </p>
+              </div>
+            )}
             <button
               type="button"
               onClick={() => openAccessModal({ tab: 'ADMIN_GEN' })}
@@ -726,6 +744,22 @@ export const AdminPinManagerModal: React.FC<AdminPinManagerModalProps> = ({
                     <span>Refresh Status</span>
                   </button>
                 </div>
+
+                {adminPinConfig?.envPinPolicyError && (
+                  <div className="rounded-lg border border-amber-500/60 bg-amber-950/35 px-3.5 py-2.5 font-mono text-[11px] text-amber-200 flex items-start gap-2">
+                    <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                    <div>
+                      <div className="font-bold uppercase text-amber-300">
+                        Strict Secrets Policy Warning ({adminPinConfig.envPinPolicyError})
+                      </div>
+                      <p className="mt-0.5 text-amber-100/90 leading-relaxed">
+                        {adminPinConfig.envPinPolicyError === 'ADMIN_ENV_PIN_TOO_WEAK'
+                          ? 'VECL_ADMIN_MASTER_PIN must be at least 10 characters when VECL_STRICT_PRODUCTION_SECRETS=true.'
+                          : 'VECL_LICENSE_HMAC_SECRET (32+ characters) is required when VECL_STRICT_PRODUCTION_SECRETS=true, or set VECL_STRICT_PRODUCTION_SECRETS=false.'}
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 {masterPinErrorMsg && (
                   <div className="rounded border border-rose-500/60 bg-rose-950/50 px-3 py-2 font-mono text-[11px] text-rose-200">

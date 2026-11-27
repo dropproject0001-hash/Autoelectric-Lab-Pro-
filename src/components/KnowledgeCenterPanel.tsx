@@ -15,17 +15,19 @@ import {
   Database,
   Download,
   Upload,
+  Clock,
 } from 'lucide-react';
 import {
   loadAutomotiveKnowledgeCatalog,
   searchAutomotiveKnowledge,
   exportCatalogToJson,
   importCatalogFromJson,
+  importOemManufacturersFromCsv,
 } from '../services/automotiveKnowledgeService';
 import { SYSTEM_CATEGORIES } from '../data/automotiveKnowledgeSeed';
 import { SystemCategoryId } from '../types/automotiveKnowledge';
-import { VEHICLE_CATALOG } from '../utils/vehicleEcuRegistry';
 import { playCockpitTabDetent, playRotaryEncoderTick } from '../utils/audioFeedback';
+import { resolveLatestOemKnowledgeTimestamp } from '../utils/oemCountingMonitor';
 import { OemCountingMonitor } from './OemCountingMonitor';
 
 interface KnowledgeCenterPanelProps {
@@ -35,7 +37,11 @@ interface KnowledgeCenterPanelProps {
 export const KnowledgeCenterPanel: React.FC<KnowledgeCenterPanelProps> = ({
   onSelectVehicleContext,
 }) => {
-  const catalog = useMemo(() => loadAutomotiveKnowledgeCatalog(), []);
+  const [catalog, setCatalog] = useState(() => loadAutomotiveKnowledgeCatalog());
+  const lastUpdatedMeta = useMemo(
+    () => resolveLatestOemKnowledgeTimestamp({ catalogGeneratedAt: catalog.generatedAt }),
+    [catalog.generatedAt]
+  );
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMake, setSelectedMake] = useState<string>('all');
   const [selectedModel, setSelectedModel] = useState<string>('all');
@@ -43,11 +49,27 @@ export const KnowledgeCenterPanel: React.FC<KnowledgeCenterPanelProps> = ({
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [importExportStatus, setImportExportStatus] = useState<string | null>(null);
 
+  const sortedManufacturers = useMemo(
+    () => [...catalog.manufacturers].sort((a, b) => a.make.localeCompare(b.make)),
+    [catalog.manufacturers]
+  );
+
+  const selectedManufacturerRecord = useMemo(() => {
+    if (selectedMake === 'all') return null;
+    return (
+      catalog.manufacturers.find(
+        (m) => m.slug.toLowerCase() === selectedMake.toLowerCase()
+      ) ?? null
+    );
+  }, [catalog.manufacturers, selectedMake]);
+
   const availableModels = useMemo(() => {
     if (selectedMake === 'all') {
       return catalog.vehicles.map((v) => v.model);
     }
-    return catalog.vehicles.filter((v) => v.makeSlug.toLowerCase() === selectedMake.toLowerCase()).map((v) => v.model);
+    return catalog.vehicles
+      .filter((v) => v.makeSlug.toLowerCase() === selectedMake.toLowerCase())
+      .map((v) => v.model);
   }, [catalog, selectedMake]);
 
   const searchResults = useMemo(() => {
@@ -58,7 +80,7 @@ export const KnowledgeCenterPanel: React.FC<KnowledgeCenterPanelProps> = ({
       systemCategoryId: selectedCategory as SystemCategoryId | 'all',
       verifiedOnly,
     });
-  }, [searchQuery, selectedMake, selectedModel, selectedCategory, verifiedOnly]);
+  }, [catalog, searchQuery, selectedMake, selectedModel, selectedCategory, verifiedOnly]);
 
   const handleExport = () => {
     const jsonStr = exportCatalogToJson();
@@ -75,18 +97,34 @@ export const KnowledgeCenterPanel: React.FC<KnowledgeCenterPanelProps> = ({
   const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const isCsv = file.name.toLowerCase().endsWith('.csv');
     const reader = new FileReader();
     reader.onload = (event) => {
       const content = event.target?.result as string;
       if (content) {
-        const res = importCatalogFromJson(content);
-        if (res.success) {
-          setImportExportStatus(`Successfully imported ${res.count} repair references.`);
-          window.location.reload();
+        if (isCsv) {
+          const res = importOemManufacturersFromCsv(content);
+          if (res.success) {
+            setCatalog(loadAutomotiveKnowledgeCatalog());
+            setImportExportStatus(
+              `Imported ${res.addedCount} new OEM manufacturers (${res.duplicateCount} duplicates skipped, ${res.totalManufacturers} unique makes saved).`
+            );
+          } else {
+            setImportExportStatus(`CSV import failed: ${res.error}`);
+          }
         } else {
-          setImportExportStatus(`Import failed: ${res.error}`);
+          const res = importCatalogFromJson(content);
+          if (res.success) {
+            setCatalog(loadAutomotiveKnowledgeCatalog());
+            setImportExportStatus(
+              `Catalog merged cleanly: ${res.count} repair references (${res.duplicatesSkipped ?? 0} duplicates skipped).`
+            );
+          } else {
+            setImportExportStatus(`Import failed: ${res.error}`);
+          }
         }
       }
+      e.target.value = '';
     };
     reader.readAsText(file);
   };
@@ -104,7 +142,7 @@ export const KnowledgeCenterPanel: React.FC<KnowledgeCenterPanelProps> = ({
             OEM Metadata & Service Knowledge Center
           </h1>
           <p className="text-sm text-[#91A4BD] mt-1 max-w-2xl">
-            Search indexed service manuals, Dual-OEM fuse/relay layouts, and ECU diagnostics for Ford, Toyota, Nissan, Honda, Suzuki, and Isuzu with verified provenance.
+            Search indexed service manuals, Dual-OEM fuse/relay layouts, and {catalog.manufacturers.length} deduplicated OEM manufacturer directories with verified provenance.
           </p>
         </div>
 
@@ -123,8 +161,8 @@ export const KnowledgeCenterPanel: React.FC<KnowledgeCenterPanelProps> = ({
 
           <label className="flex min-h-[38px] items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-[#0A1220] border border-[#203653] text-[#20D889] hover:bg-[#121E33] transition cursor-pointer whitespace-nowrap">
             <Upload className="h-3.5 w-3.5" />
-            <span>Import JSON</span>
-            <input type="file" accept=".json" onChange={handleImportFile} className="hidden" />
+            <span>Import JSON / CSV</span>
+            <input type="file" accept=".json,.csv" onChange={handleImportFile} className="hidden" />
           </label>
         </div>
       </div>
@@ -177,6 +215,8 @@ export const KnowledgeCenterPanel: React.FC<KnowledgeCenterPanelProps> = ({
         {/* Make Filter */}
         <div className="relative">
           <select
+            aria-label="Filter by manufacturer"
+            data-testid="knowledge-make-select"
             value={selectedMake}
             onChange={(e) => {
               setSelectedMake(e.target.value);
@@ -184,8 +224,10 @@ export const KnowledgeCenterPanel: React.FC<KnowledgeCenterPanelProps> = ({
             }}
             className="w-full h-10 px-3 bg-[#0A1220] border border-[#203653] rounded-lg text-sm text-white focus:outline-none focus:border-[#19C8F5]"
           >
-            <option value="all">All Manufacturers</option>
-            {catalog.manufacturers.map((m) => (
+            <option value="all">
+              All Manufacturers ({sortedManufacturers.length})
+            </option>
+            {sortedManufacturers.map((m) => (
               <option key={m.id} value={m.slug}>
                 {m.make}
               </option>
@@ -274,24 +316,59 @@ export const KnowledgeCenterPanel: React.FC<KnowledgeCenterPanelProps> = ({
       </div>
 
       {/* Results Count & Statistics */}
-      <div className="flex items-center justify-between text-xs text-[#91A4BD] mb-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[#91A4BD] mb-4">
         <span>Showing {searchResults.length} indexed repair references</span>
-        <span>Catalog Version: {catalog.schemaVersion} ({catalog.statistics.referenceCount} total records)</span>
+        <span>
+          Catalog Version: {catalog.schemaVersion} ({catalog.statistics.manufacturerCount} OEM makes · {catalog.statistics.referenceCount} records)
+        </span>
       </div>
 
       {/* Reference Results Grid */}
       {searchResults.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 px-4 rounded-xl border border-[#203653] bg-[#0A1220]/60 text-center my-auto">
-          <Database className="h-12 w-12 text-[#91A4BD] mb-3 opacity-60" />
-          <p className="text-base font-semibold text-white">Reference not available in the current database.</p>
-          <p className="text-xs text-[#91A4BD] mt-1 max-w-md">
-            Try adjusting your search filters or select a different manufacturer/model from the catalog.
-          </p>
-        </div>
+        selectedManufacturerRecord && selectedManufacturerRecord.catalogUrl ? (
+          <div
+            data-testid="oem-directory-manufacturer-card"
+            className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-xl border border-[#203653] bg-[#0A1220]/90 mb-8"
+          >
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#19C8F5]/10 text-[#19C8F5] border border-[#19C8F5]/30">
+                  OEM Directory Indexed
+                </span>
+                <span className="text-xs font-mono text-[#91A4BD]">
+                  ID: {selectedManufacturerRecord.id}
+                </span>
+              </div>
+              <h3 className="text-lg font-bold text-white">
+                {selectedManufacturerRecord.make} — StartMyCar OEM Model Directory
+              </h3>
+              <p className="text-xs text-[#91A4BD] max-w-2xl leading-relaxed">
+                Saved in the local OEM knowledge database without duplication. Deep fuse-box cavity maps are not fabricated until individual model diagrams are ingested.
+              </p>
+            </div>
+            <a
+              href={selectedManufacturerRecord.catalogUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-[#19C8F5]/15 text-[#19C8F5] hover:bg-[#19C8F5]/25 transition whitespace-nowrap shrink-0"
+            >
+              <span>Open OEM Model Index</span>
+              <ExternalLink className="h-3.5 w-3.5" />
+            </a>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-20 px-4 rounded-xl border border-[#203653] bg-[#0A1220]/60 text-center my-auto">
+            <Database className="h-12 w-12 text-[#91A4BD] mb-3 opacity-60" />
+            <p className="text-base font-semibold text-white">Reference not available in the current database.</p>
+            <p className="text-xs text-[#91A4BD] mt-1 max-w-md">
+              Try adjusting your search filters or select a different manufacturer/model from the catalog.
+            </p>
+          </div>
+        )
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-12">
           {searchResults.map((scored) => {
-            const { reference, vehicle, relevanceScore, matchReasons } = scored;
+            const { reference } = scored;
             return (
               <div
                 key={reference.id}
@@ -351,6 +428,42 @@ export const KnowledgeCenterPanel: React.FC<KnowledgeCenterPanelProps> = ({
           })}
         </div>
       )}
+
+      {/* Knowledge Center Footer — Compiled OEM Database Timestamp */}
+      <footer
+        aria-label="Knowledge Center database metadata"
+        className="mt-auto pt-4 pb-2 border-t border-[#203653] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-[#91A4BD]"
+      >
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono tabular-nums">
+          <span>OEM Knowledge Database</span>
+          <span aria-hidden="true">·</span>
+          <span>Schema v{catalog.schemaVersion}</span>
+          <span aria-hidden="true">·</span>
+          <span>{catalog.statistics.manufacturerCount} Manufacturers</span>
+          <span aria-hidden="true">·</span>
+          <span>{catalog.statistics.referenceCount} Records</span>
+        </div>
+
+        <div
+          data-testid="knowledge-center-last-updated"
+          title={
+            lastUpdatedMeta.sources.length > 0
+              ? lastUpdatedMeta.sources.map((s) => `${s.label}: ${s.iso}`).join('\n')
+              : 'Compiled OEM knowledge metadata timestamp'
+          }
+          className="inline-flex items-center gap-1.5 font-mono tabular-nums text-[#91A4BD] whitespace-nowrap"
+        >
+          <Clock className="h-3.5 w-3.5 text-[#19C8F5] shrink-0" aria-hidden="true" />
+          <span>Last updated:</span>
+          {lastUpdatedMeta.latestIso ? (
+            <time dateTime={lastUpdatedMeta.latestIso} className="text-[#EAF3FF] font-semibold">
+              {lastUpdatedMeta.formattedUtc}
+            </time>
+          ) : (
+            <span className="text-[#EAF3FF] font-semibold">Unavailable</span>
+          )}
+        </div>
+      </footer>
     </div>
   );
 };

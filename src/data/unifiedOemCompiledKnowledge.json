@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "databaseName": "AutoElectric Lab Pro — Unified Dual-OEM Compiled Knowledge Base",
-  "generatedAt": "2026-11-27T14:00:28.772Z",
+  "generatedAt": "2026-11-27T19:02:26.462Z",
   "zeroFabricationIntegrity": true,
   "sources": [
     "fuse-box.info",
@@ -12,7 +12,10 @@
     "fuseBoxInfoProfilesCount": 17,
     "startMyCarProfilesCount": 14,
     "totalCavitiesCompiled": 4254,
-    "dualOemConfirmedVehiclesCount": 13
+    "dualOemConfirmedVehiclesCount": 13,
+    "indexedManufacturersCount": 96,
+    "csvImportedManufacturersCount": 90,
+    "deduplicatedCsvDuplicatesSkipped": 12
   },
   "manufacturers": [
     {
@@ -56,6 +59,636 @@
       "slug": "suzuki",
       "catalogUrl": "https://fuse-box.info/suzuki",
       "verified": true
+    },
+    {
+      "id": "m-abarth",
+      "make": "Abarth",
+      "slug": "abarth",
+      "catalogUrl": "https://www.startmycar.com/abarth/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-acura",
+      "make": "Acura",
+      "slug": "acura",
+      "catalogUrl": "https://www.startmycar.com/acura/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-alfa-romeo",
+      "make": "Alfa Romeo",
+      "slug": "alfa-romeo",
+      "catalogUrl": "https://www.startmycar.com/alfa-romeo/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-arcfox",
+      "make": "Arcfox",
+      "slug": "arcfox",
+      "catalogUrl": "https://www.startmycar.com/arcfox/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-aston-martin",
+      "make": "Aston Martin",
+      "slug": "aston-martin",
+      "catalogUrl": "https://www.startmycar.com/aston-martin/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-audi",
+      "make": "Audi",
+      "slug": "audi",
+      "catalogUrl": "https://www.startmycar.com/audi/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-austin",
+      "make": "Austin",
+      "slug": "austin",
+      "catalogUrl": "https://www.startmycar.com/austin/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-baic",
+      "make": "Baic",
+      "slug": "baic",
+      "catalogUrl": "https://www.startmycar.com/baic/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-bentley",
+      "make": "Bentley",
+      "slug": "bentley",
+      "catalogUrl": "https://www.startmycar.com/bentley/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-bmw",
+      "make": "BMW",
+      "slug": "bmw",
+      "catalogUrl": "https://www.startmycar.com/bmw/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-buick",
+      "make": "Buick",
+      "slug": "buick",
+      "catalogUrl": "https://www.startmycar.com/buick/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-byd",
+      "make": "BYD",
+      "slug": "byd",
+      "catalogUrl": "https://www.startmycar.com/byd/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-cadillac",
+      "make": "Cadillac",
+      "slug": "cadillac",
+      "catalogUrl": "https://www.startmycar.com/cadillac/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-changan",
+      "make": "Changan",
+      "slug": "changan",
+      "catalogUrl": "https://www.startmycar.com/changan/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-chery",
+      "make": "Chery",
+      "slug": "chery",
+      "catalogUrl": "https://www.startmycar.com/chery/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-chevrolet",
+      "make": "Chevrolet",
+      "slug": "chevrolet",
+      "catalogUrl": "https://www.startmycar.com/chevrolet/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-chrysler",
+      "make": "Chrysler",
+      "slug": "chrysler",
+      "catalogUrl": "https://www.startmycar.com/chrysler/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-citroen",
+      "make": "Citroën",
+      "slug": "citroen",
+      "catalogUrl": "https://www.startmycar.com/citroen/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-cupra",
+      "make": "Cupra",
+      "slug": "cupra",
+      "catalogUrl": "https://www.startmycar.com/cupra/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-dacia",
+      "make": "Dacia",
+      "slug": "dacia",
+      "catalogUrl": "https://www.startmycar.com/dacia/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-daewoo",
+      "make": "Daewoo",
+      "slug": "daewoo",
+      "catalogUrl": "https://www.startmycar.com/daewoo/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-daihatsu",
+      "make": "Daihatsu",
+      "slug": "daihatsu",
+      "catalogUrl": "https://www.startmycar.com/daihatsu/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-dfsk",
+      "make": "DFSK",
+      "slug": "dfsk",
+      "catalogUrl": "https://www.startmycar.com/dfsk/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-dodge",
+      "make": "Dodge",
+      "slug": "dodge",
+      "catalogUrl": "https://www.startmycar.com/dodge/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-dongfeng",
+      "make": "Dongfeng",
+      "slug": "dongfeng",
+      "catalogUrl": "https://www.startmycar.com/dongfeng/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-ds",
+      "make": "DS",
+      "slug": "ds",
+      "catalogUrl": "https://www.startmycar.com/ds/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-ferrari",
+      "make": "Ferrari",
+      "slug": "ferrari",
+      "catalogUrl": "https://www.startmycar.com/ferrari/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-fiat",
+      "make": "Fiat",
+      "slug": "fiat",
+      "catalogUrl": "https://www.startmycar.com/fiat/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-forthing",
+      "make": "Forthing",
+      "slug": "forthing",
+      "catalogUrl": "https://www.startmycar.com/forthing/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-foton",
+      "make": "Foton",
+      "slug": "foton",
+      "catalogUrl": "https://www.startmycar.com/foton/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-gac",
+      "make": "GAC",
+      "slug": "gac",
+      "catalogUrl": "https://www.startmycar.com/gac/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-geely",
+      "make": "Geely",
+      "slug": "geely",
+      "catalogUrl": "https://www.startmycar.com/geely/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-genesis",
+      "make": "Genesis",
+      "slug": "genesis",
+      "catalogUrl": "https://www.startmycar.com/genesis/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-gmc",
+      "make": "GMC",
+      "slug": "gmc",
+      "catalogUrl": "https://www.startmycar.com/gmc/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-great-wall",
+      "make": "Great Wall",
+      "slug": "great-wall",
+      "catalogUrl": "https://www.startmycar.com/great-wall/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-haval",
+      "make": "Haval",
+      "slug": "haval",
+      "catalogUrl": "https://www.startmycar.com/haval/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-holden",
+      "make": "Holden",
+      "slug": "holden",
+      "catalogUrl": "https://www.startmycar.com/holden/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-hsv",
+      "make": "HSV",
+      "slug": "hsv",
+      "catalogUrl": "https://www.startmycar.com/hsv/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-hummer",
+      "make": "Hummer",
+      "slug": "hummer",
+      "catalogUrl": "https://www.startmycar.com/hummer/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-hyundai",
+      "make": "Hyundai",
+      "slug": "hyundai",
+      "catalogUrl": "https://www.startmycar.com/hyundai/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-infiniti",
+      "make": "Infiniti",
+      "slug": "infiniti",
+      "catalogUrl": "https://www.startmycar.com/infiniti/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-jac",
+      "make": "JAC",
+      "slug": "jac",
+      "catalogUrl": "https://www.startmycar.com/jac/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-jaguar",
+      "make": "Jaguar",
+      "slug": "jaguar",
+      "catalogUrl": "https://www.startmycar.com/jaguar/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-jeep",
+      "make": "Jeep",
+      "slug": "jeep",
+      "catalogUrl": "https://www.startmycar.com/jeep/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-jetour",
+      "make": "Jetour",
+      "slug": "jetour",
+      "catalogUrl": "https://www.startmycar.com/jetour/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-jmc",
+      "make": "JMC",
+      "slug": "jmc",
+      "catalogUrl": "https://www.startmycar.com/jmc/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-jmev",
+      "make": "JMEV",
+      "slug": "jmev",
+      "catalogUrl": "https://www.startmycar.com/jmev/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-kaiyi",
+      "make": "Kaiyi",
+      "slug": "kaiyi",
+      "catalogUrl": "https://www.startmycar.com/kaiyi/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-kia",
+      "make": "Kia",
+      "slug": "kia",
+      "catalogUrl": "https://www.startmycar.com/kia/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-kyc",
+      "make": "KYC",
+      "slug": "kyc",
+      "catalogUrl": "https://www.startmycar.com/kyc/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-lancia",
+      "make": "Lancia",
+      "slug": "lancia",
+      "catalogUrl": "https://www.startmycar.com/lancia/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-land-rover",
+      "make": "Land Rover",
+      "slug": "land-rover",
+      "catalogUrl": "https://www.startmycar.com/land-rover/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-leapmotor",
+      "make": "Leapmotor",
+      "slug": "leapmotor",
+      "catalogUrl": "https://www.startmycar.com/leapmotor/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-lexus",
+      "make": "Lexus",
+      "slug": "lexus",
+      "catalogUrl": "https://www.startmycar.com/lexus/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-lincoln",
+      "make": "Lincoln",
+      "slug": "lincoln",
+      "catalogUrl": "https://www.startmycar.com/lincoln/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-lynk-co",
+      "make": "Lynk & Co",
+      "slug": "lynk-co",
+      "catalogUrl": "https://www.startmycar.com/lynk-co/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-mahindra",
+      "make": "Mahindra",
+      "slug": "mahindra",
+      "catalogUrl": "https://www.startmycar.com/mahindra/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-maserati",
+      "make": "Maserati",
+      "slug": "maserati",
+      "catalogUrl": "https://www.startmycar.com/maserati/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-maxus",
+      "make": "Maxus",
+      "slug": "maxus",
+      "catalogUrl": "https://www.startmycar.com/maxus/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-mazda",
+      "make": "Mazda",
+      "slug": "mazda",
+      "catalogUrl": "https://www.startmycar.com/mazda/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-mercedes-benz",
+      "make": "Mercedes-Benz",
+      "slug": "mercedes-benz",
+      "catalogUrl": "https://www.startmycar.com/mercedes-benz/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-mercury",
+      "make": "Mercury",
+      "slug": "mercury",
+      "catalogUrl": "https://www.startmycar.com/mercury/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-mg",
+      "make": "MG",
+      "slug": "mg",
+      "catalogUrl": "https://www.startmycar.com/mg/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-mini",
+      "make": "Mini",
+      "slug": "mini",
+      "catalogUrl": "https://www.startmycar.com/mini/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-mitsubishi",
+      "make": "Mitsubishi",
+      "slug": "mitsubishi",
+      "catalogUrl": "https://www.startmycar.com/mitsubishi/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-oldsmobile",
+      "make": "Oldsmobile",
+      "slug": "oldsmobile",
+      "catalogUrl": "https://www.startmycar.com/oldsmobile/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-opel",
+      "make": "Opel",
+      "slug": "opel",
+      "catalogUrl": "https://www.startmycar.com/opel/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-peugeot",
+      "make": "Peugeot",
+      "slug": "peugeot",
+      "catalogUrl": "https://www.startmycar.com/peugeot/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-pontiac",
+      "make": "Pontiac",
+      "slug": "pontiac",
+      "catalogUrl": "https://www.startmycar.com/pontiac/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-porsche",
+      "make": "Porsche",
+      "slug": "porsche",
+      "catalogUrl": "https://www.startmycar.com/porsche/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-proton",
+      "make": "Proton",
+      "slug": "proton",
+      "catalogUrl": "https://www.startmycar.com/proton/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-ram",
+      "make": "RAM",
+      "slug": "ram",
+      "catalogUrl": "https://www.startmycar.com/ram/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-renault",
+      "make": "Renault",
+      "slug": "renault",
+      "catalogUrl": "https://www.startmycar.com/renault/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-rover",
+      "make": "Rover",
+      "slug": "rover",
+      "catalogUrl": "https://www.startmycar.com/rover/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-saab",
+      "make": "Saab",
+      "slug": "saab",
+      "catalogUrl": "https://www.startmycar.com/saab/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-saturn",
+      "make": "Saturn",
+      "slug": "saturn",
+      "catalogUrl": "https://www.startmycar.com/saturn/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-scion",
+      "make": "Scion",
+      "slug": "scion",
+      "catalogUrl": "https://www.startmycar.com/scion/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-seat",
+      "make": "Seat",
+      "slug": "seat",
+      "catalogUrl": "https://www.startmycar.com/seat/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-shineray",
+      "make": "Shineray",
+      "slug": "shineray",
+      "catalogUrl": "https://www.startmycar.com/shineray/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-skoda",
+      "make": "Skoda",
+      "slug": "skoda",
+      "catalogUrl": "https://www.startmycar.com/skoda/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-smart",
+      "make": "Smart",
+      "slug": "smart",
+      "catalogUrl": "https://www.startmycar.com/smart/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-ssangyong",
+      "make": "SsangYong",
+      "slug": "ssangyong",
+      "catalogUrl": "https://www.startmycar.com/ssangyong/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-subaru",
+      "make": "Subaru",
+      "slug": "subaru",
+      "catalogUrl": "https://www.startmycar.com/subaru/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-swm",
+      "make": "SWM",
+      "slug": "swm",
+      "catalogUrl": "https://www.startmycar.com/swm/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-tata",
+      "make": "Tata",
+      "slug": "tata",
+      "catalogUrl": "https://www.startmycar.com/tata/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-tesla",
+      "make": "Tesla",
+      "slug": "tesla",
+      "catalogUrl": "https://www.startmycar.com/tesla/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-triumph",
+      "make": "Triumph",
+      "slug": "triumph",
+      "catalogUrl": "https://www.startmycar.com/triumph/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-vauxhall",
+      "make": "Vauxhall",
+      "slug": "vauxhall",
+      "catalogUrl": "https://www.startmycar.com/vauxhall/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-volkswagen",
+      "make": "Volkswagen",
+      "slug": "volkswagen",
+      "catalogUrl": "https://www.startmycar.com/volkswagen/pickmodel",
+      "verified": false
+    },
+    {
+      "id": "m-volvo",
+      "make": "Volvo",
+      "slug": "volvo",
+      "catalogUrl": "https://www.startmycar.com/volvo/pickmodel",
+      "verified": false
     }
   ],
   "vehicleModelRecords": [
@@ -4143,5 +4776,18 @@
         ]
       }
     }
-  ]
+  ],
+  "oemDirectoryImport": {
+    "importedAt": "2026-11-27T19:02:26.462Z",
+    "sourceFiles": [
+      "links-startmycar.com__1__952f30fe.csv",
+      "links-startmycar.com_7256e111.csv"
+    ],
+    "totalRowsScanned": 122,
+    "validOemLinksFound": 102,
+    "ignoredNonOemRows": 20,
+    "addedManufacturersCount": 90,
+    "duplicatesSkippedCount": 12,
+    "totalUniqueManufacturers": 96
+  }
 }

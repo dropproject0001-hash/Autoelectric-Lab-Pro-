@@ -6,7 +6,10 @@
 import crypto from 'node:crypto';
 import type { NextFunction, Response } from 'express';
 import type { AuthenticatedRequest } from './firebaseAuthMiddleware';
-import { isStrictProductionSecrets } from './secretsPolicy';
+import {
+  isStrictProductionSecrets,
+  resolveConfiguredMasterAdminPin,
+} from './secretsPolicy';
 
 export const MASTER_ADMIN_ACTOR_UID = 'master-pin-admin:env';
 
@@ -75,6 +78,21 @@ function computeEnvFingerprint(envPin: string): string {
     .digest('hex');
 }
 
+const INVISIBLE_PIN_CHARS_REGEX = /[\u200B-\u200D\uFEFF]/g;
+
+export type PinFormatClass =
+  | 'empty'
+  | 'digits_only'
+  | 'digits_formatted'
+  | 'alphanumeric_or_symbols';
+
+export function classifyPinFormat(value: string): PinFormatClass {
+  if (!value) return 'empty';
+  if (/^\d+$/.test(value)) return 'digits_only';
+  if (/^\d[\d\s-]*\d$/.test(value)) return 'digits_formatted';
+  return 'alphanumeric_or_symbols';
+}
+
 function isNumericFormattedPin(value: string): boolean {
   return /^\d[\d\s-]*\d$/.test(value);
 }
@@ -87,15 +105,46 @@ function deriveMasterPinScrypt(domain: 'raw' | 'num', pinValue: string, saltHex:
   return crypto.scryptSync(`vecl:master-admin:v1:${domain}:${pinValue}`, saltHex, 32);
 }
 
+function emitMasterPinAuthTrace(trace: Record<string, unknown>): void {
+  // Structured server-only trace: never logs raw PINs, env secrets, salts, or crackable hashes.
+  console.info('[MasterAdminPinAuthTrace]', JSON.stringify(trace));
+}
+
 function getOrBuildHashedEnvRecord(nowMs: number):
-  | { ok: true; record: HashedEnvAdminPinRecord }
+  | {
+      ok: true;
+      record: HashedEnvAdminPinRecord;
+      meta: {
+        sourceKey: string | null;
+        strictMode: boolean;
+        envRawLen: number;
+        envSanitizedLen: number;
+        envWasSanitized: boolean;
+        envFormatClass: PinFormatClass;
+        envNormalizedLen: number;
+        hashCacheHit: boolean;
+      };
+    }
   | {
       ok: false;
       statusCode: number;
       code: 'ADMIN_ENV_PIN_NOT_CONFIGURED' | 'ADMIN_ENV_PIN_TOO_WEAK';
       error: string;
+      meta: {
+        sourceKey: string | null;
+        strictMode: boolean;
+        envRawLen: number;
+        envSanitizedLen: number;
+        envWasSanitized: boolean;
+        envFormatClass: PinFormatClass;
+      };
     } {
-  const envPin = (process.env.VECL_ADMIN_MASTER_PIN || '').trim();
+  const resolved = resolveConfiguredMasterAdminPin();
+  const envPin = resolved.sanitized;
+  const strict = isStrictProductionSecrets();
+  const envFormatClass = classifyPinFormat(envPin);
+  const envWasSanitized = resolved.raw !== envPin;
+
   if (!envPin) {
     cachedEnvRecord = null;
     return {
@@ -104,10 +153,17 @@ function getOrBuildHashedEnvRecord(nowMs: number):
       code: 'ADMIN_ENV_PIN_NOT_CONFIGURED',
       error:
         'Master Admin PIN authentication is unavailable because VECL_ADMIN_MASTER_PIN is not configured on the server.',
+      meta: {
+        sourceKey: resolved.sourceKey,
+        strictMode: strict,
+        envRawLen: resolved.raw.length,
+        envSanitizedLen: 0,
+        envWasSanitized,
+        envFormatClass,
+      },
     };
   }
 
-  const strict = isStrictProductionSecrets();
   if (strict && envPin.length < MIN_ENV_ADMIN_PIN_LENGTH_STRICT) {
     cachedEnvRecord = null;
     return {
@@ -115,6 +171,14 @@ function getOrBuildHashedEnvRecord(nowMs: number):
       statusCode: 503,
       code: 'ADMIN_ENV_PIN_TOO_WEAK',
       error: `Server Master Admin PIN is too weak for strict production mode. Configure at least ${MIN_ENV_ADMIN_PIN_LENGTH_STRICT} characters in VECL_ADMIN_MASTER_PIN.`,
+      meta: {
+        sourceKey: resolved.sourceKey,
+        strictMode: strict,
+        envRawLen: resolved.raw.length,
+        envSanitizedLen: envPin.length,
+        envWasSanitized,
+        envFormatClass,
+      },
     };
   }
 
@@ -125,6 +189,14 @@ function getOrBuildHashedEnvRecord(nowMs: number):
       statusCode: 503,
       code: 'ADMIN_ENV_PIN_TOO_WEAK',
       error: `Server Master Admin PIN must be at least ${MIN_ENV_ADMIN_PIN_LENGTH_DEV} characters.`,
+      meta: {
+        sourceKey: resolved.sourceKey,
+        strictMode: strict,
+        envRawLen: resolved.raw.length,
+        envSanitizedLen: envPin.length,
+        envWasSanitized,
+        envFormatClass,
+      },
     };
   }
 
@@ -135,18 +207,36 @@ function getOrBuildHashedEnvRecord(nowMs: number):
     );
   }
 
+  const normalizedEnvLen = isNumericFormattedPin(envPin)
+    ? normalizeNumericPin(envPin).length
+    : envPin.length;
   const fingerprint = computeEnvFingerprint(envPin);
   if (cachedEnvRecord && cachedEnvRecord.envFingerprintHmac === fingerprint) {
-    return { ok: true, record: cachedEnvRecord };
+    return {
+      ok: true,
+      record: cachedEnvRecord,
+      meta: {
+        sourceKey: resolved.sourceKey,
+        strictMode: strict,
+        envRawLen: resolved.raw.length,
+        envSanitizedLen: envPin.length,
+        envWasSanitized,
+        envFormatClass,
+        envNormalizedLen: normalizedEnvLen,
+        hashCacheHit: true,
+      },
+    };
   }
 
   const salt = crypto.randomBytes(16).toString('hex');
   const rawScryptHash = deriveMasterPinScrypt('raw', envPin, salt);
 
+  // Always compute normalized numeric hash when env PIN is numeric (with or without separators)
+  // so both "908172635544" and "9081-7263-5544" validate symmetrically in either direction.
   let normalizedNumericScryptHash: Buffer | null = null;
   if (isNumericFormattedPin(envPin)) {
     const normalized = normalizeNumericPin(envPin);
-    if (normalized.length >= MIN_ENV_ADMIN_PIN_LENGTH_DEV && normalized !== envPin) {
+    if (normalized.length >= MIN_ENV_ADMIN_PIN_LENGTH_DEV) {
       normalizedNumericScryptHash = deriveMasterPinScrypt('num', normalized, salt);
     }
   }
@@ -160,7 +250,20 @@ function getOrBuildHashedEnvRecord(nowMs: number):
     hashedAtMs: nowMs,
   };
 
-  return { ok: true, record: cachedEnvRecord };
+  return {
+    ok: true,
+    record: cachedEnvRecord,
+    meta: {
+      sourceKey: resolved.sourceKey,
+      strictMode: strict,
+      envRawLen: resolved.raw.length,
+      envSanitizedLen: envPin.length,
+      envWasSanitized,
+      envFormatClass,
+      envNormalizedLen: normalizedEnvLen,
+      hashCacheHit: false,
+    },
+  };
 }
 
 function checkFailureRateLimit(
@@ -225,7 +328,7 @@ export function isValidMasterAdminProof(value: unknown): value is MasterAdminPro
 }
 
 export function getMasterAdminPinPolicyStatus(): MasterAdminPinPolicyStatus {
-  const envPin = (process.env.VECL_ADMIN_MASTER_PIN || '').trim();
+  const envPin = resolveConfiguredMasterAdminPin().sanitized;
   const strictMode = isStrictProductionSecrets();
   const minLen = strictMode ? MIN_ENV_ADMIN_PIN_LENGTH_STRICT : MIN_ENV_ADMIN_PIN_LENGTH_DEV;
   const meetsStrengthRequirement = envPin.length >= minLen;
@@ -244,13 +347,26 @@ export function getMasterAdminPinPolicyStatus(): MasterAdminPinPolicyStatus {
 
 export function verifyMasterAdminPinAgainstEnvHash(
   rawPin: string,
-  options?: { ipKey?: string; nowMs?: number }
+  options?: { ipKey?: string; nowMs?: number; source?: string; route?: string }
 ): MasterAdminPinVerificationResult {
-  const nowMs = options?.nowMs ?? Date.now();
+  const startedMs = Date.now();
+  const traceId = `mpin_${crypto.randomBytes(4).toString('hex')}`;
+  const nowMs = options?.nowMs ?? startedMs;
   const ipKey = (options?.ipKey || 'unknown').trim() || 'unknown';
+  const source = options?.source || 'direct';
+  const route = options?.route || 'adminMasterPinService';
 
   const rate = checkFailureRateLimit(ipKey, nowMs);
   if (!rate.allowed) {
+    emitMasterPinAuthTrace({
+      traceId,
+      route,
+      source,
+      outcome: 'DENY_RATE_LIMITED',
+      httpStatus: 429,
+      retryAfterSec: rate.retryAfterSec,
+      elapsedMs: Date.now() - startedMs,
+    });
     return {
       valid: false,
       statusCode: 429,
@@ -262,6 +378,15 @@ export function verifyMasterAdminPinAgainstEnvHash(
 
   const envCheck = getOrBuildHashedEnvRecord(nowMs);
   if (!envCheck.ok) {
+    emitMasterPinAuthTrace({
+      traceId,
+      route,
+      source,
+      envConfig: envCheck.meta,
+      outcome: `DENY_${envCheck.code}`,
+      httpStatus: envCheck.statusCode,
+      elapsedMs: Date.now() - startedMs,
+    });
     return {
       valid: false,
       statusCode: envCheck.statusCode,
@@ -272,6 +397,16 @@ export function verifyMasterAdminPinAgainstEnvHash(
 
   if (typeof rawPin !== 'string') {
     recordFailedAttempt(ipKey, nowMs);
+    emitMasterPinAuthTrace({
+      traceId,
+      route,
+      source,
+      envConfig: envCheck.meta,
+      incoming: { type: typeof rawPin },
+      outcome: 'DENY_NON_STRING_PIN',
+      httpStatus: 401,
+      elapsedMs: Date.now() - startedMs,
+    });
     return {
       valid: false,
       statusCode: 401,
@@ -280,12 +415,35 @@ export function verifyMasterAdminPinAgainstEnvHash(
     };
   }
 
-  const trimmed = rawPin.trim();
+  const withoutInvisible = rawPin.replace(INVISIBLE_PIN_CHARS_REGEX, '');
+  const hadInvisibleChars = withoutInvisible.length !== rawPin.length;
+  const trimmed = withoutInvisible.trim();
+  const hadOuterWhitespace = trimmed.length !== withoutInvisible.length;
+  const incomingFormatClass = classifyPinFormat(trimmed);
+  const incomingNormalized = isNumericFormattedPin(trimmed) ? normalizeNumericPin(trimmed) : trimmed;
+
   if (
     trimmed.length < MIN_ENV_ADMIN_PIN_LENGTH_DEV ||
     trimmed.length > MAX_INCOMING_PIN_LENGTH
   ) {
     recordFailedAttempt(ipKey, nowMs);
+    emitMasterPinAuthTrace({
+      traceId,
+      route,
+      source,
+      envConfig: envCheck.meta,
+      incoming: {
+        rawLen: rawPin.length,
+        trimmedLen: trimmed.length,
+        normalizedLen: incomingNormalized.length,
+        hadInvisibleChars,
+        hadOuterWhitespace,
+        formatClass: incomingFormatClass,
+      },
+      outcome: 'DENY_LENGTH_BOUNDS',
+      httpStatus: 401,
+      elapsedMs: Date.now() - startedMs,
+    });
     return {
       valid: false,
       statusCode: 401,
@@ -296,19 +454,55 @@ export function verifyMasterAdminPinAgainstEnvHash(
 
   const { record } = envCheck;
   const candidateRawHash = deriveMasterPinScrypt('raw', trimmed, record.salt);
-  let matched =
+  const rawHashMatched =
     candidateRawHash.length === record.rawScryptHash.length &&
     crypto.timingSafeEqual(candidateRawHash, record.rawScryptHash);
 
-  if (!matched && record.normalizedNumericScryptHash && isNumericFormattedPin(trimmed)) {
+  let normalizedHashCompareRan = false;
+  let normalizedHashMatched = false;
+  if (!rawHashMatched && record.normalizedNumericScryptHash && isNumericFormattedPin(trimmed)) {
     const normalized = normalizeNumericPin(trimmed);
     if (normalized.length >= MIN_ENV_ADMIN_PIN_LENGTH_DEV) {
+      normalizedHashCompareRan = true;
       const candidateNumHash = deriveMasterPinScrypt('num', normalized, record.salt);
-      matched =
+      normalizedHashMatched =
         candidateNumHash.length === record.normalizedNumericScryptHash.length &&
         crypto.timingSafeEqual(candidateNumHash, record.normalizedNumericScryptHash);
     }
   }
+
+  const matched = rawHashMatched || normalizedHashMatched;
+
+  emitMasterPinAuthTrace({
+    traceId,
+    route,
+    source,
+    algorithm: 'scrypt-timingSafeEqual',
+    envConfig: {
+      ...envCheck.meta,
+      hasNormalizedNumericHash: record.normalizedNumericScryptHash !== null,
+      hashBytes: record.rawScryptHash.length,
+    },
+    incoming: {
+      rawLen: rawPin.length,
+      trimmedLen: trimmed.length,
+      normalizedLen: incomingNormalized.length,
+      hadInvisibleChars,
+      hadOuterWhitespace,
+      formatClass: incomingFormatClass,
+      lengthMatchesSanitized: trimmed.length === envCheck.meta.envSanitizedLen,
+      lengthMatchesNormalized: incomingNormalized.length === envCheck.meta.envNormalizedLen,
+    },
+    comparison: {
+      rawHashCompareRan: true,
+      rawHashMatched,
+      normalizedHashCompareRan,
+      normalizedHashMatched,
+    },
+    outcome: matched ? 'ALLOW' : 'DENY_SCRYPT_HASH_MISMATCH',
+    httpStatus: matched ? 200 : 401,
+    elapsedMs: Date.now() - startedMs,
+  });
 
   if (!matched) {
     recordFailedAttempt(ipKey, nowMs);
@@ -329,34 +523,38 @@ export function verifyMasterAdminPinAgainstEnvHash(
 
 function extractIncomingMasterPinFromHeaders(
   req: AuthenticatedRequest
-): { pin: string | null; rejectedLegacyScheme: boolean } {
+): { pin: string | null; headerSource: string; rejectedLegacyScheme: boolean } {
   const xAdminPin = req.headers['x-admin-pin'];
   if (typeof xAdminPin === 'string' && xAdminPin.trim().length > 0) {
-    return { pin: xAdminPin, rejectedLegacyScheme: false };
+    return { pin: xAdminPin, headerSource: 'x-admin-pin', rejectedLegacyScheme: false };
   }
   if (Array.isArray(xAdminPin) && xAdminPin.length > 0) {
-    return { pin: null, rejectedLegacyScheme: true };
+    return { pin: null, headerSource: 'x-admin-pin:array', rejectedLegacyScheme: true };
   }
 
   const xMasterPin = req.headers['x-master-pin'];
   if (typeof xMasterPin === 'string' && xMasterPin.trim().length > 0) {
-    return { pin: xMasterPin, rejectedLegacyScheme: false };
+    return { pin: xMasterPin, headerSource: 'x-master-pin', rejectedLegacyScheme: false };
   }
   if (Array.isArray(xMasterPin) && xMasterPin.length > 0) {
-    return { pin: null, rejectedLegacyScheme: true };
+    return { pin: null, headerSource: 'x-master-pin:array', rejectedLegacyScheme: true };
   }
 
   const authHeader = req.headers.authorization;
   if (typeof authHeader === 'string' && authHeader.trim().length > 0) {
     if (/^MasterPin\s+/i.test(authHeader)) {
       const token = authHeader.replace(/^MasterPin\s+/i, '').trim();
-      return { pin: token || null, rejectedLegacyScheme: !token };
+      return {
+        pin: token || null,
+        headerSource: 'authorization:MasterPin',
+        rejectedLegacyScheme: !token,
+      };
     }
     // Reject Firebase JWTs, Trial tokens, or Session tokens explicitly — VECL_ADMIN_MASTER_PIN is exclusive.
-    return { pin: null, rejectedLegacyScheme: true };
+    return { pin: null, headerSource: 'authorization:non-MasterPin', rejectedLegacyScheme: true };
   }
 
-  return { pin: null, rejectedLegacyScheme: false };
+  return { pin: null, headerSource: 'none', rejectedLegacyScheme: false };
 }
 
 export function requireExclusiveMasterAdminPin(
@@ -364,8 +562,16 @@ export function requireExclusiveMasterAdminPin(
   res: Response,
   next: NextFunction
 ): void {
-  const { pin, rejectedLegacyScheme } = extractIncomingMasterPinFromHeaders(req);
+  const { pin, headerSource, rejectedLegacyScheme } = extractIncomingMasterPinFromHeaders(req);
   if (!pin) {
+    emitMasterPinAuthTrace({
+      route: `${req.method} ${req.path}`,
+      middleware: 'requireExclusiveMasterAdminPin',
+      headerSource,
+      rejectedLegacyScheme,
+      outcome: 'DENY_AUTH_REQUIRED',
+      httpStatus: 401,
+    });
     res.status(401).json({
       error: rejectedLegacyScheme
         ? 'Exclusive Master Admin PIN authentication (X-Admin-Pin) is required; Bearer tokens and Firebase accounts are not accepted on license admin endpoints.'
@@ -376,7 +582,11 @@ export function requireExclusiveMasterAdminPin(
   }
 
   const ipKey = `license-admin:${req.ip || req.socket?.remoteAddress || 'unknown'}`;
-  const result = verifyMasterAdminPinAgainstEnvHash(pin, { ipKey });
+  const result = verifyMasterAdminPinAgainstEnvHash(pin, {
+    ipKey,
+    source: headerSource,
+    route: `${req.method} ${req.path}`,
+  });
   if (!result.valid || !result.proof) {
     if (result.statusCode === 429 && result.retryAfterSec) {
       res.setHeader('Retry-After', String(result.retryAfterSec));

@@ -1149,6 +1149,23 @@ export const IntroductionPinLandingPage: React.FC = () => {
                     </span>
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </button>
+
+                  <div className="text-center pt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setErrorMsg(null);
+                        setSuccessMsg(null);
+                        setActiveTab('ADMIN_MASTER');
+                      }}
+                      className="text-xs text-[#91A4BD] hover:text-[#FFB020] transition-colors cursor-pointer"
+                    >
+                      Have a Master Admin PIN?{' '}
+                      <span className="underline text-[#FFB020] font-medium">
+                        Switch to Admin Master Login
+                      </span>
+                    </button>
+                  </div>
                 </div>
               </form>
             )}
@@ -1240,11 +1257,25 @@ export const IntroductionPinLandingPage: React.FC = () => {
                           Enter the Master Admin PIN to issue 8-digit trial PINs (3h to 1 year) or open the bench lab directly as administrator.
                         </p>
                       </div>
+                      {adminConfig.envPinPolicyError && (
+                        <div className="rounded-md border border-[#FFB020]/55 bg-[#1B1408] p-3 text-xs text-[#FFE0A3] leading-relaxed space-y-1">
+                          <div className="flex items-center gap-1.5 font-semibold text-[#FFB020]">
+                            <AlertTriangle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                            <span>Strict Production Secret Policy Notice</span>
+                          </div>
+                          <p>
+                            {adminConfig.envPinPolicyError === 'ADMIN_ENV_PIN_TOO_WEAK'
+                              ? 'Your server Master Admin PIN secret is shorter than the 10-character minimum required in strict production mode. Update your Master Admin PIN secret to at least 10 characters (or disable strict secrets mode) and restart the server.'
+                              : 'Your server signing secret is missing or under 32 characters in strict production mode. Configure a 32+ character signing secret (or disable strict secrets mode) and restart the server.'}
+                          </p>
+                        </div>
+                      )}
                       <div className="relative">
                         <input
                           type={showMasterPin ? 'text' : 'password'}
                           name="vecl-admin-master-pin"
-                          autoComplete="one-time-code"
+                          autoComplete="off"
+                          spellCheck={false}
                           value={masterPinInput}
                           onChange={(e) => setMasterPinInput(e.target.value)}
                           placeholder="Enter Master Admin PIN"

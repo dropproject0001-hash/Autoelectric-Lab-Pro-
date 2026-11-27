@@ -3,7 +3,7 @@
  * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
  */
 
-import { INITIAL_AUTOMOTIVE_CATALOG, SYSTEM_CATEGORIES } from '../data/automotiveKnowledgeSeed';
+import { INITIAL_AUTOMOTIVE_CATALOG } from '../data/automotiveKnowledgeSeed';
 import unifiedOemCompiledJson from '../data/unifiedOemCompiledKnowledge.json';
 import {
   AutomotiveKnowledgeCatalog,
@@ -13,60 +13,76 @@ import {
   VehicleModelRecord,
 } from '../types/automotiveKnowledge';
 import { normalizeSystemCategory } from '../utils/automotiveTaxonomy';
+import {
+  deduplicateCatalog,
+  mergeOemManufacturersDeduplicated,
+  parseStartMyCarOemCsv,
+} from '../utils/oemManufacturerCsvImporter';
 
 const STORAGE_KEY = 'autolab_automotive_knowledge_index_v1';
 
 let cachedCatalog: AutomotiveKnowledgeCatalog | null = null;
 
+function pickLatestIsoTimestamp(a?: string, b?: string): string {
+  const aMs = a ? Date.parse(a) : Number.NaN;
+  const bMs = b ? Date.parse(b) : Number.NaN;
+  if (Number.isFinite(aMs) && Number.isFinite(bMs)) {
+    return bMs >= aMs ? b! : a!;
+  }
+  if (Number.isFinite(bMs)) return b!;
+  if (Number.isFinite(aMs)) return a!;
+  return new Date().toISOString();
+}
+
 function buildEnrichedDefaultCatalog(): AutomotiveKnowledgeCatalog {
   const compiled = unifiedOemCompiledJson as unknown as {
+    generatedAt?: string;
     manufacturers: ManufacturerRecord[];
     vehicleModelRecords: VehicleModelRecord[];
     knowledgeIndexEntries: RepairReferenceRecord[];
   };
 
-  const manufacturerSlugs = new Set(INITIAL_AUTOMOTIVE_CATALOG.manufacturers.map((m) => m.slug.toLowerCase()));
-  const mergedManufacturers: ManufacturerRecord[] = [...INITIAL_AUTOMOTIVE_CATALOG.manufacturers];
-  for (const m of compiled.manufacturers || []) {
-    if (!manufacturerSlugs.has(m.slug.toLowerCase())) {
-      mergedManufacturers.push(m);
-      manufacturerSlugs.add(m.slug.toLowerCase());
-    }
-  }
+  const mergedMfg = mergeOemManufacturersDeduplicated(
+    INITIAL_AUTOMOTIVE_CATALOG.manufacturers,
+    compiled.manufacturers || []
+  );
 
-  const vehicleIds = new Set(INITIAL_AUTOMOTIVE_CATALOG.vehicles.map((v) => v.id));
-  const mergedVehicles: VehicleModelRecord[] = [...INITIAL_AUTOMOTIVE_CATALOG.vehicles];
-  for (const v of compiled.vehicleModelRecords || []) {
-    if (!vehicleIds.has(v.id)) {
-      mergedVehicles.push(v);
-      vehicleIds.add(v.id);
-    }
-  }
-
-  const refIds = new Set(INITIAL_AUTOMOTIVE_CATALOG.repairReferences.map((r) => r.id));
-  const mergedRefs: RepairReferenceRecord[] = [...INITIAL_AUTOMOTIVE_CATALOG.repairReferences];
-  for (const r of compiled.knowledgeIndexEntries || []) {
-    if (!refIds.has(r.id)) {
-      mergedRefs.push(r);
-      refIds.add(r.id);
-    }
-  }
-
-  const verifiedCount = mergedRefs.filter((r) => r.verified).length;
-
-  return {
+  return deduplicateCatalog({
     ...INITIAL_AUTOMOTIVE_CATALOG,
-    manufacturers: mergedManufacturers,
-    vehicles: mergedVehicles,
-    repairReferences: mergedRefs,
-    statistics: {
-      manufacturerCount: mergedManufacturers.length,
-      vehicleCount: mergedVehicles.length,
-      referenceCount: mergedRefs.length,
-      verifiedCount,
-      unverifiedCount: mergedRefs.length - verifiedCount,
-    },
-  };
+    generatedAt: pickLatestIsoTimestamp(
+      INITIAL_AUTOMOTIVE_CATALOG.generatedAt,
+      compiled.generatedAt
+    ),
+    manufacturers: mergedMfg.manufacturers,
+    vehicles: [
+      ...INITIAL_AUTOMOTIVE_CATALOG.vehicles,
+      ...(compiled.vehicleModelRecords || []),
+    ],
+    repairReferences: [
+      ...INITIAL_AUTOMOTIVE_CATALOG.repairReferences,
+      ...(compiled.knowledgeIndexEntries || []),
+    ],
+  });
+}
+
+function mergeWithBundledDefaults(
+  stored: AutomotiveKnowledgeCatalog
+): AutomotiveKnowledgeCatalog {
+  const defaults = buildEnrichedDefaultCatalog();
+  return deduplicateCatalog({
+    ...defaults,
+    ...stored,
+    generatedAt: pickLatestIsoTimestamp(stored.generatedAt, defaults.generatedAt),
+    manufacturers: [...(stored.manufacturers || []), ...defaults.manufacturers],
+    vehicles: [...(stored.vehicles || []), ...defaults.vehicles],
+    repairReferences: [...(stored.repairReferences || []), ...defaults.repairReferences],
+    systems:
+      stored.systems && stored.systems.length > 0 ? stored.systems : defaults.systems,
+  });
+}
+
+export function resetAutomotiveKnowledgeCatalogCache(): void {
+  cachedCatalog = null;
 }
 
 export function loadAutomotiveKnowledgeCatalog(): AutomotiveKnowledgeCatalog {
@@ -78,8 +94,9 @@ export function loadAutomotiveKnowledgeCatalog(): AutomotiveKnowledgeCatalog {
       if (raw) {
         const parsed = JSON.parse(raw) as AutomotiveKnowledgeCatalog;
         if (parsed && parsed.repairReferences && parsed.vehicles) {
-          cachedCatalog = parsed;
-          return parsed;
+          const synced = mergeWithBundledDefaults(parsed);
+          cachedCatalog = synced;
+          return synced;
         }
       }
     }
@@ -92,10 +109,11 @@ export function loadAutomotiveKnowledgeCatalog(): AutomotiveKnowledgeCatalog {
 }
 
 export function saveAutomotiveKnowledgeCatalog(catalog: AutomotiveKnowledgeCatalog): void {
-  cachedCatalog = catalog;
+  const deduplicated = deduplicateCatalog(catalog);
+  cachedCatalog = deduplicated;
   try {
     if (typeof window !== 'undefined' && window.localStorage) {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(catalog));
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(deduplicated));
     }
   } catch (err) {
     console.error('Failed to persist automotive knowledge catalog to localStorage:', err);
@@ -123,9 +141,11 @@ export function searchAutomotiveKnowledge(filter: KnowledgeSearchFilter): Scored
   const q = (filter.query || '').toLowerCase().trim();
   const makeFilter = (filter.make || '').toLowerCase().trim();
   const modelFilter = (filter.model || '').toLowerCase().trim();
-  const systemFilter = filter.systemCategoryId
-    ? normalizeSystemCategory(String(filter.systemCategoryId)) || filter.systemCategoryId
-    : null;
+  const rawSystemCategory = (filter.systemCategoryId ? String(filter.systemCategoryId) : '').trim();
+  const systemFilter =
+    rawSystemCategory && rawSystemCategory.toLowerCase() !== 'all'
+      ? normalizeSystemCategory(rawSystemCategory) || rawSystemCategory
+      : null;
 
   const tokens = q.split(/\s+/).filter(Boolean);
 
@@ -250,15 +270,110 @@ export function exportCatalogToJson(): string {
   return JSON.stringify(catalog, null, 2);
 }
 
-export function importCatalogFromJson(jsonString: string): { success: boolean; error?: string; count?: number } {
+export interface CatalogImportResult {
+  success: boolean;
+  error?: string;
+  count?: number;
+  addedManufacturers?: number;
+  addedReferences?: number;
+  duplicatesSkipped?: number;
+}
+
+export function importCatalogFromJson(jsonString: string): CatalogImportResult {
   try {
     const parsed = JSON.parse(jsonString) as AutomotiveKnowledgeCatalog;
     if (!parsed || !Array.isArray(parsed.repairReferences) || !Array.isArray(parsed.vehicles)) {
       return { success: false, error: 'Invalid JSON schema: missing repairReferences or vehicles array.' };
     }
-    saveAutomotiveKnowledgeCatalog(parsed);
-    return { success: true, count: parsed.repairReferences.length };
+
+    const current = loadAutomotiveKnowledgeCatalog();
+    const beforeMfgCount = current.manufacturers.length;
+    const beforeRefCount = current.repairReferences.length;
+
+    const merged = deduplicateCatalog({
+      ...current,
+      ...parsed,
+      generatedAt: pickLatestIsoTimestamp(current.generatedAt, parsed.generatedAt),
+      manufacturers: [...current.manufacturers, ...(parsed.manufacturers || [])],
+      vehicles: [...current.vehicles, ...parsed.vehicles],
+      repairReferences: [...current.repairReferences, ...parsed.repairReferences],
+      systems:
+        parsed.systems && parsed.systems.length > 0 ? parsed.systems : current.systems,
+    });
+
+    const addedManufacturers = Math.max(0, merged.manufacturers.length - beforeMfgCount);
+    const addedReferences = Math.max(0, merged.repairReferences.length - beforeRefCount);
+    const incomingTotal =
+      (parsed.manufacturers?.length || 0) + parsed.repairReferences.length;
+    const duplicatesSkipped = Math.max(
+      0,
+      incomingTotal - (addedManufacturers + addedReferences)
+    );
+
+    saveAutomotiveKnowledgeCatalog(merged);
+    return {
+      success: true,
+      count: merged.repairReferences.length,
+      addedManufacturers,
+      addedReferences,
+      duplicatesSkipped,
+    };
   } catch (err) {
     return { success: false, error: String(err) };
+  }
+}
+
+export interface CsvOemImportResult {
+  success: boolean;
+  error?: string;
+  addedCount: number;
+  duplicateCount: number;
+  ignoredNonOemCount: number;
+  totalManufacturers: number;
+}
+
+export function importOemManufacturersFromCsv(csvText: string): CsvOemImportResult {
+  try {
+    const parsed = parseStartMyCarOemCsv(csvText);
+    if (parsed.validOemLinksFound === 0) {
+      return {
+        success: false,
+        error: 'No valid StartMyCar OEM manufacturer links (/pickmodel) found in CSV.',
+        addedCount: 0,
+        duplicateCount: 0,
+        ignoredNonOemCount: parsed.ignoredNonOemRows,
+        totalManufacturers: loadAutomotiveKnowledgeCatalog().manufacturers.length,
+      };
+    }
+
+    const current = loadAutomotiveKnowledgeCatalog();
+    const mergeResult = mergeOemManufacturersDeduplicated(
+      current.manufacturers,
+      parsed.manufacturers
+    );
+
+    const updatedCatalog: AutomotiveKnowledgeCatalog = {
+      ...current,
+      generatedAt: new Date().toISOString(),
+      manufacturers: mergeResult.manufacturers,
+    };
+    saveAutomotiveKnowledgeCatalog(updatedCatalog);
+
+    return {
+      success: true,
+      addedCount: mergeResult.addedCount,
+      duplicateCount: parsed.inFileDuplicatesSkipped + mergeResult.duplicateCount,
+      ignoredNonOemCount: parsed.ignoredNonOemRows,
+      totalManufacturers: mergeResult.totalCount,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      error: String(err),
+      addedCount: 0,
+      duplicateCount: 0,
+      ignoredNonOemCount: 0,
+      totalManufacturers: loadAutomotiveKnowledgeCatalog().manufacturers.length,
+    };
   }
 }

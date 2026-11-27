@@ -5,12 +5,13 @@
 
 import { getApp, getApps, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
-import firebaseConfig from '../../firebase-applet-config.json';
+import { resolveFirebaseProjectId } from '../server/services/firebaseAuthMiddleware';
+
+const resolvedProjectId =
+  resolveFirebaseProjectId() || process.env.GOOGLE_CLOUD_PROJECT || undefined;
 
 const adminApp = getApps().length
   ? getApp()
-  : initializeApp({
-      projectId: firebaseConfig.projectId,
-    });
+  : initializeApp(resolvedProjectId ? { projectId: resolvedProjectId } : undefined);
 
 export const adminAuth = getAuth(adminApp);

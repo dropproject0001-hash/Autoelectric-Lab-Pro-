@@ -196,15 +196,106 @@ export interface FirestoreConnectionCheckResult {
   reachable: boolean;
   offline: boolean;
   permissionDenied: boolean;
+  quotaExceeded: boolean;
+  databaseId: string;
   errorMessage?: string;
 }
 
+export interface FirebaseTargetSummary {
+  configured: boolean;
+  projectId: string;
+  authDomain: string;
+  firestoreDatabaseId: string;
+  storageBucket: string;
+  currentHostname: string;
+  consoleAuthorizedDomainsUrl: string | null;
+  consoleFirestoreUrl: string | null;
+  consoleQuotaUpgradeUrl: string | null;
+}
+
+export interface VerifiedAuthUserResult {
+  authenticated: boolean;
+  emailVerified: boolean;
+  user: FirebaseCurrentUserSnapshot | null;
+  reason?: 'UNAUTHENTICATED' | 'EMAIL_NOT_VERIFIED';
+}
+
+const SAFE_PROJECT_ID_PATTERN = /^[a-z0-9-]+$/;
+
+/**
+ * Returns a safe, sanitized summary of the active Firebase project, custom Firestore database,
+ * current browser hostname, and direct Firebase Console remediation links.
+ */
+export function getFirebaseTargetSummary(hostnameOverride?: string): FirebaseTargetSummary {
+  const projectId = resolvedFirebaseConfig.projectId || '';
+  const firestoreDatabaseId = resolvedFirebaseConfig.firestoreDatabaseId || '(default)';
+  const currentHostname =
+    hostnameOverride ||
+    (typeof window !== 'undefined' && window.location?.hostname
+      ? window.location.hostname
+      : 'localhost');
+  const hasSafeProject = Boolean(projectId && SAFE_PROJECT_ID_PATTERN.test(projectId));
+  const safeDbEncoded = encodeURIComponent(firestoreDatabaseId);
+
+  return {
+    configured: isFirebaseConfigured,
+    projectId,
+    authDomain: resolvedFirebaseConfig.authDomain || '',
+    firestoreDatabaseId,
+    storageBucket: resolvedFirebaseConfig.storageBucket || '',
+    currentHostname,
+    consoleAuthorizedDomainsUrl: hasSafeProject
+      ? `https://console.firebase.google.com/project/${projectId}/authentication/settings`
+      : null,
+    consoleFirestoreUrl: hasSafeProject
+      ? `https://console.firebase.google.com/project/${projectId}/firestore/databases/${safeDbEncoded}/data`
+      : null,
+    consoleQuotaUpgradeUrl: hasSafeProject
+      ? `https://console.firebase.google.com/project/${projectId}/firestore/databases/${safeDbEncoded}/data?openUpgradeDialog=true`
+      : null,
+  };
+}
+
+/**
+ * Verifies whether the active Firebase Auth session satisfies our hardened Firestore security rules
+ * (authenticated user with a verified email address).
+ */
+export function getVerifiedAuthUser(
+  authHandle: Auth | FirebaseAuthHandle = auth
+): VerifiedAuthUserResult {
+  const currentUser = authHandle?.currentUser ?? null;
+  if (!currentUser || !currentUser.uid) {
+    return {
+      authenticated: false,
+      emailVerified: false,
+      user: null,
+      reason: 'UNAUTHENTICATED',
+    };
+  }
+  if (!currentUser.emailVerified) {
+    return {
+      authenticated: true,
+      emailVerified: false,
+      user: currentUser,
+      reason: 'EMAIL_NOT_VERIFIED',
+    };
+  }
+  return {
+    authenticated: true,
+    emailVerified: true,
+    user: currentUser,
+  };
+}
+
 export async function validateFirestoreConnection(): Promise<FirestoreConnectionCheckResult> {
+  const databaseId = resolvedFirebaseConfig.firestoreDatabaseId || '(default)';
   if (!isFirebaseConfigured || !firestoreInstance) {
     return {
       reachable: false,
       offline: false,
       permissionDenied: false,
+      quotaExceeded: false,
+      databaseId,
       errorMessage: 'Firebase is not configured for this environment.',
     };
   }
@@ -214,6 +305,8 @@ export async function validateFirestoreConnection(): Promise<FirestoreConnection
       reachable: true,
       offline: false,
       permissionDenied: false,
+      quotaExceeded: false,
+      databaseId,
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -227,6 +320,22 @@ export async function validateFirestoreConnection(): Promise<FirestoreConnection
         reachable: false,
         offline: true,
         permissionDenied: false,
+        quotaExceeded: false,
+        databaseId,
+        errorMessage: message,
+      };
+    }
+    if (
+      code === 'resource-exhausted' ||
+      message.includes('Quota exceeded') ||
+      message.includes('Free daily read units')
+    ) {
+      return {
+        reachable: false,
+        offline: false,
+        permissionDenied: false,
+        quotaExceeded: true,
+        databaseId,
         errorMessage: message,
       };
     }
@@ -235,17 +344,21 @@ export async function validateFirestoreConnection(): Promise<FirestoreConnection
       message.includes('Missing or insufficient permissions') ||
       message.includes('permission-denied')
     ) {
-      // Expected against default-deny /test/connection rule: proves Firestore server is reachable
+      // Expected against default-deny /test/connection rule: proves custom Firestore server is reachable
       return {
         reachable: true,
         offline: false,
         permissionDenied: true,
+        quotaExceeded: false,
+        databaseId,
       };
     }
     return {
       reachable: false,
       offline: false,
       permissionDenied: false,
+      quotaExceeded: false,
+      databaseId,
       errorMessage: message,
     };
   }

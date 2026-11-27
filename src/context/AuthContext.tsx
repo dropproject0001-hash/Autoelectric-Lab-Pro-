@@ -10,7 +10,7 @@ import {
   signOut,
   type User,
 } from 'firebase/auth';
-import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 import {
   db,
   firebaseAuth,
@@ -86,17 +86,14 @@ async function ensureUserProfileDocument(user: User): Promise<void> {
   try {
     const existingSnap = await getDoc(profileRef);
     if (existingSnap.exists()) {
-      const existingData = existingSnap.data();
       const updatePayload: Record<string, unknown> = {
-        uid: user.uid,
         email: cleanEmail,
-        createdAt: existingData?.createdAt ?? serverTimestamp(),
         updatedAt: serverTimestamp(),
       };
       if (cleanDisplayName !== undefined) {
         updatePayload.displayName = cleanDisplayName;
       }
-      await setDoc(profileRef, updatePayload);
+      await updateDoc(profileRef, updatePayload);
     } else {
       const createPayload: Record<string, unknown> = {
         uid: user.uid,

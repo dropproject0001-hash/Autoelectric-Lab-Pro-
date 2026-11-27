@@ -3,26 +3,32 @@
  * Copyright (c) 2026 RMATi- Ruben Modern Auto-motive-electrical Technology innovations
  */
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertTriangle,
+  Check,
   CheckCircle2,
   ChevronDown,
   ChevronUp,
+  Copy,
   Database,
+  ExternalLink,
   Info,
   LogIn,
   RefreshCw,
   ShieldCheck,
+  Wrench,
   XCircle,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { getFirebaseTargetSummary } from '../lib/firebase';
 import {
-  FullConnectionHealthSnapshot,
+  buildFirebaseFixGuideItems,
+  type FullConnectionHealthSnapshot,
   runConnectionHealthDiagnostics,
 } from '../services/connectionHealthClient';
 import {
-  CloudSyncStatusSnapshot,
+  type CloudSyncStatusSnapshot,
   getSyncStatusSnapshot,
   subscribeSyncStatus,
 } from '../services/benchStorageService';
@@ -118,16 +124,18 @@ export function formatCloudSqlErrorDetails(
 }
 
 export const ConnectionHealthWidget: React.FC = () => {
-  const { user, authReady, isSigningIn, signInWithGoogle } = useAuth();
+  const { user, authReady, isSigningIn, authErrorDetails, signInWithGoogle } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [dbPulseActive, setDbPulseActive] = useState(false);
   const [showErrorTooltip, setShowErrorTooltip] = useState(false);
+  const [copiedHostname, setCopiedHostname] = useState(false);
   const [snapshot, setSnapshot] = useState<FullConnectionHealthSnapshot | null>(null);
   const [syncStatus, setSyncStatus] = useState<CloudSyncStatusSnapshot>(() =>
     getSyncStatusSnapshot()
   );
   const pulseTimeoutRef = useRef<number | null>(null);
+  const copyTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     return subscribeSyncStatus(setSyncStatus);
@@ -135,8 +143,9 @@ export const ConnectionHealthWidget: React.FC = () => {
 
   useEffect(() => {
     return () => {
-      if (pulseTimeoutRef.current !== null && typeof window !== 'undefined') {
-        window.clearTimeout(pulseTimeoutRef.current);
+      if (typeof window !== 'undefined') {
+        if (pulseTimeoutRef.current !== null) window.clearTimeout(pulseTimeoutRef.current);
+        if (copyTimeoutRef.current !== null) window.clearTimeout(copyTimeoutRef.current);
       }
     };
   }, []);
@@ -170,10 +179,48 @@ export const ConnectionHealthWidget: React.FC = () => {
     void runProbe();
   }, [authReady, user?.uid, runProbe]);
 
+  const firebaseTarget = useMemo(
+    () => snapshot?.firebaseTarget ?? getFirebaseTargetSummary(),
+    [snapshot]
+  );
+
+  const fixGuideItems = useMemo(
+    () => buildFirebaseFixGuideItems(snapshot, authErrorDetails),
+    [snapshot, authErrorDetails]
+  );
+
+  const handleCopyHostname = useCallback(async () => {
+    const hostname = firebaseTarget.currentHostname;
+    if (!hostname) return;
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(hostname);
+      }
+      setCopiedHostname(true);
+      if (typeof window !== 'undefined') {
+        if (copyTimeoutRef.current !== null) window.clearTimeout(copyTimeoutRef.current);
+        copyTimeoutRef.current = window.setTimeout(() => setCopiedHostname(false), 2000);
+      }
+    } catch {
+      setCopiedHostname(false);
+    }
+  }, [firebaseTarget.currentHostname]);
+
   const isRealtimeDbActivity =
     isChecking || dbPulseActive || syncStatus.state === 'SYNCING';
 
-  const overallTone = isChecking && !snapshot ? 'CHECKING' : snapshot?.overall || 'CHECKING';
+  const hasCriticalAuthError = Boolean(
+    authErrorDetails &&
+      authErrorDetails.code !== 'auth/popup-closed-by-user' &&
+      authErrorDetails.code !== 'auth/cancelled-popup-request'
+  );
+
+  const overallTone = isChecking && !snapshot
+    ? 'CHECKING'
+    : hasCriticalAuthError
+      ? 'DEGRADED'
+      : snapshot?.overall || 'CHECKING';
+
   const errorDetails = formatCloudSqlErrorDetails(snapshot);
 
   const statusDotClass =
@@ -194,11 +241,13 @@ export const ConnectionHealthWidget: React.FC = () => {
 
   const authShort = !snapshot
     ? '...'
-    : snapshot.firebaseAuth.signedIn
-      ? snapshot.firebaseAuth.serverTokenVerified
-        ? 'OK'
-        : 'CLIENT'
-      : 'GUEST';
+    : hasCriticalAuthError
+      ? 'FIX'
+      : snapshot.firebaseAuth.signedIn
+        ? snapshot.firebaseAuth.serverTokenVerified
+          ? 'OK'
+          : 'CLIENT'
+        : 'GUEST';
 
   const pgShort = !snapshot
     ? '...'
@@ -229,7 +278,7 @@ export const ConnectionHealthWidget: React.FC = () => {
           setIsExpanded((prev) => !prev);
         }}
         aria-expanded={isExpanded}
-        title="Verify Firebase Auth, Cloud SQL PostgreSQL ping, and Cloud Firestore connection health"
+        title="Inspect Firebase project, custom Firestore database, auth status, and Fix Guide"
         className={`hw-btn flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-mono transition cursor-pointer whitespace-nowrap ${
           isExpanded ? 'hw-btn-blue' : 'text-[#d9e8fa]'
         }`}
@@ -265,9 +314,11 @@ export const ConnectionHealthWidget: React.FC = () => {
             className={
               authShort === 'OK'
                 ? 'text-[#20d889]'
-                : authShort === 'GUEST'
-                  ? 'text-[#ffb020]'
-                  : 'text-[#19c8f5]'
+                : authShort === 'FIX'
+                  ? 'text-[#ff4d62]'
+                  : authShort === 'GUEST'
+                    ? 'text-[#ffb020]'
+                    : 'text-[#19c8f5]'
             }
           >
             {authShort}
@@ -348,7 +399,7 @@ export const ConnectionHealthWidget: React.FC = () => {
                   <AlertTriangle className="w-3.5 h-3.5 text-[#ff4d62] shrink-0" />
                   <span>{errorDetails.headline}</span>
                 </span>
-                <span className="px-1.5 py-0.5 rounded bg-rose-950 border border-rose-500/50 text-[9px] text-rose-200">
+                <span className="text-[9.5px] font-bold text-rose-200 uppercase">
                   {errorDetails.errorCode}
                 </span>
               </div>
@@ -367,24 +418,25 @@ export const ConnectionHealthWidget: React.FC = () => {
         </div>
       )}
 
-      {/* Expandable Upward Connection Health Diagnostic Popover */}
+      {/* Expandable Upward Firebase Status & Fix Guide Popover */}
       {isExpanded && (
         <div
           role="region"
           data-testid="connection-health-popover"
-          aria-label="Firebase Auth & Database Connection Health Diagnostics"
-          className="fixed sm:absolute bottom-14 sm:bottom-full left-2 right-2 sm:left-auto sm:right-0 mb-0 sm:mb-2 sm:w-[420px] max-h-[75dvh] overflow-y-auto hud-panel border-[#203653] rounded-xl p-3 shadow-2xl z-50 text-[11px] font-mono text-[#eaf3ff]"
+          aria-label="Firebase Status, Database Connection Health & Fix Guide"
+          className="fixed sm:absolute bottom-14 sm:bottom-full left-2 right-2 sm:left-auto sm:right-0 mb-0 sm:mb-2 sm:w-[440px] max-h-[78dvh] overflow-y-auto bg-[#0a1220] border border-[#203653] rounded-xl p-3 shadow-2xl z-50 text-[11px] font-mono text-[#eaf3ff]"
         >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-[#203653] pb-2 mb-2.5 gap-2">
             <div className="flex items-center gap-1.5 min-w-0">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#19c8f5] shrink-0" />
+              <ShieldCheck className="w-3.5 h-3.5 text-[#19c8f5] shrink-0" aria-hidden="true" />
               <span className="font-hud text-xs font-bold tracking-wider text-[#eaf3ff] uppercase truncate">
-                Auth &amp; Database Connection Health
+                Firebase Status &amp; Fix Guide
               </span>
             </div>
             <button
               type="button"
+              data-testid="firebase-reping-btn"
               onClick={() => void runProbe()}
               disabled={isChecking}
               className="hw-btn px-2 py-0.5 rounded-md text-[10px] text-[#19c8f5] hover:text-white flex items-center gap-1 transition cursor-pointer disabled:opacity-50 shrink-0"
@@ -399,23 +451,137 @@ export const ConnectionHealthWidget: React.FC = () => {
           </div>
 
           <div className="space-y-2">
+            {/* Active Firebase Target Metadata Block */}
+            <div
+              data-testid="firebase-active-target"
+              className="rounded-lg border border-[#203653] bg-[#050a14] p-2.5 space-y-1.5"
+            >
+              <div className="flex items-center justify-between gap-2 border-b border-[#203653]/70 pb-1">
+                <span className="text-[10px] uppercase tracking-wider text-[#8fa7c7] font-semibold">
+                  Active Firebase Target
+                </span>
+                <span
+                  className={`inline-flex items-center gap-1 text-[10px] font-bold ${
+                    firebaseTarget.configured ? 'text-[#20d889]' : 'text-[#ff4d62]'
+                  }`}
+                >
+                  {firebaseTarget.configured ? (
+                    <>
+                      <CheckCircle2 className="w-3 h-3" aria-hidden="true" /> CONFIGURED
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="w-3 h-3" aria-hidden="true" /> UNCONFIGURED
+                    </>
+                  )}
+                </span>
+              </div>
+
+              <dl className="grid grid-cols-[88px_1fr] gap-y-1 gap-x-2 text-[10px] tabular-nums">
+                <dt className="text-[#8fa7c7]">Project ID</dt>
+                <dd
+                  data-testid="firebase-target-project-id"
+                  className="text-[#eaf3ff] font-semibold truncate"
+                  title={firebaseTarget.projectId}
+                >
+                  {firebaseTarget.projectId || 'Not set'}
+                </dd>
+
+                <dt className="text-[#8fa7c7]">Firestore DB</dt>
+                <dd
+                  data-testid="firebase-target-database-id"
+                  className="text-[#19c8f5] font-semibold truncate"
+                  title={firebaseTarget.firestoreDatabaseId}
+                >
+                  {firebaseTarget.firestoreDatabaseId || '(default)'}
+                </dd>
+
+                <dt className="text-[#8fa7c7]">Auth Domain</dt>
+                <dd
+                  className="text-slate-300 truncate"
+                  title={firebaseTarget.authDomain}
+                >
+                  {firebaseTarget.authDomain || 'Not set'}
+                </dd>
+
+                <dt className="text-[#8fa7c7]">Preview Host</dt>
+                <dd
+                  data-testid="firebase-target-hostname"
+                  className="text-slate-200 truncate"
+                  title={firebaseTarget.currentHostname}
+                >
+                  {firebaseTarget.currentHostname}
+                </dd>
+              </dl>
+
+              <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-[#203653]/70">
+                <button
+                  type="button"
+                  data-testid="copy-firebase-hostname-btn"
+                  onClick={() => void handleCopyHostname()}
+                  className="hw-btn px-2 py-0.5 rounded-md text-[10px] text-slate-200 hover:text-white inline-flex items-center gap-1 cursor-pointer transition-colors"
+                >
+                  {copiedHostname ? (
+                    <>
+                      <Check className="w-3 h-3 text-[#20d889]" aria-hidden="true" />
+                      <span className="text-[#20d889]">Copied Hostname</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3 h-3 text-[#19c8f5]" aria-hidden="true" />
+                      <span>Copy Hostname</span>
+                    </>
+                  )}
+                </button>
+
+                {firebaseTarget.consoleAuthorizedDomainsUrl && (
+                  <a
+                    href={firebaseTarget.consoleAuthorizedDomainsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-testid="open-authorized-domains-link"
+                    className="hw-btn px-2 py-0.5 rounded-md text-[10px] text-[#19c8f5] hover:text-white inline-flex items-center gap-1 transition-colors"
+                  >
+                    <ExternalLink className="w-3 h-3" aria-hidden="true" />
+                    <span>Authorized Domains</span>
+                  </a>
+                )}
+
+                {firebaseTarget.consoleFirestoreUrl && (
+                  <a
+                    href={firebaseTarget.consoleFirestoreUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hw-btn px-2 py-0.5 rounded-md text-[10px] text-slate-300 hover:text-white inline-flex items-center gap-1 transition-colors"
+                  >
+                    <ExternalLink className="w-3 h-3" aria-hidden="true" />
+                    <span>Firestore Console</span>
+                  </a>
+                )}
+              </div>
+            </div>
+
             {/* 1. Firebase Authentication Card */}
-            <div className="hw-lcd-well rounded-lg p-2.5 space-y-1.5">
+            <div className="rounded-lg border border-[#203653] bg-[#050a14] p-2.5 space-y-1.5">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[10px] uppercase tracking-wider text-[#91a4bd] font-semibold">
+                <span className="text-[10px] uppercase tracking-wider text-[#8fa7c7] font-semibold">
                   1. Firebase Authentication
                 </span>
-                {snapshot?.firebaseAuth.signedIn && snapshot.firebaseAuth.serverTokenVerified ? (
+                {hasCriticalAuthError ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#ff4d62]">
+                    <XCircle className="w-3 h-3" aria-hidden="true" /> ACTION REQUIRED
+                  </span>
+                ) : snapshot?.firebaseAuth.signedIn && snapshot.firebaseAuth.serverTokenVerified ? (
                   <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#20d889]">
-                    <CheckCircle2 className="w-3 h-3" /> VERIFIED
+                    <CheckCircle2 className="w-3 h-3" aria-hidden="true" /> VERIFIED
                   </span>
                 ) : snapshot?.firebaseAuth.signedIn ? (
                   <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#19c8f5]">
-                    <CheckCircle2 className="w-3 h-3" /> SIGNED IN
+                    <CheckCircle2 className="w-3 h-3" aria-hidden="true" /> SIGNED IN
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#ffb020]">
-                    <AlertTriangle className="w-3 h-3" /> SIGNED OUT
+                    <AlertTriangle className="w-3 h-3" aria-hidden="true" /> GUEST LOCAL
                   </span>
                 )}
               </div>
@@ -430,7 +596,7 @@ export const ConnectionHealthWidget: React.FC = () => {
                 <div>
                   Server Token:{' '}
                   <strong className={snapshot?.firebaseAuth.serverTokenVerified ? 'text-[#20d889]' : 'text-[#ffb020]'}>
-                    {snapshot?.firebaseAuth.serverTokenVerified ? 'RS256 Valid' : 'Not Verified'}
+                    {snapshot?.firebaseAuth.serverTokenVerified ? 'RS256 Valid' : 'Guest / Local'}
                   </strong>
                 </div>
                 {snapshot?.firebaseAuth.uidMasked && (
@@ -445,7 +611,7 @@ export const ConnectionHealthWidget: React.FC = () => {
               </div>
 
               <p className="text-[10px] font-sans text-slate-400 leading-snug">
-                {snapshot?.firebaseAuth.detail || 'Checking Firebase Auth status...'}
+                {authErrorDetails?.message || snapshot?.firebaseAuth.detail || 'Checking Firebase Auth status...'}
               </p>
 
               {snapshot && !snapshot.firebaseAuth.signedIn && snapshot.firebaseAuth.configured && (
@@ -455,33 +621,68 @@ export const ConnectionHealthWidget: React.FC = () => {
                   disabled={isSigningIn}
                   className="mt-1 hw-btn hw-btn-blue px-2.5 py-1 rounded-md text-[10px] inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                 >
-                  <LogIn className="w-3 h-3" />
+                  <LogIn className="w-3 h-3" aria-hidden="true" />
                   <span>{isSigningIn ? 'Signing in...' : 'Sign in with Google to Verify'}</span>
                 </button>
               )}
             </div>
 
-            {/* 2. Cloud SQL PostgreSQL Ping Card */}
-            <div className="hw-lcd-well rounded-lg p-2.5 space-y-1.5">
+            {/* 2. Active Cloud Firestore Read Ping Card */}
+            <div className="rounded-lg border border-[#203653] bg-[#050a14] p-2.5 space-y-1.5">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[10px] uppercase tracking-wider text-[#91a4bd] font-semibold">
-                  2. Cloud SQL PostgreSQL Ping
+                <span className="text-[10px] uppercase tracking-wider text-[#8fa7c7] font-semibold">
+                  2. Cloud Firestore Target &amp; Rules
                 </span>
-                {snapshot?.cloudSqlPostgres.status === 'CONNECTED' ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#20d889]">
-                    <CheckCircle2 className="w-3 h-3" /> CONNECTED ({snapshot.cloudSqlPostgres.latencyMs}ms)
+                {snapshot?.firestore.status === 'CONNECTED' ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#20d889] tabular-nums">
+                    <CheckCircle2 className="w-3 h-3" aria-hidden="true" /> CONNECTED ({snapshot.firestore.latencyMs}ms)
                   </span>
-                ) : snapshot?.cloudSqlPostgres.status === 'UNREACHABLE' ? (
+                ) : snapshot?.firestore.status === 'UNREACHABLE' ? (
                   <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#ff4d62]">
-                    <XCircle className="w-3 h-3" /> UNREACHABLE
-                  </span>
-                ) : snapshot?.cloudSqlPostgres.status === 'AUTH_REQUIRED' ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#ffb020]">
-                    <AlertTriangle className="w-3 h-3" /> AUTH REQUIRED
+                    <XCircle className="w-3 h-3" aria-hidden="true" /> BLOCKED
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#ffb020]">
-                    <AlertTriangle className="w-3 h-3" /> NOT CONFIGURED
+                    <AlertTriangle className="w-3 h-3" aria-hidden="true" /> {snapshot?.firestore.status || 'CHECKING'}
+                  </span>
+                )}
+              </div>
+
+              <div className="text-[10px] text-slate-300 truncate">
+                Rules Gate:{' '}
+                <strong className="text-slate-100">
+                  {snapshot?.firestore.profileReadVerified
+                    ? 'Verified Owner Read OK'
+                    : 'Verified Email + Owner Scoped'}
+                </strong>
+              </div>
+
+              <p className="text-[10px] font-sans text-slate-400 leading-snug">
+                {snapshot?.firestore.detail || 'Running Firestore getDocFromServer check...'}
+              </p>
+            </div>
+
+            {/* 3. Cloud SQL PostgreSQL Ping Card */}
+            <div className="rounded-lg border border-[#203653] bg-[#050a14] p-2.5 space-y-1.5">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[10px] uppercase tracking-wider text-[#8fa7c7] font-semibold">
+                  3. Cloud SQL PostgreSQL Ping
+                </span>
+                {snapshot?.cloudSqlPostgres.status === 'CONNECTED' ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#20d889] tabular-nums">
+                    <CheckCircle2 className="w-3 h-3" aria-hidden="true" /> CONNECTED ({snapshot.cloudSqlPostgres.latencyMs}ms)
+                  </span>
+                ) : snapshot?.cloudSqlPostgres.status === 'UNREACHABLE' ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#ff4d62]">
+                    <XCircle className="w-3 h-3" aria-hidden="true" /> UNREACHABLE
+                  </span>
+                ) : snapshot?.cloudSqlPostgres.status === 'AUTH_REQUIRED' ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#ffb020]">
+                    <AlertTriangle className="w-3 h-3" aria-hidden="true" /> AUTH REQUIRED
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#ffb020]">
+                    <AlertTriangle className="w-3 h-3" aria-hidden="true" /> NOT CONFIGURED
                   </span>
                 )}
               </div>
@@ -490,7 +691,7 @@ export const ConnectionHealthWidget: React.FC = () => {
                 <div>
                   Runtime Env:{' '}
                   <strong className={snapshot?.cloudSqlPostgres.configured ? 'text-[#20d889]' : 'text-[#ffb020]'}>
-                    {snapshot?.cloudSqlPostgres.configured ? 'SQL_* Set' : 'Not Provisioned'}
+                    {snapshot?.cloudSqlPostgres.configured ? 'SQL_* Set' : 'Auth Needed / Local'}
                   </strong>
                 </div>
                 <div>
@@ -508,41 +709,117 @@ export const ConnectionHealthWidget: React.FC = () => {
               </p>
             </div>
 
-            {/* 3. Active Cloud Firestore Read Ping Card */}
-            <div className="hw-lcd-well rounded-lg p-2.5 space-y-1.5">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[10px] uppercase tracking-wider text-[#91a4bd] font-semibold">
-                  3. Cloud Firestore Server Read
-                </span>
-                {snapshot?.firestore.status === 'CONNECTED' ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#20d889]">
-                    <CheckCircle2 className="w-3 h-3" /> REACHABLE ({snapshot.firestore.latencyMs}ms)
+            {/* Context-Aware Fix Guide */}
+            {fixGuideItems.length > 0 && (
+              <div
+                data-testid="firebase-fix-guide"
+                className="rounded-lg border border-[#203653] bg-[#050a14] p-2.5 space-y-2"
+              >
+                <div className="flex items-center justify-between gap-2 border-b border-[#203653]/70 pb-1">
+                  <span className="text-[10px] uppercase tracking-wider text-[#8fa7c7] font-semibold inline-flex items-center gap-1">
+                    <Wrench className="w-3 h-3 text-[#19c8f5]" aria-hidden="true" />
+                    <span>Context-Aware Fix Guide</span>
                   </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#ffb020]">
-                    <AlertTriangle className="w-3 h-3" /> {snapshot?.firestore.status || 'CHECKING'}
+                  <span className="text-[9.5px] text-slate-400 tabular-nums">
+                    {fixGuideItems.length} {fixGuideItems.length === 1 ? 'item' : 'items'}
                   </span>
-                )}
-              </div>
+                </div>
 
-              <div className="text-[10px] text-slate-300 truncate">
-                DB ID:{' '}
-                <strong className="text-slate-100">
-                  {snapshot?.firestore.databaseId || '(default)'}
-                </strong>
-                {snapshot?.firestore.profileReadVerified && (
-                  <span className="ml-1.5 text-[#20d889]">· Profile Read OK</span>
-                )}
+                <ul className="space-y-2">
+                  {fixGuideItems.map((item) => (
+                    <li
+                      key={item.id}
+                      className={`rounded-md border p-2 space-y-1 ${
+                        item.severity === 'ERROR'
+                          ? 'border-[#ff4d62]/50 bg-rose-950/25'
+                          : item.severity === 'WARNING'
+                            ? 'border-[#ffb020]/45 bg-amber-950/20'
+                            : 'border-[#203653] bg-[#0a1220]'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span
+                          className={`text-[10.5px] font-semibold ${
+                            item.severity === 'ERROR'
+                              ? 'text-[#ff8a98]'
+                              : item.severity === 'WARNING'
+                                ? 'text-[#ffd07a]'
+                                : 'text-[#eaf3ff]'
+                          }`}
+                        >
+                          {item.title}
+                        </span>
+                        <span
+                          className={`text-[9px] font-bold uppercase shrink-0 ${
+                            item.severity === 'ERROR'
+                              ? 'text-[#ff4d62]'
+                              : item.severity === 'WARNING'
+                                ? 'text-[#ffb020]'
+                                : 'text-[#19c8f5]'
+                          }`}
+                        >
+                          {item.severity}
+                        </span>
+                      </div>
+                      <p className="text-[10px] font-sans text-slate-300 leading-snug">
+                        {item.description}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                        {item.actionKind === 'OPEN_AUTH_DOMAINS' && (
+                          <button
+                            type="button"
+                            onClick={() => void handleCopyHostname()}
+                            className="hw-btn px-2 py-0.5 rounded-md text-[10px] text-slate-200 inline-flex items-center gap-1 cursor-pointer"
+                          >
+                            <Copy className="w-3 h-3 text-[#19c8f5]" aria-hidden="true" />
+                            <span>{copiedHostname ? 'Copied!' : 'Copy Hostname'}</span>
+                          </button>
+                        )}
+                        {(item.actionKind === 'OPEN_AUTH_DOMAINS' ||
+                          item.actionKind === 'OPEN_QUOTA_UPGRADE') &&
+                          item.actionUrl && (
+                            <a
+                              href={item.actionUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hw-btn hw-btn-blue px-2 py-0.5 rounded-md text-[10px] inline-flex items-center gap-1"
+                            >
+                              <ExternalLink className="w-3 h-3" aria-hidden="true" />
+                              <span>{item.actionLabel || 'Open Firebase Console'}</span>
+                            </a>
+                          )}
+                        {item.actionKind === 'SIGN_IN' && (
+                          <button
+                            type="button"
+                            onClick={() => void signInWithGoogle()}
+                            disabled={isSigningIn}
+                            className="hw-btn hw-btn-blue px-2 py-0.5 rounded-md text-[10px] inline-flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                          >
+                            <LogIn className="w-3 h-3" aria-hidden="true" />
+                            <span>{isSigningIn ? 'Signing in...' : item.actionLabel || 'Sign In'}</span>
+                          </button>
+                        )}
+                        {item.actionKind === 'REPING' && (
+                          <button
+                            type="button"
+                            onClick={() => void runProbe()}
+                            disabled={isChecking}
+                            className="hw-btn px-2 py-0.5 rounded-md text-[10px] text-[#19c8f5] inline-flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                          >
+                            <RefreshCw className={`w-3 h-3 ${isChecking ? 'animate-spin' : ''}`} aria-hidden="true" />
+                            <span>{item.actionLabel || 'Re-Ping'}</span>
+                          </button>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               </div>
-
-              <p className="text-[10px] font-sans text-slate-400 leading-snug">
-                {snapshot?.firestore.detail || 'Running Firestore getDocFromServer check...'}
-              </p>
-            </div>
+            )}
           </div>
 
-          <div className="mt-2 pt-1.5 border-t border-[#242b36] flex items-center justify-between text-[10px] text-slate-400">
-            <span>On-demand probe · subtle pulse on activity</span>
+          <div className="mt-2 pt-1.5 border-t border-[#203653] flex items-center justify-between text-[10px] text-slate-400">
+            <span>On-demand probe · zero guest 401 noise</span>
             <span className="tabular-nums">Last checked: {errorDetails.checkedAtLabel}</span>
           </div>
         </div>

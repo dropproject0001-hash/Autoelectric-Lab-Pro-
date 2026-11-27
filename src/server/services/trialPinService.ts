@@ -4,7 +4,10 @@
  */
 
 import crypto from 'node:crypto';
-import { isStrictProductionSecrets } from './secretsPolicy';
+import {
+  isStrictProductionSecrets,
+  resolveConfiguredMasterAdminPin,
+} from './secretsPolicy';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -703,7 +706,7 @@ function verifyHmacToken<T>(token: string, expectedPrefix: string): { valid: boo
 // ============================================================================
 
 export function isFirstRunAdminSetupEnabled(): boolean {
-  const envPin = (process.env.VECL_ADMIN_MASTER_PIN || '').trim();
+  const envPin = resolveConfiguredMasterAdminPin().sanitized;
   if (envPin.length > 0) return false;
   if (isStrictProductionSecrets()) return false;
   const explicit = (process.env.VECL_ALLOW_FIRST_RUN_ADMIN_SETUP || '').trim().toLowerCase();
@@ -711,21 +714,45 @@ export function isFirstRunAdminSetupEnabled(): boolean {
   return true;
 }
 
+export type AdminPinPolicyErrorCode =
+  | 'ADMIN_ENV_PIN_TOO_WEAK'
+  | 'LICENSE_HMAC_SECRET_MISSING_OR_WEAK'
+  | null;
+
 export function getAdminPinConfigStatus(): {
   masterEnvConfigured: boolean;
   adminClaimed: boolean;
   setupEnabled: boolean;
   pinInitialized: boolean;
+  strictMode: boolean;
+  envPinPolicyError: AdminPinPolicyErrorCode;
 } {
   ensureTrialStoreLoaded();
-  const envPin = (process.env.VECL_ADMIN_MASTER_PIN || '').trim();
+  const resolvedEnv = resolveConfiguredMasterAdminPin();
+  const envPin = resolvedEnv.sanitized;
   const masterEnvConfigured = envPin.length > 0;
   const adminClaimed = storedAdminCredential !== null;
+  const strictMode = isStrictProductionSecrets();
+
+  let envPinPolicyError: AdminPinPolicyErrorCode = null;
+  if (strictMode) {
+    const hmacSecret = (process.env.VECL_LICENSE_HMAC_SECRET || '').trim();
+    if (masterEnvConfigured && envPin.length < MIN_ENV_ADMIN_PIN_LENGTH_STRICT) {
+      envPinPolicyError = 'ADMIN_ENV_PIN_TOO_WEAK';
+    } else if (hmacSecret.length < 32) {
+      envPinPolicyError = 'LICENSE_HMAC_SECRET_MISSING_OR_WEAK';
+    }
+  } else if (masterEnvConfigured && envPin.length < 4) {
+    envPinPolicyError = 'ADMIN_ENV_PIN_TOO_WEAK';
+  }
+
   return {
     masterEnvConfigured,
     adminClaimed,
     setupEnabled: isFirstRunAdminSetupEnabled() && !adminClaimed,
     pinInitialized: masterEnvConfigured || adminClaimed,
+    strictMode,
+    envPinPolicyError,
   };
 }
 
@@ -734,7 +761,7 @@ export function setupFirstRunAdminPin(
   nowMs = Date.now()
 ): { adminToken: string; expiresAtMs: number } {
   ensureTrialStoreLoaded();
-  const envPin = (process.env.VECL_ADMIN_MASTER_PIN || '').trim();
+  const envPin = resolveConfiguredMasterAdminPin().sanitized;
   if (envPin.length > 0) {
     throw new Error('ADMIN_ENV_MANAGED');
   }
@@ -776,7 +803,7 @@ export function changeClaimedAdminPin(
   nowMs = Date.now()
 ): { adminToken: string; expiresAtMs: number } {
   ensureTrialStoreLoaded();
-  const envPin = (process.env.VECL_ADMIN_MASTER_PIN || '').trim();
+  const envPin = resolveConfiguredMasterAdminPin().sanitized;
   if (envPin.length > 0) {
     throw new Error('ADMIN_ENV_MANAGED');
   }
@@ -823,49 +850,228 @@ export function changeClaimedAdminPin(
   return { adminToken, expiresAtMs };
 }
 
+function classifyTrialAdminPinFormat(
+  value: string
+): 'empty' | 'digits_only' | 'digits_formatted' | 'alphanumeric_or_symbols' {
+  if (!value) return 'empty';
+  if (/^\d+$/.test(value)) return 'digits_only';
+  if (/^\d[\d\s-]*\d$/.test(value)) return 'digits_formatted';
+  return 'alphanumeric_or_symbols';
+}
+
+function emitTrialAdminAuthTrace(trace: Record<string, unknown>): void {
+  // Structured server-only trace: never logs raw PINs, env secrets, salts, or crackable hashes.
+  console.info('[TrialAdminPinAuthTrace]', JSON.stringify(trace));
+}
+
 export function verifyMasterAdminPinAndIssueToken(
   rawPin: string,
   nowMs = Date.now()
 ): { adminToken: string; expiresAtMs: number } {
+  const startedMs = Date.now();
+  const traceId = `tpin_${crypto.randomBytes(4).toString('hex')}`;
   ensureTrialStoreLoaded();
-  const cleaned = normalizeTrialPin(rawPin);
-  if (!cleaned || cleaned.length < 4 || cleaned.length > 64) {
+
+  const rawString = String(rawPin || '');
+  const withoutInvisible = rawString.replace(/[\u200B-\u200D\uFEFF]/g, '');
+  const hadInvisibleChars = withoutInvisible.length !== rawString.length;
+  const trimmedInput = withoutInvisible.trim();
+  const hadOuterWhitespace = trimmedInput.length !== withoutInvisible.length;
+  const cleaned = normalizeTrialPin(trimmedInput);
+  const incomingFormatClass = classifyTrialAdminPinFormat(trimmedInput);
+
+  const resolvedEnv = resolveConfiguredMasterAdminPin();
+  const envPin = resolvedEnv.sanitized;
+  const strictMode = isStrictProductionSecrets();
+  const hmacSecretLen = (process.env.VECL_LICENSE_HMAC_SECRET || '').trim().length;
+  const envSummary = {
+    sourceKey: resolvedEnv.sourceKey,
+    masterEnvConfigured: envPin.length > 0,
+    adminClaimed: storedAdminCredential !== null,
+    strictMode,
+    envRawLen: resolvedEnv.raw.length,
+    envSanitizedLen: envPin.length,
+    envWasSanitized: resolvedEnv.raw !== envPin,
+    envFormatClass: classifyTrialAdminPinFormat(envPin),
+    hmacSecretConfigured: hmacSecretLen > 0,
+    hmacSecretMeetsStrict: hmacSecretLen >= 32,
+  };
+
+  if (!cleaned || cleaned.length < 4 || trimmedInput.length > 128) {
+    emitTrialAdminAuthTrace({
+      traceId,
+      op: 'verifyMasterAdminPinAndIssueToken',
+      envConfig: envSummary,
+      incoming: {
+        rawLen: rawString.length,
+        trimmedLen: trimmedInput.length,
+        normalizedLen: cleaned.length,
+        hadInvisibleChars,
+        hadOuterWhitespace,
+        formatClass: incomingFormatClass,
+      },
+      outcome: 'DENY_INVALID_FORMAT_BOUNDS',
+      elapsedMs: Date.now() - startedMs,
+    });
     throw new Error('INVALID_MASTER_PIN');
   }
 
-  const envPin = (process.env.VECL_ADMIN_MASTER_PIN || '').trim();
+  let comparisonTrace: Record<string, unknown>;
   if (envPin.length > 0) {
-    assertEnvAdminPinStrength(envPin);
-    // Support both exact match (trimmed) and hyphen-stripped numeric match
+    try {
+      assertEnvAdminPinStrength(envPin);
+    } catch (err) {
+      emitTrialAdminAuthTrace({
+        traceId,
+        op: 'verifyMasterAdminPinAndIssueToken',
+        mode: 'env_managed',
+        envConfig: envSummary,
+        outcome: 'DENY_ADMIN_ENV_PIN_TOO_WEAK',
+        elapsedMs: Date.now() - startedMs,
+      });
+      throw err;
+    }
+
+    // Support exact match (trimmed), unquoted sanitized match, and hyphen/space-stripped match
     const normalizedEnv = normalizeTrialPin(envPin);
-    const matchesRaw = constantTimeUtf8DigestEquals(rawPin.trim(), envPin);
+    const matchesSanitized = constantTimeUtf8DigestEquals(trimmedInput, envPin);
+    const rawEnvCompareRan = resolvedEnv.raw.length > 0 && resolvedEnv.raw !== envPin;
+    const matchesRawEnv =
+      rawEnvCompareRan && constantTimeUtf8DigestEquals(trimmedInput, resolvedEnv.raw);
+    const normalizedCompareRan = normalizedEnv.length >= 4;
     const matchesNormalized =
-      normalizedEnv.length >= 4 && constantTimeUtf8DigestEquals(cleaned, normalizedEnv);
-    if (!matchesRaw && !matchesNormalized) {
+      normalizedCompareRan && constantTimeUtf8DigestEquals(cleaned, normalizedEnv);
+    const matched = matchesSanitized || matchesRawEnv || matchesNormalized;
+
+    comparisonTrace = {
+      mode: 'env_managed',
+      algorithm: 'sha256-digest-timingSafeEqual',
+      lengthMatchesSanitized: trimmedInput.length === envPin.length,
+      lengthMatchesNormalized: cleaned.length === normalizedEnv.length,
+      sanitizedDigestMatched: matchesSanitized,
+      rawEnvCompareRan,
+      rawEnvDigestMatched: matchesRawEnv,
+      normalizedCompareRan,
+      normalizedDigestMatched: matchesNormalized,
+      pinComparisonPassed: matched,
+    };
+
+    if (!matched) {
+      emitTrialAdminAuthTrace({
+        traceId,
+        op: 'verifyMasterAdminPinAndIssueToken',
+        envConfig: envSummary,
+        incoming: {
+          rawLen: rawString.length,
+          trimmedLen: trimmedInput.length,
+          normalizedLen: cleaned.length,
+          hadInvisibleChars,
+          hadOuterWhitespace,
+          formatClass: incomingFormatClass,
+        },
+        comparison: comparisonTrace,
+        outcome: 'DENY_ENV_DIGEST_MISMATCH',
+        elapsedMs: Date.now() - startedMs,
+      });
       throw new Error('INVALID_MASTER_PIN');
     }
   } else {
     if (!storedAdminCredential) {
+      emitTrialAdminAuthTrace({
+        traceId,
+        op: 'verifyMasterAdminPinAndIssueToken',
+        mode: 'claimed_scrypt',
+        envConfig: envSummary,
+        outcome: 'DENY_ADMIN_PIN_NOT_INITIALIZED',
+        elapsedMs: Date.now() - startedMs,
+      });
       throw new Error('ADMIN_PIN_NOT_INITIALIZED');
     }
     const candidateHash = crypto
       .scryptSync(`vecl:admin:v1:${cleaned}`, storedAdminCredential.salt, 32)
       .toString('hex');
-    if (!constantTimeHexEquals(candidateHash, storedAdminCredential.scryptHash)) {
+    const scryptMatched = constantTimeHexEquals(candidateHash, storedAdminCredential.scryptHash);
+
+    comparisonTrace = {
+      mode: 'claimed_scrypt',
+      algorithm: 'scrypt-timingSafeEqual',
+      scryptMatched,
+      pinComparisonPassed: scryptMatched,
+    };
+
+    if (!scryptMatched) {
+      emitTrialAdminAuthTrace({
+        traceId,
+        op: 'verifyMasterAdminPinAndIssueToken',
+        envConfig: envSummary,
+        incoming: {
+          rawLen: rawString.length,
+          trimmedLen: trimmedInput.length,
+          normalizedLen: cleaned.length,
+          hadInvisibleChars,
+          hadOuterWhitespace,
+          formatClass: incomingFormatClass,
+        },
+        comparison: comparisonTrace,
+        outcome: 'DENY_CLAIMED_SCRYPT_MISMATCH',
+        elapsedMs: Date.now() - startedMs,
+      });
       throw new Error('INVALID_MASTER_PIN');
     }
   }
 
   const expiresAtMs = nowMs + ADMIN_SESSION_TTL_MS;
-  const adminToken = signHmacToken('vecl_admin_v1', {
-    kind: 'admin_v1',
-    adminId: 'master_pin_admin',
-    jti: crypto.randomBytes(12).toString('hex'),
-    issuedAtMs: nowMs,
-    expiresAtMs,
-  } satisfies AdminSessionTokenPayload);
+  try {
+    const adminToken = signHmacToken('vecl_admin_v1', {
+      kind: 'admin_v1',
+      adminId: 'master_pin_admin',
+      jti: crypto.randomBytes(12).toString('hex'),
+      issuedAtMs: nowMs,
+      expiresAtMs,
+    } satisfies AdminSessionTokenPayload);
 
-  return { adminToken, expiresAtMs };
+    emitTrialAdminAuthTrace({
+      traceId,
+      op: 'verifyMasterAdminPinAndIssueToken',
+      envConfig: envSummary,
+      incoming: {
+        rawLen: rawString.length,
+        trimmedLen: trimmedInput.length,
+        normalizedLen: cleaned.length,
+        hadInvisibleChars,
+        hadOuterWhitespace,
+        formatClass: incomingFormatClass,
+      },
+      comparison: comparisonTrace,
+      hmacTokenMintStatus: 'OK',
+      outcome: 'ALLOW',
+      elapsedMs: Date.now() - startedMs,
+    });
+
+    return { adminToken, expiresAtMs };
+  } catch (err: unknown) {
+    const errMsg = err instanceof Error ? err.message : 'HMAC_SIGN_FAILED';
+    emitTrialAdminAuthTrace({
+      traceId,
+      op: 'verifyMasterAdminPinAndIssueToken',
+      envConfig: envSummary,
+      incoming: {
+        rawLen: rawString.length,
+        trimmedLen: trimmedInput.length,
+        normalizedLen: cleaned.length,
+        hadInvisibleChars,
+        hadOuterWhitespace,
+        formatClass: incomingFormatClass,
+      },
+      comparison: comparisonTrace,
+      hmacTokenMintStatus: errMsg.startsWith('LICENSE_HMAC_SECRET_MISSING_OR_WEAK')
+        ? 'FAILED_LICENSE_HMAC_SECRET_MISSING_OR_WEAK'
+        : 'FAILED_HMAC_SIGN',
+      outcome: 'DENY_POST_MATCH_HMAC_SIGN_FAILED',
+      elapsedMs: Date.now() - startedMs,
+    });
+    throw err;
+  }
 }
 
 export function revokeAdminSessionToken(
@@ -873,7 +1079,12 @@ export function revokeAdminSessionToken(
   nowMs = Date.now()
 ): { revoked: boolean } {
   ensureTrialStoreLoaded();
-  const verified = verifyHmacToken<AdminSessionTokenPayload>(token, 'vecl_admin_v1');
+  let verified: { valid: boolean; payload?: AdminSessionTokenPayload; reason?: string };
+  try {
+    verified = verifyHmacToken<AdminSessionTokenPayload>(token, 'vecl_admin_v1');
+  } catch {
+    return { revoked: false };
+  }
   if (!verified.valid || !verified.payload || verified.payload.kind !== 'admin_v1') {
     return { revoked: false };
   }
@@ -897,10 +1108,43 @@ export function revokeAllAdminSessionTokens(nowMs = Date.now()): { revokedBefore
 export function verifyAdminSessionToken(
   token: string,
   nowMs = Date.now()
-): { valid: boolean; payload?: AdminSessionTokenPayload; code?: 'INVALID_TOKEN' | 'TOKEN_EXPIRED' | 'TOKEN_REVOKED'; error?: string } {
+): {
+  valid: boolean;
+  payload?: AdminSessionTokenPayload;
+  code?: 'INVALID_TOKEN' | 'TOKEN_EXPIRED' | 'TOKEN_REVOKED' | 'LICENSE_HMAC_SECRET_MISSING_OR_WEAK';
+  error?: string;
+} {
   ensureTrialStoreLoaded();
-  const verified = verifyHmacToken<AdminSessionTokenPayload>(token, 'vecl_admin_v1');
+  let verified: { valid: boolean; payload?: AdminSessionTokenPayload; reason?: string };
+  try {
+    verified = verifyHmacToken<AdminSessionTokenPayload>(token, 'vecl_admin_v1');
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : '';
+    if (msg.startsWith('LICENSE_HMAC_SECRET_MISSING_OR_WEAK')) {
+      emitTrialAdminAuthTrace({
+        op: 'verifyAdminSessionToken',
+        strictMode: isStrictProductionSecrets(),
+        outcome: 'DENY_LICENSE_HMAC_SECRET_MISSING_OR_WEAK',
+      });
+      return {
+        valid: false,
+        code: 'LICENSE_HMAC_SECRET_MISSING_OR_WEAK',
+        error:
+          'Server signing secret (VECL_LICENSE_HMAC_SECRET) is missing or under 32 characters in strict production mode.',
+      };
+    }
+    return {
+      valid: false,
+      code: 'INVALID_TOKEN',
+      error: 'Admin session verification failed.',
+    };
+  }
   if (!verified.valid || !verified.payload || verified.payload.kind !== 'admin_v1') {
+    emitTrialAdminAuthTrace({
+      op: 'verifyAdminSessionToken',
+      reason: verified.reason || 'INVALID_TOKEN',
+      outcome: 'DENY_INVALID_TOKEN',
+    });
     return {
       valid: false,
       code: 'INVALID_TOKEN',
@@ -908,6 +1152,10 @@ export function verifyAdminSessionToken(
     };
   }
   if (typeof verified.payload.expiresAtMs !== 'number' || nowMs >= verified.payload.expiresAtMs) {
+    emitTrialAdminAuthTrace({
+      op: 'verifyAdminSessionToken',
+      outcome: 'DENY_TOKEN_EXPIRED',
+    });
     return {
       valid: false,
       code: 'TOKEN_EXPIRED',
@@ -918,6 +1166,10 @@ export function verifyAdminSessionToken(
     (typeof verified.payload.issuedAtMs === 'number' && verified.payload.issuedAtMs < adminSessionMinIssuedAtMs) ||
     (typeof verified.payload.jti === 'string' && revokedAdminTokenExpiries.has(verified.payload.jti))
   ) {
+    emitTrialAdminAuthTrace({
+      op: 'verifyAdminSessionToken',
+      outcome: 'DENY_TOKEN_REVOKED',
+    });
     return {
       valid: false,
       code: 'TOKEN_REVOKED',

@@ -118,6 +118,8 @@ export interface AdminPinConfigStatus {
   adminClaimed: boolean;
   setupEnabled: boolean;
   pinInitialized: boolean;
+  strictMode?: boolean;
+  envPinPolicyError?: 'ADMIN_ENV_PIN_TOO_WEAK' | 'LICENSE_HMAC_SECRET_MISSING_OR_WEAK' | null;
 }
 
 // Keep signed trial & admin tokens strictly in JS memory (never localStorage/sessionStorage)
@@ -324,6 +326,8 @@ export async function fetchAdminPinConfigStatus(): Promise<AdminPinConfigStatus>
       typeof data.pinInitialized === 'boolean'
         ? data.pinInitialized
         : masterEnvConfigured || adminClaimed,
+    strictMode: Boolean(data.strictMode),
+    envPinPolicyError: data.envPinPolicyError ?? null,
   };
 }
 
