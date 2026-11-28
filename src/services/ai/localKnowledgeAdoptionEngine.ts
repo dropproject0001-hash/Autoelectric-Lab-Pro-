@@ -35,12 +35,17 @@ import {
   getAllIngestedVehicleProfiles,
   searchStartMyCarKnowledge,
 } from '../startMyCarKnowledgeService';
+import {
+  getAllOscilloscopeWaveforms,
+  searchOscilloscopeWaveforms,
+} from '../oscilloscopeWaveformKnowledgeService';
 import { listAdaptiveKnowledgeQueue } from './adaptiveKnowledgeEngine';
 import { formatEvidenceHeader } from './evidenceHierarchy';
 import { getLocalAiRuntimeStatus } from './localWebLlmService';
 
 export type KnowledgeAdoptionStore =
   | 'ECU_REPAIR_KB'
+  | 'OSCILLOSCOPE_OEM_WAVEFORMS'
   | 'FUSE_BOX_INFO'
   | 'START_MY_CAR'
   | 'PH_TROUBLE_SCENARIOS'
@@ -105,6 +110,7 @@ export function adoptMultiStoreLocalKnowledge(params: {
   const maxItems = params.maxItems ?? 5;
   const storesQueried: KnowledgeAdoptionStore[] = [
     'ECU_REPAIR_KB',
+    'OSCILLOSCOPE_OEM_WAVEFORMS',
     'FUSE_BOX_INFO',
     'START_MY_CAR',
     'PH_TROUBLE_SCENARIOS',
@@ -157,6 +163,43 @@ export function adoptMultiStoreLocalKnowledge(params: {
         evidenceLevel: 'TECHNICIAN_CONFIRMED',
         score: (dtcMatch ? 95 : 0) + tokenHits.length * 18,
         specsText: topSteps,
+      });
+    }
+  }
+
+  // 1b. OEM Oscilloscope & Sensor Waveforms (118 PicoAuto AGT known-good vs faulty references)
+  const isWaveformOrSensorQuery =
+    /\b(?:oscilloscope|scope|waveform|signal|crankshaft|ckp|camshaft|cmp|hall|inductive|can\s*bus|lin\s*bus|flexray|sent|injector|ignition|coil|spark|maf|air\s*flow|map|manifold|oxygen|lambda|o2|knock|abs|wheel\s*speed|alternator|ripple|compression|throttle|tps|app|egr|vvt|coolant|rail\s*pressure|pwm|faulty|known[\s-]*good)\b/i.test(
+      lowerQuery
+    ) || dtcCodes.length > 0;
+  if (isWaveformOrSensorQuery && (tokens.length > 0 || dtcCodes.length > 0)) {
+    const oscHits = searchOscilloscopeWaveforms({
+      query: dtcCodes.length > 0 ? dtcCodes[0] : query,
+      dtcCode: dtcCodes.length > 0 ? dtcCodes[0] : undefined,
+    }).slice(0, 3);
+    for (const hit of oscHits) {
+      const rec = hit.record;
+      const hay = `${rec.agtCode} ${rec.title} ${rec.subCategory} ${rec.signalFamily} ${rec.knownGood.waveformShape} ${rec.faultyComparison.associatedDtcs.join(' ')}`.toLowerCase();
+      const entityHits = tokens.filter((t) => hay.includes(t));
+      const dtcHit = dtcCodes.some((d) => rec.faultyComparison.associatedDtcs.includes(d));
+      if (!dtcHit && entityHits.length === 0) continue;
+
+      candidates.push({
+        id: `adopt-osc-${rec.agtCode.toLowerCase()}`,
+        store: 'OSCILLOSCOPE_OEM_WAVEFORMS',
+        title: `${rec.title} — Known-Good vs Faulty [${rec.agtCode}]`,
+        summary: rec.faultyComparison.goodVsFaultyDiagnosticRule,
+        sourceDocument: rec.provenance.sourceUrl,
+        pageOrSection: `${rec.category} / ${rec.subCategory} (${rec.agtCode})`,
+        revision: rec.agtCode,
+        evidenceLevel: 'VERIFIED_OEM',
+        score: (dtcHit ? 92 : 62) + hit.score + entityHits.length * 10,
+        specsText: [
+          rec.knownGood.waveformShape,
+          ...rec.knownGood.extractedVoltageSpecs,
+          ...rec.knownGood.extractedFrequencyOrTimingSpecs,
+          ...rec.faultyComparison.associatedDtcs.slice(0, 6),
+        ].join(' '),
       });
     }
   }
@@ -489,11 +532,13 @@ export function runEndToEndCalibrationAudit(): EndToEndCalibrationReport {
   const fbiProfiles = getAllFuseBoxInfoProfiles();
   const smcProfiles = getAllIngestedVehicleProfiles();
   const archiveManuals = getAllArchiveOrgToyotaManuals();
+  const oscWaveforms = getAllOscilloscopeWaveforms();
 
   const storeAudits: StoreDuplicateAuditEntry[] = [
     auditKeys('Catalog Manufacturers (slug)', catalog.manufacturers.map((m) => m.slug.toLowerCase())),
     auditKeys('Catalog Vehicles (id)', catalog.vehicles.map((v) => v.id)),
     auditKeys('Catalog RepairReferences (id)', catalog.repairReferences.map((r) => r.id)),
+    auditKeys('OEM Oscilloscope Waveforms (agtCode)', oscWaveforms.map((w) => w.agtCode)),
     auditKeys(
       'FuseBoxInfo Profiles (make+model+years)',
       fbiProfiles.map(

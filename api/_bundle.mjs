@@ -12598,6 +12598,5499 @@ function buildArchiveOrgToyotaVehicleModels() {
   return [...seen.values()].sort((a, b) => a.model.localeCompare(b.model));
 }
 
+// src/data/oscilloscope/oemOscilloscopeWaveformsCatalog.json
+var oemOscilloscopeWaveformsCatalog_default = {
+  schemaVersion: "1.0.0",
+  sourceSite: "picoauto.com",
+  sourceIndexUrl: "https://www.picoauto.com/library/automotive-guided-tests",
+  generatedAt: "2026-11-28T05:15:08.609Z",
+  zeroFabricationIntegrity: true,
+  totalGuidesDiscovered: 118,
+  totalWaveformsIngested: 118,
+  totalDtcsIndexed: 335,
+  categoriesBreakdown: {
+    sensors: 38,
+    actuators: 25,
+    communication: 10,
+    ignition: 31,
+    "charging-starting": 8,
+    "system-tests": 6
+  },
+  signalFamiliesBreakdown: {
+    CHARGING_STARTING_RIPPLE: 8,
+    ABS_WHEEL_SPEED: 3,
+    PWM_SOLENOID_VALVE: 13,
+    MAF_AIRFLOW: 4,
+    MAP_PRESSURE: 4,
+    CMP_CAMSHAFT: 2,
+    CKP_CRANKSHAFT: 7,
+    TEMP_ECT_IAT: 2,
+    IGNITION_PRIMARY_SECONDARY: 33,
+    KNOCK_SENSOR: 1,
+    O2_LAMBDA_AFR: 8,
+    OTHER_AUTOMOTIVE_SIGNAL: 3,
+    TPS_APP_THROTTLE: 5,
+    INJECTOR_FUEL: 12,
+    CAN_LIN_NETWORK: 10,
+    FUEL_RAIL_PRESSURE: 1,
+    SYSTEM_COMPRESSION_CORRELATION: 2
+  },
+  records: [
+    {
+      id: "osc-pico-agt-001",
+      agtCode: "AGT-001",
+      title: "Alternator voltage and current (12 V)",
+      category: "charging-starting",
+      subCategory: "charging",
+      signalFamily: "CHARGING_STARTING_RIPPLE",
+      systemCategoryId: "electrical_charging",
+      purposeSummary: "The purpose of this test is to assess the charging rate of the alternator in relation to the electrical load on the battery in a 12 V system.",
+      knownGood: {
+        waveformShape: "AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed)",
+        extractedVoltageSpecs: [
+          "12 V",
+          "500 mV"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect PicoScope Channel A to the vehicle battery terminals. \u2192 Connect the high amps clamp to PicoScope Channel B. \u2192 Switch on and zero the high amps clamp before connecting to the battery positive cable. \u2192 Start the engine and run at idle. \u2192 Minimize the help page. You will se\u2026",
+        knownGoodSummary: "Alternator voltage and current output at idle. When the engine is running, an alternator generates electrical energy to supply the vehicle's on-board electrical systems and replace the battery charge consumed during cranking. Accurate ECM controlled charging is essential to the operation of Start-Stop systems, which p\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Typical symptoms of faulty alternator would be:",
+          "Reduced output from winding or diode faults, caused by heat and vibration or the inclusion of moisture into the circuitry.",
+          "Faulty voltage regulators (where applicable) causing alternator output to increase with increasing engine speed.",
+          "Short or open circuits, or high resistances, in the stator windings.",
+          "Short or open circuits, or high resistances, in battery or earth cables and/or connections."
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination.",
+          "Possible engine misfire."
+        ],
+        associatedDtcs: [
+          "P0620",
+          "P0621",
+          "P0622",
+          "P0623",
+          "P0624",
+          "P0625",
+          "P0626"
+        ],
+        goodVsFaultyDiagnosticRule: "[CHARGING_STARTING_RIPPLE] Known-Good: AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed). Expected voltage references: 12 V, 500 mV. Faulty signal deviations to compare: Typical symptoms of faulty alternator would be:; Reduced output from winding or diode faults, caused by heat and vibration or the inclusion of moisture into the circuitry.; Faulty voltage regulators (where applicable) causing alternator output to increase with increasing engine speed.. Typical DTCs: P0620, P0621, P0622, P0623, P0624."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/charging-starting/charging/AGT-001-alternator-voltage-and-current-12-v/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-002",
+      agtCode: "AGT-002",
+      title: "Alternator ripple (without ECM control)",
+      category: "charging-starting",
+      subCategory: "charging",
+      signalFamily: "CHARGING_STARTING_RIPPLE",
+      systemCategoryId: "electrical_charging",
+      purposeSummary: "The purpose of this test is to check the rectification of the alternator output voltage, where the alternator output is not regulated by the Engine Control Module (ECM).",
+      knownGood: {
+        waveformShape: "AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed)",
+        extractedVoltageSpecs: [
+          "500 mV"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect PicoScope Channel A to the alternator B+ terminal. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Start the engine and allow it to idle. \u2192 Start the scope to see live data. \u2192 Switch on ele\u2026",
+        knownGoodSummary: "When the engine is running, an alternator generates electrical energy to supply the vehicle's on-board electrical systems and replace the battery charge consumed during cranking. The alternator converts mechanical rotation to electrical energy by causing a magnetic field to rotate within a fixed set of windings. The c\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Typical symptoms of faulty alternator would be:",
+          "Diode faults, caused by heat and vibration or the inclusion of moisture into the circuitry.",
+          "Short or open circuits, or high resistances, in the stator windings.",
+          "Short or open circuits, or high resistances, in battery or earth cables and/or connections."
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination.",
+          "Possible engine misfire."
+        ],
+        associatedDtcs: [
+          "P0620",
+          "P0621",
+          "P0622",
+          "P0623",
+          "P0624",
+          "P0625",
+          "P0626"
+        ],
+        goodVsFaultyDiagnosticRule: "[CHARGING_STARTING_RIPPLE] Known-Good: AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed). Expected voltage references: 500 mV. Faulty signal deviations to compare: Typical symptoms of faulty alternator would be:; Diode faults, caused by heat and vibration or the inclusion of moisture into the circuitry.; Short or open circuits, or high resistances, in the stator windings.. Typical DTCs: P0620, P0621, P0622, P0623, P0624."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/charging-starting/charging/AGT-002-alternator-ripple-without-ecm-control/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-003",
+      agtCode: "AGT-003",
+      title: "Wheel speed sensor (inductive)",
+      category: "sensors",
+      subCategory: "wheel-speed",
+      signalFamily: "ABS_WHEEL_SPEED",
+      systemCategoryId: "safety_abs_srs",
+      purposeSummary: "The purpose of this test is to evaluate the operation of an inductive Antilock Braking System (ABS) wheel speed sensor.",
+      knownGood: {
+        waveformShape: "AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the wheel speed sensor circuits. \u2192 Connect PicoScope Channel A to the sensor circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Turn the ignition on but do\u2026",
+        knownGoodSummary: "Output from one sensor. Wheel speed sensors provide wheel and road speed feedback to ABS and derivative active vehicle safety systems (i.e. stability and traction control etc.). These systems are designed to provide corrective action (e.g. wheel braking or engine torque limitation) when the vehicle chassis or wheel sp\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Wheel speed sensor circuits and connectors are also prone to the atmosphere and possible electrical failures, such as open or short circuits or high circuit re\u2026"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [
+          "C0000",
+          "C0035",
+          "C0036",
+          "C0040",
+          "C0041",
+          "C0045",
+          "C0046",
+          "C0050",
+          "C0051",
+          "C0221",
+          "C0222",
+          "C0223",
+          "C0225",
+          "C0226",
+          "C0227",
+          "C0229",
+          "C0235",
+          "C0236",
+          "C0237",
+          "C0238",
+          "C0245",
+          "C0300",
+          "C0305"
+        ],
+        goodVsFaultyDiagnosticRule: "[ABS_WHEEL_SPEED] Known-Good: AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed). Faulty signal deviations to compare: Wheel speed sensor circuits and connectors are also prone to the atmosphere and possible electrical failures, such as open or short circuits or high circuit re\u2026. Typical DTCs: C0000, C0035, C0036, C0040, C0041."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/wheel-speed/AGT-003-wheel-speed-sensor-inductive/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-004",
+      agtCode: "AGT-004",
+      title: "Relative compression (gasoline)",
+      category: "charging-starting",
+      subCategory: "starting",
+      signalFamily: "CHARGING_STARTING_RIPPLE",
+      systemCategoryId: "electrical_charging",
+      purposeSummary: "The purpose of this test is to evaluate engine cylinder and starter motor condition from the electrical current drawn by the starter motor during engine cranking.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Disable the vehicle's fuel injection. \u2192 Connect the high amps clamp to PicoScope Channel A. \u2192 Select the highest range and zero the clamp. \u2192 Connect the clamp to either the positive or negative battery lead. \u2192 Minimize the help page. You will see that PicoScope has displayed an\u2026",
+        knownGoodSummary: "The test uses the following property of a Direct Current (DC) starter motor to provide a convenient, non-invasive comparison of engine cylinder compression: With a fixed supply voltage, the current drawn by a DC starter motor is proportional to the load on the motor; when the load increases the current increases. Duri\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [
+          "Compression related issues can cause poor running, misfire and emissions related symptoms. Typical faults that cause compression issues are:"
+        ],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[CHARGING_STARTING_RIPPLE] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/charging-starting/starting/AGT-004-relative-compression-gasoline/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-005",
+      agtCode: "AGT-005",
+      title: "Relative compression (diesel)",
+      category: "charging-starting",
+      subCategory: "starting",
+      signalFamily: "CHARGING_STARTING_RIPPLE",
+      systemCategoryId: "electrical_charging",
+      purposeSummary: "The purpose of this test is to evaluate engine cylinder and starter motor condition from the electrical current drawn by the starter motor during engine cranking.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Disable the vehicle's fuel injection. \u2192 Connect the high amps clamp to PicoScope Channel A. \u2192 Select the highest range and zero the clamp. \u2192 Connect the clamp to either the positive or negative battery lead. \u2192 Minimize the help page. You will see that PicoScope has displayed an\u2026",
+        knownGoodSummary: "The test uses the following property of a Direct Current (DC) starter motor to provide a convenient, non-invasive, comparison of engine cylinder compression: With a fixed supply voltage, the current drawn by a DC starter motor is proportional to the load on the motor; when the load increases the current increases. Dur\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [
+          "Compression related issues can cause poor running, misfire and emissions related symptoms. Typical faults that cause compression issues are:"
+        ],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[CHARGING_STARTING_RIPPLE] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/charging-starting/starting/AGT-005-relative-compression-diesel/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-006",
+      agtCode: "AGT-006",
+      title: "Glow plug system (current)",
+      category: "actuators",
+      subCategory: "glow-plugs",
+      signalFamily: "PWM_SOLENOID_VALVE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the operation of the glow plug power supply circuit.",
+      knownGood: {
+        waveformShape: "Pulse-Width Modulated (PWM) Switched Square Wave",
+        extractedVoltageSpecs: [
+          "12 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the glow plug supply circuit and activation conditions (e.g. ambient and engine temperatures). \u2192 Connect the high amps clamp to PicoScope Channel A \u2192 Switch on and zero the clamp. \u2192 Place the clamp around the glow plug supply circuit. \u2192 Minimi\u2026",
+        knownGoodSummary: "Glow plugs support diesel fuel combustion and emissions control processes. Injected diesel fuel ignites if the cylinder charge temperature reaches 850\xB0 C during compression. However, this temperature may not be achieved with cold ambient air conditions and engine components. In these circumstances, the glow plugs are\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "One of the main causes of glow plug failure is overheating. Therefore, some systems use Pulse Width Modulation (PWM) of the supply voltage to regulate the circ\u2026",
+          "It is important to be able to identify control system failures, such as those that might occur in the ECM, glow control module, or other relays, as a cause of\u2026",
+          "Short or open circuits or high resistances within the circuitry or connections"
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) or glow plug warning lamp illumination"
+        ],
+        associatedDtcs: [
+          "P0380",
+          "P0381",
+          "P0382",
+          "P0383",
+          "P0384",
+          "P0670",
+          "P0671",
+          "P0672",
+          "P0673",
+          "P0674",
+          "P0675",
+          "P0676",
+          "P0677",
+          "P0678",
+          "P0679",
+          "P0680",
+          "P0681",
+          "P0682",
+          "P0683",
+          "P0684"
+        ],
+        goodVsFaultyDiagnosticRule: "[PWM_SOLENOID_VALVE] Known-Good: Pulse-Width Modulated (PWM) Switched Square Wave. Expected voltage references: 12 V. Faulty signal deviations to compare: One of the main causes of glow plug failure is overheating. Therefore, some systems use Pulse Width Modulation (PWM) of the supply voltage to regulate the circ\u2026; It is important to be able to identify control system failures, such as those that might occur in the ECM, glow control module, or other relays, as a cause of\u2026; Short or open circuits or high resistances within the circuitry or connections. Typical DTCs: P0380, P0381, P0382, P0383, P0384."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/glow-plugs/AGT-006-glow-plug-system-current/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-007",
+      agtCode: "AGT-007",
+      title: "Air flow meter (hot wire, gasoline)",
+      category: "sensors",
+      subCategory: "air-flow-mass",
+      signalFamily: "MAF_AIRFLOW",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the voltage output and response time of the Air Flow Meter (AFM) during engine idle, Wide Open Throttle (WOT) and over-run conditions.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the AFM sensor signal circuit. \u2192 Connect PicoScope Channel A to the sensor signal circuit. \u2192 Start the engine. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 St\u2026",
+        knownGoodSummary: "Air flow meters measure the quantity of filtered air entering an engine. As such, they are used by the Engine Control Module (ECM) as the primary engine load sensor. Hot wire air flow meters have a heated wire element located within the intake air flow. The voltage, and hence current, through the hot-wire circuit is v\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "open- or short-circuits"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [
+          "P0100",
+          "P0101",
+          "P0102",
+          "P0103",
+          "P0104"
+        ],
+        goodVsFaultyDiagnosticRule: "[MAF_AIRFLOW] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Faulty signal deviations to compare: open- or short-circuits. Typical DTCs: P0100, P0101, P0102, P0103, P0104."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/air-flow-mass/AGT-007-air-flow-meter-hot-wire-gasoline/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-008",
+      agtCode: "AGT-008",
+      title: "Air flow meter (air vane, gasoline)",
+      category: "sensors",
+      subCategory: "air-flow-mass",
+      signalFamily: "MAF_AIRFLOW",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the voltage output from the internal track of the Air Flow Meter (AFM) during engine idle, Wide Open Throttle (WOT) and over-run conditions.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the AFM sensor signal circuit. \u2192 Connect PicoScope Channel A to the sensor signal circuit. \u2192 Start the engine. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 St\u2026",
+        knownGoodSummary: "Vane-type air flow meters indicate the quantity of air flowing into an engine. They consist of a spring-loaded vane flap , which is deflected by the air flowing past it. The air vane is mechanically linked to an electrical contact, which slides across a carbon track as the vane moves. The effect is that of a variable\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "The mechanical action of the contact against the carbon track causes wear and other inaccuracies."
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [
+          "P0100",
+          "P0101",
+          "P0102",
+          "P0103",
+          "P0104"
+        ],
+        goodVsFaultyDiagnosticRule: "[MAF_AIRFLOW] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Faulty signal deviations to compare: The mechanical action of the contact against the carbon track causes wear and other inaccuracies.. Typical DTCs: P0100, P0101, P0102, P0103, P0104."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/air-flow-mass/AGT-008-air-flow-meter-air-vane-gasoline/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-009",
+      agtCode: "AGT-009",
+      title: "Air mass meter (hot film, turbo diesel)",
+      category: "sensors",
+      subCategory: "air-flow-mass",
+      signalFamily: "MAF_AIRFLOW",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the voltage output and response time of the Air Mass Meter (AMM) during engine idle, Wide Open Throttle (WOT) and over-run conditions.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the Air Flow Meter (AFM) output terminal. \u2192 Connect PicoScope Channel A. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Start the scope to see live data. \u2192 Star\u2026",
+        knownGoodSummary: "Air flow meters measure the quantity of filtered air entering an engine. Typically, Engine Control Modules (ECM) use these meters as the primary engine load sensor. Hot film, or wire, air flow meters have a heated element located within the intake air flow. The voltage, and hence current, through the heated element's\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [
+          "P0100",
+          "P0101",
+          "P0102",
+          "P0103",
+          "P0104"
+        ],
+        goodVsFaultyDiagnosticRule: "[MAF_AIRFLOW] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference. Typical DTCs: P0100, P0101, P0102, P0103, P0104."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/air-flow-mass/AGT-009-air-mass-meter-hot-film-turbo-diesel/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-010",
+      agtCode: "AGT-010",
+      title: "Manifold absolute pressure (turbo diesel)",
+      category: "sensors",
+      subCategory: "manifold-air-pressure",
+      signalFamily: "MAP_PRESSURE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the operation of an analog Manifold Absolute Pressure (MAP) sensor and the turbo diesel engine intake system pressure during idle, free revving and overrun conditions.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the MAP sensor signal circuit. \u2192 Connect PicoScope Channel A to the MAP sensor signal circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Run the engine and\u2026",
+        knownGoodSummary: "MAP sensors respond to the air pressure within the intake manifold and allow the Engine Control Module (ECM) to estimate two important parameters: Atmospheric pressure at key on. Engine load. The sensor can be mounted on the manifold housing, or elsewhere using pipework connecting the sensing element to the manifold v\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Symptoms of a faulty MAP sensor:",
+          "Electrical circuit issues, such as a short, open or high resistance.",
+          "Internal wear or damage within the sensor unit (from heat, vibration or pollutants)."
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination.",
+          "Erratic or rough idle."
+        ],
+        associatedDtcs: [
+          "P0105",
+          "P0106",
+          "P0107",
+          "P0108",
+          "P0109",
+          "P1101",
+          "P1106",
+          "P1107"
+        ],
+        goodVsFaultyDiagnosticRule: "[MAP_PRESSURE] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Faulty signal deviations to compare: Symptoms of a faulty MAP sensor:; Electrical circuit issues, such as a short, open or high resistance.; Internal wear or damage within the sensor unit (from heat, vibration or pollutants).. Typical DTCs: P0105, P0106, P0107, P0108, P0109."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/manifold-air-pressure/AGT-010-manifold-absolute-pressure-turbo-diesel/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-011",
+      agtCode: "AGT-011",
+      title: "Camshaft position (inductive)",
+      category: "sensors",
+      subCategory: "camshaft-position",
+      signalFamily: "CMP_CAMSHAFT",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the operation of an inductive Camshaft Position (CMP) sensor from its output voltage.",
+      knownGood: {
+        waveformShape: "AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the CMP sensor signal circuit. \u2192 Connect PicoScope Channel A to the sensor signal circuit. \u2192 Start the engine and run at idle. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture you\u2026",
+        knownGoodSummary: "A CMP sensor signals one or more fixed camshaft reference positions to the Engine Control Module (ECM), for example, the arrival of cylinder one intake stroke. A CMP sensor is sometimes referred to as a Cylinder Identification (CID) sensor or phase sensor. The ECM uses the camshaft sensor signal for accurate timing co\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "A faulty camshaft sensor can cause multiple misfires, loss of engine performance, engine cutting out, limp-home mode operation, or engine cranking but not star\u2026",
+          "Short or open circuits and high resistance in the sensor coil or circuit.",
+          "Reduced sensor output due to excessive dirt and detritus on the sensor housing or reluctor .",
+          "damage to the sensor housing or reluctor"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [
+          "P0340",
+          "P0341",
+          "P0342",
+          "P0343",
+          "P0344",
+          "P0345",
+          "P0346",
+          "P0347",
+          "P0348",
+          "P0349",
+          "P0365",
+          "P0366",
+          "P0367",
+          "P0368",
+          "P0369",
+          "P0390",
+          "P0391",
+          "P0392",
+          "P0393",
+          "P0394"
+        ],
+        goodVsFaultyDiagnosticRule: "[CMP_CAMSHAFT] Known-Good: AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed). Faulty signal deviations to compare: A faulty camshaft sensor can cause multiple misfires, loss of engine performance, engine cutting out, limp-home mode operation, or engine cranking but not star\u2026; Short or open circuits and high resistance in the sensor coil or circuit.; Reduced sensor output due to excessive dirt and detritus on the sensor housing or reluctor .. Typical DTCs: P0340, P0341, P0342, P0343, P0344."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/camshaft-position/AGT-011-camshaft-position-inductive/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-012",
+      agtCode: "AGT-012",
+      title: "Crankshaft position (Hall effect, running)",
+      category: "sensors",
+      subCategory: "crankshaft-position",
+      signalFamily: "CKP_CRANKSHAFT",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the output of a Hall effect Crankshaft Position (CKP) sensor, during engine running.",
+      knownGood: {
+        waveformShape: "Digital Square Wave (Hall / Optical / Logic 0V-5V or 0V-12V)",
+        extractedVoltageSpecs: [
+          "0 V",
+          "5 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the crankshaft sensor signal circuit. \u2192 Connect PicoScope Channel A to the circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Start the scope to see live d\u2026",
+        knownGoodSummary: "The Crankshaft Position (CKP) sensor provides an Engine Control Module (ECM) with its primary timing reference signal. The ECM uses it to calculate the engine speed and position for accurate injection control etc. The signal is also used to detect engine speed anomalies from misfires etc. Unsurprisingly, Hall effect C\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Short or open circuits or high circuit resistances.",
+          "Signal errors resulting from excessive dirt or detritus on the sensor housing or pulse wheel.",
+          "Damage to the sensor housing or pulse wheel."
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination",
+          "Excessive crank or flywheel movement or vibration."
+        ],
+        associatedDtcs: [
+          "P0016",
+          "P0315",
+          "P0335",
+          "P0336",
+          "P0337",
+          "P0338",
+          "P0339",
+          "P0385",
+          "P0386",
+          "P0387",
+          "P0388",
+          "P0389"
+        ],
+        goodVsFaultyDiagnosticRule: "[CKP_CRANKSHAFT] Known-Good: Digital Square Wave (Hall / Optical / Logic 0V-5V or 0V-12V). Expected voltage references: 0 V, 5 V. Faulty signal deviations to compare: Short or open circuits or high circuit resistances.; Signal errors resulting from excessive dirt or detritus on the sensor housing or pulse wheel.; Damage to the sensor housing or pulse wheel.. Typical DTCs: P0016, P0315, P0335, P0336, P0337."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/crankshaft-position/AGT-012-crankshaft-position-hall-effect-running/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-015",
+      agtCode: "AGT-015",
+      title: "Engine coolant temperature (5 V)",
+      category: "sensors",
+      subCategory: "coolant-temperature",
+      signalFamily: "TEMP_ECT_IAT",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the voltage output of an Engine Coolant Temperature (ECT) sensor as the engine coolant temperature increases.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [
+          "5 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the temperature sensor signal circuit. \u2192 Connect PicoScope Channel A to the temperature sensor signal circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 St\u2026",
+        knownGoodSummary: "Unfiltered waveform An ECT sensor provides a measure of the engine's coolant temperature to the Engine Control Module (ECM), as part of the engine load sensing apparatus. It is therefore partly responsible for the determination of fuelling, timing and engine speed requirements. Most ECT sensors have a Negative Tempera\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Typical symptoms of a faulty ECT sensor are:"
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) or glow plug warning light illumination"
+        ],
+        associatedDtcs: [
+          "P0115",
+          "P0116",
+          "P0117",
+          "P0118",
+          "P0119",
+          "P0125",
+          "P1114",
+          "P1115",
+          "P1116",
+          "P1117",
+          "P1118",
+          "P1119",
+          "P1258"
+        ],
+        goodVsFaultyDiagnosticRule: "[TEMP_ECT_IAT] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Expected voltage references: 5 V. Faulty signal deviations to compare: Typical symptoms of a faulty ECT sensor are:. Typical DTCs: P0115, P0116, P0117, P0118, P0119."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/coolant-temperature/AGT-015-engine-coolant-temperature-5-v/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-017",
+      agtCode: "AGT-017",
+      title: "Crankshaft position (non-floating, cranking)",
+      category: "sensors",
+      subCategory: "crankshaft-position",
+      signalFamily: "CKP_CRANKSHAFT",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the output of an inductive Crankshaft Position (CKP) sensor, with a ground reference (non-floating), during engine cranking.",
+      knownGood: {
+        waveformShape: "AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the CKP signal terminal. \u2192 Connect PicoScope Channel A. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Start the scope. \u2192 Crank the engine for around 3 seconds\u2026",
+        knownGoodSummary: "A Crankshaft Position (CKP) sensor provides an Engine Control Module (ECM) with its primary engine timing reference signal. The ECM uses the signal to calculate the engine speed and position for accurate injection and ignition control. The signal is also used to detect engine speed anomalies from misfires etc. An indu\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Short or open circuits and high resistance in the sensor coil or circuit.",
+          "Reduced sensor output due to excessive dirt and detritus on the sensor housing or pulse wheel.",
+          "damage to the sensor housing or pulse wheel"
+        ],
+        symptomIndicators: [
+          "excessive crank or flywheel movement or vibration"
+        ],
+        associatedDtcs: [
+          "P0016",
+          "P0017",
+          "P0018",
+          "P0019",
+          "P0315",
+          "P0335",
+          "P0336",
+          "P0337",
+          "P0338",
+          "P0339",
+          "P0385",
+          "P0386",
+          "P0387",
+          "P0388",
+          "P0389"
+        ],
+        goodVsFaultyDiagnosticRule: "[CKP_CRANKSHAFT] Known-Good: AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed). Faulty signal deviations to compare: Short or open circuits and high resistance in the sensor coil or circuit.; Reduced sensor output due to excessive dirt and detritus on the sensor housing or pulse wheel.; damage to the sensor housing or pulse wheel. Typical DTCs: P0016, P0017, P0018, P0019, P0315."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/crankshaft-position/AGT-017-crankshaft-position-non-floating-cranking/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-019",
+      agtCode: "AGT-019",
+      title: "Distributor pickup (inductive)",
+      category: "sensors",
+      subCategory: "distributor-timing",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check an inductive distributor pickup signal during engine cranking or running conditions.",
+      knownGood: {
+        waveformShape: "AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the distributor pickup circuit. \u2192 Connect PicoScope Channel A to the distributor pickup signal circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Start the\u2026",
+        knownGoodSummary: "Cranking conditions. The function of a distributor pickup is to provide a timing reference signal to the Ignition Control Module (ICM) or Engine Control Module (ECM) to indicate the mechanical dwell period for each ignition event. The mechanism requires a rotating reluctor and a stationary pickup coil with a magnetise\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Mounting and drive issues (e.g. excessive air gap or wear) associated with distributor.",
+          "Physical damage or excessive detritus around armature and pickup within the distributor.",
+          "General electrical external circuit problems, open, short, high resistance.",
+          "Pickup circuitry damage due to heat and vibration."
+        ],
+        symptomIndicators: [
+          "Engine misfire."
+        ],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed). Faulty signal deviations to compare: Mounting and drive issues (e.g. excessive air gap or wear) associated with distributor.; Physical damage or excessive detritus around armature and pickup within the distributor.; General electrical external circuit problems, open, short, high resistance.."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/distributor-timing/AGT-019-distributor-pickup-inductive/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-020",
+      agtCode: "AGT-020",
+      title: "Distributor pickup (Hall effect)",
+      category: "sensors",
+      subCategory: "distributor-timing",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check a Hall effect distributor pickup signal during engine cranking or running conditions.",
+      knownGood: {
+        waveformShape: "Digital Square Wave (Hall / Optical / Logic 0V-5V or 0V-12V)",
+        extractedVoltageSpecs: [
+          "0 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the distributor pickup circuit. \u2192 Connect PicoScope Channel A to the distributor pickup signal circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Start the\u2026",
+        knownGoodSummary: "The function of a distributor pickup is to provide a timing reference signal to the Ignition Control Module (ICM) or Engine Control Module (ECM) to indicate the primary circuit dwell period for each ignition event. The mechanism uses a rotating assembly consisting of a set of rotating vanes (one for each cylinder) pas\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Mounting and drive issues (e.g. excessive air gap or wear) associated with distributor.",
+          "Physical damage or excessive detritus around armature and pickup within the distributor.",
+          "General electrical external circuit problems, open, short, high resistance.",
+          "Pickup circuitry damage due to heat and vibration."
+        ],
+        symptomIndicators: [
+          "Engine misfire."
+        ],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Digital Square Wave (Hall / Optical / Logic 0V-5V or 0V-12V). Expected voltage references: 0 V. Faulty signal deviations to compare: Mounting and drive issues (e.g. excessive air gap or wear) associated with distributor.; Physical damage or excessive detritus around armature and pickup within the distributor.; General electrical external circuit problems, open, short, high resistance.."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/distributor-timing/AGT-020-distributor-pickup-hall-effect/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-021",
+      agtCode: "AGT-021",
+      title: "Knock sensor",
+      category: "sensors",
+      subCategory: "knock",
+      signalFamily: "KNOCK_SENSOR",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the operation of a piezoelectric knock sensor when subjected to a simulated engine knock.",
+      knownGood: {
+        waveformShape: "Inductive Switched Pulse with Flyback Voltage Spike & Pintle/Dwell Signature",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the knock sensor output circuit. \u2192 Connect a x10 (attenuated) probe to PicoScope Channel A and the sensor output circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your wav\u2026",
+        knownGoodSummary: "Knocking (also known as pinking, pinging or detonation) occurs in a spark-ignition engine when pockets of air-fuel mixture combust (explode) outside the area of the normal spark-initiated, flame-front driven, combustion process. The uncontrolled explosions cause structure borne vibrations (causing the characteristic p\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [
+          "P0324",
+          "P0325",
+          "P0326",
+          "P0327",
+          "P0328",
+          "P0329",
+          "P0330",
+          "P0331",
+          "P0332",
+          "P0333",
+          "P0334"
+        ],
+        goodVsFaultyDiagnosticRule: "[KNOCK_SENSOR] Known-Good: Inductive Switched Pulse with Flyback Voltage Spike & Pintle/Dwell Signature. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference. Typical DTCs: P0324, P0325, P0326, P0327, P0328."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/knock/AGT-021-knock-sensor/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-022",
+      agtCode: "AGT-022",
+      title: "Oxygen (zirconia): output",
+      category: "sensors",
+      subCategory: "oxygen",
+      signalFamily: "O2_LAMBDA_AFR",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the operation of a zirconia type oxygen sensor during engine running conditions based upon its output voltage and response time.",
+      knownGood: {
+        waveformShape: "Slow Switching Analog Voltage (0.1V Lean to 0.9V Rich Lambda Oscillation)",
+        extractedVoltageSpecs: [
+          "0.2 V",
+          "0.8 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the sensor signal circuit. \u2192 Connect PicoScope Channel A to the sensor signal circuit. \u2192 Allow the engine to run at idle speed until normal operating temperature is reached. \u2192 Minimize the help page. You will see that PicoScope has displayed a\u2026",
+        knownGoodSummary: "An oxygen sensor also can be referred to as a Lambda sensor, an O2 sensor, or a Heated Exhaust Gas Oxygen (HEGO) sensor. It is a feedback sensor used by the Engine Control Module (ECM) to perform closed loop control of engine fueling and, if a post catalytic converter sensor is present, monitor catalytic converter fun\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Symptoms of a faulty/inoperative oxygen sensor:",
+          "Open or short circuits or high resistances in the sensor circuits, such as in the:",
+          "Damage or contamination from excessive fuel in the exhaust.",
+          "Damage from excessive heat.",
+          "Incorrect fitment (and damage arising therefrom)."
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination."
+        ],
+        associatedDtcs: [
+          "P0030",
+          "P0031",
+          "P0032",
+          "P0036",
+          "P0037",
+          "P0038",
+          "P0040",
+          "P0041",
+          "P0042",
+          "P0043",
+          "P0044",
+          "P0050",
+          "P0051",
+          "P0052",
+          "P0053",
+          "P0054",
+          "P0055",
+          "P0056",
+          "P0057",
+          "P0058",
+          "P0059",
+          "P0060",
+          "P0061",
+          "P0062",
+          "P0063",
+          "P0064",
+          "P0130",
+          "P0131",
+          "P0132",
+          "P0133",
+          "P0134",
+          "P0135",
+          "P0136",
+          "P0137",
+          "P0138",
+          "P0139",
+          "P0140",
+          "P0141",
+          "P0142",
+          "P0143",
+          "P0144",
+          "P0145",
+          "P0146",
+          "P0147",
+          "P0150",
+          "P0151",
+          "P0152",
+          "P0153",
+          "P0154",
+          "P0155",
+          "P0156",
+          "P0157",
+          "P0158",
+          "P0159",
+          "P0160",
+          "P0161",
+          "P0162",
+          "P0163",
+          "P0164",
+          "P0165",
+          "P0166",
+          "P0167",
+          "P0170",
+          "P0171",
+          "P0172",
+          "P0173",
+          "P0174",
+          "P0175"
+        ],
+        goodVsFaultyDiagnosticRule: "[O2_LAMBDA_AFR] Known-Good: Slow Switching Analog Voltage (0.1V Lean to 0.9V Rich Lambda Oscillation). Expected voltage references: 0.2 V, 0.8 V. Faulty signal deviations to compare: Symptoms of a faulty/inoperative oxygen sensor:; Open or short circuits or high resistances in the sensor circuits, such as in the:; Damage or contamination from excessive fuel in the exhaust.. Typical DTCs: P0030, P0031, P0032, P0036, P0037."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/oxygen/AGT-022-oxygen-zirconia-output/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-023",
+      agtCode: "AGT-023",
+      title: "Oxygen (titania): output",
+      category: "sensors",
+      subCategory: "oxygen",
+      signalFamily: "O2_LAMBDA_AFR",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the operation of a titania type oxygen sensor during engine running conditions based upon its output voltage and response time.",
+      knownGood: {
+        waveformShape: "Slow Switching Analog Voltage (0.1V Lean to 0.9V Rich Lambda Oscillation)",
+        extractedVoltageSpecs: [
+          "5 V",
+          "4.5 V",
+          "0.2 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the sensor signal circuit. \u2192 Connect PicoScope Channel A to the sensor signal circuit. \u2192 Allow the engine to run at idle speed until normal operating temperature is reached. \u2192 Minimize the help page. You will see that PicoScope has displayed a\u2026",
+        knownGoodSummary: "An oxygen sensor also can be referred to as a Lambda sensor, an O2 sensor, or a Heated Exhaust Gas Oxygen (HEGO) sensor. It is a feedback sensor used by the Engine Control Module (ECM) to perform closed loop control of engine fueling and, if a post catalytic converter sensor is present, monitor catalytic converter fun\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Symptoms of a faulty/inoperative oxygen sensor:",
+          "Open or short circuits or high resistances in the sensor circuits, such as in the:",
+          "Damage or contamination from excessive fuel in the exhaust.",
+          "Damage from excessive heat.",
+          "Incorrect fitment (and damage arising therefrom)."
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination."
+        ],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[O2_LAMBDA_AFR] Known-Good: Slow Switching Analog Voltage (0.1V Lean to 0.9V Rich Lambda Oscillation). Expected voltage references: 5 V, 4.5 V, 0.2 V. Faulty signal deviations to compare: Symptoms of a faulty/inoperative oxygen sensor:; Open or short circuits or high resistances in the sensor circuits, such as in the:; Damage or contamination from excessive fuel in the exhaust.."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/oxygen/AGT-023-oxygen-titania-output/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-024",
+      agtCode: "AGT-024",
+      title: "Manifold absolute pressure (gasoline)",
+      category: "sensors",
+      subCategory: "manifold-air-pressure",
+      signalFamily: "MAP_PRESSURE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the operation of an analog Manifold Absolute Pressure (MAP) sensor and the gasoline engine intake system pressure during idle, free revving, and overrun conditions.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [
+          "5 V",
+          "4.5 V",
+          "1.5 V",
+          "0.5 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the MAP sensor signal circuit. \u2192 Connect PicoScope Channel A to the MAP sensor signal circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Start the engine a\u2026",
+        knownGoodSummary: "MAP sensors respond to the air pressure within the intake manifold and allow the Engine Control Module (ECM) to estimate two important parameters: Atmospheric pressure at key on. Engine load. The sensor can be mounted on the manifold housing or remotely, with pipework connecting the sensing element to the manifold vol\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Symptoms of a faulty MAP sensor:",
+          "Electrical circuit issues, such as a short, open or high resistance.",
+          "Internal wear or damage within the sensor unit (from heat, vibration or pollutants)."
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination.",
+          "Erratic or rough idle."
+        ],
+        associatedDtcs: [
+          "P0105",
+          "P0106",
+          "P0107",
+          "P0108",
+          "P0109"
+        ],
+        goodVsFaultyDiagnosticRule: "[MAP_PRESSURE] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Expected voltage references: 5 V, 4.5 V, 1.5 V. Faulty signal deviations to compare: Symptoms of a faulty MAP sensor:; Electrical circuit issues, such as a short, open or high resistance.; Internal wear or damage within the sensor unit (from heat, vibration or pollutants).. Typical DTCs: P0105, P0106, P0107, P0108, P0109."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/manifold-air-pressure/AGT-024-manifold-absolute-pressure-gasoline/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-025",
+      agtCode: "AGT-025",
+      title: "Manifold absolute pressure (digital)",
+      category: "sensors",
+      subCategory: "manifold-air-pressure",
+      signalFamily: "MAP_PRESSURE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the operation of a digital Manifold Absolute Pressure (MAP) sensor and the engine intake system pressure during idle, free revving and overrun conditions.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [
+          "5 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [
+          "160 Hz",
+          "80 - 100 Hz"
+        ],
+        testSetupSummary: "Use manufacturer's data to identify the MAP sensor signal circuit. \u2192 Connect PicoScope Channel A to the MAP sensor signal circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Start the engine a\u2026",
+        knownGoodSummary: "MAP sensors respond to the air pressure within the intake manifold and allow the Engine Control Module (ECM) to estimate two important parameters: Atmospheric pressure at key on. Engine load. The sensor can be mounted on the manifold housing or remotely, with pipework connecting the sensing element to the manifold vol\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Symptoms of a faulty MAP sensor:",
+          "Electrical circuit issues, such as a short, open or high resistance.",
+          "Internal wear or damage within the sensor unit (from heat, vibration or pollutants)."
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination.",
+          "Erratic or rough idle."
+        ],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[MAP_PRESSURE] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Expected voltage references: 5 V. Faulty signal deviations to compare: Symptoms of a faulty MAP sensor:; Electrical circuit issues, such as a short, open or high resistance.; Internal wear or damage within the sensor unit (from heat, vibration or pollutants).."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/manifold-air-pressure/AGT-025-manifold-absolute-pressure-digital/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-026",
+      agtCode: "AGT-026",
+      title: "Road speed (Hall effect)",
+      category: "sensors",
+      subCategory: "road-speed",
+      signalFamily: "OTHER_AUTOMOTIVE_SIGNAL",
+      systemCategoryId: "body_electrical",
+      purposeSummary: "The purpose of this test is to evaluate the operation of a Hall effect Road Speed Sensor (RSS) based on output voltage and frequency during road test conditions.",
+      knownGood: {
+        waveformShape: "Digital Square Wave (Hall / Optical / Logic 0V-5V or 0V-12V)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect a test lead to Channel A and the Road Speed Sensor signal circuit. \u2192 Secure the vehicle on a wheel-free vehicle lift (e.g. a 2-post lift). \u2192 Have another qualified technician seated in and ready to operate the vehicle. \u2192 Lift the vehicle so that all it's wheels are just\u2026",
+        knownGoodSummary: "The purpose of this test is to evaluate the operation of a Hall effect Road Speed Sensor (RSS) based on output voltage and frequency during road test conditions."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[OTHER_AUTOMOTIVE_SIGNAL] Known-Good: Digital Square Wave (Hall / Optical / Logic 0V-5V or 0V-12V). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/road-speed/AGT-026-road-speed-hall-effect/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-028",
+      agtCode: "AGT-028",
+      title: "Throttle position switch",
+      category: "sensors",
+      subCategory: "throttle-position",
+      signalFamily: "TPS_APP_THROTTLE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to investigate the operation of the idle and full throttle position switches.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [
+          "5 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the throttle switch circuit. \u2192 Connect PicoScope Channel A to the idle switch circuit. \u2192 Connect PicoScope Channel B to the full load switch circuit. \u2192 Turn the ignition on, engine off. \u2192 Minimize the help page. You will see that PicoScope has\u2026",
+        knownGoodSummary: "The throttle position switch signals the movement and position of the throttle valve to the Engine Control Module (ECM). The switch unit is installed at the throttle housing and attached to the throttle butterfly spindle. Throttle position switches can be configured in different ways, so it will be necessary to check\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open, short and high resistance faults in connectors and circuits.",
+          "A faulty throttle valve switch can cause:"
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination."
+        ],
+        associatedDtcs: [
+          "P0068",
+          "P0120",
+          "P0121",
+          "P0122",
+          "P0123",
+          "P0124",
+          "P0220",
+          "P0221",
+          "P0222",
+          "P0223",
+          "P0224",
+          "P0225",
+          "P0226",
+          "P0227",
+          "P0228",
+          "P0229",
+          "P0510"
+        ],
+        goodVsFaultyDiagnosticRule: "[TPS_APP_THROTTLE] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Expected voltage references: 5 V. Faulty signal deviations to compare: Open, short and high resistance faults in connectors and circuits.; A faulty throttle valve switch can cause:. Typical DTCs: P0068, P0120, P0121, P0122, P0123."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/throttle-position/AGT-028-throttle-position-switch/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-029",
+      agtCode: "AGT-029",
+      title: "Throttle position potentiometer",
+      category: "sensors",
+      subCategory: "throttle-position",
+      signalFamily: "TPS_APP_THROTTLE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate Throttle Position Sensor (TPS) potentiometer output in relation to throttle position.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [
+          "5 V",
+          "0.5 V",
+          "4.5 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the sensor output circuit. \u2192 Connect PicoScope Channel A to the sensor output circuit. \u2192 Turn ignition on engine off. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your wavefor\u2026",
+        knownGoodSummary: "A throttle position sensor signals the position of the throttle valve to the Engine Control Module (ECM). Throttle potentiometers are generally carbon track type units mounted directly onto the throttle butterfly spindle. They are a three-wire device with a reference 5 V supply, output signal and earth terminals. Some\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Faulty Throttle Potentiometer - Symptoms",
+          "Faulty Throttle Potentiometer - Causes",
+          "Mechanical damage caused by heat and vibration.",
+          "Internal short circuits caused by fluid contamination and humidity.",
+          "Contact and external circuit damage."
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination."
+        ],
+        associatedDtcs: [
+          "P0120",
+          "P0121",
+          "P0122",
+          "P0123",
+          "P0124",
+          "P0220",
+          "P0221",
+          "P0222",
+          "P0223",
+          "P0224",
+          "P0225",
+          "P0226",
+          "P0227",
+          "P0228",
+          "P0229",
+          "P0510"
+        ],
+        goodVsFaultyDiagnosticRule: "[TPS_APP_THROTTLE] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Expected voltage references: 5 V, 0.5 V, 4.5 V. Faulty signal deviations to compare: Faulty Throttle Potentiometer - Symptoms; Faulty Throttle Potentiometer - Causes; Mechanical damage caused by heat and vibration.. Typical DTCs: P0120, P0121, P0122, P0123, P0124."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/throttle-position/AGT-029-throttle-position-potentiometer/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-030",
+      agtCode: "AGT-030",
+      title: "Carbon canister purge valve solenoid",
+      category: "actuators",
+      subCategory: "carbon-canister-purge-valve",
+      signalFamily: "PWM_SOLENOID_VALVE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the operation of the carbon canister purge control valve solenoid control circuit and signal.",
+      knownGood: {
+        waveformShape: "Pulse-Width Modulated (PWM) Switched Square Wave",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the carbon canister purge control valve circuit and operating modes (i.e. the engine conditions required to trigger valve operation). \u2192 Connect PicoScope Channel A to the valve's switched earth circuit. \u2192 Start and run the engine. \u2192 Minimize t\u2026",
+        knownGoodSummary: "The carbon canister is a container filled with fuel vapor absorbent carbon granules. It stores harmful evaporative emissions until they can be delivered to the intake manifold for combustion by the engine. The carbon canister's inlet is connected to the fuel tank and its outlet is connected via a purge control valve t\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Typical causes of failure",
+          "Short and open circuits or high resistances in the solenoid or circuits.",
+          "Leak or collapse of vacuum lines between the intake manifold and the canister.",
+          "Leak or collapse of the tank vent lines between the tank and the canister.",
+          "Failure of ECM control, such as software or hardware (driver) issues."
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination."
+        ],
+        associatedDtcs: [
+          "P0440",
+          "P0441",
+          "P0443",
+          "P0444",
+          "P0445",
+          "P0446",
+          "P0447",
+          "P0448",
+          "P0449",
+          "P0458",
+          "P0459",
+          "P0496",
+          "P0497",
+          "P0498",
+          "P0499"
+        ],
+        goodVsFaultyDiagnosticRule: "[PWM_SOLENOID_VALVE] Known-Good: Pulse-Width Modulated (PWM) Switched Square Wave. Faulty signal deviations to compare: Typical causes of failure; Short and open circuits or high resistances in the solenoid or circuits.; Leak or collapse of vacuum lines between the intake manifold and the canister.. Typical DTCs: P0440, P0441, P0443, P0444, P0445."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/carbon-canister-purge-valve/AGT-030-carbon-canister-purge-valve-solenoid/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-031",
+      agtCode: "AGT-031",
+      title: "Exhaust gas recirculation valve solenoid",
+      category: "actuators",
+      subCategory: "exhaust-gas-recirculation-valve",
+      signalFamily: "PWM_SOLENOID_VALVE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the operation of the Exhaust Gas Recirculation (EGR) valve solenoid control circuit and signal.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect a test lead to Channel A and the EGR solenoid valve switched-earth control circuit. \u2192 Start the engine and run at idle. \u2192 Start the scope to see live data. \u2192 Vary the engine RPM and look for waveform changes. \u2192 When your waveforms are captured, stop the scope. \u2192 Turn off\u2026",
+        knownGoodSummary: "The purpose of this test is to evaluate the operation of the Exhaust Gas Recirculation (EGR) valve solenoid control circuit and signal."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [
+          "P0400",
+          "P0401",
+          "P0402",
+          "P0403",
+          "P0404",
+          "P0405",
+          "P0406",
+          "P0407",
+          "P0408",
+          "P1403",
+          "P1404",
+          "P1405",
+          "P1406",
+          "P1407",
+          "P1409"
+        ],
+        goodVsFaultyDiagnosticRule: "[PWM_SOLENOID_VALVE] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference. Typical DTCs: P0400, P0401, P0402, P0403, P0404."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/exhaust-gas-recirculation-valve/AGT-031-exhaust-gas-recirculation-valve-solenoid/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-032",
+      agtCode: "AGT-032",
+      title: "Fuel pump motor (brushed)",
+      category: "actuators",
+      subCategory: "fuel-pump",
+      signalFamily: "PWM_SOLENOID_VALVE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the current draw and characteristics of a Direct Current (DC), brushed, fuel pump motor.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use vehicle manufacturer data to identify the fuel pump fuse. \u2192 Replace the fuel pump fuse with a Fuse extension lead and insert it into the Fuse extension lead fuse holder. \u2192 Connect the low amps clamp to PicoScope Channel A. \u2192 If using a non-PicoBNC+\xAE low amps clamp, select th\u2026",
+        knownGoodSummary: "Fuel pump motors Many fuel pumps are driven by DC, brushed, motors. These motors have a set of stationary magnets (as part of a subassembly called the stator ) within which a set of windings around an iron core (in an arrangement called the armature ) can rotate. The shaft at the centre of the armature is called the r\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "A faulty fuel pump can cause the following symptoms:",
+          "Noise from the fuel pump assembly and/or fuel tank.",
+          "Fuel or tank contamination (from dirt, rust, incorrect fuel, or poor fuel quality)."
+        ],
+        symptomIndicators: [
+          "Engine surging during steady-state partial load.",
+          "Loss of power under load."
+        ],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[PWM_SOLENOID_VALVE] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Faulty signal deviations to compare: A faulty fuel pump can cause the following symptoms:; Noise from the fuel pump assembly and/or fuel tank.; Fuel or tank contamination (from dirt, rust, incorrect fuel, or poor fuel quality).."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/fuel-pump/AGT-032-fuel-pump-motor-brushed/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-033",
+      agtCode: "AGT-033",
+      title: "Idle speed control valve (rotary solenoid)",
+      category: "actuators",
+      subCategory: "idle-speed-control-valve-(iac)",
+      signalFamily: "PWM_SOLENOID_VALVE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the Idle Speed Control Valve (ISCV) control signal from the Engine Control Module (ECM).",
+      knownGood: {
+        waveformShape: "Pulse-Width Modulated (PWM) Switched Square Wave",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the ISCV switched earth circuit. \u2192 Connect PicoScope Channel A to the switched earth circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Start the engine an\u2026",
+        knownGoodSummary: "An ISCV is used by the Engine Control Module (ECM) to regulate engine idle speed according to engine temperature and load when there is no driver demand from the accelerator pedal and the throttle is closed. For example, during cold start conditions, the ECM will seek to quickly raise engine temperature by opening the\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Symptoms of a faulty ISCV:",
+          "Causes of ISCV failure:",
+          "Internal electrical damage due to heat and vibration.",
+          "External connector damage/contamination."
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination."
+        ],
+        associatedDtcs: [
+          "P0505",
+          "P0506",
+          "P0507",
+          "P0508",
+          "P0509",
+          "P0511",
+          "P0518",
+          "P0519"
+        ],
+        goodVsFaultyDiagnosticRule: "[PWM_SOLENOID_VALVE] Known-Good: Pulse-Width Modulated (PWM) Switched Square Wave. Faulty signal deviations to compare: Symptoms of a faulty ISCV:; Causes of ISCV failure:; Internal electrical damage due to heat and vibration.. Typical DTCs: P0505, P0506, P0507, P0508, P0509."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/idle-speed-control-valve-(iac)/AGT-033-idle-speed-control-valve-rotary-solenoid/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-034",
+      agtCode: "AGT-034",
+      title: "Idle speed control valve (linear solenoid)",
+      category: "actuators",
+      subCategory: "idle-speed-control-valve-(iac)",
+      signalFamily: "PWM_SOLENOID_VALVE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the Idle Speed Control Valve (ISCV) control signal from the Engine Control Module (ECM).",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the ISCV switched earth circuit. \u2192 Connect PicoScope Channel A to the switched earth circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Start the engine an\u2026",
+        knownGoodSummary: "An ISCV is used by the Engine Control Module (ECM) to regulate engine idle speed according to engine temperature and load when there is no driver demand from the accelerator pedal and the throttle is closed. For example, during cold start conditions, the ECM will seek to quickly raise engine temperature by increasing\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Symptoms of a faulty ISCV:",
+          "Causes of ISCV failure:",
+          "Internal electrical damage due to heat and vibration.",
+          "External connector damage/contamination."
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination."
+        ],
+        associatedDtcs: [
+          "P0505",
+          "P0506",
+          "P0507",
+          "P0508",
+          "P0509",
+          "P0511",
+          "P0518",
+          "P0519"
+        ],
+        goodVsFaultyDiagnosticRule: "[PWM_SOLENOID_VALVE] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Faulty signal deviations to compare: Symptoms of a faulty ISCV:; Causes of ISCV failure:; Internal electrical damage due to heat and vibration.. Typical DTCs: P0505, P0506, P0507, P0508, P0509."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/idle-speed-control-valve-(iac)/AGT-034-idle-speed-control-valve-linear-solenoid/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-036",
+      agtCode: "AGT-036",
+      title: "MPI injector current",
+      category: "actuators",
+      subCategory: "injector-(gasoline)",
+      signalFamily: "INJECTOR_FUEL",
+      systemCategoryId: "fuel_system",
+      purposeSummary: "The purpose of this test is to evaluate the operation of the Multi-Point Injection (MPI) injector control circuit, switching signal and solenoid mechanism. This test involves taking measurements on a system or component having a potentially hazardous voltage.\u2026",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [
+          "4 to 5 ms",
+          "2.5 ms"
+        ],
+        testSetupSummary: "Connect the low amps clamp into PicoScope Channel A. \u2192 Select the 20 A scale and zero the clamp before connecting to the injector supply circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Sta\u2026",
+        knownGoodSummary: "An indirect injector is used to deliver the correct quantity of atomised fuel to the air in the inlet tract, as it is drawn through to a cylinder. A multi-point injection system has one injector per cylinder supplied by a common fuel rail. As the rail pressure regulator maintains a constant pressure difference between\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [
+          "P0200",
+          "P0201",
+          "P0202",
+          "P0203",
+          "P0204",
+          "P0205",
+          "P0206",
+          "P0207",
+          "P0208",
+          "P0209",
+          "P0210",
+          "P0211",
+          "P0212",
+          "P0213",
+          "P0214",
+          "P0216",
+          "P0261",
+          "P0262",
+          "P0263",
+          "P0264",
+          "P0265",
+          "P0266",
+          "P0267",
+          "P0268",
+          "P0269",
+          "P0270",
+          "P0271",
+          "P0272",
+          "P0273",
+          "P0274",
+          "P0275",
+          "P0276",
+          "P0277",
+          "P0278",
+          "P0279",
+          "P0280",
+          "P0281",
+          "P0282",
+          "P0283",
+          "P0284",
+          "P0285",
+          "P0286",
+          "P0287",
+          "P0288",
+          "P0289",
+          "P0290",
+          "P0291",
+          "P0292",
+          "P0293",
+          "P0294",
+          "P0295",
+          "P0296"
+        ],
+        goodVsFaultyDiagnosticRule: "[INJECTOR_FUEL] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference. Typical DTCs: P0200, P0201, P0202, P0203, P0204."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/injector-(gasoline)/AGT-036-mpi-injector-current/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-039",
+      agtCode: "AGT-039",
+      title: "CRD (Bosch) solenoid injector",
+      category: "actuators",
+      subCategory: "injector-(diesel)",
+      signalFamily: "INJECTOR_FUEL",
+      systemCategoryId: "fuel_system",
+      purposeSummary: "The purpose of this test is to evaluate the actuation current within a Bosch-type Common Rail Diesel (CRD) solenoid injector circuit across a range of engine operating conditions. This test involves taking measurements on a system or component having a potent\u2026",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [
+          "50 to 90 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect the low amps clamp into PicoScope Channel A. \u2192 Select the 20 A scale and zero the clamp before connecting to the injector supply circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Sta\u2026",
+        knownGoodSummary: "Engine at idle. A common rail diesel injector delivers atomised fuel directly to the combustion chamber. Injection timing and quantity is controlled by the Engine Control Module (ECM). Common rail diesel solenoid injectors can be actuated independently of the pressure generating mechanism, unlike their counterparts wi\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [
+          "Electrical circuits: if an injector solenoid cannot energise sufficiently then it's valve may not open properly, which may cause misfire sy\u2026"
+        ],
+        associatedDtcs: [
+          "P0200",
+          "P0201",
+          "P0202",
+          "P0203",
+          "P0204",
+          "P0205",
+          "P0206",
+          "P0207",
+          "P0208",
+          "P0209",
+          "P0210",
+          "P0211",
+          "P0212",
+          "P0213",
+          "P0214",
+          "P0216",
+          "P0261",
+          "P0262",
+          "P0263",
+          "P0264",
+          "P0265",
+          "P0266",
+          "P0267",
+          "P0268",
+          "P0269",
+          "P0270",
+          "P0271",
+          "P0272",
+          "P0273",
+          "P0274",
+          "P0275",
+          "P0276",
+          "P0277",
+          "P0278",
+          "P0279",
+          "P0280",
+          "P0281",
+          "P0282",
+          "P0283",
+          "P0284",
+          "P0285",
+          "P0286",
+          "P0287",
+          "P0288",
+          "P0289",
+          "P0290",
+          "P0291",
+          "P0292",
+          "P0293",
+          "P0294",
+          "P0295",
+          "P0296"
+        ],
+        goodVsFaultyDiagnosticRule: "[INJECTOR_FUEL] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Expected voltage references: 50 to 90 V. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference. Typical DTCs: P0200, P0201, P0202, P0203, P0204."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/injector-(diesel)/AGT-039-crd-bosch-solenoid-injector/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-040",
+      agtCode: "AGT-040",
+      title: "Stepper motor",
+      category: "actuators",
+      subCategory: "idle-speed-control-valve-(iac)",
+      signalFamily: "PWM_SOLENOID_VALVE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the correct operation of the stepper motor based on the switching voltage and frequency present at each individual return path in response to target idle speed.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer data to identify the switched earth terminals at the stepper motor multi-plug. \u2192 Start the engine and allow it to idle. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Start the sc\u2026",
+        knownGoodSummary: "Four wire The stepper or stepper motor is a small electro-mechanical device that allows either an air by-pass circuit or a throttle opening to alter in position depending on the amounts that the stepper is indexed. Invariably it will be used to control the idle speed when an idle speed control valve is not employed. T\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Pin 1 is the idle switch return and will be open circuit at idle."
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [
+          "P1554",
+          "P1559",
+          "P1564",
+          "P1565",
+          "P1568",
+          "P1579",
+          "P1581",
+          "P1789"
+        ],
+        goodVsFaultyDiagnosticRule: "[PWM_SOLENOID_VALVE] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Faulty signal deviations to compare: Pin 1 is the idle switch return and will be open circuit at idle.. Typical DTCs: P1554, P1559, P1564, P1565, P1568."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/idle-speed-control-valve-(iac)/AGT-040-stepper-motor/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-041",
+      agtCode: "AGT-041",
+      title: "Ignition amplifier earth (volt drop)",
+      category: "ignition",
+      subCategory: "distributorless-wasted-spark",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the integrity of ignition amplifier earth circuit based on voltage drop during engine run conditions. This test involves taking measurements on a system or component having a potentially hazardous voltage. Risk of damag\u2026",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect a test lead to Channel A and the ignition amplifier earth terminal. \u2192 Start the engine and run at idle. \u2192 Start the scope to see live data. \u2192 Vary the engine RPM and look for waveform changes. \u2192 When your waveforms are captured, stop the scope. \u2192 Turn off the engine.",
+        knownGoodSummary: "The purpose of this test is to evaluate the integrity of ignition amplifier earth circuit based on voltage drop during engine run conditions. This test involves taking measurements on a system or component having a potentially hazardous voltage. Risk of damag\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/distributorless-wasted-spark/AGT-041-ignition-amplifier-earth-volt-drop/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-044",
+      agtCode: "AGT-044",
+      title: "Primary voltage",
+      category: "ignition",
+      subCategory: "coil-on-plug",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the operation of a Coil-On-Plug (COP) unit having an externally switched primary circuit by evaluating the primary circuit voltage. This test involves measuring a potentially hazardous voltage. Risk of damage to equipment\u2026",
+      knownGood: {
+        waveformShape: "AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed)",
+        extractedVoltageSpecs: [
+          "0 V",
+          "250 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect a test lead with a 10:1 attenuator to PicoScope Channel A. \u2192 Connect the test lead to the coil switched earth circuit (often marked CB, T1 or -) and to earth. \u2192 Start the engine and allow it to idle. \u2192 Minimize the help page. You will see that PicoScope has displayed an\u2026",
+        knownGoodSummary: "General principles All (inductive) spark ignition systems use one or more ignition coils. The coils act as both an accumulator, to store energy, and a step-up transformer, to generate the high voltages necessary to produce an electrical spark within a combustion chamber. An ignition coil consists of a primary coil and\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "When the primary circuit is on, the switched earth voltage should be very close to 0 V. If not, there is likely to be a high resistance in the earth circuit (e\u2026"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed). Expected voltage references: 0 V, 250 V. Faulty signal deviations to compare: When the primary circuit is on, the switched earth voltage should be very close to 0 V. If not, there is likely to be a high resistance in the earth circuit (e\u2026."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/coil-on-plug/AGT-044-primary-voltage/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-046",
+      agtCode: "AGT-046",
+      title: "Secondary (king lead) sequential",
+      category: "ignition",
+      subCategory: "distributor-",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check secondary ignition system operation by evaluating king lead secondary ignition voltages sequentially. This test involves measurements on a potentially hazardous High Tension (HT) ignition system. Risk of damage to equipmen\u2026",
+      knownGood: {
+        waveformShape: "AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Turn the ignition off. \u2192 Connect a secondary ignition pick up lead to PicoScope Channel A. \u2192 Clamp the secondary ignition pick up around the distributor HT king lead and connect its earth fly lead to earth. \u2192 Minimize the help page. You will see that PicoScope has displayed an e\u2026",
+        knownGoodSummary: "General principles All (inductive) spark ignition systems use one or more ignition coils. The coils act as both an accumulator, to store energy, and a step-up transformer, to generate the high voltages necessary to produce an electrical spark within a combustion chamber. An ignition coil consists of a primary coil and\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "There is an inversely proportional relationship between sparkline kV and spark duration. If the sparkline kV is too high, the spark duration will be too short,\u2026",
+          "A misfire may occur if there is too little energy within the ignition system - for example, if the coil is faulty or there are shorts or high resistance in the\u2026"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed). Faulty signal deviations to compare: There is an inversely proportional relationship between sparkline kV and spark duration. If the sparkline kV is too high, the spark duration will be too short,\u2026; A misfire may occur if there is too little energy within the ignition system - for example, if the coil is faulty or there are shorts or high resistance in the\u2026."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/distributor-/AGT-046-secondary-king-lead-sequential/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-047",
+      agtCode: "AGT-047",
+      title: "Secondary (plug lead)",
+      category: "ignition",
+      subCategory: "distributor-",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check a single cylinder's ignition system by evaluating plug lead secondary ignition voltages. This test involves measurements on a potentially hazardous High Tension (HT) ignition system. Risk of damage to equipment and propert\u2026",
+      knownGood: {
+        waveformShape: "AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Turn the ignition off. \u2192 Connect a secondary ignition pick up lead to PicoScope Channel A. \u2192 Clamp the secondary ignition pick up around a suspect distributor HT plug lead and connect its earth fly lead to earth. \u2192 Minimize the help page. You will see that PicoScope has displaye\u2026",
+        knownGoodSummary: "General principles All (inductive) spark ignition systems use one or more ignition coils. The coils act as both an accumulator, to store energy, and a step-up transformer, to generate the high voltages necessary to produce an electrical spark within a combustion chamber. An ignition coil consists of a primary coil and\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "There is an inversely proportional relationship between sparkline kV and spark duration. If the sparkline kV is too high, the spark duration will be too short,\u2026",
+          "A misfire may occur if there is too little energy within the ignition system - for example, if the coil is faulty or there are shorts or high resistance in the\u2026"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed). Faulty signal deviations to compare: There is an inversely proportional relationship between sparkline kV and spark duration. If the sparkline kV is too high, the spark duration will be too short,\u2026; A misfire may occur if there is too little energy within the ignition system - for example, if the coil is faulty or there are shorts or high resistance in the\u2026."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/distributor-/AGT-047-secondary-plug-lead/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-055",
+      agtCode: "AGT-055",
+      title: "CRD (Bosch) pressure regulating valve",
+      category: "actuators",
+      subCategory: "pressure-regulator",
+      signalFamily: "PWM_SOLENOID_VALVE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the operation of the Bosch Common Rail Diesel (CRD) Pressure Regulating Valve (PRV) and control circuit based on the voltage and duty control under engine run conditions.",
+      knownGood: {
+        waveformShape: "Pulse-Width Modulated (PWM) Switched Square Wave",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Using manufacturer's data, identify the fuel rail pressure regulator valve control signal circuit. \u2192 Connect PicoScope Channel A to the pressure regulator valve control signal circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is\u2026",
+        knownGoodSummary: "Within a common rail diesel system, the Engine Control Module (ECM) uses a pressure regulator valve to control the fuel pressure within the common rail. When the ECM needs to reduce the pressure, the valve is opened and excess fuel is released to the fuel return system. Conversely, when an increased pressure is needed\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [
+          "P0087",
+          "P0088",
+          "P0089",
+          "P0090",
+          "P0091",
+          "P0092",
+          "P0093",
+          "P0094"
+        ],
+        goodVsFaultyDiagnosticRule: "[PWM_SOLENOID_VALVE] Known-Good: Pulse-Width Modulated (PWM) Switched Square Wave. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference. Typical DTCs: P0087, P0088, P0089, P0090, P0091."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/pressure-regulator/AGT-055-crd-bosch-pressure-regulating-valve/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-056",
+      agtCode: "AGT-056",
+      title: "CRD (Bosch) quantity control valve",
+      category: "actuators",
+      subCategory: "quantity-control-valve",
+      signalFamily: "PWM_SOLENOID_VALVE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the operation of the Bosch Common Rail Diesel (CRD) Quantity Control Valve (QCV) and control circuit based on the voltage and duty control under engine run conditions.",
+      knownGood: {
+        waveformShape: "Pulse-Width Modulated (PWM) Switched Square Wave",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Using manufacturer's data, identify the fuel rail pressure regulator valve control signal circuit. \u2192 Connect PicoScope Channel A to the control signal circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your w\u2026",
+        knownGoodSummary: "Within a common rail diesel system, the Engine Control Module (ECM) uses a quantity control valve to regulate the fuel pressure entering the common rail via the high pressure pump: when the ECM needs to reduce the pressure, the valve is closed and less fuel is drawn through the pumping mechanism, excess fuel is releas\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [
+          "P0001",
+          "P0002",
+          "P0003",
+          "P0004",
+          "P0087",
+          "P0088",
+          "P0251",
+          "P0252",
+          "P0253",
+          "P0254",
+          "P0255"
+        ],
+        goodVsFaultyDiagnosticRule: "[PWM_SOLENOID_VALVE] Known-Good: Pulse-Width Modulated (PWM) Switched Square Wave. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference. Typical DTCs: P0001, P0002, P0003, P0004, P0087."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/quantity-control-valve/AGT-056-crd-bosch-quantity-control-valve/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-058",
+      agtCode: "AGT-058",
+      title: "VVT control solenoid",
+      category: "actuators",
+      subCategory: "variable-valve-timing",
+      signalFamily: "PWM_SOLENOID_VALVE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the operation of the variable camshaft timing control solenoid based on the switching voltage and duty control during engine run conditions.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect a test lead to Channel A and the VVT control solenoid switched earth circuit. \u2192 Start the engine and run at idle. \u2192 Start the scope to see live data. \u2192 Vary the engine RPM and look for waveform changes. \u2192 When your waveforms are captured, stop the scope. \u2192 Turn off the e\u2026",
+        knownGoodSummary: "The purpose of this test is to evaluate the operation of the variable camshaft timing control solenoid based on the switching voltage and duty control during engine run conditions."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[PWM_SOLENOID_VALVE] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/variable-valve-timing/AGT-058-vvt-control-solenoid/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-061",
+      agtCode: "AGT-061",
+      title: "Camshaft position (Hall effect)",
+      category: "sensors",
+      subCategory: "camshaft-position",
+      signalFamily: "CMP_CAMSHAFT",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the operation of a Hall effect Camshaft Position (CMP) sensor from its output voltage.",
+      knownGood: {
+        waveformShape: "Digital Square Wave (Hall / Optical / Logic 0V-5V or 0V-12V)",
+        extractedVoltageSpecs: [
+          "0 V",
+          "5 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the camshaft sensor output signal circuit. \u2192 Connect PicoScope Channel A to the circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Start the scope to see l\u2026",
+        knownGoodSummary: "A CMP sensor signals one or more fixed camshaft reference positions to the Engine Control Module (ECM), for example, the arrival of a cylinder's intake stroke. The ECM uses the camshaft sensor signal for accurate timing control of ignition (if a gasoline engine), injection, and variable valve phasing, etc. As their na\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Signal errors resulting from excessive dirt or detritus on the sensor housing or pulse wheel.",
+          "Damage to the sensor housing or pulse wheel."
+        ],
+        symptomIndicators: [
+          "Limp-home mode operation",
+          "Malfunction Indicator Lamp (MIL) illumination",
+          "Excessive crank or flywheel movement or vibration."
+        ],
+        associatedDtcs: [
+          "P0340",
+          "P0341",
+          "P0342",
+          "P0343",
+          "P0344",
+          "P0345",
+          "P0346",
+          "P0347",
+          "P0348",
+          "P0349",
+          "P0365",
+          "P0366",
+          "P0367",
+          "P0368",
+          "P0369",
+          "P0390",
+          "P0391",
+          "P0392",
+          "P0393",
+          "P0394"
+        ],
+        goodVsFaultyDiagnosticRule: "[CMP_CAMSHAFT] Known-Good: Digital Square Wave (Hall / Optical / Logic 0V-5V or 0V-12V). Expected voltage references: 0 V, 5 V. Faulty signal deviations to compare: Signal errors resulting from excessive dirt or detritus on the sensor housing or pulse wheel.; Damage to the sensor housing or pulse wheel.. Typical DTCs: P0340, P0341, P0342, P0343, P0344."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/camshaft-position/AGT-061-camshaft-position-hall-effect/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-063",
+      agtCode: "AGT-063",
+      title: "Accelerator pedal position (analog)",
+      category: "sensors",
+      subCategory: "accelerator-pedal-position",
+      signalFamily: "TPS_APP_THROTTLE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the operation of the Accelerator Pedal Position (APP) sensor from the output voltages in relation to the pedal position.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect a test lead to Channel A and one of the two accelerator pedal position sensor output circuits. \u2192 Connect a test lead to Channel B and the other accelerator pedal position sensor output circuit. \u2192 Turn on the ignition. \u2192 Start the scope to see live data. \u2192 Vary the accele\u2026",
+        knownGoodSummary: "The purpose of this test is to evaluate the operation of the Accelerator Pedal Position (APP) sensor from the output voltages in relation to the pedal position."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [
+          "P0221",
+          "P0222",
+          "P0223",
+          "P0225",
+          "P0226",
+          "P0227",
+          "P0228",
+          "P1545"
+        ],
+        goodVsFaultyDiagnosticRule: "[TPS_APP_THROTTLE] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference. Typical DTCs: P0221, P0222, P0223, P0225, P0226."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/accelerator-pedal-position/AGT-063-accelerator-pedal-position-analog/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-071",
+      agtCode: "AGT-071",
+      title: "Variable-speed cooling fan",
+      category: "actuators",
+      subCategory: "variable-speed-cooling-fan",
+      signalFamily: "PWM_SOLENOID_VALVE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the operation of the cooling fan and circuit based upon the current draw and the control signal voltage and duty cycle.",
+      knownGood: {
+        waveformShape: "Pulse-Width Modulated (PWM) Switched Square Wave",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer data to identify the cooling fan circuit. \u2192 Connect PicoScope Channel A to the cooling fan switching circuit. \u2192 Switch on, zero and connect the high amps clamp to PicoScope Channel B. \u2192 Minimize the help page. You will see that PicoScope has displayed an example\u2026",
+        knownGoodSummary: "Cooling fan on Variable-speed cooling fans are used within vehicles to provide more precise control of engine coolant cooling. This allows the vehicle to provide better control of the engine operating temperature, as well as other benefits for the control of Heating Ventilation and Air Conditioning (HVAC). Variable sp\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[PWM_SOLENOID_VALVE] Known-Good: Pulse-Width Modulated (PWM) Switched Square Wave. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/variable-speed-cooling-fan/AGT-071-variable-speed-cooling-fan/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-072",
+      agtCode: "AGT-072",
+      title: "Wheel speed sensor (Hall effect)",
+      category: "sensors",
+      subCategory: "wheel-speed",
+      signalFamily: "ABS_WHEEL_SPEED",
+      systemCategoryId: "safety_abs_srs",
+      purposeSummary: "The purpose of this test is to evaluate the operation of a Hall effect Antilock Braking System (ABS) wheel speed sensor.",
+      knownGood: {
+        waveformShape: "Digital Square Wave (Hall / Optical / Logic 0V-5V or 0V-12V)",
+        extractedVoltageSpecs: [
+          "5 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the wheel speed sensor output circuits. \u2192 Connect PicoScope Channel A to the sensor signal circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Turn the igni\u2026",
+        knownGoodSummary: "Wheel speed sensors provide wheel and road speed feedback to ABS and derivative active vehicle safety systems (i.e. stability and traction control etc.). These systems are designed to provide corrective action (e.g. wheel braking or engine torque limitation) when the vehicle chassis or wheel speeds have exceeded their\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Wheel speed sensor circuits and connectors are also prone to the atmosphere and possible electrical failures, such as open or short circuits or high circuit re\u2026",
+          "Active wheel speed sensors are susceptible to damage from incorrect testing methods; in particular, the application of resistance testing."
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[ABS_WHEEL_SPEED] Known-Good: Digital Square Wave (Hall / Optical / Logic 0V-5V or 0V-12V). Expected voltage references: 5 V. Faulty signal deviations to compare: Wheel speed sensor circuits and connectors are also prone to the atmosphere and possible electrical failures, such as open or short circuits or high circuit re\u2026; Active wheel speed sensors are susceptible to damage from incorrect testing methods; in particular, the application of resistance testing.."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/wheel-speed/AGT-072-wheel-speed-sensor-hall-effect/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-076",
+      agtCode: "AGT-076",
+      title: "Throttle servomotors",
+      category: "actuators",
+      subCategory: "throttle-servomotor",
+      signalFamily: "TPS_APP_THROTTLE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the operation of a throttle servo motor and Throttle Position Sensor (TPS) across a range of engine speeds.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect a test lead to Channel A and the throttle position sensor output circuit. \u2192 Connect a test lead to Channel B and the throttle control motor switching circuit. \u2192 Start the scope to see live data. \u2192 Run the engine and vary the accelerator pedal position to see changes in t\u2026",
+        knownGoodSummary: "The purpose of this test is to evaluate the operation of a throttle servo motor and Throttle Position Sensor (TPS) across a range of engine speeds."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[TPS_APP_THROTTLE] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/throttle-servomotor/AGT-076-throttle-servomotors/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-078",
+      agtCode: "AGT-078",
+      title: "Primary voltage vs. secondary",
+      category: "ignition",
+      subCategory: "coil-on-plug",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the operation of a Coil-On-Plug (COP) unit having an externally switched primary circuit by evaluating the primary circuit voltage and the resulting secondary voltage using a Coil On Plug (COP) and Signal Probe. This test\u2026",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect a test lead with a 20:1 attenuator to Channel A and the coil's switched earth circuit. \u2192 Connection a Coil On Plug (COP) and Signal Probe to Channel B. \u2192 Start the engine and run at idle. \u2192 Start the scope to see live data. \u2192 Place the tip of the COP and Signal Probe on\u2026",
+        knownGoodSummary: "The purpose of this test is to check the operation of a Coil-On-Plug (COP) unit having an externally switched primary circuit by evaluating the primary circuit voltage and the resulting secondary voltage using a Coil On Plug (COP) and Signal Probe. This test\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/coil-on-plug/AGT-078-primary-voltage-vs-secondary/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-079",
+      agtCode: "AGT-079",
+      title: "Primary voltage and current vs. secondary",
+      category: "ignition",
+      subCategory: "coil-on-plug",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the operation of a Coil-On-Plug (COP) unit having an externally switched primary circuit by evaluating the primary circuit voltage and current and the resulting secondary voltage using a Coil On Plug (COP) and Signal Probe.",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check the operation of a Coil-On-Plug (COP) unit having an externally switched primary circuit by evaluating the primary circuit voltage and current and the resulting secondary voltage using a Coil On Plug (COP) and Signal Probe."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/coil-on-plug/AGT-079-primary-voltage-and-current-vs-secondary/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-081",
+      agtCode: "AGT-081",
+      title: "Secondary (negative-fired)",
+      category: "ignition",
+      subCategory: "distributorless-wasted-spark",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check a negative-fired secondary spark event within a distributorless wasted spark ignition system.",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check a negative-fired secondary spark event within a distributorless wasted spark ignition system."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/distributorless-wasted-spark/AGT-081-secondary-negative-fired/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-082",
+      agtCode: "AGT-082",
+      title: "Secondary (positive-fired)",
+      category: "ignition",
+      subCategory: "distributorless-wasted-spark",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check a positive-fired secondary spark event within a distributorless wasted spark ignition system.",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check a positive-fired secondary spark event within a distributorless wasted spark ignition system."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/distributorless-wasted-spark/AGT-082-secondary-positive-fired/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-095",
+      agtCode: "AGT-095",
+      title: "Air mass meter (digital)",
+      category: "sensors",
+      subCategory: "air-flow-mass",
+      signalFamily: "MAF_AIRFLOW",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the output from a digital Air Mass Meter (AMM).",
+      knownGood: {
+        waveformShape: "Digital Square Wave (Hall / Optical / Logic 0V-5V or 0V-12V)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [
+          "20 kHz",
+          "1.93 kHz"
+        ],
+        testSetupSummary: "Use manufacturer's data to identify the AFM output signal circuit. \u2192 Connect PicoScope Channel A and Channel B and join the test leads. \u2192 Connect the joined leads to the AFM circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is p\u2026",
+        knownGoodSummary: "Air flow meters measure the quantity of filtered air entering an engine. As such, they are used by the Engine Control Module (ECM) as the primary engine load sensor. Digital air flow meters operate in a manner similar to hot wire (or hot film) air flow meters but have a digital output signal. The digital signal is not\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [
+          "P0100",
+          "P0101",
+          "P0102",
+          "P0103",
+          "P0104"
+        ],
+        goodVsFaultyDiagnosticRule: "[MAF_AIRFLOW] Known-Good: Digital Square Wave (Hall / Optical / Logic 0V-5V or 0V-12V). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference. Typical DTCs: P0100, P0101, P0102, P0103, P0104."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/air-flow-mass/AGT-095-air-mass-meter-digital/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-098",
+      agtCode: "AGT-098",
+      title: "CRD (Bosch) piezo injector",
+      category: "actuators",
+      subCategory: "injector-(diesel)",
+      signalFamily: "INJECTOR_FUEL",
+      systemCategoryId: "fuel_system",
+      purposeSummary: "The purpose of this test is to evaluate the actuation current within a Bosch-type Common Rail Diesel (CRD) piezo injector circuit across a range of engine operating conditions. This test involves taking measurements on a system or component having a potential\u2026",
+      knownGood: {
+        waveformShape: "Inductive Switched Pulse with Flyback Voltage Spike & Pintle/Dwell Signature",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect the low amps clamp into PicoScope Channel A. \u2192 Select the 20 A scale and zero the clamp, then clamp it around an injector circuit wire. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Start\u2026",
+        knownGoodSummary: "Engine at idle speed. A piezoelectric diesel injector delivers atomized fuel directly to the engine combustion chamber when signaled to do so by the Engine Control Module (ECM). The injected fuel quantity is proportional to the injector duration (opening time), fuel rail pressure, fuel temperature and fluid viscosity.\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [
+          "Diagnostically, it is recommended to check that the correct injector codes are assigned to the correct cylinders within the ECM if the engi\u2026",
+          "Electrical circuits: if an injector cannot be energised sufficiently then its valve may not open properly, which may cause misfire symptoms."
+        ],
+        associatedDtcs: [
+          "P0200",
+          "P0201",
+          "P0202",
+          "P0203",
+          "P0204",
+          "P0205",
+          "P0206",
+          "P0207",
+          "P0208",
+          "P0209",
+          "P0210",
+          "P0211",
+          "P0212",
+          "P0261",
+          "P0262",
+          "P0264",
+          "P0265",
+          "P0267",
+          "P0268",
+          "P0270",
+          "P0271",
+          "P0273",
+          "P0274",
+          "P0276",
+          "P0277",
+          "P0279",
+          "P0280",
+          "P0282",
+          "P0283",
+          "P0285",
+          "P0286",
+          "P0288",
+          "P0289",
+          "P0291",
+          "P0292",
+          "P0294",
+          "P0295"
+        ],
+        goodVsFaultyDiagnosticRule: "[INJECTOR_FUEL] Known-Good: Inductive Switched Pulse with Flyback Voltage Spike & Pintle/Dwell Signature. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference. Typical DTCs: P0200, P0201, P0202, P0203, P0204."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/injector-(diesel)/AGT-098-crd-bosch-piezo-injector/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-099",
+      agtCode: "AGT-099",
+      title: "CRD (Delphi) solenoid injector",
+      category: "actuators",
+      subCategory: "injector-(diesel)",
+      signalFamily: "INJECTOR_FUEL",
+      systemCategoryId: "fuel_system",
+      purposeSummary: "The purpose of this test is to evaluate the actuation current within a Delphi-type Common Rail Diesel (CRD) solenoid injector circuit across a range of engine operating conditions.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to evaluate the actuation current within a Delphi-type Common Rail Diesel (CRD) solenoid injector circuit across a range of engine operating conditions."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[INJECTOR_FUEL] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/injector-(diesel)/AGT-099-crd-delphi-solenoid-injector/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-124",
+      agtCode: "AGT-124",
+      title: "LIN Bus physical layer",
+      category: "communication",
+      subCategory: "lin-bus",
+      signalFamily: "CAN_LIN_NETWORK",
+      systemCategoryId: "diagnostics_obd_dtc",
+      purposeSummary: "The purpose of this test is to validate the LIN bus communication signal.",
+      knownGood: {
+        waveformShape: "Differential Digital Bus (CAN-H / CAN-L mirrored 2.5V recessive -> 3.5V/1.5V dominant)",
+        extractedVoltageSpecs: [
+          "0V"
+        ],
+        extractedFrequencyOrTimingSpecs: [
+          "150\xB5s",
+          "100ms",
+          "250ms"
+        ],
+        testSetupSummary: "Connect x1 test lead on PicoScope Channel A to the wiring on the LIN BUS network. Connect the ground lead to a suitable earth point or battery negative. \u2192 Ensure the ignition is switched on. \u2192 Minimise the help page. You will now see that PicoScope has displayed an example wavef\u2026",
+        knownGoodSummary: "LIN is a single wire, bi-directional data bus transmitting at relatively low speeds with a max speed of 20kBaud (kbits/s) with typical speeds of 9.6kBaud and 19.2kBaud. LIN works on a master and multiple slave concept, such as a central electronics ECU which communicates with all the door locks. Voltages for this sign\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "The frame structure consists of a number of elements but its basic form consists of 2 sections, the header and the response which is then broken down further."
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[CAN_LIN_NETWORK] Known-Good: Differential Digital Bus (CAN-H / CAN-L mirrored 2.5V recessive -> 3.5V/1.5V dominant). Expected voltage references: 0V. Faulty signal deviations to compare: The frame structure consists of a number of elements but its basic form consists of 2 sections, the header and the response which is then broken down further.."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/communication/lin-bus/AGT-124-lin-bus-physical-layer/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-125",
+      agtCode: "AGT-125",
+      title: "FlexRay bus physical layer",
+      category: "communication",
+      subCategory: "flexray-bus",
+      signalFamily: "CAN_LIN_NETWORK",
+      systemCategoryId: "diagnostics_obd_dtc",
+      purposeSummary: "The purpose of this test is to verify the integrity of the FlexRay networks by checking the mirror image nature of the signals and the coincidence of the edges.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to verify the integrity of the FlexRay networks by checking the mirror image nature of the signals and the coincidence of the edges."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[CAN_LIN_NETWORK] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/communication/flexray-bus/AGT-125-flexray-bus-physical-layer/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-126",
+      agtCode: "AGT-126",
+      title: "CAN bus physical layer",
+      category: "communication",
+      subCategory: "can-bus",
+      signalFamily: "CAN_LIN_NETWORK",
+      systemCategoryId: "diagnostics_obd_dtc",
+      purposeSummary: "The purpose of this test is to determine the physical integrity of a Controller Area Network (CAN) bus by checking its low (CAN-L) and high (CAN-H) line voltages.",
+      knownGood: {
+        waveformShape: "Differential Digital Bus (CAN-H / CAN-L mirrored 2.5V recessive -> 3.5V/1.5V dominant)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Locate the Diagnostic Link Connector (DLC). \u2192 Connect PicoScope Channel A to terminal 6 and chassis earth. \u2192 Connect PicoScope Channel B to terminal 14 and chassis earth. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to cap\u2026",
+        knownGoodSummary: "A CAN bus provides serial communication between control units. For example, a powertrain CAN bus allows an ABS control unit to broadcast a message containing wheel speed data simultaneously to the Engine Control Module (ECM), Transmission Control Module (TCM), Instrument Cluster (IC), and Supplementary Restraint Syste\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Interference from untwisted CAN lines or a degradation in their shielding, as might arise from previous repairs, the use of puncture probes, abrasion, or gener\u2026",
+          "Interference from other electrically noisy components."
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[CAN_LIN_NETWORK] Known-Good: Differential Digital Bus (CAN-H / CAN-L mirrored 2.5V recessive -> 3.5V/1.5V dominant). Faulty signal deviations to compare: Interference from untwisted CAN lines or a degradation in their shielding, as might arise from previous repairs, the use of puncture probes, abrasion, or gener\u2026; Interference from other electrically noisy components.."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/communication/can-bus/AGT-126-can-bus-physical-layer/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-128",
+      agtCode: "AGT-128",
+      title: "Oxygen (zirconia): pre and post",
+      category: "sensors",
+      subCategory: "oxygen",
+      signalFamily: "O2_LAMBDA_AFR",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate catalytic convertor and oxygen sensor (zirconia) operation from the sensors' voltage outputs.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to evaluate catalytic convertor and oxygen sensor (zirconia) operation from the sensors' voltage outputs."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[O2_LAMBDA_AFR] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/oxygen/AGT-128-oxygen-zirconia-pre-and-post/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-136",
+      agtCode: "AGT-136",
+      title: "MAP and temperature (turbo diesel)",
+      category: "sensors",
+      subCategory: "manifold-air-pressure",
+      signalFamily: "MAP_PRESSURE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the operation of a combined Temperature and Manifold Absolute Pressure (TMAP) sensor and the turbo diesel engine intake system pressure during idle, free revving, and overrun conditions.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [
+          "5V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the TMAP sensor signal circuits. \u2192 Connect PicoScope Channel A to the TMAP pressure signal circuit. \u2192 Connect PicoScope Channel B to the TMAP temperature signal circuit. \u2192 Start the engine and allow it to idle. \u2192 Minimize the help page. You wi\u2026",
+        knownGoodSummary: "TMAP sensors fulfil the functions of standard MAP sensors. That is, they respond to the air pressure within the intake manifold and allow the Engine Control Module (ECM) to estimate two important parameters: Atmospheric pressure at key on. Engine load. However, they also have an additional intake temperature sensor to\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Symptoms of a faulty MAP sensor:",
+          "Electrical circuit issues, such as a short, open or high resistance.",
+          "Internal wear or damage within the sensor unit (from heat, vibration or pollutants)."
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination.",
+          "Erratic or rough idle."
+        ],
+        associatedDtcs: [
+          "P0105",
+          "P0106",
+          "P0107",
+          "P0108",
+          "P0109",
+          "P0110",
+          "P0111",
+          "P0112",
+          "P0113",
+          "P0114",
+          "P1101",
+          "P1106",
+          "P1107",
+          "P1111",
+          "P1112"
+        ],
+        goodVsFaultyDiagnosticRule: "[MAP_PRESSURE] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Expected voltage references: 5V. Faulty signal deviations to compare: Symptoms of a faulty MAP sensor:; Electrical circuit issues, such as a short, open or high resistance.; Internal wear or damage within the sensor unit (from heat, vibration or pollutants).. Typical DTCs: P0105, P0106, P0107, P0108, P0109."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/manifold-air-pressure/AGT-136-map-and-temperature-turbo-diesel/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-137",
+      agtCode: "AGT-137",
+      title: "Trigger vs. secondary",
+      category: "ignition",
+      subCategory: "coil-on-plug",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the operation of a Coil-On-Plug (COP) unit having an internally switched primary circuit by evaluating the trigger signal and the resulting secondary ignition voltage using an HT Extension Lead and a Secondary Ignition Pic\u2026",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check the operation of a Coil-On-Plug (COP) unit having an internally switched primary circuit by evaluating the trigger signal and the resulting secondary ignition voltage using an HT Extension Lead and a Secondary Ignition Pic\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/coil-on-plug/AGT-137-trigger-vs-secondary/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-138",
+      agtCode: "AGT-138",
+      title: "CRD (Bosch) fuel rail pressure",
+      category: "sensors",
+      subCategory: "fuel-pressure",
+      signalFamily: "FUEL_RAIL_PRESSURE",
+      systemCategoryId: "fuel_system",
+      purposeSummary: "The purpose of this test is to evaluate the signal and common rail diesel system pressure from the fuel rail pressure sensor output.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [
+          "0.5 V",
+          "4.5 V",
+          "0 V",
+          "5 V",
+          "2.5 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Using manufacturer's data, identify the output signal circuit for the fuel rail pressure sensor. \u2192 Ensure the engine is stopped. \u2192 Connect PicoScope Channel A to the signal circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is pr\u2026",
+        knownGoodSummary: "The fuel rail pressure sensor provides feedback to the ECM, which regulates the rail pressure by varying the volume of fuel delivered by the high-pressure pump and/or controlling the flow of excess fuel from the rail to the fuel return system. The ECM uses its internal calibration tables ( maps ) to calculate the desi\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "A high-pressure system leak can be indicated if the sensor output rapidly drops to 0.5 V after the engine has been stopped, as might occur with a leaky injecto\u2026"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [
+          "P0087",
+          "P0088",
+          "P0190",
+          "P0191",
+          "P0192",
+          "P0193",
+          "P0194"
+        ],
+        goodVsFaultyDiagnosticRule: "[FUEL_RAIL_PRESSURE] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Expected voltage references: 0.5 V, 4.5 V, 0 V. Faulty signal deviations to compare: A high-pressure system leak can be indicated if the sensor output rapidly drops to 0.5 V after the engine has been stopped, as might occur with a leaky injecto\u2026. Typical DTCs: P0087, P0088, P0190, P0191, P0192."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/fuel-pressure/AGT-138-crd-bosch-fuel-rail-pressure/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-141",
+      agtCode: "AGT-141",
+      title: "Ford smart alternator",
+      category: "charging-starting",
+      subCategory: "charging",
+      signalFamily: "CHARGING_STARTING_RIPPLE",
+      systemCategoryId: "electrical_charging",
+      purposeSummary: "The purpose of this test is to check the output of a Ford-type smart charging alternator, with and without an electrical system load, whilst monitoring Engine Control Module (ECM) control.",
+      knownGood: {
+        waveformShape: "Pulse-Width Modulated (PWM) Switched Square Wave",
+        extractedVoltageSpecs: [
+          "18 V",
+          "14.75 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the alternator command, feedback, and output circuits. \u2192 Connect the high amps clamp into PicoScope Channel A, select the 200 A range and zero the clamp. \u2192 Connect the high amps clamp around the alternator B+ cable. \u2192 Connect PicoScope Channel\u2026",
+        knownGoodSummary: "Engine at idle, alternator under light load. When the engine is running, an alternator generates electrical energy to supply the vehicle's onboard electrical systems and replace the battery charge consumed during cranking. Smart charge systems are able to balance these requirements against the needs of the driver, suc\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Other possible symptoms of faulty alternator or charging system might be:",
+          "Diode faults, caused by heat and vibration or the inclusion of moisture into the circuitry.",
+          "Short or open circuits, or high resistances, in the stator windings.",
+          "Short or open circuits, or high resistances, in battery or earth cables and/or connections."
+        ],
+        symptomIndicators: [
+          "Possible engine misfire."
+        ],
+        associatedDtcs: [
+          "P0620",
+          "P0621",
+          "P0622",
+          "P0623",
+          "P0624",
+          "P0625",
+          "P0626"
+        ],
+        goodVsFaultyDiagnosticRule: "[CHARGING_STARTING_RIPPLE] Known-Good: Pulse-Width Modulated (PWM) Switched Square Wave. Expected voltage references: 18 V, 14.75 V. Faulty signal deviations to compare: Other possible symptoms of faulty alternator or charging system might be:; Diode faults, caused by heat and vibration or the inclusion of moisture into the circuitry.; Short or open circuits, or high resistances, in the stator windings.. Typical DTCs: P0620, P0621, P0622, P0623, P0624."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/charging-starting/charging/AGT-141-ford-smart-alternator/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-142",
+      agtCode: "AGT-142",
+      title: "Oxygen (zirconia), pre-cat: output and heater",
+      category: "sensors",
+      subCategory: "oxygen",
+      signalFamily: "O2_LAMBDA_AFR",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate pre-catalytic converter oxygen sensor (zirconia) operation using the output signal voltage and heater current.",
+      knownGood: {
+        waveformShape: "Slow Switching Analog Voltage (0.1V Lean to 0.9V Rich Lambda Oscillation)",
+        extractedVoltageSpecs: [
+          "0.2 V",
+          "0.8 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect a low-amps clamp to Channel A and around the pre-catalytic converter sensor's heater supply circuit. \u2192 Connect a test lead to Channel B and the sensor's output signal circuit. \u2192 Start the scope. \u2192 Start the engine and allow it to idle. \u2192 With your waveforms on screen sto\u2026",
+        knownGoodSummary: "An oxygen sensor also can be referred to as a Lambda sensor, an O2 sensor, or a Heated Exhaust Gas Oxygen (HEGO) sensor. It is a feedback sensor used by the Engine Control Module (ECM) to perform closed loop control of engine fueling and, if a post catalytic converter sensor is present, monitor catalytic converter fun\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Symptoms of a faulty/inoperative oxygen sensor:",
+          "Open or short circuits or high resistances in the sensor circuits, such as in the:",
+          "Damage or contamination from excessive fuel in the exhaust.",
+          "Damage from excessive heat.",
+          "Incorrect fitment (and damage arising therefrom)."
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination."
+        ],
+        associatedDtcs: [
+          "P0030",
+          "P0031",
+          "P0032",
+          "P0036",
+          "P0037",
+          "P0038",
+          "P0040",
+          "P0041",
+          "P0042",
+          "P0043",
+          "P0044",
+          "P0050",
+          "P0051",
+          "P0052",
+          "P0053",
+          "P0054",
+          "P0055",
+          "P0056",
+          "P0057",
+          "P0058",
+          "P0059",
+          "P0060",
+          "P0061",
+          "P0062",
+          "P0063",
+          "P0064",
+          "P0130",
+          "P0131",
+          "P0132",
+          "P0133",
+          "P0134",
+          "P0135",
+          "P0136",
+          "P0137",
+          "P0138",
+          "P0139",
+          "P0140",
+          "P0141",
+          "P0142",
+          "P0143",
+          "P0144",
+          "P0145",
+          "P0146",
+          "P0147",
+          "P0150",
+          "P0151",
+          "P0152",
+          "P0153",
+          "P0154",
+          "P0155",
+          "P0156",
+          "P0157",
+          "P0158",
+          "P0159",
+          "P0160",
+          "P0161",
+          "P0162",
+          "P0163",
+          "P0164",
+          "P0165",
+          "P0166",
+          "P0167",
+          "P0170",
+          "P0171",
+          "P0172",
+          "P0173",
+          "P0174",
+          "P0175"
+        ],
+        goodVsFaultyDiagnosticRule: "[O2_LAMBDA_AFR] Known-Good: Slow Switching Analog Voltage (0.1V Lean to 0.9V Rich Lambda Oscillation). Expected voltage references: 0.2 V, 0.8 V. Faulty signal deviations to compare: Symptoms of a faulty/inoperative oxygen sensor:; Open or short circuits or high resistances in the sensor circuits, such as in the:; Damage or contamination from excessive fuel in the exhaust.. Typical DTCs: P0030, P0031, P0032, P0036, P0037."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/oxygen/AGT-142-oxygen-zirconia-pre-cat-output-and-heater/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-145",
+      agtCode: "AGT-145",
+      title: "Glow plug (voltage and current)",
+      category: "actuators",
+      subCategory: "glow-plugs",
+      signalFamily: "PWM_SOLENOID_VALVE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the operation of the glow plug circuit and signal.",
+      knownGood: {
+        waveformShape: "Pulse-Width Modulated (PWM) Switched Square Wave",
+        extractedVoltageSpecs: [
+          "4 to 5 V",
+          "7 V",
+          "12 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the glow plug supply circuit. \u2192 Connect a low amps clamp to PicoScope Channel A. \u2192 Select the 60 A scale and zero the clamp. \u2192 Attach the clamp around the (individual) suspect glow plug supply wire. \u2192 Connect PicoScope Channel B voltage probe\u2026",
+        knownGoodSummary: "Glow plugs support diesel fuel combustion and emissions control processes. Injected diesel fuel ignites if the cylinder charge temperature reaches 850\xB0 C during compression. However, this temperature may not be achieved with cold ambient air conditions and engine components. In these circumstances, the glow plugs are\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Short or open circuits or high resistances within the circuitry or connections",
+          "The most common glow plug fault is a thermal failure from overheating."
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) or glow plug warning lamp illumination"
+        ],
+        associatedDtcs: [
+          "P0380",
+          "P0381",
+          "P0382",
+          "P0383",
+          "P0384",
+          "P0670",
+          "P0671",
+          "P0672",
+          "P0673",
+          "P0674",
+          "P0675",
+          "P0676",
+          "P0677",
+          "P0678",
+          "P0679",
+          "P0680",
+          "P0681",
+          "P0682",
+          "P0683",
+          "P0684"
+        ],
+        goodVsFaultyDiagnosticRule: "[PWM_SOLENOID_VALVE] Known-Good: Pulse-Width Modulated (PWM) Switched Square Wave. Expected voltage references: 4 to 5 V, 7 V, 12 V. Faulty signal deviations to compare: Short or open circuits or high resistances within the circuitry or connections; The most common glow plug fault is a thermal failure from overheating.. Typical DTCs: P0380, P0381, P0382, P0383, P0384."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/glow-plugs/AGT-145-glow-plug-voltage-and-current/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-146",
+      agtCode: "AGT-146",
+      title: "UI (VAG PD) piezo injector",
+      category: "actuators",
+      subCategory: "injector-(diesel)",
+      signalFamily: "INJECTOR_FUEL",
+      systemCategoryId: "fuel_system",
+      purposeSummary: "The purpose of this test is to evaluate the operation of the Volkswagen-Audi Group (VAG) Unit Injection (UI) [or Pumpe-D\xFCse (PD)] piezo injector actuation current across a range of engine operating conditions.",
+      knownGood: {
+        waveformShape: "Inductive Switched Pulse with Flyback Voltage Spike & Pintle/Dwell Signature",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to evaluate the operation of the Volkswagen-Audi Group (VAG) Unit Injection (UI) [or Pumpe-D\xFCse (PD)] piezo injector actuation current across a range of engine operating conditions."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[INJECTOR_FUEL] Known-Good: Inductive Switched Pulse with Flyback Voltage Spike & Pintle/Dwell Signature. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/injector-(diesel)/AGT-146-ui-vag-pd-piezo-injector/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-151",
+      agtCode: "AGT-151",
+      title: "Crankshaft position vs. camshaft position.",
+      category: "system-tests",
+      subCategory: "camshaft-position-vs.-crankshaft-position",
+      signalFamily: "CKP_CRANKSHAFT",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the relative crankshaft and camshaft positions.",
+      knownGood: {
+        waveformShape: "AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the crankshaft and camshaft sensor signal circuits. \u2192 Connect PicoScope Channel A to the crankshaft circuit. \u2192 Connect PicoScope Channel B to the camshaft circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example\u2026",
+        knownGoodSummary: "An engine's CKP and CMP sensors provide the Engine Control Module (ECM) with critical engine speed, position, and timing reference data. For the engine to function properly, the engine must be timed correctly and the sensors and related apparatus must be fixed in the correct position relative to the crankshaft and cam\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [
+          "Limp-home mode operation",
+          "Malfunction Indicator Lamp (MIL) illumination",
+          "Discrepancies in crank and valvetrain timing caused by:"
+        ],
+        associatedDtcs: [
+          "P0335",
+          "P0336",
+          "P0337",
+          "P0338",
+          "P0339",
+          "P0340",
+          "P0341",
+          "P0342",
+          "P0343",
+          "P0344",
+          "P0345",
+          "P0346",
+          "P0347",
+          "P0348",
+          "P0349",
+          "P0365",
+          "P0366",
+          "P0367",
+          "P0368",
+          "P0369",
+          "P0390",
+          "P0391",
+          "P0392",
+          "P0393",
+          "P0394"
+        ],
+        goodVsFaultyDiagnosticRule: "[CKP_CRANKSHAFT] Known-Good: AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference. Typical DTCs: P0335, P0336, P0337, P0338, P0339."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/system-tests/camshaft-position-vs.-crankshaft-position/AGT-151-crankshaft-position-vs-camshaft-position/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-156",
+      agtCode: "AGT-156",
+      title: "VVT dual control solenoids",
+      category: "actuators",
+      subCategory: "variable-valve-timing",
+      signalFamily: "PWM_SOLENOID_VALVE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the duty cycle actuation signals of dual Variable Valve Timing (VVT) solenoid control actuators.",
+      knownGood: {
+        waveformShape: "Pulse-Width Modulated (PWM) Switched Square Wave",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to evaluate the duty cycle actuation signals of dual Variable Valve Timing (VVT) solenoid control actuators."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[PWM_SOLENOID_VALVE] Known-Good: Pulse-Width Modulated (PWM) Switched Square Wave. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/variable-valve-timing/AGT-156-vvt-dual-control-solenoids/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-161",
+      agtCode: "AGT-161",
+      title: "Primary voltage and current",
+      category: "ignition",
+      subCategory: "coil-on-plug",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the operation of a Coil-On-Plug (COP) unit having an externally switched primary circuit by evaluating the primary circuit voltage and current.",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check the operation of a Coil-On-Plug (COP) unit having an externally switched primary circuit by evaluating the primary circuit voltage and current."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/coil-on-plug/AGT-161-primary-voltage-and-current/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-162",
+      agtCode: "AGT-162",
+      title: "Trigger vs. primary current",
+      category: "ignition",
+      subCategory: "coil-on-plug",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the operation of a Coil-On-Plug (COP) unit having an internally switched primary circuit by evaluating the trigger signal and the resulting supply voltage, ground voltage and primary current.",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check the operation of a Coil-On-Plug (COP) unit having an internally switched primary circuit by evaluating the trigger signal and the resulting supply voltage, ground voltage and primary current."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/coil-on-plug/AGT-162-trigger-vs-primary-current/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-166",
+      agtCode: "AGT-166",
+      title: "K-Line bus physical layer",
+      category: "communication",
+      subCategory: "k-line-bus",
+      signalFamily: "CAN_LIN_NETWORK",
+      systemCategoryId: "diagnostics_obd_dtc",
+      purposeSummary: "The purpose of this test is to verify K-Line integrity and diagnostic data exchange when a scan-tool uses the line to interrogate a control module.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to verify K-Line integrity and diagnostic data exchange when a scan-tool uses the line to interrogate a control module."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[CAN_LIN_NETWORK] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/communication/k-line-bus/AGT-166-k-line-bus-physical-layer/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-168",
+      agtCode: "AGT-168",
+      title: "Primary current",
+      category: "ignition",
+      subCategory: "distributorless-wasted-spark",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check saturation of a single ignition coil within a distributorless/wasted spark ignition system by evaluating the primary circuit current.",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check saturation of a single ignition coil within a distributorless/wasted spark ignition system by evaluating the primary circuit current."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/distributorless-wasted-spark/AGT-168-primary-current/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-176",
+      agtCode: "AGT-176",
+      title: "Trigger (dual), feed and ground (4 cyl)",
+      category: "ignition",
+      subCategory: "multi-coil-on-plug-unit",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the system ground, feed and (dual) trigger circuits in a multi-coil-on-plug ignition system.",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check the system ground, feed and (dual) trigger circuits in a multi-coil-on-plug ignition system."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/multi-coil-on-plug-unit/AGT-176-trigger-dual-feed-and-ground-4-cyl/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-185",
+      agtCode: "AGT-185",
+      title: "Secondary (4 cyl)",
+      category: "ignition",
+      subCategory: "multi-coil-on-plug-unit",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the secondary ignition voltages across all cylinders in a multi-coil-on-plug ignition system.",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check the secondary ignition voltages across all cylinders in a multi-coil-on-plug ignition system."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/multi-coil-on-plug-unit/AGT-185-secondary-4-cyl/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-186",
+      agtCode: "AGT-186",
+      title: "Secondary (1 cyl, positive-fired)",
+      category: "ignition",
+      subCategory: "multi-coil-on-plug-unit",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the positive-fired secondary ignition voltage on one cylinder in a multi-coil-on-plug ignition system.",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check the positive-fired secondary ignition voltage on one cylinder in a multi-coil-on-plug ignition system."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/multi-coil-on-plug-unit/AGT-186-secondary-1-cyl-positive-fired/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-191",
+      agtCode: "AGT-191",
+      title: "Secondary (1 cyl, negative-fired)",
+      category: "ignition",
+      subCategory: "multi-coil-on-plug-unit",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the negative-fired secondary ignition voltage on one cylinder in a multi-coil-on-plug ignition system.",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check the negative-fired secondary ignition voltage on one cylinder in a multi-coil-on-plug ignition system."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/multi-coil-on-plug-unit/AGT-191-secondary-1-cyl-negative-fired/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-192",
+      agtCode: "AGT-192",
+      title: "Trigger (dual), feed and current (4 cyl)",
+      category: "ignition",
+      subCategory: "multi-coil-on-plug-unit",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the (dual) trigger voltages against the primary current across all cylinders in a multi-coil-on-plug ignition system.",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check the (dual) trigger voltages against the primary current across all cylinders in a multi-coil-on-plug ignition system."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/multi-coil-on-plug-unit/AGT-192-trigger-dual-feed-and-current-4-cyl/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-193",
+      agtCode: "AGT-193",
+      title: "Trigger and current vs. secondary (1 cyl)",
+      category: "ignition",
+      subCategory: "multi-coil-on-plug-unit",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the trigger signal and primary current against the secondary ignition voltage on one cylinder in a multi-coil-on-plug ignition system.",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check the trigger signal and primary current against the secondary ignition voltage on one cylinder in a multi-coil-on-plug ignition system."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/multi-coil-on-plug-unit/AGT-193-trigger-and-current-vs-secondary-1-cyl/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-194",
+      agtCode: "AGT-194",
+      title: "Trigger vs. secondary (1 cyl)",
+      category: "ignition",
+      subCategory: "multi-coil-on-plug-unit",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the trigger signal against the secondary ignition voltage on one cylinder in a multi-coil-on-plug ignition system.",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check the trigger signal against the secondary ignition voltage on one cylinder in a multi-coil-on-plug ignition system."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/multi-coil-on-plug-unit/AGT-194-trigger-vs-secondary-1-cyl/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-196",
+      agtCode: "AGT-196",
+      title: "Secondary (COP probe, mV scaled)",
+      category: "ignition",
+      subCategory: "coil-on-plug",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the operation of a Coil-On-Plug (COP) unit by evaluating secondary ignition events using a Coil On Plug (COP) and Signal Probe.",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check the operation of a Coil-On-Plug (COP) unit by evaluating secondary ignition events using a Coil On Plug (COP) and Signal Probe."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/coil-on-plug/AGT-196-secondary-cop-probe-mv-scaled/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-198",
+      agtCode: "AGT-198",
+      title: "Trigger vs. feedback",
+      category: "ignition",
+      subCategory: "coil-on-plug",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the operation of a Coil-On-Plug (COP) unit having an feedback circuit by evaluating the trigger signal and the resulting feedback signal.",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check the operation of a Coil-On-Plug (COP) unit having an feedback circuit by evaluating the trigger signal and the resulting feedback signal."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/coil-on-plug/AGT-198-trigger-vs-feedback/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-382",
+      agtCode: "AGT-382",
+      title: "MPI injector voltage",
+      category: "actuators",
+      subCategory: "injector-(gasoline)",
+      signalFamily: "INJECTOR_FUEL",
+      systemCategoryId: "fuel_system",
+      purposeSummary: "The purpose of this test is to evaluate the operation of the Multi-Point Injection (MPI) injector control circuit, switching signal and solenoid mechanism. This test involves measuring a potentially hazardous voltage. Risk of damage to equipment and property,\u2026",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [
+          "4 to 5 ms",
+          "2.5 ms"
+        ],
+        testSetupSummary: "Connect PicoScope Channel A to the injector's switched-earth circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Run the engine. \u2192 Start the scope to see live data. \u2192 With your waveform on scr\u2026",
+        knownGoodSummary: "An indirect injector delivers the correct quantity of atomised fuel to the air in the inlet tract, as it is drawn through to a cylinder. A multi-point injection system has one injector per cylinder supplied by a common fuel rail. As the rail pressure regulator maintains a constant pressure the injected fuel quantity d\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [
+          "P0200",
+          "P0201",
+          "P0202",
+          "P0203",
+          "P0204",
+          "P0205",
+          "P0206",
+          "P0207",
+          "P0208",
+          "P0209",
+          "P0210",
+          "P0211",
+          "P0212",
+          "P0213",
+          "P0214",
+          "P0216",
+          "P0261",
+          "P0262",
+          "P0263",
+          "P0264",
+          "P0265",
+          "P0266",
+          "P0267",
+          "P0268",
+          "P0269",
+          "P0270",
+          "P0271",
+          "P0272",
+          "P0273",
+          "P0274",
+          "P0275",
+          "P0276",
+          "P0277",
+          "P0278",
+          "P0279",
+          "P0280",
+          "P0281",
+          "P0282",
+          "P0283",
+          "P0284",
+          "P0285",
+          "P0286",
+          "P0287",
+          "P0288",
+          "P0289",
+          "P0290",
+          "P0291",
+          "P0292",
+          "P0293",
+          "P0294",
+          "P0295",
+          "P0296"
+        ],
+        goodVsFaultyDiagnosticRule: "[INJECTOR_FUEL] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference. Typical DTCs: P0200, P0201, P0202, P0203, P0204."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/injector-(gasoline)/AGT-382-mpi-injector-voltage/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-385",
+      agtCode: "AGT-385",
+      title: "UI (VAG PD) solenoid injector",
+      category: "actuators",
+      subCategory: "injector-(diesel)",
+      signalFamily: "INJECTOR_FUEL",
+      systemCategoryId: "fuel_system",
+      purposeSummary: "The purpose of this test is to evaluate the operation of the Volkswagen-Audi Group (VAG) Unit Injection (UI) [or Pumpe-D\xFCse (PD)] solenoid injector current, voltage and earth circuits.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to evaluate the operation of the Volkswagen-Audi Group (VAG) Unit Injection (UI) [or Pumpe-D\xFCse (PD)] solenoid injector current, voltage and earth circuits."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[INJECTOR_FUEL] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/injector-(diesel)/AGT-385-ui-vag-pd-solenoid-injector/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-386",
+      agtCode: "AGT-386",
+      title: "Primary voltage",
+      category: "ignition",
+      subCategory: "distributor-",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check ignition coil primary circuit operation by evaluating the primary circuit voltage. This test involves measuring a potentially hazardous voltage. Risk of damage to equipment and property, and risk of electric shock, persona\u2026",
+      knownGood: {
+        waveformShape: "AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed)",
+        extractedVoltageSpecs: [
+          "0 V",
+          "250 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect a test lead with a 10:1 attenuator to PicoScope Channel A. \u2192 Connect the test lead to the coil switched earth circuit (often marked CB, T1 or -) and to earth. \u2192 Start the engine and allow it to idle. \u2192 Minimize the help page. You will see that PicoScope has displayed an\u2026",
+        knownGoodSummary: "General principles All (inductive) spark ignition systems use one or more ignition coils. The coils act as both an accumulator, to store energy, and a step-up transformer, to generate the high voltages necessary to produce an electrical spark within a combustion chamber. An ignition coil consists of a primary coil and\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "When the primary circuit is on, the switched earth voltage should be very close to 0 V. If not, there is likely to be a high resistance in the earth circuit (e\u2026"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed). Expected voltage references: 0 V, 250 V. Faulty signal deviations to compare: When the primary circuit is on, the switched earth voltage should be very close to 0 V. If not, there is likely to be a high resistance in the earth circuit (e\u2026."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/distributor-/AGT-386-primary-voltage/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-387",
+      agtCode: "AGT-387",
+      title: "Primary current",
+      category: "ignition",
+      subCategory: "distributor-",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check ignition coil saturation by evaluating the primary circuit current. This test involves taking measurements on a system or component having a potentially hazardous voltage. Risk of damage to equipment and property, and risk\u2026",
+      knownGood: {
+        waveformShape: "AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer data to identify the coil switched earth circuit. \u2192 Connect the low amps clamp to PicoScope Channel A. \u2192 Select the 20 A scale and zero the clamp before clamping around the ignition coil switched earth circuit. \u2192 Start the engine and allow it to idle. \u2192 Minimize\u2026",
+        knownGoodSummary: "General principles All (inductive) spark ignition systems use one or more ignition coils. The coils act as both an accumulator, to store energy, and a step-up transformer, to generate the high voltages necessary to produce an electrical spark within a combustion chamber. An ignition coil consists of a primary coil and\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Symptoms of a faulty coil can be:"
+        ],
+        symptomIndicators: [
+          "Multiple, possibly random, misfire across cylinders."
+        ],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed). Faulty signal deviations to compare: Symptoms of a faulty coil can be:."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/distributor-/AGT-387-primary-current/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-388",
+      agtCode: "AGT-388",
+      title: "MPI injector voltage and current",
+      category: "actuators",
+      subCategory: "injector-(gasoline)",
+      signalFamily: "INJECTOR_FUEL",
+      systemCategoryId: "fuel_system",
+      purposeSummary: "The purpose of this test is to evaluate the operation of the Multi-Point Injection (MPI) injector control circuit, switching signal and solenoid mechanism. This test involves taking measurements on a system or component having a potentially hazardous voltage.\u2026",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [
+          "4 to 5 ms",
+          "2.5 ms"
+        ],
+        testSetupSummary: "Connect PicoScope Channel A to the injector switched earth circuit. \u2192 Connect the low amps clamp to PicoScope Channel B. \u2192 Select the 20 A scale and zero the clamp before connecting it to the injector power supply circuit. \u2192 Minimize the help page. You will see that PicoScope ha\u2026",
+        knownGoodSummary: "An indirect injector delivers the correct quantity of atomised fuel to the air in the inlet tract as it is drawn through to a cylinder. A multi-point injection system has one injector per cylinder supplied by a common fuel rail. As the rail pressure regulator maintains a constant pressure, the injected fuel quantity d\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [
+          "P0200",
+          "P0201",
+          "P0202",
+          "P0203",
+          "P0204",
+          "P0205",
+          "P0206",
+          "P0207",
+          "P0208",
+          "P0209",
+          "P0210",
+          "P0211",
+          "P0212",
+          "P0213",
+          "P0214",
+          "P0216",
+          "P0261",
+          "P0262",
+          "P0263",
+          "P0264",
+          "P0265",
+          "P0266",
+          "P0267",
+          "P0268",
+          "P0269",
+          "P0270",
+          "P0271",
+          "P0272",
+          "P0273",
+          "P0274",
+          "P0275",
+          "P0276",
+          "P0277",
+          "P0278",
+          "P0279",
+          "P0280",
+          "P0281",
+          "P0282",
+          "P0283",
+          "P0284",
+          "P0285",
+          "P0286",
+          "P0287",
+          "P0288",
+          "P0289",
+          "P0290",
+          "P0291",
+          "P0292",
+          "P0293",
+          "P0294",
+          "P0295",
+          "P0296"
+        ],
+        goodVsFaultyDiagnosticRule: "[INJECTOR_FUEL] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference. Typical DTCs: P0200, P0201, P0202, P0203, P0204."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/injector-(gasoline)/AGT-388-mpi-injector-voltage-and-current/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-389",
+      agtCode: "AGT-389",
+      title: "Primary voltage vs. secondary (king lead)",
+      category: "ignition",
+      subCategory: "distributor-",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check ignition coil operation by evaluating the primary circuit current and the king lead secondary voltages. This test involves taking measurements on a system or component having a potentially hazardous voltage. Risk of damage\u2026",
+      knownGood: {
+        waveformShape: "AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed)",
+        extractedVoltageSpecs: [
+          "0 V",
+          "250 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect a test lead with a 10:1 attenuator to PicoScope Channel A. \u2192 Connect the test lead to the coil switched earth circuit (often marked CB, T1 or -) and to earth. \u2192 Connect a secondary ignition pickup lead to PicoScope Channel B. \u2192 Clamp the secondary ignition pickup around\u2026",
+        knownGoodSummary: "General principles All (inductive) spark ignition systems use one or more ignition coils. The coils act as both an accumulator, to store energy, and a step-up transformer, to generate the high voltages necessary to produce an electrical spark within a combustion chamber. An ignition coil consists of a primary coil and\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "When the primary circuit is on, the switched earth voltage should be very close to 0 V. If not, there is likely to be a high resistance in the earth circuit (e\u2026",
+          "There is an inversely proportional relationship between sparkline kV and spark duration. If the sparkline kV is too high, the spark duration will be too short,\u2026",
+          "A misfire may occur if there is too little energy within the ignition system - for example, if the coil is faulty or there are shorts or high resistance in the\u2026",
+          "Symptoms of a faulty coil can be:"
+        ],
+        symptomIndicators: [
+          "Multiple, possibly random, misfire across cylinders."
+        ],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed). Expected voltage references: 0 V, 250 V. Faulty signal deviations to compare: When the primary circuit is on, the switched earth voltage should be very close to 0 V. If not, there is likely to be a high resistance in the earth circuit (e\u2026; There is an inversely proportional relationship between sparkline kV and spark duration. If the sparkline kV is too high, the spark duration will be too short,\u2026; A misfire may occur if there is too little energy within the ignition system - for example, if the coil is faulty or there are shorts or high resistance in the\u2026."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/distributor-/AGT-389-primary-voltage-vs-secondary-king-lead/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-390",
+      agtCode: "AGT-390",
+      title: "Crankshaft position vs. primary ignition",
+      category: "system-tests",
+      subCategory: "crankshaft-vs.-primary-ignition-timing",
+      signalFamily: "CKP_CRANKSHAFT",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to monitor the Crankshaft Position (CKP) sensor output voltage and the primary ignition voltage to identify the cause of any misfires at higher engine speeds.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to monitor the Crankshaft Position (CKP) sensor output voltage and the primary ignition voltage to identify the cause of any misfires at higher engine speeds."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[CKP_CRANKSHAFT] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/system-tests/crankshaft-vs.-primary-ignition-timing/AGT-390-crankshaft-position-vs-primary-ignition/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-391",
+      agtCode: "AGT-391",
+      title: "Injector current vs. primary ignition",
+      category: "system-tests",
+      subCategory: "primary-ignition-timing-vs.-injector-current",
+      signalFamily: "INJECTOR_FUEL",
+      systemCategoryId: "fuel_system",
+      purposeSummary: "The purpose of this test is to monitor the current draw from an injector whilst observing the primary ignition trace.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to monitor the current draw from an injector whilst observing the primary ignition trace."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[INJECTOR_FUEL] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/system-tests/primary-ignition-timing-vs.-injector-current/AGT-391-injector-current-vs-primary-ignition/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-392",
+      agtCode: "AGT-392",
+      title: "Primary voltage vs.secondary",
+      category: "ignition",
+      subCategory: "distributorless-wasted-spark",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the operation of a single ignition coil within a distributorless/wasted spark ignition system by evaluating the primary circuit voltage and the resulting secondary ignition.",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check the operation of a single ignition coil within a distributorless/wasted spark ignition system by evaluating the primary circuit voltage and the resulting secondary ignition."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/distributorless-wasted-spark/AGT-392-primary-voltage-vssecondary/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-393",
+      agtCode: "AGT-393",
+      title: "Primary voltage and current",
+      category: "ignition",
+      subCategory: "distributorless-wasted-spark",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the operation of a single ignition coil primary circuit operation within a distributorless/wasted spark ignition system by evaluating the primary circuit voltage and current.",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check the operation of a single ignition coil primary circuit operation within a distributorless/wasted spark ignition system by evaluating the primary circuit voltage and current."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/distributorless-wasted-spark/AGT-393-primary-voltage-and-current/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-394",
+      agtCode: "AGT-394",
+      title: "Primary voltage and current vs.secondary",
+      category: "ignition",
+      subCategory: "distributorless-wasted-spark",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the operation of a single ignition coil within a distributorless/wasted spark ignition system by evaluating the primary circuit voltage and current and the resulting secondary ignition.",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check the operation of a single ignition coil within a distributorless/wasted spark ignition system by evaluating the primary circuit voltage and current and the resulting secondary ignition."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/distributorless-wasted-spark/AGT-394-primary-voltage-and-current-vssecondary/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-395",
+      agtCode: "AGT-395",
+      title: "Primary voltage (dual) and current",
+      category: "ignition",
+      subCategory: "distributorless-wasted-spark",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check and compare dual ignition coil primary circuit operation within a distributorless/wasted spark ignition system by evaluating the primary circuit voltage and current.",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check and compare dual ignition coil primary circuit operation within a distributorless/wasted spark ignition system by evaluating the primary circuit voltage and current."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/distributorless-wasted-spark/AGT-395-primary-voltage-dual-and-current/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-396",
+      agtCode: "AGT-396",
+      title: "Primary voltage",
+      category: "ignition",
+      subCategory: "distributorless-wasted-spark",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check the operation of a single ignition coil primary circuit within a distributorless/wasted spark ignition system by evaluating the primary circuit voltage.",
+      knownGood: {
+        waveformShape: "Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to check the operation of a single ignition coil primary circuit within a distributorless/wasted spark ignition system by evaluating the primary circuit voltage."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: Ignition Dwell Ramp, High-Voltage Firing Spike, Spark Burn Line & Coil Oscillations. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/distributorless-wasted-spark/AGT-396-primary-voltage/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-399",
+      agtCode: "AGT-399",
+      title: "Primary voltage and current",
+      category: "ignition",
+      subCategory: "distributor-",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check ignition coil primary circuit operation and saturation by evaluating the primary circuit voltage and current. This test involves measuring a potentially hazardous voltage. Risk of damage to equipment and property, and risk\u2026",
+      knownGood: {
+        waveformShape: "AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed)",
+        extractedVoltageSpecs: [
+          "0 V",
+          "250 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect a test lead with a 10:1 attenuator to PicoScope Channel A. \u2192 Connect the test lead to the coil switched earth circuit (often marked CB, T1 or -) and to earth. \u2192 Connect the low amps clamp to PicoScope Channel B, select the 20 A scale and zero the clamp, then connect the\u2026",
+        knownGoodSummary: "General principles All (inductive) spark ignition systems use one or more ignition coils. The coils act as both an accumulator, to store energy, and a step-up transformer, to generate the high voltages necessary to produce an electrical spark within a combustion chamber. An ignition coil consists of a primary coil and\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "When the primary circuit is on, the switched earth voltage should be very close to 0 V. If not, there is likely to be a high resistance in the earth circuit (e\u2026",
+          "Symptoms of a faulty coil can be:"
+        ],
+        symptomIndicators: [
+          "Multiple, possibly random, misfire across cylinders."
+        ],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed). Expected voltage references: 0 V, 250 V. Faulty signal deviations to compare: When the primary circuit is on, the switched earth voltage should be very close to 0 V. If not, there is likely to be a high resistance in the earth circuit (e\u2026; Symptoms of a faulty coil can be:."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/distributor-/AGT-399-primary-voltage-and-current/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-400",
+      agtCode: "AGT-400",
+      title: "10BASE-T1S Physical layer",
+      category: "communication",
+      subCategory: "10base-t1s",
+      signalFamily: "CAN_LIN_NETWORK",
+      systemCategoryId: "diagnostics_obd_dtc",
+      purposeSummary: "The purpose of this test is to determine the physical integrity of a 10BASE-T1S network by checking its high and low line voltages",
+      knownGood: {
+        waveformShape: "Differential Digital Bus (CAN-H / CAN-L mirrored 2.5V recessive -> 3.5V/1.5V dominant)",
+        extractedVoltageSpecs: [
+          "1 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Locate an ECU, or connector for 10BASE-T1S using the manufacturer wiring diagram. \u2192 Connect a x10 high speed probe (TA375 or PicoBNC+ TA506) PicoScope Channel A to the 10BASE-T1S (High) network with the ground lead to the chassis or battery negative. \u2192 Connect a x10 high speed p\u2026",
+        knownGoodSummary: "10BASE-T1S is fast becoming the network of choice to bridge the gap between typical CAN networks and Automotive Ethernet. Why not just use 100BASE-T1S and 1000BASE-T1? It mainly comes down to cost. With either of these two networks they work on point to point being able to pass over large amounts of data between two E\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[CAN_LIN_NETWORK] Known-Good: Differential Digital Bus (CAN-H / CAN-L mirrored 2.5V recessive -> 3.5V/1.5V dominant). Expected voltage references: 1 V. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/communication/10base-t1s/AGT-400-10base-t1s-physical-layer/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-401",
+      agtCode: "AGT-401",
+      title: "10BASE-T1S Serial decoding",
+      category: "communication",
+      subCategory: "10base-t1s",
+      signalFamily: "CAN_LIN_NETWORK",
+      systemCategoryId: "diagnostics_obd_dtc",
+      purposeSummary: "The purpose of this test is to view and evaluate 10BASE-T1S network messages in their number, rather than their voltage, form.",
+      knownGood: {
+        waveformShape: "Differential Digital Bus (CAN-H / CAN-L mirrored 2.5V recessive -> 3.5V/1.5V dominant)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Locate an ECU, or connector for 10BASE-T1S using the manufacturer wiring diagram. \u2192 Connect x10 high speed probe (TA375 or PicoBNC+ TA506) PicoScope Channel A to the 10BASE-T1S network with the ground lead to the chassis or battery negative. \u2192 Please note when back pinning this\u2026",
+        knownGoodSummary: "10BASE-T1S is fast becoming the network of choice to bridge the gap between typical CAN networks and Automotive Ethernet. Why not just use 100BASE-T1S and 1000BASE-T1? It mainly comes down to cost. With either of these two networks they work on point to point being able to pass over large amounts of data between two E\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[CAN_LIN_NETWORK] Known-Good: Differential Digital Bus (CAN-H / CAN-L mirrored 2.5V recessive -> 3.5V/1.5V dominant). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/communication/10base-t1s/AGT-401-10base-t1s-serial-decoding/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-402",
+      agtCode: "AGT-402",
+      title: "Bosch LSU 4.2 oxygen sensor switching",
+      category: "sensors",
+      subCategory: "oxygen",
+      signalFamily: "O2_LAMBDA_AFR",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the response of a Bosch LSU 4.2 O2 sensor (Pre-Catalyst) in relation to the air/fuel ratio. The correct operation of the O2 sensor is dependent upon the internal heating element, the mechanical condition of the engine,\u2026",
+      knownGood: {
+        waveformShape: "Slow Switching Analog Voltage (0.1V Lean to 0.9V Rich Lambda Oscillation)",
+        extractedVoltageSpecs: [
+          "450 mV"
+        ],
+        extractedFrequencyOrTimingSpecs: [
+          "20 kHz"
+        ],
+        testSetupSummary: "Use manufacturer's data to identify the pump cell circuit at the Oxygen sensor \u2192 Connect x1 blue test lead to PicoScope Channel A, with signal to the Oxygen sensor terminal 6 (Typically a Red wire) and ground lead to the vehicle battery negative terminal, or chassis ground \u2192 Ens\u2026",
+        knownGoodSummary: "Excessive high frequency noise may be present on the captured waveform during the warm up period of the O2 sensor. This is an operational characteristic and not a fault. In order to minimise the acquired noise level, it is advisable to activate Bandwidth Limit prior to testing the LSU 4.2 Oxygen Sensor. Click on Chann\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Symptoms associated with a faulty Oxygen sensor:",
+          "Excessive engine wear/oil consumption",
+          "Physical damage to Oxygen sensor tip"
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination",
+          "Misfire caused by mechanical or electrical systems"
+        ],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[O2_LAMBDA_AFR] Known-Good: Slow Switching Analog Voltage (0.1V Lean to 0.9V Rich Lambda Oscillation). Expected voltage references: 450 mV. Faulty signal deviations to compare: Symptoms associated with a faulty Oxygen sensor:; Excessive engine wear/oil consumption; Physical damage to Oxygen sensor tip."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/oxygen/AGT-402-bosch-lsu-42-oxygen-sensor-switching/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-403",
+      agtCode: "AGT-403",
+      title: "SENT Slow (Standard testing)",
+      category: "communication",
+      subCategory: "sent",
+      signalFamily: "CAN_LIN_NETWORK",
+      systemCategoryId: "diagnostics_obd_dtc",
+      purposeSummary: "The purpose of this test is to view and evaluate SENT SLOW messages in their voltage and number form.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [
+          "3 \xB5s",
+          "90 \xB5s",
+          "177 \xB5s"
+        ],
+        testSetupSummary: "Use manufacturer information to confirm whether the component under test transmits signals using the SENT protocol. \u2192 Connect a x1 test lead to PicoScope Channel A and the SENT communication line, with the ground lead connected to the chassis ground or battery negative terminal.\u2026",
+        knownGoodSummary: "SENT - Single Edge Nibble Transmission is a point-to-point unidirectional communication standard that converts analogue sensor signal outputs, such as mass air flow, throttle position, pressure or temperature, into digital signals. SENT sensors have been utilised by vehicle manufacturers since the mid-2000s given thei\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[CAN_LIN_NETWORK] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/communication/sent/AGT-403-sent-slow-standard-testing/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-404",
+      agtCode: "AGT-404",
+      title: "SENT Fast (Extended testing)",
+      category: "communication",
+      subCategory: "sent",
+      signalFamily: "CAN_LIN_NETWORK",
+      systemCategoryId: "diagnostics_obd_dtc",
+      purposeSummary: "The purpose of this test is to view and evaluate SENT FAST and SENT SLOW messages in their number, rather than their voltage, form.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [
+          "168 \xB5s",
+          "3 \xB5s",
+          "90 \xB5s",
+          "51 \xB5s"
+        ],
+        testSetupSummary: "Use manufacturer information to confirm whether the component under test transmits signals using the SENT protocol. \u2192 Connect a x1 test lead to PicoScope Channel A and the SENT communication line, with the ground lead connected to the chassis ground or battery negative terminal.\u2026",
+        knownGoodSummary: "To set the SENT FAST decoder correctly, you can use the data found from the SENT SLOW decoder. In the majority of SENT sensor information regarding the sensor type can be found in the enhanced serial message. In this test the SENT FAST decoder sensor type is set to None to be as generic as possible and where the senso\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[CAN_LIN_NETWORK] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/communication/sent/AGT-404-sent-fast-extended-testing/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-428",
+      agtCode: "AGT-428",
+      title: "Crankshaft position (floating, cranking)",
+      category: "sensors",
+      subCategory: "crankshaft-position",
+      signalFamily: "CKP_CRANKSHAFT",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the output of an inductive Crankshaft Position (CKP) sensor, with no ground reference (floating), during engine cranking.",
+      knownGood: {
+        waveformShape: "AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect PicoScope Channel A and Channel B to the CKP sensor circuits. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Start the scope to see live data. \u2192 Crank the engine for around 3 seconds to ca\u2026",
+        knownGoodSummary: "A CKP sensor provides an Engine Control Module (ECM) with its primary engine timing reference signal. The ECM uses it to calculate the engine speed and position for accurate injection and ignition control. The signal is also used to detect engine speed anomalies from misfires etc. An inductive CKP sensor consists of a\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Short or open circuits or high circuit resistances.",
+          "Signal errors resulting from excessive dirt and detritus on the sensor housing or pulse wheel.",
+          "Damage to the sensor housing or pulse wheel"
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination",
+          "Excessive crank or flywheel movement or vibration"
+        ],
+        associatedDtcs: [
+          "P0016",
+          "P0017",
+          "P0018",
+          "P0019",
+          "P0315",
+          "P0335",
+          "P0336",
+          "P0337",
+          "P0338",
+          "P0339",
+          "P0385",
+          "P0386",
+          "P0387",
+          "P0388",
+          "P0389"
+        ],
+        goodVsFaultyDiagnosticRule: "[CKP_CRANKSHAFT] Known-Good: AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed). Faulty signal deviations to compare: Short or open circuits or high circuit resistances.; Signal errors resulting from excessive dirt and detritus on the sensor housing or pulse wheel.; Damage to the sensor housing or pulse wheel. Typical DTCs: P0016, P0017, P0018, P0019, P0315."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/crankshaft-position/AGT-428-crankshaft-position-floating-cranking/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-429",
+      agtCode: "AGT-429",
+      title: "Crankshaft position (floating, running)",
+      category: "sensors",
+      subCategory: "crankshaft-position",
+      signalFamily: "CKP_CRANKSHAFT",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the output of an inductive Crankshaft Position (CKP) sensor, with no ground reference (floating), during engine running.",
+      knownGood: {
+        waveformShape: "AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect PicoScope Channel A and Channel B to the CKP sensor circuits. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Start the scope to see live data. \u2192 Start and run the engine. \u2192 With your wavef\u2026",
+        knownGoodSummary: "A CKP sensor provides an Engine Control Module (ECM) with its primary engine timing reference signal. The ECM uses it to calculate the engine speed and position for accurate injection and ignition control. The signal is also used to detect engine speed anomalies from misfires etc. An inductive CKP sensor consists of a\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Short or open circuits or high circuit resistances.",
+          "Signal errors resulting from excessive dirt and detritus on the sensor housing or pulse wheel.",
+          "Damage to the sensor housing or pulse wheel"
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination",
+          "Excessive crank or flywheel movement or vibration"
+        ],
+        associatedDtcs: [
+          "P0016",
+          "P0017",
+          "P0018",
+          "P0019",
+          "P0315",
+          "P0335",
+          "P0336",
+          "P0337",
+          "P0338",
+          "P0339",
+          "P0385",
+          "P0386",
+          "P0387",
+          "P0388",
+          "P0389"
+        ],
+        goodVsFaultyDiagnosticRule: "[CKP_CRANKSHAFT] Known-Good: AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed). Faulty signal deviations to compare: Short or open circuits or high circuit resistances.; Signal errors resulting from excessive dirt and detritus on the sensor housing or pulse wheel.; Damage to the sensor housing or pulse wheel. Typical DTCs: P0016, P0017, P0018, P0019, P0315."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/crankshaft-position/AGT-429-crankshaft-position-floating-running/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-430",
+      agtCode: "AGT-430",
+      title: "Crankshaft position (non-floating, running)",
+      category: "sensors",
+      subCategory: "crankshaft-position",
+      signalFamily: "CKP_CRANKSHAFT",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the output of an inductive Crankshaft Position (CKP) sensor, with a ground reference (non-floating), during engine running.",
+      knownGood: {
+        waveformShape: "AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the CKP signal circuit. \u2192 Connect PicoScope Channel A. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Start the scope to see live data. \u2192 Start and run the engi\u2026",
+        knownGoodSummary: "An inductive Crankshaft Position (CKP) sensor provides an Engine Control Module (ECM) with its primary engine timing reference signal. The ECM uses the signal to calculate the engine speed and position for accurate injection and ignition control. The signal is also used to detect engine speed anomalies from misfires e\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Short or open circuits and high resistance in the sensor coil or circuit.",
+          "Reduced sensor output due to excessive dirt and detritus on the sensor housing or pulse wheel.",
+          "damage to the sensor housing or pulse wheel"
+        ],
+        symptomIndicators: [
+          "excessive crank or flywheel movement or vibration"
+        ],
+        associatedDtcs: [
+          "P0016",
+          "P0017",
+          "P0018",
+          "P0019",
+          "P0315",
+          "P0335",
+          "P0336",
+          "P0337",
+          "P0338",
+          "P0339",
+          "P0385",
+          "P0386",
+          "P0387",
+          "P0388",
+          "P0389"
+        ],
+        goodVsFaultyDiagnosticRule: "[CKP_CRANKSHAFT] Known-Good: AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed). Faulty signal deviations to compare: Short or open circuits and high resistance in the sensor coil or circuit.; Reduced sensor output due to excessive dirt and detritus on the sensor housing or pulse wheel.; damage to the sensor housing or pulse wheel. Typical DTCs: P0016, P0017, P0018, P0019, P0315."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/crankshaft-position/AGT-430-crankshaft-position-non-floating-running/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-783",
+      agtCode: "AGT-783",
+      title: "Parasitic battery drain (clamp method)",
+      category: "charging-starting",
+      subCategory: "charging",
+      signalFamily: "CHARGING_STARTING_RIPPLE",
+      systemCategoryId: "electrical_charging",
+      purposeSummary: "The purpose of this test is to evaluate the parasitic current draw from a vehicle battery measured using a current clamp during electrical system shutdown and sleep.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [
+          "1 Hz"
+        ],
+        testSetupSummary: "Fully charge the vehicle battery and carry out a battery test to check its state of health. Replace the battery if its state of health is poor. \u2192 Switch off all vehicle equipment and accessories such as location devices, data loggers, motion cameras, in-car entertainment, charge\u2026",
+        knownGoodSummary: "Parasitic battery drain is the current draw from a battery when a vehicle has been switched off, locked (with its alarm system armed, if present) and its electrical systems have shut down and are in their sleep state. Electrical system, network and control module shutdown periods can range from 30 minutes to 2 hours,\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "An intermittent or permanent short within a circuit or component.",
+          "A circuit or component (e.g. a relay) stuck in its ON state."
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[CHARGING_STARTING_RIPPLE] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Faulty signal deviations to compare: An intermittent or permanent short within a circuit or component.; A circuit or component (e.g. a relay) stuck in its ON state.."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/charging-starting/charging/AGT-783-parasitic-battery-drain-clamp-method/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-784",
+      agtCode: "AGT-784",
+      title: "Bosch LSU 4.2 oxygen sensor full",
+      category: "sensors",
+      subCategory: "oxygen",
+      signalFamily: "O2_LAMBDA_AFR",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the operation of a Bosch LSU 4.2 6-wire oxygen sensor (pre-catalyst) in relation to the air-fuel ratio using voltage drop.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to evaluate the operation of a Bosch LSU 4.2 6-wire oxygen sensor (pre-catalyst) in relation to the air-fuel ratio using voltage drop."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[O2_LAMBDA_AFR] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/oxygen/AGT-784-bosch-lsu-42-oxygen-sensor-full/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-813",
+      agtCode: "AGT-813",
+      title: "Alternator voltage and current (24 V)",
+      category: "charging-starting",
+      subCategory: "charging",
+      signalFamily: "CHARGING_STARTING_RIPPLE",
+      systemCategoryId: "electrical_charging",
+      purposeSummary: "The purpose of this test is to assess the charging rate of the alternator in relation to the electrical load on the battery in a 24 V system.",
+      knownGood: {
+        waveformShape: "AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed)",
+        extractedVoltageSpecs: [
+          "24 V",
+          "500 mV"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect PicoScope Channel A to the vehicle battery terminals. \u2192 Connect the high amps clamp to PicoScope Channel B. \u2192 Switch on and zero the high amps clamp before connecting to the battery positive cable. \u2192 Start the engine and run at idle. \u2192 Minimize the help page. You will se\u2026",
+        knownGoodSummary: "Engine at idle. When the engine is running, an alternator generates electrical energy to supply the vehicle's on-board electrical systems and replace the battery charge consumed during cranking. Accurate ECM controlled charging is essential to the operation of Start-Stop systems, which place increased demands on start\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Typical symptoms of faulty alternator would be:",
+          "Reduced output from winding or diode faults, caused by heat and vibration or the inclusion of moisture into the circuitry.",
+          "Faulty voltage regulators (where applicable) causing alternator output to increase with increasing engine speed.",
+          "Short or open circuits, or high resistances, in the stator windings.",
+          "Short or open circuits, or high resistances, in battery or earth cables and/or connections."
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination.",
+          "Possible engine misfire."
+        ],
+        associatedDtcs: [
+          "P0620",
+          "P0621",
+          "P0622",
+          "P0623",
+          "P0624",
+          "P0625",
+          "P0626"
+        ],
+        goodVsFaultyDiagnosticRule: "[CHARGING_STARTING_RIPPLE] Known-Good: AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed). Expected voltage references: 24 V, 500 mV. Faulty signal deviations to compare: Typical symptoms of faulty alternator would be:; Reduced output from winding or diode faults, caused by heat and vibration or the inclusion of moisture into the circuitry.; Faulty voltage regulators (where applicable) causing alternator output to increase with increasing engine speed.. Typical DTCs: P0620, P0621, P0622, P0623, P0624."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/charging-starting/charging/AGT-813-alternator-voltage-and-current-24-v/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-814",
+      agtCode: "AGT-814",
+      title: "Parking sensors",
+      category: "sensors",
+      subCategory: "parking",
+      signalFamily: "OTHER_AUTOMOTIVE_SIGNAL",
+      systemCategoryId: "body_electrical",
+      purposeSummary: "The purpose of this test is to evaluate the operation of ultrasonic proximity sensors (referred to as parking sensors) using an Ultrasonic parking sensor detector. This test may involve having the transmission in gear with the engine running (but with the clu\u2026",
+      knownGood: {
+        waveformShape: "Slow Switching Analog Voltage (0.1V Lean to 0.9V Rich Lambda Oscillation)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [
+          "40 kHz"
+        ],
+        testSetupSummary: "Connect the Ultrasonic parking sensor detector to PicoScope Channel A. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Start the scope to see live data. \u2192 Activate the vehicle's parking sensors (re\u2026",
+        knownGoodSummary: "A typical parking sensor can be considered as both a transmitter and a receiver. An internal piezoelectric device is utilised to generate a high-frequency pulse through the air and convert any reflected pulses to a voltage representation of distance. The parking sensor is driven by a control unit for sufficient time t\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[OTHER_AUTOMOTIVE_SIGNAL] Known-Good: Slow Switching Analog Voltage (0.1V Lean to 0.9V Rich Lambda Oscillation). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/parking/AGT-814-parking-sensors/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-846",
+      agtCode: "AGT-846",
+      title: "Alternator ripple (with ECM control)",
+      category: "charging-starting",
+      subCategory: "charging",
+      signalFamily: "CHARGING_STARTING_RIPPLE",
+      systemCategoryId: "electrical_charging",
+      purposeSummary: "The purpose of this test is to check the rectification of the alternator output voltage, where the alternator output is regulated by the Engine Control Module (ECM).",
+      knownGood: {
+        waveformShape: "AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed)",
+        extractedVoltageSpecs: [
+          "500 mV"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect PicoScope Channel A to the alternator B+ terminal. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Start the engine and allow it to idle. \u2192 Start the scope to see live data. \u2192 Switch on ele\u2026",
+        knownGoodSummary: "When the engine is running, an alternator generates electrical energy to supply the vehicle's on-board electrical systems and replace the battery charge consumed during cranking. Accurate control of alternator output and charging is essential to the operation of Start-Stop systems, which place increased demands on sta\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Typical symptoms of faulty alternator would be:",
+          "Diode faults, caused by heat and vibration or the inclusion of moisture into the circuitry.",
+          "Short or open circuits, or high resistances, in the stator windings.",
+          "Short or open circuits, or high resistances, in battery or earth cables and/or connections."
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination.",
+          "Possible engine misfire."
+        ],
+        associatedDtcs: [
+          "P0620",
+          "P0621",
+          "P0622",
+          "P0623",
+          "P0624",
+          "P0625",
+          "P0626"
+        ],
+        goodVsFaultyDiagnosticRule: "[CHARGING_STARTING_RIPPLE] Known-Good: AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed). Expected voltage references: 500 mV. Faulty signal deviations to compare: Typical symptoms of faulty alternator would be:; Diode faults, caused by heat and vibration or the inclusion of moisture into the circuitry.; Short or open circuits, or high resistances, in the stator windings.. Typical DTCs: P0620, P0621, P0622, P0623, P0624."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/charging-starting/charging/AGT-846-alternator-ripple-with-ecm-control/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-847",
+      agtCode: "AGT-847",
+      title: "Wheel speed sensor (magnetoresistive)",
+      category: "sensors",
+      subCategory: "wheel-speed",
+      signalFamily: "ABS_WHEEL_SPEED",
+      systemCategoryId: "safety_abs_srs",
+      purposeSummary: "The purpose of this test is to evaluate the operation of a magnetoresitive (MRE) Antilock Braking System (ABS) wheel speed sensor.",
+      knownGood: {
+        waveformShape: "Digital Square Wave (Hall / Optical / Logic 0V-5V or 0V-12V)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the output signal circuit. \u2192 Connect PicoScope Channel A to the output signal circuit. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your waveform. \u2192 Start the scope to see liv\u2026",
+        knownGoodSummary: "Wheel speed sensors provide wheel and road speed feedback to ABS and derivative active vehicle safety systems (i.e. stability and traction control etc.). These systems are designed to provide corrective action (e.g. wheel braking or engine torque limitation) when the vehicle chassis or wheel speeds have exceeded their\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Wheel speed sensor circuits and connectors are also prone to the atmosphere and possible electrical failures, such as open or short circuits or high circuit re\u2026",
+          "Active wheel speed sensors are susceptible to damage from incorrect testing methods; in particular, the application of resistance testing."
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[ABS_WHEEL_SPEED] Known-Good: Digital Square Wave (Hall / Optical / Logic 0V-5V or 0V-12V). Faulty signal deviations to compare: Wheel speed sensor circuits and connectors are also prone to the atmosphere and possible electrical failures, such as open or short circuits or high circuit re\u2026; Active wheel speed sensors are susceptible to damage from incorrect testing methods; in particular, the application of resistance testing.."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/wheel-speed/AGT-847-wheel-speed-sensor-magnetoresistive/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-849",
+      agtCode: "AGT-849",
+      title: "Keyless entry",
+      category: "sensors",
+      subCategory: "keyless-entry",
+      signalFamily: "OTHER_AUTOMOTIVE_SIGNAL",
+      systemCategoryId: "body_electrical",
+      purposeSummary: "The purpose of this test is to evaluate keyless entry and starting system operation using a keyless entry carrier signal detector.",
+      knownGood: {
+        waveformShape: "Slow Switching Analog Voltage (0.1V Lean to 0.9V Rich Lambda Oscillation)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [
+          "250 ms",
+          "750 ms"
+        ],
+        testSetupSummary: "Ensure the vehicle is locked and that the key is outside the detection zones. \u2192 Connect the Keyless entry carrier signal detector to PicoScope Channel A. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and is preset to capture your wavefor\u2026",
+        knownGoodSummary: "No key in the detection zones. Keyless entry systems are given many alternative names but they are commonly referred to as smart entry, smart start or Passive Keyless Entry (PKE) systems. When the vehicle is locked the system uses antennas to periodically output a low frequency (LF) radio wave signal pulse. The pulses\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[OTHER_AUTOMOTIVE_SIGNAL] Known-Good: Slow Switching Analog Voltage (0.1V Lean to 0.9V Rich Lambda Oscillation). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/keyless-entry/AGT-849-keyless-entry/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-850",
+      agtCode: "AGT-850",
+      title: "Accelerator pedal position (digital)",
+      category: "sensors",
+      subCategory: "accelerator-pedal-position",
+      signalFamily: "TPS_APP_THROTTLE",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the Accelerator Pedal Position (APP) sensor output in relation to pedal position.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Identify signal circuit using OEM data, connect scope channel, capture at idle/crank.",
+        knownGoodSummary: "The purpose of this test is to evaluate the Accelerator Pedal Position (APP) sensor output in relation to pedal position."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[TPS_APP_THROTTLE] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/accelerator-pedal-position/AGT-850-accelerator-pedal-position-digital/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-861",
+      agtCode: "AGT-861",
+      title: "GDI injector voltage",
+      category: "actuators",
+      subCategory: "injector-(gasoline)",
+      signalFamily: "INJECTOR_FUEL",
+      systemCategoryId: "fuel_system",
+      purposeSummary: "The purpose of this test is to evaluate the operation of the Gasoline Direct Injection (GDI) injector control circuit, switching signal and solenoid mechanism. This test involves measuring a potentially hazardous voltage. Risk of damage to equipment and prope\u2026",
+      knownGood: {
+        waveformShape: "Slow Switching Analog Voltage (0.1V Lean to 0.9V Rich Lambda Oscillation)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the positive feed and switched earth circuits. \u2192 Connect PicoScope Channel A to the injector positive feed circuit. \u2192 Connect PicoScope Channel B to the injector switched earth circuit. \u2192 Minimise the help page. You will see that PicoScope has\u2026",
+        knownGoodSummary: "Engine cranking A Gasoline Direct Injection (GDI) injector delivers fuel directly to the air charge within a cylinder. GDI injector fast reaction times enable an engine management system to operate across different cylinder charge modes, for example:"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "GDI injector failures may cause loss of engine performance, misfire, or excessive smoking symptoms. Possible failure modes may be:",
+          "mechanical inlet or outlet blockages, sticky/stuck injector valves or defective spray patterns;",
+          "electrical open or short circuits and high resistances in the wiring or solenoids; or"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [
+          "P0200",
+          "P0201",
+          "P0202",
+          "P0203",
+          "P0204",
+          "P0205",
+          "P0206",
+          "P0207",
+          "P0208",
+          "P0209",
+          "P0210",
+          "P0211",
+          "P0212",
+          "P0213",
+          "P0214",
+          "P0216",
+          "P0261",
+          "P0262",
+          "P0263",
+          "P0264",
+          "P0265",
+          "P0266",
+          "P0267",
+          "P0268",
+          "P0269",
+          "P0270",
+          "P0271",
+          "P0272",
+          "P0273",
+          "P0274",
+          "P0275",
+          "P0276",
+          "P0277",
+          "P0278",
+          "P0279",
+          "P0280",
+          "P0281",
+          "P0282",
+          "P0283",
+          "P0284",
+          "P0285",
+          "P0286",
+          "P0287",
+          "P0288",
+          "P0289",
+          "P0290",
+          "P0291",
+          "P0292",
+          "P0293",
+          "P0294",
+          "P0295",
+          "P0296"
+        ],
+        goodVsFaultyDiagnosticRule: "[INJECTOR_FUEL] Known-Good: Slow Switching Analog Voltage (0.1V Lean to 0.9V Rich Lambda Oscillation). Faulty signal deviations to compare: GDI injector failures may cause loss of engine performance, misfire, or excessive smoking symptoms. Possible failure modes may be:; mechanical inlet or outlet blockages, sticky/stuck injector valves or defective spray patterns;; electrical open or short circuits and high resistances in the wiring or solenoids; or. Typical DTCs: P0200, P0201, P0202, P0203, P0204."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/injector-(gasoline)/AGT-861-gdi-injector-voltage/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-868",
+      agtCode: "AGT-868",
+      title: "GDI injector current",
+      category: "actuators",
+      subCategory: "injector-(gasoline)",
+      signalFamily: "INJECTOR_FUEL",
+      systemCategoryId: "fuel_system",
+      purposeSummary: "The purpose of this test is to evaluate the operation of the Gasoline Direct Injection (GDI) injector control circuit, switching signal and solenoid mechanism. This test involves taking measurements on a system or component having a potentially hazardous volt\u2026",
+      knownGood: {
+        waveformShape: "Slow Switching Analog Voltage (0.1V Lean to 0.9V Rich Lambda Oscillation)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use manufacturer's data to identify the injector power supply circuit. \u2192 Connect the low amps clamp to PicoScope Channel A. \u2192 Select the 20 A scale and zero the clamp before connecting to the injector power supply circuit. \u2192 Minimize the help page. You will see that PicoScope ha\u2026",
+        knownGoodSummary: "Injector current waveform during engine cranking conditions. A Gasoline Direct Injection (GDI) injector delivers fuel directly to the air charge within a cylinder. GDI injector fast reaction times enable an engine management system to operate across different cylinder charge modes, for example:"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "GDI injector failures may cause loss of engine performance, misfire, or excessive smoking symptoms. Possible failure modes may be:",
+          "Mechanical inlet or outlet blockages, sticky/stuck injector valves or defective spray patterns.",
+          "Electrical open or short circuits and high resistances in the wiring or solenoids."
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [
+          "P0200",
+          "P0201",
+          "P0202",
+          "P0203",
+          "P0204",
+          "P0205",
+          "P0206",
+          "P0207",
+          "P0208",
+          "P0209",
+          "P0210",
+          "P0211",
+          "P0212",
+          "P0213",
+          "P0214",
+          "P0216",
+          "P0261",
+          "P0262",
+          "P0263",
+          "P0264",
+          "P0265",
+          "P0266",
+          "P0267",
+          "P0268",
+          "P0269",
+          "P0270",
+          "P0271",
+          "P0272",
+          "P0273",
+          "P0274",
+          "P0275",
+          "P0276",
+          "P0277",
+          "P0278",
+          "P0279",
+          "P0280",
+          "P0281",
+          "P0282",
+          "P0283",
+          "P0284",
+          "P0285",
+          "P0286",
+          "P0287",
+          "P0288",
+          "P0289",
+          "P0290",
+          "P0291",
+          "P0292",
+          "P0293",
+          "P0294",
+          "P0295",
+          "P0296"
+        ],
+        goodVsFaultyDiagnosticRule: "[INJECTOR_FUEL] Known-Good: Slow Switching Analog Voltage (0.1V Lean to 0.9V Rich Lambda Oscillation). Faulty signal deviations to compare: GDI injector failures may cause loss of engine performance, misfire, or excessive smoking symptoms. Possible failure modes may be:; Mechanical inlet or outlet blockages, sticky/stuck injector valves or defective spray patterns.; Electrical open or short circuits and high resistances in the wiring or solenoids.. Typical DTCs: P0200, P0201, P0202, P0203, P0204."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/injector-(gasoline)/AGT-868-gdi-injector-current/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-869",
+      agtCode: "AGT-869",
+      title: "GDI injector voltage and current",
+      category: "actuators",
+      subCategory: "injector-(gasoline)",
+      signalFamily: "INJECTOR_FUEL",
+      systemCategoryId: "fuel_system",
+      purposeSummary: "The purpose of this test is to evaluate the operation of the Gasoline Direct Injection (GDI) injector control circuit, switching signal and solenoid mechanism. This test involves measuring a potentially hazardous voltage. Risk of damage to equipment and prope\u2026",
+      knownGood: {
+        waveformShape: "Digital Square Wave (Hall / Optical / Logic 0V-5V or 0V-12V)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Use the vehicle wiring diagram to identify the positive feed and switched earth circuits. \u2192 Connect PicoScope Channel A to the injector positive feed circuit. \u2192 Connect PicoScope Channel B to the injector switched earth circuit. \u2192 Connect the low amps clamp to PicoScope Channel\u2026",
+        knownGoodSummary: "Injector feed and switched earth voltages and circuit current during engine cranking conditions. A GDI injector delivers fuel directly to the air charge within a cylinder. The GDI injector fast reaction times enable an engine management system to operate across different cylinder charge modes, for example:"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "GDI injector failures may cause loss of engine performance , misfire or excessive smoking symptoms. Possible failure modes may be:",
+          "Mechanical inlet or outlet blockages, sticky/stuck injector valves or defective spray patterns.",
+          "Electrical open, short circuits or high resistances in the wiring, solenoids.",
+          "ECM failure."
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [
+          "P0200",
+          "P0201",
+          "P0202",
+          "P0203",
+          "P0204",
+          "P0205",
+          "P0206",
+          "P0207",
+          "P0208",
+          "P0209",
+          "P0210",
+          "P0211",
+          "P0212",
+          "P0213",
+          "P0214",
+          "P0216",
+          "P0261",
+          "P0262",
+          "P0263",
+          "P0264",
+          "P0265",
+          "P0266",
+          "P0267",
+          "P0268",
+          "P0269",
+          "P0270",
+          "P0271",
+          "P0272",
+          "P0273",
+          "P0274",
+          "P0275",
+          "P0276",
+          "P0277",
+          "P0278",
+          "P0279",
+          "P0280",
+          "P0281",
+          "P0282",
+          "P0283",
+          "P0284",
+          "P0285",
+          "P0286",
+          "P0287",
+          "P0288",
+          "P0289",
+          "P0290",
+          "P0291",
+          "P0292",
+          "P0293",
+          "P0294",
+          "P0295",
+          "P0296"
+        ],
+        goodVsFaultyDiagnosticRule: "[INJECTOR_FUEL] Known-Good: Digital Square Wave (Hall / Optical / Logic 0V-5V or 0V-12V). Faulty signal deviations to compare: GDI injector failures may cause loss of engine performance , misfire or excessive smoking symptoms. Possible failure modes may be:; Mechanical inlet or outlet blockages, sticky/stuck injector valves or defective spray patterns.; Electrical open, short circuits or high resistances in the wiring, solenoids.. Typical DTCs: P0200, P0201, P0202, P0203, P0204."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/actuators/injector-(gasoline)/AGT-869-gdi-injector-voltage-and-current/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-870",
+      agtCode: "AGT-870",
+      title: "Bosch LSU 4.9 oxygen sensor switching",
+      category: "sensors",
+      subCategory: "oxygen",
+      signalFamily: "O2_LAMBDA_AFR",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate the response of a Bosch LSU 4.9 O2 sensor (Pre-Catalyst) in relation to the air/fuel ratio. The correct operation of the O2 sensor is dependent upon the internal heating element, the mechanical condition of the engine,\u2026",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [
+          "450 mV"
+        ],
+        extractedFrequencyOrTimingSpecs: [
+          "20 kHz"
+        ],
+        testSetupSummary: "Use manufacturer's data to identify the pump cell circuit at the Oxygen sensor. \u2192 Connect PicoScope Channel A blue test lead signal wire to the Oxygen sensor terminal 1 (Typically a Red wire) and ground lead to the vehicle battery negative terminal. \u2192 Ensure the engine is at its\u2026",
+        knownGoodSummary: "Excessive high frequency noise may be present on the captured waveform during the warm up period of the O2 sensor. This is an operational characteristic and not a fault. In order to minimise the acquired noise level, it is advisable to activate Bandwidth Limit prior to testing the LSU 4.9 Oxygen Sensor. Click on Chann\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[O2_LAMBDA_AFR] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Expected voltage references: 450 mV. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/oxygen/AGT-870-bosch-lsu-49-oxygen-sensor-switching/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-874",
+      agtCode: "AGT-874",
+      title: "CAN bus serial decoding",
+      category: "communication",
+      subCategory: "can-bus",
+      signalFamily: "CAN_LIN_NETWORK",
+      systemCategoryId: "diagnostics_obd_dtc",
+      purposeSummary: "The purpose of this test is to view and evaluate Controller Area Network (CAN) bus messages in their number, rather than their voltage, form.",
+      knownGood: {
+        waveformShape: "Differential Digital Bus (CAN-H / CAN-L mirrored 2.5V recessive -> 3.5V/1.5V dominant)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Locate the Diagnostic Link Connector (DLC). \u2192 Connect PicoScope Channel A to terminal 6 (CAN-H) and chassis earth. \u2192 Connect PicoScope Channel B to terminal 14 (CAN-L) and chassis earth. \u2192 Minimize the help page. You will see that PicoScope has displayed an example waveform and\u2026",
+        knownGoodSummary: "A CAN bus provides serial communication between control units. For example, a powertrain CAN bus allows an ABS control unit to broadcast a message containing wheel speed data simultaneously to the Engine Control Module (ECM), Transmission Control Module (TCM), Instrument Cluster (IC), and Supplementary Restraint Syste\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Interference from untwisted CAN lines or a degradation in their shielding, as might arise from previous repairs, the use of puncture probes, abrasion, or gener\u2026",
+          "Interference from other electrically noisy components."
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[CAN_LIN_NETWORK] Known-Good: Differential Digital Bus (CAN-H / CAN-L mirrored 2.5V recessive -> 3.5V/1.5V dominant). Faulty signal deviations to compare: Interference from untwisted CAN lines or a degradation in their shielding, as might arise from previous repairs, the use of puncture probes, abrasion, or gener\u2026; Interference from other electrically noisy components.."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/communication/can-bus/AGT-874-can-bus-serial-decoding/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-890",
+      agtCode: "AGT-890",
+      title: "Belt tension",
+      category: "system-tests",
+      subCategory: "belt-tension-(natural-frequency)",
+      signalFamily: "SYSTEM_COMPRESSION_CORRELATION",
+      systemCategoryId: "diagnostics_obd_dtc",
+      purposeSummary: "The purpose of this test is to measure the natural frequency of a belt (auxiliary or timing), as a means to check the applied tension.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [
+          "223.6 Hz"
+        ],
+        testSetupSummary: "Ensure any belt manufacturer pre-test conditions are met (e.g. engine temperature or engine turning operations). \u2192 Take all necessary steps to prohibit the component under test from rotating and cranking. \u2192 Identify and gain access to the belt test location, as specified by the\u2026",
+        knownGoodSummary: "Calculating belt tension from vibration frequency (optional technique) The test methodology is based on the theory of vibrating strings. Strumming imparts a momentary force to the belt. If the belt is under tension, this will cause it to vibrate at its natural frequency (i.e. the frequency occuring with free vibration\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Premature wear and reduced operating cycles.",
+          "Pulley, idler, or tensioner bearing noise (rumble or whine).",
+          "Pulley and tensioner wear, alignment, free-play, or float issues"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[SYSTEM_COMPRESSION_CORRELATION] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Faulty signal deviations to compare: Premature wear and reduced operating cycles.; Pulley, idler, or tensioner bearing noise (rumble or whine).; Pulley and tensioner wear, alignment, free-play, or float issues."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/system-tests/belt-tension-(natural-frequency)/AGT-890-belt-tension/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-891",
+      agtCode: "AGT-891",
+      title: "Secondary (king lead) parade",
+      category: "ignition",
+      subCategory: "distributor-",
+      signalFamily: "IGNITION_PRIMARY_SECONDARY",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check secondary ignition system operation by evaluating king lead secondary ignition voltages across cylinders, in their firing order. This test involves measurements on a potentially hazardous High Tension (HT) ignition system.\u2026",
+      knownGood: {
+        waveformShape: "AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Turn the ignition off. \u2192 Connect a secondary ignition pick up lead to PicoScope Channel A. \u2192 Clamp the secondary ignition pick up around the distributor HT king lead and connect its earth fly lead to earth. \u2192 Connect a secondary ignition pick up lead to PicoScope Channel B. \u2192 Cl\u2026",
+        knownGoodSummary: "General principles All (inductive) spark ignition systems use one or more ignition coils. The coils act as both an accumulator, to store energy, and a step-up transformer, to generate the high voltages necessary to produce an electrical spark within a combustion chamber. An ignition coil consists of a primary coil and\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "There is an inversely proportional relationship between sparkline kV and spark duration. If the sparkline kV is too high, the spark duration will be too short,\u2026",
+          "A misfire may occur if there is too little energy within the ignition system - for example, if the coil is faulty or there are shorts or high resistance in the\u2026"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[IGNITION_PRIMARY_SECONDARY] Known-Good: AC Sine Wave (Inductive / Reluctor \u2014 amplitude & frequency scale with speed). Faulty signal deviations to compare: There is an inversely proportional relationship between sparkline kV and spark duration. If the sparkline kV is too high, the spark duration will be too short,\u2026; A misfire may occur if there is too little energy within the ignition system - for example, if the coil is faulty or there are shorts or high resistance in the\u2026."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/ignition/distributor-/AGT-891-secondary-king-lead-parade/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-898",
+      agtCode: "AGT-898",
+      title: "HVAC efficiency",
+      category: "system-tests",
+      subCategory: "hvac-efficiency-(temperature)",
+      signalFamily: "TEMP_ECT_IAT",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to check heating, ventilation and air conditioning (HVAC) system efficiency by measuring the difference between the ambient and center vent output temperatures.",
+      knownGood: {
+        waveformShape: "Differential Digital Bus (CAN-H / CAN-L mirrored 2.5V recessive -> 3.5V/1.5V dominant)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Set the HVAC controls to maximum fan speed, minimum temperature, face position output and recirculation to off. \u2192 Close the hood and open all the doors. \u2192 Connect the PicoBNC+ temperature probe to Channel A. \u2192 Place the PicoBNC+ temperature probe at or near to the external HVAC\u2026",
+        knownGoodSummary: "HVAC system efficiency depends on: The ambient air temperature (the higher the ambient air temperature the higher the cooling potential). The HVAC system design and specifications. The HVAC system condition."
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[TEMP_ECT_IAT] Known-Good: Differential Digital Bus (CAN-H / CAN-L mirrored 2.5V recessive -> 3.5V/1.5V dominant). Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/system-tests/hvac-efficiency-(temperature)/AGT-898-hvac-efficiency/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-899",
+      agtCode: "AGT-899",
+      title: "Wiggle test",
+      category: "system-tests",
+      subCategory: "wiggle-test-(resistance)",
+      signalFamily: "SYSTEM_COMPRESSION_CORRELATION",
+      systemCategoryId: "diagnostics_obd_dtc",
+      purposeSummary: "The purpose of this test is to check circuit integrity during a wiggle test.",
+      knownGood: {
+        waveformShape: "Continuous Analog Voltage / Current Envelope (see OEM reference range)",
+        extractedVoltageSpecs: [],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Disconnect any devices connecting the PC to the vehicle earth (e.g., a scan tool or data logger). \u2192 Power down and disconnect the suspect circuit(s) at both ends. \u2192 Connect the PicoBNC+ resistance probe to Channel A. \u2192 Connect the PicoBNC+ resistance probe across the suspect cir\u2026",
+        knownGoodSummary: "Continuity check of circuit resistance during wiggle test. Wiring faults occur because: the insulation breaks down, causing the conducting core of an unshielded wire to touch another or some other part of a vehicle. the conductor corrodes due to moisture ingress or breaks down due to the stress and strain caused by mo\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open circuit",
+          "Short to positive",
+          "Short to negative",
+          "High resistance",
+          "Test type Measurement points Possible failure mode Expected resistance"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[SYSTEM_COMPRESSION_CORRELATION] Known-Good: Continuous Analog Voltage / Current Envelope (see OEM reference range). Faulty signal deviations to compare: Open circuit; Short to positive; Short to negative."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/system-tests/wiggle-test-(resistance)/AGT-899-wiggle-test/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-937",
+      agtCode: "AGT-937",
+      title: "Oxygen (zirconia), post-cat: output and heater",
+      category: "sensors",
+      subCategory: "oxygen",
+      signalFamily: "O2_LAMBDA_AFR",
+      systemCategoryId: "engine_management_ecu",
+      purposeSummary: "The purpose of this test is to evaluate post-catalytic converter oxygen sensor (zirconia) operation using the output signal voltage and heater current.",
+      knownGood: {
+        waveformShape: "Slow Switching Analog Voltage (0.1V Lean to 0.9V Rich Lambda Oscillation)",
+        extractedVoltageSpecs: [
+          "0.2 V",
+          "0.8 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [],
+        testSetupSummary: "Connect a low-amps clamp to Channel A and around the post-catalytic converter sensor's heater supply circuit. \u2192 Connect a test lead to Channel B and the sensor's output signal circuit. \u2192 Start the scope. \u2192 Start the engine and allow it to idle. \u2192 With your waveforms on screen st\u2026",
+        knownGoodSummary: "An oxygen sensor also can be referred to as a Lambda sensor, an O2 sensor, or a Heated Exhaust Gas Oxygen (HEGO) sensor. It is a feedback sensor used by the Engine Control Module (ECM) to perform closed loop control of engine fueling and, if a post catalytic converter sensor is present, monitor catalytic converter fun\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Symptoms of a faulty/inoperative oxygen sensor:",
+          "Open or short circuits or high resistances in the sensor circuits, such as in the:",
+          "Damage or contamination from excessive fuel in the exhaust.",
+          "Damage from excessive heat.",
+          "Incorrect fitment (and damage arising therefrom)."
+        ],
+        symptomIndicators: [
+          "Malfunction Indicator Lamp (MIL) illumination."
+        ],
+        associatedDtcs: [
+          "P0030",
+          "P0031",
+          "P0032",
+          "P0036",
+          "P0037",
+          "P0038",
+          "P0040",
+          "P0041",
+          "P0042",
+          "P0043",
+          "P0044",
+          "P0050",
+          "P0051",
+          "P0052",
+          "P0053",
+          "P0054",
+          "P0055",
+          "P0056",
+          "P0057",
+          "P0058",
+          "P0059",
+          "P0060",
+          "P0061",
+          "P0062",
+          "P0063",
+          "P0064",
+          "P0130",
+          "P0131",
+          "P0132",
+          "P0133",
+          "P0134",
+          "P0135",
+          "P0136",
+          "P0137",
+          "P0138",
+          "P0139",
+          "P0140",
+          "P0141",
+          "P0142",
+          "P0143",
+          "P0144",
+          "P0145",
+          "P0146",
+          "P0147",
+          "P0150",
+          "P0151",
+          "P0152",
+          "P0153",
+          "P0154",
+          "P0155",
+          "P0156",
+          "P0157",
+          "P0158",
+          "P0159",
+          "P0160",
+          "P0161",
+          "P0162",
+          "P0163",
+          "P0164",
+          "P0165",
+          "P0166",
+          "P0167",
+          "P0170",
+          "P0171",
+          "P0172",
+          "P0173",
+          "P0174",
+          "P0175"
+        ],
+        goodVsFaultyDiagnosticRule: "[O2_LAMBDA_AFR] Known-Good: Slow Switching Analog Voltage (0.1V Lean to 0.9V Rich Lambda Oscillation). Expected voltage references: 0.2 V, 0.8 V. Faulty signal deviations to compare: Symptoms of a faulty/inoperative oxygen sensor:; Open or short circuits or high resistances in the sensor circuits, such as in the:; Damage or contamination from excessive fuel in the exhaust.. Typical DTCs: P0030, P0031, P0032, P0036, P0037."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/sensors/oxygen/AGT-937-oxygen-zirconia-post-cat-output-and-heater/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    },
+    {
+      id: "osc-pico-agt-938",
+      agtCode: "AGT-938",
+      title: "FlexRay Serial decoding",
+      category: "communication",
+      subCategory: "flexray-bus",
+      signalFamily: "CAN_LIN_NETWORK",
+      systemCategoryId: "diagnostics_obd_dtc",
+      purposeSummary: "The purpose of this test is to view and evaluate the data bus messages (packets) transported on the FlexRay network.",
+      knownGood: {
+        waveformShape: "Differential Digital Bus (CAN-H / CAN-L mirrored 2.5V recessive -> 3.5V/1.5V dominant)",
+        extractedVoltageSpecs: [
+          "0 V",
+          "2.5 V",
+          "3.5 V",
+          "1.5 V",
+          "2 V"
+        ],
+        extractedFrequencyOrTimingSpecs: [
+          "1.3 \xB5s",
+          "1.1 \xB5s"
+        ],
+        testSetupSummary: "Locate an accessible point along the FlexRay network using the manufacturer wiring diagram. \u2192 Connect a x10 attenuated test lead to PicoScope Channel A and FlexRay bus plus and its ground lead to battery negative or a good chassis ground. \u2192 Connect a x10 attenuated test lead to\u2026",
+        knownGoodSummary: "Modern vehicle design now incorporates an ever-increasing list of driveability, safety and interconnectivity features that have placed a huge demand on typical vehicle networks (i.e. CAN). As a result, a consortium of vehicle manufacturers has developed a bespoke protocol capable of handling the required transfer of d\u2026"
+      },
+      faultyComparison: {
+        faultIndicators: [
+          "Open/short circuit or high circuit resistance causing flatline or voltage offset",
+          "Amplitude dropout, erratic noise, or timing/duty-cycle deviation vs. known-good reference"
+        ],
+        symptomIndicators: [],
+        associatedDtcs: [],
+        goodVsFaultyDiagnosticRule: "[CAN_LIN_NETWORK] Known-Good: Differential Digital Bus (CAN-H / CAN-L mirrored 2.5V recessive -> 3.5V/1.5V dominant). Expected voltage references: 0 V, 2.5 V, 3.5 V. Compare amplitude, frequency/duty cycle, ground offset, noise/dropouts, and missing pulses against the known-good reference."
+      },
+      provenance: {
+        sourceSite: "picoauto.com",
+        sourceUrl: "https://www.picoauto.com/library/automotive-guided-tests/communication/flexray-bus/AGT-938-flexray-serial-decoding/",
+        crawledAt: "2026-11-28T05:15:08.609Z",
+        tier: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        copyrightNotice: "Structured oscilloscope signal parameters, DTCs, and short technical extracts only; full guided test remains hosted on picoauto.com."
+      }
+    }
+  ]
+};
+
+// src/services/oscilloscopeWaveformKnowledgeService.ts
+var OSCILLOSCOPE_MANIFEST = oemOscilloscopeWaveformsCatalog_default;
+function getAllOscilloscopeWaveforms() {
+  return OSCILLOSCOPE_MANIFEST.records || [];
+}
+function buildOscilloscopeWaveformRepairReferences() {
+  return getAllOscilloscopeWaveforms().map((rec) => {
+    const electricalSpecs = [];
+    if (rec.knownGood.extractedVoltageSpecs.length > 0 || rec.knownGood.extractedFrequencyOrTimingSpecs.length > 0) {
+      electricalSpecs.push({
+        signalName: rec.title,
+        voltageRange: rec.knownGood.extractedVoltageSpecs.slice(0, 3).join(", ") || void 0,
+        frequencyRange: rec.knownGood.extractedFrequencyOrTimingSpecs.slice(0, 3).join(", ") || void 0,
+        testCondition: rec.knownGood.testSetupSummary.slice(0, 140)
+      });
+    }
+    const tags = Array.from(
+      /* @__PURE__ */ new Set([
+        "oscilloscope",
+        "waveform",
+        "known-good-vs-faulty",
+        "picoauto",
+        rec.agtCode.toLowerCase(),
+        rec.category,
+        rec.subCategory,
+        rec.signalFamily.toLowerCase(),
+        ...rec.faultyComparison.associatedDtcs.slice(0, 8).map((d) => d.toLowerCase())
+      ])
+    );
+    const record = {
+      id: `ref-osc-${rec.agtCode.toLowerCase()}`,
+      vehicleId: "v-universal-12v-oscilloscope",
+      make: "Universal OEM",
+      model: `${rec.title} (${rec.agtCode})`,
+      years: "All Modern 12V/24V EFI",
+      systemCategoryId: rec.systemCategoryId,
+      title: `${rec.title} \u2014 Known-Good vs Faulty Oscilloscope Reference [${rec.agtCode}]`,
+      referenceType: "electrical_system",
+      summary: `${rec.faultyComparison.goodVsFaultyDiagnosticRule} Test Setup: ${rec.knownGood.testSetupSummary}`,
+      source: {
+        sourceName: "PicoAuto Automotive Guided Tests (picoauto.com)",
+        originalUrl: rec.provenance.sourceUrl,
+        sourceType: "oem_oscilloscope_guided_test",
+        collectedAt: rec.provenance.crawledAt,
+        language: "en",
+        verificationStatus: "verified_source",
+        confidenceScore: 0.92
+      },
+      verified: true,
+      tags,
+      electricalSpecs: electricalSpecs.length > 0 ? electricalSpecs : void 0,
+      provenance: {
+        sourceDocument: `PicoAuto ${rec.agtCode} (${rec.provenance.sourceUrl})`,
+        pageOrSection: `${rec.category} / ${rec.subCategory}`,
+        revision: rec.agtCode,
+        captureDate: rec.provenance.crawledAt,
+        verificationStatus: "VERIFIED",
+        evidenceType: "VERIFIED_OEM",
+        testConditions: rec.knownGood.testSetupSummary,
+        copyrightNotice: rec.provenance.copyrightNotice,
+        versionHistory: [
+          {
+            version: 1,
+            updatedAt: rec.provenance.crawledAt,
+            actor: "oscilloscope-waveform-ingestion-engine",
+            lifecycleStatus: "VERIFIED",
+            changeSummary: `Ingested OEM oscilloscope known-good vs faulty comparison from ${rec.provenance.sourceUrl}`
+          }
+        ]
+      }
+    };
+    return record;
+  });
+}
+
 // src/services/automotiveKnowledgeService.ts
 var STORAGE_KEY = "autolab_automotive_knowledge_index_v1";
 var cachedCatalog = null;
@@ -12643,6 +18136,7 @@ function buildEnrichedDefaultCatalog() {
   );
   const archiveOrgVehicles = buildArchiveOrgToyotaVehicleModels();
   const archiveOrgRefs = buildArchiveOrgToyotaRepairReferences();
+  const oscWaveformRefs = buildOscilloscopeWaveformRepairReferences();
   const deduplicated = deduplicateCatalog({
     ...INITIAL_AUTOMOTIVE_CATALOG,
     generatedAt: pickLatestIsoTimestamp(
@@ -12658,6 +18152,7 @@ function buildEnrichedDefaultCatalog() {
     repairReferences: [
       ...INITIAL_AUTOMOTIVE_CATALOG.repairReferences,
       ...compiled.knowledgeIndexEntries || [],
+      ...oscWaveformRefs,
       ...archiveOrgRefs
     ]
   });
