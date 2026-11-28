@@ -3,17 +3,33 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "functions": {
-    "api/index.ts": {
+    "api/index.mjs": {
       "maxDuration": 30
     }
   },
+  "headers": [
+    {
+      "source": "/(sw\\.js|sw\\.mjs)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
+        { "key": "Service-Worker-Allowed", "value": "/" }
+      ]
+    },
+    {
+      "source": "/(manifest\\.webmanifest|manifest\\.json)",
+      "headers": [
+        { "key": "Content-Type", "value": "application/manifest+json; charset=utf-8" },
+        { "key": "Cache-Control", "value": "no-cache" }
+      ]
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api"
+      "destination": "/api?__vercel_path=$1"
     },
     {
-      "source": "/((?!api/|assets/|sw\\.js|sw\\.mjs|manifest\\.webmanifest|manifest\\.json|offline\\.html|favicon\\.ico|favicon-32x32\\.png|apple-touch-icon\\.png|pwa-.*\\.png).*)",
+      "source": "/((?!api(?:/|$)|assets/|sw\\.js|sw\\.mjs|manifest\\.webmanifest|manifest\\.json|offline\\.html|favicon\\.ico|favicon-32x32\\.png|apple-touch-icon\\.png|pwa-.*\\.png|AutoElectric_Lab_PRO_System_Blueprint\\.pdf).*)",
       "destination": "/index.html"
     }
   ]
