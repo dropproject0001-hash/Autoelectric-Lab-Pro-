@@ -1,0 +1,2913 @@
+{
+  "schemaVersion": "1.0.0",
+  "sourceSite": "archive.org",
+  "sourceQuery": "Toyota manual pdf",
+  "sourcePage": 2,
+  "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+  "apiEndpoint": "https://archive.org/advancedsearch.php?q=Toyota+manual+pdf&fl[]=identifier,title,creator,publisher,year,date,mediatype,subject,description,language,downloads,item_size,licenseurl&rows=50&page=2&output=json",
+  "generatedAt": "2026-11-28T03:37:28.764Z",
+  "zeroFabricationIntegrity": true,
+  "totalSearchHitsReported": 463,
+  "rawPageDocsFetched": 50,
+  "automotiveManualsIngested": 47,
+  "filteredOutNonAutomotiveCount": 3,
+  "totalPdfAssetsIndexed": 129,
+  "modelsDiscovered": [
+    "Avalon",
+    "Camry",
+    "Camry Solara",
+    "Celica",
+    "Corolla",
+    "Crown",
+    "MR2",
+    "Matrix",
+    "Multi-Model / General",
+    "Prius",
+    "Sienna",
+    "Yaris"
+  ],
+  "categoriesBreakdown": {
+    "WIRING_DIAGRAM": 2,
+    "REPAIR_SERVICE_MANUAL": 5,
+    "ENGINE_ECU_MANUAL": 1,
+    "OWNERS_MANUAL": 18,
+    "NAVIGATION_AUDIO_MANUAL": 2,
+    "PARTS_CATALOG": 0,
+    "TECHNICAL_BULLETIN": 0,
+    "OTHER_AUTOMOTIVE": 19
+  },
+  "records": [
+    {
+      "identifier": "toyota-avalon-02010-owners-manual",
+      "title": "Toyota Avalon 02010 Owner's Manual + Navigation System Manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Avalon",
+      "modelSlug": "avalon",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": 2010,
+      "yearEnd": 2010,
+      "yearsLabel": "2010",
+      "category": "NAVIGATION_AUDIO_MANUAL",
+      "systemCategories": [
+        "body_electrical"
+      ],
+      "creator": "Toyota Motor Corporation",
+      "publisher": null,
+      "language": "eng",
+      "licenseUrl": null,
+      "downloads": 51,
+      "itemSizeBytes": 158425917,
+      "subjects": [
+        "Toyota",
+        "Toyota Avalon"
+      ],
+      "descriptionExcerpt": "Sources: https://www.toyota.ca/content/dam/toyota/documents/manuals/en/OM41437U/OM41437U.pdf https://www.toyota.ca/content/dam/toyota/documents/manuals/en/OM41439U/OM41439U.pdf",
+      "pdfAssets": [
+        {
+          "fileName": "Toyota Avalon 02010 Navigation System Manual.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 2418763,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/toyota-avalon-02010-owners-manual/Toyota%20Avalon%2002010%20Navigation%20System%20Manual.pdf"
+        },
+        {
+          "fileName": "Toyota Avalon 02010 Owner's Manual.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 11307626,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/toyota-avalon-02010-owners-manual/Toyota%20Avalon%2002010%20Owner's%20Manual.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/toyota-avalon-02010-owners-manual",
+        "metadataApiUrl": "https://archive.org/metadata/toyota-avalon-02010-owners-manual",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "chiltonbookcompa0000unse_h1r4",
+      "title": "Chilton Book Company repair manual. Toyota Camry, 1983-92 : all U.S. and Canadian models of Toyota Camry",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Camry",
+      "modelSlug": "camry",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": 1983,
+      "yearEnd": 1983,
+      "yearsLabel": "1983",
+      "category": "REPAIR_SERVICE_MANUAL",
+      "systemCategories": [
+        "engine_management_ecu",
+        "electrical_charging",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": "Radnor, Pa. : Chilton Book Company",
+      "language": "eng",
+      "licenseUrl": null,
+      "downloads": 140,
+      "itemSizeBytes": 1381181501,
+      "subjects": [
+        "Camry automobile -- Maintenance and repair -- Handbooks",
+        "manuals",
+        "etc"
+      ],
+      "descriptionExcerpt": "489 p. : 26 cm; Cover title: Chilton's repair manual. Toyota Camry, 1983-92; Spine title: Chilton Toyota Camry, 1983-92; \"Part no. 7740\"--Cover; Includes index",
+      "pdfAssets": [
+        {
+          "fileName": "chiltonbookcompa0000unse_h1r4.lcpdf",
+          "format": "LCP Encrypted PDF",
+          "sizeBytes": 34642800,
+          "pageCount": 518,
+          "downloadUrl": "https://archive.org/download/chiltonbookcompa0000unse_h1r4/chiltonbookcompa0000unse_h1r4.lcpdf"
+        },
+        {
+          "fileName": "chiltonbookcompa0000unse_h1r4.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 34321953,
+          "pageCount": 518,
+          "downloadUrl": "https://archive.org/download/chiltonbookcompa0000unse_h1r4/chiltonbookcompa0000unse_h1r4.pdf"
+        },
+        {
+          "fileName": "chiltonbookcompa0000unse_h1r4_encrypted.pdf",
+          "format": "ACS Encrypted PDF",
+          "sizeBytes": 33603245,
+          "pageCount": 518,
+          "downloadUrl": "https://archive.org/download/chiltonbookcompa0000unse_h1r4/chiltonbookcompa0000unse_h1r4_encrypted.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/chiltonbookcompa0000unse_h1r4",
+        "metadataApiUrl": "https://archive.org/metadata/chiltonbookcompa0000unse_h1r4",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "toyota-camry-1998-owners-manual",
+      "title": "Toyota Camry 1998 Owner's Manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Camry",
+      "modelSlug": "camry",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": 1998,
+      "yearEnd": 1998,
+      "yearsLabel": "1998",
+      "category": "OWNERS_MANUAL",
+      "systemCategories": [
+        "body_electrical"
+      ],
+      "creator": "NamVet73",
+      "publisher": null,
+      "language": "eng",
+      "licenseUrl": null,
+      "downloads": 127,
+      "itemSizeBytes": 82372011,
+      "subjects": [
+        "Manual"
+      ],
+      "descriptionExcerpt": "My 1998 Toyota Camry LE",
+      "pdfAssets": [
+        {
+          "fileName": "Toyota Camry 1998 Owner's Manual.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 4706767,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/toyota-camry-1998-owners-manual/Toyota%20Camry%201998%20Owner's%20Manual.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/toyota-camry-1998-owners-manual",
+        "metadataApiUrl": "https://archive.org/metadata/toyota-camry-1998-owners-manual",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manualsbase-id-209065",
+      "title": "Toyota CAMRY 2006 user manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Camry",
+      "modelSlug": "camry",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": 2006,
+      "yearEnd": 2006,
+      "yearsLabel": "2006",
+      "category": "OWNERS_MANUAL",
+      "systemCategories": [
+        "body_electrical"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "English",
+      "licenseUrl": null,
+      "downloads": 189,
+      "itemSizeBytes": 11323346,
+      "subjects": [
+        "manualsbase",
+        "manuals"
+      ],
+      "descriptionExcerpt": "Internet Archive cataloged Toyota reference PDF (see archive.org details URL for full document).",
+      "pdfAssets": [
+        {
+          "fileName": "209065.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 1199545,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manualsbase-id-209065/209065.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manualsbase-id-209065",
+        "metadataApiUrl": "https://archive.org/metadata/manualsbase-id-209065",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manualsbase-id-224804",
+      "title": "Toyota CAMRY SOLARA 00452-PRG07-SOL user manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Camry Solara",
+      "modelSlug": "camry-solara",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OWNERS_MANUAL",
+      "systemCategories": [
+        "body_electrical"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "English",
+      "licenseUrl": null,
+      "downloads": 157,
+      "itemSizeBytes": 12020795,
+      "subjects": [
+        "manualsbase",
+        "manuals"
+      ],
+      "descriptionExcerpt": "Internet Archive cataloged Toyota reference PDF (see archive.org details URL for full document).",
+      "pdfAssets": [
+        {
+          "fileName": "224804.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 1940187,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manualsbase-id-224804/224804.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manualsbase-id-224804",
+        "metadataApiUrl": "https://archive.org/metadata/manualsbase-id-224804",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "celica-bgb-archive",
+      "title": "Celica BGB Archive v1 - Toyota Celica repair manuals (1986-2005)",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Celica",
+      "modelSlug": "celica",
+      "chassisCodes": [
+        "ST185",
+        "ST205",
+        "SW20"
+      ],
+      "engineCodes": [
+        "3S-FE",
+        "3S-GE",
+        "3S-GTE"
+      ],
+      "yearStart": 1986,
+      "yearEnd": 2005,
+      "yearsLabel": "1986-2005",
+      "category": "WIRING_DIAGRAM",
+      "systemCategories": [
+        "electrical_charging",
+        "body_electrical",
+        "engine_management_ecu"
+      ],
+      "creator": "Toyota Motor Corporation",
+      "publisher": null,
+      "language": "eng",
+      "licenseUrl": null,
+      "downloads": 0,
+      "itemSizeBytes": 7992689437,
+      "subjects": [
+        "Toyota",
+        "Celica",
+        "Toyota Celica",
+        "repair manual",
+        "service manual",
+        "shop manual",
+        "wiring diagram",
+        "EWD",
+        "GT-Four",
+        "All-Trac",
+        "ST165",
+        "ST185"
+      ],
+      "descriptionExcerpt": "Repair manuals for the Toyota Celica, 4th to 7th generation (1986-2005), and the 1991 MR2 SW20, rebuilt from bgbonline.celicatech.com (the 'BGB online' site, offline since around late 2021) and completed from other copies found online. 26 manuals, 15,759 pages, one PDF per manual. Each has bookmarks, clickable content…",
+      "pdfAssets": [
+        {
+          "fileName": "00_README.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 9759,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/00_README.pdf"
+        },
+        {
+          "fileName": "00_README_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 1989,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/00_README_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1986 Celica Electrical Wiring Diagram (EWD005U).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 4895487,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1986%20Celica%20Electrical%20Wiring%20Diagram%20(EWD005U).pdf"
+        },
+        {
+          "fileName": "1986 Celica Electrical Wiring Diagram (EWD005U)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 166580,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1986%20Celica%20Electrical%20Wiring%20Diagram%20(EWD005U)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1986 Celica Repair Manual for Collision Damage (BRM001).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 4869946,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1986%20Celica%20Repair%20Manual%20for%20Collision%20Damage%20(BRM001).pdf"
+        },
+        {
+          "fileName": "1986 Celica Repair Manual for Collision Damage (BRM001)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 145542,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1986%20Celica%20Repair%20Manual%20for%20Collision%20Damage%20(BRM001)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1987 Celica Convertible Repair Manual Supplement (Gen 4).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 9786365,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1987%20Celica%20Convertible%20Repair%20Manual%20Supplement%20(Gen%204).pdf"
+        },
+        {
+          "fileName": "1987 Celica Convertible Repair Manual Supplement (Gen 4)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 155166,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1987%20Celica%20Convertible%20Repair%20Manual%20Supplement%20(Gen%204)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1987 Celica and Camry 3S-FE TCCS Diagnosis Manual (DM011U).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 2777415,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1987%20Celica%20and%20Camry%203S-FE%20TCCS%20Diagnosis%20Manual%20(DM011U).pdf"
+        },
+        {
+          "fileName": "1987 Celica and Camry 3S-FE TCCS Diagnosis Manual (DM011U)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 163606,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1987%20Celica%20and%20Camry%203S-FE%20TCCS%20Diagnosis%20Manual%20(DM011U)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1988 Celica All-Trac ST165 Repair Manual (RM071U).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 64127334,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1988%20Celica%20All-Trac%20ST165%20Repair%20Manual%20(RM071U).pdf"
+        },
+        {
+          "fileName": "1988 Celica All-Trac ST165 Repair Manual (RM071U)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 702757,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1988%20Celica%20All-Trac%20ST165%20Repair%20Manual%20(RM071U)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1988 Celica Service and Repair Manual (aftermarket, Gen 4).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 27165299,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1988%20Celica%20Service%20and%20Repair%20Manual%20(aftermarket%2C%20Gen%204).pdf"
+        },
+        {
+          "fileName": "1988 Celica Service and Repair Manual (aftermarket, Gen 4)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 12888936,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1988%20Celica%20Service%20and%20Repair%20Manual%20(aftermarket%2C%20Gen%204)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1989 Celica Electrical Wiring Diagram (EWD057U).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 10901459,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1989%20Celica%20Electrical%20Wiring%20Diagram%20(EWD057U).pdf"
+        },
+        {
+          "fileName": "1989 Celica Electrical Wiring Diagram (EWD057U)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 247167,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1989%20Celica%20Electrical%20Wiring%20Diagram%20(EWD057U)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1989 Celica Repair Manual (RM114U) - Charging and Clutch only.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 3517134,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1989%20Celica%20Repair%20Manual%20(RM114U)%20-%20Charging%20and%20Clutch%20only.pdf"
+        },
+        {
+          "fileName": "1989 Celica Repair Manual (RM114U) - Charging and Clutch only_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 43702,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1989%20Celica%20Repair%20Manual%20(RM114U)%20-%20Charging%20and%20Clutch%20only_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1990 Celica All-Trac ST185 Electrical Wiring Diagram.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 2479034,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1990%20Celica%20All-Trac%20ST185%20Electrical%20Wiring%20Diagram.pdf"
+        },
+        {
+          "fileName": "1990 Celica All-Trac ST185 Electrical Wiring Diagram_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 162095,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1990%20Celica%20All-Trac%20ST185%20Electrical%20Wiring%20Diagram_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1990 Celica All-Trac ST185 Repair Manual (RM176U).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 28790768,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1990%20Celica%20All-Trac%20ST185%20Repair%20Manual%20(RM176U).pdf"
+        },
+        {
+          "fileName": "1990 Celica All-Trac ST185 Repair Manual (RM176U)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 839777,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1990%20Celica%20All-Trac%20ST185%20Repair%20Manual%20(RM176U)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1990-93 Celica Electrical Wiring Diagram Manual (EWD160U).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 4448451,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1990-93%20Celica%20Electrical%20Wiring%20Diagram%20Manual%20(EWD160U).pdf"
+        },
+        {
+          "fileName": "1990-93 Celica Electrical Wiring Diagram Manual (EWD160U)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 194087,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1990-93%20Celica%20Electrical%20Wiring%20Diagram%20Manual%20(EWD160U)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1991 Celica 3S-GTE Engine Repair Manual Supplement (RM266E, Europe).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 8872055,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1991%20Celica%203S-GTE%20Engine%20Repair%20Manual%20Supplement%20(RM266E%2C%20Europe).pdf"
+        },
+        {
+          "fileName": "1991 Celica 3S-GTE Engine Repair Manual Supplement (RM266E, Europe)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 192958,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1991%20Celica%203S-GTE%20Engine%20Repair%20Manual%20Supplement%20(RM266E%2C%20Europe)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1991 MR2 SW20 Repair Manual.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 149068690,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1991%20MR2%20SW20%20Repair%20Manual.pdf"
+        },
+        {
+          "fileName": "1991 MR2 SW20 Repair Manual_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 2098475,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1991%20MR2%20SW20%20Repair%20Manual_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1992-93 Celica Repair Manual (Gen 5).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 43458288,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1992-93%20Celica%20Repair%20Manual%20(Gen%205).pdf"
+        },
+        {
+          "fileName": "1992-93 Celica Repair Manual (Gen 5)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 2475295,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1992-93%20Celica%20Repair%20Manual%20(Gen%205)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1993 Celica Service and Repair Manual (aftermarket, Gen 5).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 27788471,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1993%20Celica%20Service%20and%20Repair%20Manual%20(aftermarket%2C%20Gen%205).pdf"
+        },
+        {
+          "fileName": "1993 Celica Service and Repair Manual (aftermarket, Gen 5)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 10323267,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1993%20Celica%20Service%20and%20Repair%20Manual%20(aftermarket%2C%20Gen%205)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1994 Celica 3S-GE Engine Repair Manual (RM396E, Europe).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 14110732,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1994%20Celica%203S-GE%20Engine%20Repair%20Manual%20(RM396E%2C%20Europe).pdf"
+        },
+        {
+          "fileName": "1994 Celica 3S-GE Engine Repair Manual (RM396E, Europe)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 687650,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1994%20Celica%203S-GE%20Engine%20Repair%20Manual%20(RM396E%2C%20Europe)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1994 Celica AT200-ST204 Electrical Wiring Diagram (EWD198Y, Europe).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 21303209,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1994%20Celica%20AT200-ST204%20Electrical%20Wiring%20Diagram%20(EWD198Y%2C%20Europe).pdf"
+        },
+        {
+          "fileName": "1994 Celica AT200-ST204 Electrical Wiring Diagram (EWD198Y, Europe)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 509944,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1994%20Celica%20AT200-ST204%20Electrical%20Wiring%20Diagram%20(EWD198Y%2C%20Europe)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1994 Celica Chassis and Body Repair Manual (RM380E, Europe).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 35488981,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1994%20Celica%20Chassis%20and%20Body%20Repair%20Manual%20(RM380E%2C%20Europe).pdf"
+        },
+        {
+          "fileName": "1994 Celica Chassis and Body Repair Manual (RM380E, Europe)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 1428598,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1994%20Celica%20Chassis%20and%20Body%20Repair%20Manual%20(RM380E%2C%20Europe)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1994 Celica Electrical Wiring Diagram (USA, Gen 6).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 4847528,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1994%20Celica%20Electrical%20Wiring%20Diagram%20(USA%2C%20Gen%206).pdf"
+        },
+        {
+          "fileName": "1994 Celica Electrical Wiring Diagram (USA, Gen 6)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 264653,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1994%20Celica%20Electrical%20Wiring%20Diagram%20(USA%2C%20Gen%206)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1994 Celica GT-Four ST205 3S-GTE Engine Supplement (RM398E).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 35163037,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1994%20Celica%20GT-Four%20ST205%203S-GTE%20Engine%20Supplement%20(RM398E).pdf"
+        },
+        {
+          "fileName": "1994 Celica GT-Four ST205 3S-GTE Engine Supplement (RM398E)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 266115,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1994%20Celica%20GT-Four%20ST205%203S-GTE%20Engine%20Supplement%20(RM398E)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1994 Celica GT-Four ST205 Chassis and Body Supplement (RM399E).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 44031735,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1994%20Celica%20GT-Four%20ST205%20Chassis%20and%20Body%20Supplement%20(RM399E).pdf"
+        },
+        {
+          "fileName": "1994 Celica GT-Four ST205 Chassis and Body Supplement (RM399E)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 454466,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1994%20Celica%20GT-Four%20ST205%20Chassis%20and%20Body%20Supplement%20(RM399E)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "1994 Celica Service and Repair Manual (aftermarket, Gen 6).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 33629214,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1994%20Celica%20Service%20and%20Repair%20Manual%20(aftermarket%2C%20Gen%206).pdf"
+        },
+        {
+          "fileName": "1994 Celica Service and Repair Manual (aftermarket, Gen 6)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 13578385,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/1994%20Celica%20Service%20and%20Repair%20Manual%20(aftermarket%2C%20Gen%206)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "2000-02 Celica Parts Guide.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 41896211,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/2000-02%20Celica%20Parts%20Guide.pdf"
+        },
+        {
+          "fileName": "2000-02 Celica Parts Guide_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 20087,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/2000-02%20Celica%20Parts%20Guide_text_pdfmeta.json"
+        },
+        {
+          "fileName": "2000-05 Celica Repair Manual Volume 1 (RM744U1).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 16340098,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/2000-05%20Celica%20Repair%20Manual%20Volume%201%20(RM744U1).pdf"
+        },
+        {
+          "fileName": "2000-05 Celica Repair Manual Volume 1 (RM744U1)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 1069288,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/2000-05%20Celica%20Repair%20Manual%20Volume%201%20(RM744U1)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "2000-05 Celica Repair Manual Volume 2 (RM744U2).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 32252027,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/2000-05%20Celica%20Repair%20Manual%20Volume%202%20(RM744U2).pdf"
+        },
+        {
+          "fileName": "2000-05 Celica Repair Manual Volume 2 (RM744U2)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 1500273,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/2000-05%20Celica%20Repair%20Manual%20Volume%202%20(RM744U2)_text_pdfmeta.json"
+        },
+        {
+          "fileName": "Toyota Wire Harness Repair Manual (RM1022E).pdf",
+          "format": "Text PDF",
+          "sizeBytes": 5341420,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/Toyota%20Wire%20Harness%20Repair%20Manual%20(RM1022E).pdf"
+        },
+        {
+          "fileName": "Toyota Wire Harness Repair Manual (RM1022E)_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 516517,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/celica-bgb-archive/Toyota%20Wire%20Harness%20Repair%20Manual%20(RM1022E)_text_pdfmeta.json"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/celica-bgb-archive",
+        "metadataApiUrl": "https://archive.org/metadata/celica-bgb-archive",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "1990-toyota-celica-st185-wiring-diagram-service-manual",
+      "title": "1990 Toyota Celica ST185 Wiring Diagram Service Manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Celica",
+      "modelSlug": "celica",
+      "chassisCodes": [
+        "ST185"
+      ],
+      "engineCodes": [],
+      "yearStart": 1990,
+      "yearEnd": 1990,
+      "yearsLabel": "1990",
+      "category": "WIRING_DIAGRAM",
+      "systemCategories": [
+        "electrical_charging",
+        "body_electrical",
+        "engine_management_ecu"
+      ],
+      "creator": "Toyota",
+      "publisher": null,
+      "language": "eng",
+      "licenseUrl": null,
+      "downloads": 2289,
+      "itemSizeBytes": 75205661,
+      "subjects": [
+        "Toyota",
+        "Celica",
+        "ST185",
+        "wiring diagram",
+        "service manual",
+        "repair manual",
+        "workshop manual"
+      ],
+      "descriptionExcerpt": "PDF originally posted to MWP's Toyota Celica GT4 Documents & Media",
+      "pdfAssets": [
+        {
+          "fileName": "Toyota - ST185 - Electrical Wiring Diagram.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 2410654,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/1990-toyota-celica-st185-wiring-diagram-service-manual/Toyota%20-%20ST185%20-%20Electrical%20Wiring%20Diagram.pdf"
+        },
+        {
+          "fileName": "Toyota - ST185 - Electrical Wiring Diagram_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 159480,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/1990-toyota-celica-st185-wiring-diagram-service-manual/Toyota%20-%20ST185%20-%20Electrical%20Wiring%20Diagram_text_pdfmeta.json"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/1990-toyota-celica-st185-wiring-diagram-service-manual",
+        "metadataApiUrl": "https://archive.org/metadata/1990-toyota-celica-st185-wiring-diagram-service-manual",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "ae86-repair-manual",
+      "title": "1983 Toyota Corolla GTS Repair Manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Corolla",
+      "modelSlug": "corolla",
+      "chassisCodes": [
+        "AE86"
+      ],
+      "engineCodes": [],
+      "yearStart": 1983,
+      "yearEnd": 1983,
+      "yearsLabel": "1983",
+      "category": "REPAIR_SERVICE_MANUAL",
+      "systemCategories": [
+        "engine_management_ecu",
+        "electrical_charging",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": "Toyota",
+      "publisher": null,
+      "language": "eng",
+      "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+      "downloads": 124,
+      "itemSizeBytes": 156528499,
+      "subjects": [
+        "AE86",
+        "Toyota",
+        "Corolla",
+        "GTS",
+        "SR5",
+        "SR-5",
+        "4AGE",
+        "4AC",
+        "T50",
+        "Sprinter",
+        "Levin"
+      ],
+      "descriptionExcerpt": "This is a Repair manual for Chassis and Body of a 1983-87 Toyota Corolla GTS/SR5. This is the USDM manual. Also referred to as the AE86. Archiving for preservation. I have uploaded this, the original document came from a friend of mine. I take no credit on the document, and its an official Toyota Repair manual. The on…",
+      "pdfAssets": [
+        {
+          "fileName": "AE86Manual.pdf",
+          "format": "Image Container PDF",
+          "sizeBytes": 103419650,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/ae86-repair-manual/AE86Manual.pdf"
+        },
+        {
+          "fileName": "AE86Manual_text.pdf",
+          "format": "Additional Text PDF",
+          "sizeBytes": 5467468,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/ae86-repair-manual/AE86Manual_text.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/ae86-repair-manual",
+        "metadataApiUrl": "https://archive.org/metadata/ae86-repair-manual",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "beatsonicformultivision",
+      "title": "Beat-Sonic EMA/EMCC Manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Crown",
+      "modelSlug": "crown",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": 2006,
+      "yearEnd": 2006,
+      "yearsLabel": "2006",
+      "category": "OTHER_AUTOMOTIVE",
+      "systemCategories": [
+        "body_electrical",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": "Beat-Sonic, Inc.",
+      "publisher": null,
+      "language": "jpn",
+      "licenseUrl": null,
+      "downloads": 171,
+      "itemSizeBytes": 4108001,
+      "subjects": [
+        "beatsonic",
+        "multivisonadaptor",
+        "multivison curcuit"
+      ],
+      "descriptionExcerpt": "EMA(Electro Multivision Adaptor)-40 for Toyota Crown S140 EMA-20 for Toyota Celsior UCF10 EMCC(Electro Multivison CirCuit)-40 for Toyota Crown S140 (Missing) EMCC-20 for Toyota Celsior UCF10 EMCC-21 for Toyota Celsior UCF20",
+      "pdfAssets": [
+        {
+          "fileName": "ema-20.pdf",
+          "format": "Image Container PDF",
+          "sizeBytes": 927183,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/beatsonicformultivision/ema-20.pdf"
+        },
+        {
+          "fileName": "ema-20_text.pdf",
+          "format": "Additional Text PDF",
+          "sizeBytes": 23390,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/beatsonicformultivision/ema-20_text.pdf"
+        },
+        {
+          "fileName": "ema-40.pdf",
+          "format": "Image Container PDF",
+          "sizeBytes": 961480,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/beatsonicformultivision/ema-40.pdf"
+        },
+        {
+          "fileName": "ema-40_text.pdf",
+          "format": "Additional Text PDF",
+          "sizeBytes": 23980,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/beatsonicformultivision/ema-40_text.pdf"
+        },
+        {
+          "fileName": "emcc-20.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 311230,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/beatsonicformultivision/emcc-20.pdf"
+        },
+        {
+          "fileName": "emcc21.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 299019,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/beatsonicformultivision/emcc21.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/beatsonicformultivision",
+        "metadataApiUrl": "https://archive.org/metadata/beatsonicformultivision",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manualzilla-id-6964023",
+      "title": "Toyota Matrix 2006 User's Manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Matrix",
+      "modelSlug": "matrix",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": 2006,
+      "yearEnd": 2006,
+      "yearsLabel": "2006",
+      "category": "OWNERS_MANUAL",
+      "systemCategories": [
+        "body_electrical"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": null,
+      "licenseUrl": null,
+      "downloads": 199,
+      "itemSizeBytes": 15874364,
+      "subjects": [
+        "manualzilla",
+        "manuals"
+      ],
+      "descriptionExcerpt": "Internet Archive cataloged Toyota reference PDF (see archive.org details URL for full document).",
+      "pdfAssets": [
+        {
+          "fileName": "6964023.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 1358399,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manualzilla-id-6964023/6964023.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manualzilla-id-6964023",
+        "metadataApiUrl": "https://archive.org/metadata/manualzilla-id-6964023",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manualzilla-id-6964020",
+      "title": "Toyota MR2 User's Manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "MR2",
+      "modelSlug": "mr2",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OWNERS_MANUAL",
+      "systemCategories": [
+        "body_electrical"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": null,
+      "licenseUrl": null,
+      "downloads": 239,
+      "itemSizeBytes": 3629197,
+      "subjects": [
+        "manualzilla",
+        "manuals"
+      ],
+      "descriptionExcerpt": "Internet Archive cataloged Toyota reference PDF (see archive.org details URL for full document).",
+      "pdfAssets": [
+        {
+          "fileName": "6964020.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 298237,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manualzilla-id-6964020/6964020.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manualzilla-id-6964020",
+        "metadataApiUrl": "https://archive.org/metadata/manualzilla-id-6964020",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "chiltonsimportca0000unse_j1k1",
+      "title": "Chilton's import car repair manual, 1984 : import cars from 1977 through 1984",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": 1977,
+      "yearEnd": 1984,
+      "yearsLabel": "1977-1984",
+      "category": "ENGINE_ECU_MANUAL",
+      "systemCategories": [
+        "engine_management_ecu",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": "Radnor, Pa. : Chilton Book Co.",
+      "language": "eng",
+      "licenseUrl": null,
+      "downloads": 127,
+      "itemSizeBytes": 5293610965,
+      "subjects": [
+        "Automobiles",
+        "Foreign -- Maintenance and repair"
+      ],
+      "descriptionExcerpt": "1046, 382 pages : 28 cm; Unit repair section: Tools and equipment -- Basic maintenance -- Gauges and indicators -- Air conditioning service -- Diesel service -- Carburetor service -- Fuel injection -- Turbocharging -- Engine rebuilding -- U-joint/CV-joint overhaul -- Drive axles -- Manual transmission overhaul -- Manu…",
+      "pdfAssets": [
+        {
+          "fileName": "chiltonsimportca0000unse_j1k1.lcpdf",
+          "format": "LCP Encrypted PDF",
+          "sizeBytes": 135598990,
+          "pageCount": 1450,
+          "downloadUrl": "https://archive.org/download/chiltonsimportca0000unse_j1k1/chiltonsimportca0000unse_j1k1.lcpdf"
+        },
+        {
+          "fileName": "chiltonsimportca0000unse_j1k1.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 135087617,
+          "pageCount": 1450,
+          "downloadUrl": "https://archive.org/download/chiltonsimportca0000unse_j1k1/chiltonsimportca0000unse_j1k1.pdf"
+        },
+        {
+          "fileName": "chiltonsimportca0000unse_j1k1_encrypted.pdf",
+          "format": "ACS Encrypted PDF",
+          "sizeBytes": 132147401,
+          "pageCount": 1450,
+          "downloadUrl": "https://archive.org/download/chiltonsimportca0000unse_j1k1/chiltonsimportca0000unse_j1k1_encrypted.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/chiltonsimportca0000unse_j1k1",
+        "metadataApiUrl": "https://archive.org/metadata/chiltonsimportca0000unse_j1k1",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "toyotarepairmanu0000vari",
+      "title": "Toyota Repair Manual Corporation",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": 1989,
+      "yearEnd": 1989,
+      "yearsLabel": "1989",
+      "category": "REPAIR_SERVICE_MANUAL",
+      "systemCategories": [
+        "engine_management_ecu",
+        "electrical_charging",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": "Various",
+      "publisher": null,
+      "language": "Eng",
+      "licenseUrl": null,
+      "downloads": 8,
+      "itemSizeBytes": 3394299365,
+      "subjects": [],
+      "descriptionExcerpt": "Internet Archive cataloged Toyota reference PDF (see archive.org details URL for full document).",
+      "pdfAssets": [
+        {
+          "fileName": "toyotarepairmanu0000vari.lcpdf",
+          "format": "LCP Encrypted PDF",
+          "sizeBytes": 83111841,
+          "pageCount": 1792,
+          "downloadUrl": "https://archive.org/download/toyotarepairmanu0000vari/toyotarepairmanu0000vari.lcpdf"
+        },
+        {
+          "fileName": "toyotarepairmanu0000vari.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 82748804,
+          "pageCount": 1792,
+          "downloadUrl": "https://archive.org/download/toyotarepairmanu0000vari/toyotarepairmanu0000vari.pdf"
+        },
+        {
+          "fileName": "toyotarepairmanu0000vari_encrypted.pdf",
+          "format": "ACS Encrypted PDF",
+          "sizeBytes": 82259913,
+          "pageCount": 1792,
+          "downloadUrl": "https://archive.org/download/toyotarepairmanu0000vari/toyotarepairmanu0000vari_encrypted.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/toyotarepairmanu0000vari",
+        "metadataApiUrl": "https://archive.org/metadata/toyotarepairmanu0000vari",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manualsbase-id-552366",
+      "title": "Toyota 2005 user manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": 2005,
+      "yearEnd": 2005,
+      "yearsLabel": "2005",
+      "category": "OWNERS_MANUAL",
+      "systemCategories": [
+        "body_electrical"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "English",
+      "licenseUrl": null,
+      "downloads": 103,
+      "itemSizeBytes": 14158436,
+      "subjects": [
+        "manualsbase",
+        "manuals"
+      ],
+      "descriptionExcerpt": "Internet Archive cataloged Toyota reference PDF (see archive.org details URL for full document).",
+      "pdfAssets": [
+        {
+          "fileName": "552366.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 1683596,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manualsbase-id-552366/552366.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manualsbase-id-552366",
+        "metadataApiUrl": "https://archive.org/metadata/manualsbase-id-552366",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manualsbase-id-233502",
+      "title": "Toyota 2005 user manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": 2005,
+      "yearEnd": 2005,
+      "yearsLabel": "2005",
+      "category": "OWNERS_MANUAL",
+      "systemCategories": [
+        "body_electrical"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "English",
+      "licenseUrl": null,
+      "downloads": 167,
+      "itemSizeBytes": 15361835,
+      "subjects": [
+        "manualsbase",
+        "manuals"
+      ],
+      "descriptionExcerpt": "Internet Archive cataloged Toyota reference PDF (see archive.org details URL for full document).",
+      "pdfAssets": [
+        {
+          "fileName": "233502.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 2488682,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manualsbase-id-233502/233502.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manualsbase-id-233502",
+        "metadataApiUrl": "https://archive.org/metadata/manualsbase-id-233502",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manualzilla-id-7260590",
+      "title": "Toyota 2007 Automobile User Manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": 2007,
+      "yearEnd": 2007,
+      "yearsLabel": "2007",
+      "category": "OWNERS_MANUAL",
+      "systemCategories": [
+        "body_electrical"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": null,
+      "licenseUrl": null,
+      "downloads": 239,
+      "itemSizeBytes": 13577523,
+      "subjects": [
+        "manualzilla",
+        "manuals",
+        "Old",
+        "Automotive",
+        "Cars"
+      ],
+      "descriptionExcerpt": "Internet Archive cataloged Toyota reference PDF (see archive.org details URL for full document).",
+      "pdfAssets": [
+        {
+          "fileName": "7260590.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 1893954,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manualzilla-id-7260590/7260590.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manualzilla-id-7260590",
+        "metadataApiUrl": "https://archive.org/metadata/manualzilla-id-7260590",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manualsbase-id-552102",
+      "title": "Toyota 2008 user manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": 2008,
+      "yearEnd": 2008,
+      "yearsLabel": "2008",
+      "category": "OWNERS_MANUAL",
+      "systemCategories": [
+        "body_electrical"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "English",
+      "licenseUrl": null,
+      "downloads": 116,
+      "itemSizeBytes": 15789808,
+      "subjects": [
+        "manualsbase",
+        "manuals"
+      ],
+      "descriptionExcerpt": "Internet Archive cataloged Toyota reference PDF (see archive.org details URL for full document).",
+      "pdfAssets": [
+        {
+          "fileName": "552102.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 624779,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manualsbase-id-552102/552102.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manualsbase-id-552102",
+        "metadataApiUrl": "https://archive.org/metadata/manualsbase-id-552102",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manualzilla-id-6265442",
+      "title": "06-2 TOYOTA PDS MANUAL",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "REPAIR_SERVICE_MANUAL",
+      "systemCategories": [
+        "engine_management_ecu",
+        "electrical_charging",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": null,
+      "licenseUrl": null,
+      "downloads": 193,
+      "itemSizeBytes": 25762211,
+      "subjects": [
+        "manualzilla",
+        "manuals"
+      ],
+      "descriptionExcerpt": "Internet Archive cataloged Toyota reference PDF (see archive.org details URL for full document).",
+      "pdfAssets": [
+        {
+          "fileName": "6265442.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 1615679,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manualzilla-id-6265442/6265442.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manualzilla-id-6265442",
+        "metadataApiUrl": "https://archive.org/metadata/manualzilla-id-6265442",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "BRepairManual",
+      "title": "B Repair Manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "REPAIR_SERVICE_MANUAL",
+      "systemCategories": [
+        "engine_management_ecu",
+        "electrical_charging",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "eng",
+      "licenseUrl": null,
+      "downloads": 465,
+      "itemSizeBytes": 316171440,
+      "subjects": [
+        "Toyota Repair Manuals"
+      ],
+      "descriptionExcerpt": "Toyota B diesels manual",
+      "pdfAssets": [
+        {
+          "fileName": "B Repair Manual.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 13901564,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/BRepairManual/B%20Repair%20Manual.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/BRepairManual",
+        "metadataApiUrl": "https://archive.org/metadata/BRepairManual",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "EngineManual2H12HT",
+      "title": "Engine Manual 2 H 12 HT",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OTHER_AUTOMOTIVE",
+      "systemCategories": [
+        "body_electrical",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "English",
+      "licenseUrl": null,
+      "downloads": 342,
+      "itemSizeBytes": 321616268,
+      "subjects": [
+        "Toyota",
+        "Manual"
+      ],
+      "descriptionExcerpt": "Engine Manual 2 H 12 HT",
+      "pdfAssets": [
+        {
+          "fileName": "_engine_manual_2H_12HT.pdf",
+          "format": "Image Container PDF",
+          "sizeBytes": 12953472,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/EngineManual2H12HT/_engine_manual_2H_12HT.pdf"
+        },
+        {
+          "fileName": "_engine_manual_2H_12HT_text.pdf",
+          "format": "Additional Text PDF",
+          "sizeBytes": 31174041,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/EngineManual2H12HT/_engine_manual_2H_12HT_text.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/EngineManual2H12HT",
+        "metadataApiUrl": "https://archive.org/metadata/EngineManual2H12HT",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "japanese-manual-27790",
+      "title": "japanese manual 27790 :  マークXジオ の取扱説明書・マニュアル",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OTHER_AUTOMOTIVE",
+      "systemCategories": [
+        "body_electrical",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "japanese",
+      "licenseUrl": null,
+      "downloads": 626,
+      "itemSizeBytes": 156684445,
+      "subjects": [
+        "japanese manuals",
+        "toyota"
+      ],
+      "descriptionExcerpt": "マークXジオのサポート サイト。設定・故障などトラブルについて質問し、自動車に詳しいエキスパートに解決してもらいましょう。型番: DSC-T99/B, DSC-T99/G, DSC-T99/P, DSC-T99/S, DSC-T99/V, サイバーショット DSC-T99",
+      "pdfAssets": [
+        {
+          "fileName": "japanese-manual-27790.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 17979827,
+          "pageCount": 348,
+          "downloadUrl": "https://archive.org/download/japanese-manual-27790/japanese-manual-27790.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/japanese-manual-27790",
+        "metadataApiUrl": "https://archive.org/metadata/japanese-manual-27790",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "japanese-manual-27793",
+      "title": "japanese manual 27793 :  エスティマハイブリッド の取扱説明書・マニュアル",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OTHER_AUTOMOTIVE",
+      "systemCategories": [
+        "body_electrical",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "japanese",
+      "licenseUrl": null,
+      "downloads": 77,
+      "itemSizeBytes": 483056922,
+      "subjects": [
+        "japanese manuals",
+        "toyota"
+      ],
+      "descriptionExcerpt": "エスティマハイブリッドのサポート サイト。設定・故障などトラブルについて質問し、自動車に詳しいエキスパートに解決してもらいましょう。型番: DSC-T99/B, DSC-T99/G, DSC-T99/P, DSC-T99/S, DSC-T99/V, サイバーショット DSC-T99",
+      "pdfAssets": [
+        {
+          "fileName": "japanese-manual-27793.pdf",
+          "format": "Image Container PDF",
+          "sizeBytes": 31377996,
+          "pageCount": 652,
+          "downloadUrl": "https://archive.org/download/japanese-manual-27793/japanese-manual-27793.pdf"
+        },
+        {
+          "fileName": "japanese-manual-27793_text.pdf",
+          "format": "Additional Text PDF",
+          "sizeBytes": 47359443,
+          "pageCount": 652,
+          "downloadUrl": "https://archive.org/download/japanese-manual-27793/japanese-manual-27793_text.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/japanese-manual-27793",
+        "metadataApiUrl": "https://archive.org/metadata/japanese-manual-27793",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "japanese-manual-27798",
+      "title": "japanese manual 27798 :  ランドクルーザー40 の取扱説明書・マニュアル",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OTHER_AUTOMOTIVE",
+      "systemCategories": [
+        "body_electrical",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "japanese",
+      "licenseUrl": null,
+      "downloads": 76,
+      "itemSizeBytes": 121121467,
+      "subjects": [
+        "japanese manuals",
+        "toyota"
+      ],
+      "descriptionExcerpt": "ランドクルーザー40のサポート サイト。設定・故障などトラブルについて質問し、自動車に詳しいエキスパートに解決してもらいましょう。型番: DSC-T99/B, DSC-T99/G, DSC-T99/P, DSC-T99/S, DSC-T99/V, サイバーショット DSC-T99",
+      "pdfAssets": [
+        {
+          "fileName": "japanese-manual-27798.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 11099211,
+          "pageCount": 512,
+          "downloadUrl": "https://archive.org/download/japanese-manual-27798/japanese-manual-27798.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/japanese-manual-27798",
+        "metadataApiUrl": "https://archive.org/metadata/japanese-manual-27798",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "japanese-manual-27812",
+      "title": "japanese manual 27812 :  アルファードハイブリッド の取扱説明書・マニュアル",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OTHER_AUTOMOTIVE",
+      "systemCategories": [
+        "body_electrical",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "japanese",
+      "licenseUrl": null,
+      "downloads": 73,
+      "itemSizeBytes": 268241235,
+      "subjects": [
+        "japanese manuals",
+        "toyota"
+      ],
+      "descriptionExcerpt": "アルファードハイブリッドのサポート サイト。設定・故障などトラブルについて質問し、自動車に詳しいエキスパートに解決してもらいましょう。型番: DSC-T99/B, DSC-T99/G, DSC-T99/P, DSC-T99/S, DSC-T99/V, サイバーショット DSC-T99",
+      "pdfAssets": [
+        {
+          "fileName": "japanese-manual-27812.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 19158086,
+          "pageCount": 544,
+          "downloadUrl": "https://archive.org/download/japanese-manual-27812/japanese-manual-27812.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/japanese-manual-27812",
+        "metadataApiUrl": "https://archive.org/metadata/japanese-manual-27812",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "japanese-manual-27830",
+      "title": "japanese manual 27830 :  エスティマ・ルシーダ の取扱説明書・マニュアル",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OTHER_AUTOMOTIVE",
+      "systemCategories": [
+        "body_electrical",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "japanese",
+      "licenseUrl": null,
+      "downloads": 82,
+      "itemSizeBytes": 483248050,
+      "subjects": [
+        "japanese manuals",
+        "toyota"
+      ],
+      "descriptionExcerpt": "エスティマ・ルシーダのサポート サイト。設定・故障などトラブルについて質問し、自動車に詳しいエキスパートに解決してもらいましょう。型番: DSC-T99/B, DSC-T99/G, DSC-T99/P, DSC-T99/S, DSC-T99/V, サイバーショット DSC-T99",
+      "pdfAssets": [
+        {
+          "fileName": "japanese-manual-27830.pdf",
+          "format": "Image Container PDF",
+          "sizeBytes": 32246380,
+          "pageCount": 684,
+          "downloadUrl": "https://archive.org/download/japanese-manual-27830/japanese-manual-27830.pdf"
+        },
+        {
+          "fileName": "japanese-manual-27830_text.pdf",
+          "format": "Additional Text PDF",
+          "sizeBytes": 47457629,
+          "pageCount": 684,
+          "downloadUrl": "https://archive.org/download/japanese-manual-27830/japanese-manual-27830_text.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/japanese-manual-27830",
+        "metadataApiUrl": "https://archive.org/metadata/japanese-manual-27830",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "japanese-manual-27832",
+      "title": "japanese manual 27832 :  エスティマ・エミーナ の取扱説明書・マニュアル",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OTHER_AUTOMOTIVE",
+      "systemCategories": [
+        "body_electrical",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "japanese",
+      "licenseUrl": null,
+      "downloads": 78,
+      "itemSizeBytes": 483248365,
+      "subjects": [
+        "japanese manuals",
+        "toyota"
+      ],
+      "descriptionExcerpt": "エスティマ・エミーナのサポート サイト。設定・故障などトラブルについて質問し、自動車に詳しいエキスパートに解決してもらいましょう。型番: DSC-T99/B, DSC-T99/G, DSC-T99/P, DSC-T99/S, DSC-T99/V, サイバーショット DSC-T99",
+      "pdfAssets": [
+        {
+          "fileName": "japanese-manual-27832.pdf",
+          "format": "Image Container PDF",
+          "sizeBytes": 32246380,
+          "pageCount": 684,
+          "downloadUrl": "https://archive.org/download/japanese-manual-27832/japanese-manual-27832.pdf"
+        },
+        {
+          "fileName": "japanese-manual-27832_text.pdf",
+          "format": "Additional Text PDF",
+          "sizeBytes": 47457623,
+          "pageCount": 684,
+          "downloadUrl": "https://archive.org/download/japanese-manual-27832/japanese-manual-27832_text.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/japanese-manual-27832",
+        "metadataApiUrl": "https://archive.org/metadata/japanese-manual-27832",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "japanese-manual-27834",
+      "title": "japanese manual 27834 :  ヴォクシー の取扱説明書・マニュアル",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OTHER_AUTOMOTIVE",
+      "systemCategories": [
+        "body_electrical",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "japanese",
+      "licenseUrl": null,
+      "downloads": 56,
+      "itemSizeBytes": 88146417,
+      "subjects": [
+        "japanese manuals",
+        "toyota"
+      ],
+      "descriptionExcerpt": "ヴォクシーのサポート サイト。設定・故障などトラブルについて質問し、自動車に詳しいエキスパートに解決してもらいましょう。型番: DSC-T99/B, DSC-T99/G, DSC-T99/P, DSC-T99/S, DSC-T99/V, サイバーショット DSC-T99",
+      "pdfAssets": [
+        {
+          "fileName": "japanese-manual-27834.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 17183051,
+          "pageCount": 392,
+          "downloadUrl": "https://archive.org/download/japanese-manual-27834/japanese-manual-27834.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/japanese-manual-27834",
+        "metadataApiUrl": "https://archive.org/metadata/japanese-manual-27834",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "japanese-manual-27837",
+      "title": "japanese manual 27837 :  ノア（タウンエース） の取扱説明書・マニュアル",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OTHER_AUTOMOTIVE",
+      "systemCategories": [
+        "body_electrical",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "japanese",
+      "licenseUrl": null,
+      "downloads": 62,
+      "itemSizeBytes": 88258047,
+      "subjects": [
+        "japanese manuals",
+        "toyota"
+      ],
+      "descriptionExcerpt": "ノア（タウンエース）のサポート サイト。設定・故障などトラブルについて質問し、自動車に詳しいエキスパートに解決してもらいましょう。型番: DSC-T99/B, DSC-T99/G, DSC-T99/P, DSC-T99/S, DSC-T99/V, サイバーショット DSC-T99",
+      "pdfAssets": [
+        {
+          "fileName": "japanese-manual-27837.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 17248513,
+          "pageCount": 392,
+          "downloadUrl": "https://archive.org/download/japanese-manual-27837/japanese-manual-27837.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/japanese-manual-27837",
+        "metadataApiUrl": "https://archive.org/metadata/japanese-manual-27837",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "japanese-manual-27841",
+      "title": "japanese manual 27841 :  プリウス の取扱説明書・マニュアル",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OTHER_AUTOMOTIVE",
+      "systemCategories": [
+        "body_electrical",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "japanese",
+      "licenseUrl": null,
+      "downloads": 58,
+      "itemSizeBytes": 120078199,
+      "subjects": [
+        "japanese manuals",
+        "toyota"
+      ],
+      "descriptionExcerpt": "プリウスのサポート サイト。設定・故障などトラブルについて質問し、自動車に詳しいエキスパートに解決してもらいましょう。型番: DSC-T99/B, DSC-T99/G, DSC-T99/P, DSC-T99/S, DSC-T99/V, サイバーショット DSC-T99",
+      "pdfAssets": [
+        {
+          "fileName": "japanese-manual-27841.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 11402038,
+          "pageCount": 516,
+          "downloadUrl": "https://archive.org/download/japanese-manual-27841/japanese-manual-27841.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/japanese-manual-27841",
+        "metadataApiUrl": "https://archive.org/metadata/japanese-manual-27841",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "japanese-manual-27846",
+      "title": "japanese manual 27846 :  カムリグラシアセダン の取扱説明書・マニュアル",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OTHER_AUTOMOTIVE",
+      "systemCategories": [
+        "body_electrical",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "japanese",
+      "licenseUrl": null,
+      "downloads": 50,
+      "itemSizeBytes": 71547382,
+      "subjects": [
+        "japanese manuals",
+        "toyota"
+      ],
+      "descriptionExcerpt": "カムリグラシアセダンのサポート サイト。設定・故障などトラブルについて質問し、自動車に詳しいエキスパートに解決してもらいましょう。型番: DSC-T99/B, DSC-T99/G, DSC-T99/P, DSC-T99/S, DSC-T99/V, サイバーショット DSC-T99",
+      "pdfAssets": [
+        {
+          "fileName": "japanese-manual-27846.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 6374895,
+          "pageCount": 372,
+          "downloadUrl": "https://archive.org/download/japanese-manual-27846/japanese-manual-27846.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/japanese-manual-27846",
+        "metadataApiUrl": "https://archive.org/metadata/japanese-manual-27846",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "japanese-manual-27851",
+      "title": "japanese manual 27851 :  カローラ フィールダー の取扱説明書・マニュアル",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OTHER_AUTOMOTIVE",
+      "systemCategories": [
+        "body_electrical",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "japanese",
+      "licenseUrl": null,
+      "downloads": 72,
+      "itemSizeBytes": 132902329,
+      "subjects": [
+        "japanese manuals",
+        "toyota"
+      ],
+      "descriptionExcerpt": "カローラ フィールダーのサポート サイト。設定・故障などトラブルについて質問し、自動車に詳しいエキスパートに解決してもらいましょう。型番: DSC-T99/B, DSC-T99/G, DSC-T99/P, DSC-T99/S, DSC-T99/V, サイバーショット DSC-T99",
+      "pdfAssets": [
+        {
+          "fileName": "japanese-manual-27851.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 13293123,
+          "pageCount": 304,
+          "downloadUrl": "https://archive.org/download/japanese-manual-27851/japanese-manual-27851.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/japanese-manual-27851",
+        "metadataApiUrl": "https://archive.org/metadata/japanese-manual-27851",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "japanese-manual-27859",
+      "title": "japanese manual 27859 :  ヴィッツ の取扱説明書・マニュアル",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OTHER_AUTOMOTIVE",
+      "systemCategories": [
+        "body_electrical",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "japanese",
+      "licenseUrl": null,
+      "downloads": 55,
+      "itemSizeBytes": 81857568,
+      "subjects": [
+        "japanese manuals",
+        "toyota"
+      ],
+      "descriptionExcerpt": "ヴィッツのサポート サイト。設定・故障などトラブルについて質問し、自動車に詳しいエキスパートに解決してもらいましょう。型番: DSC-T99/B, DSC-T99/G, DSC-T99/P, DSC-T99/S, DSC-T99/V, サイバーショット DSC-T99",
+      "pdfAssets": [
+        {
+          "fileName": "japanese-manual-27859.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 10727814,
+          "pageCount": 388,
+          "downloadUrl": "https://archive.org/download/japanese-manual-27859/japanese-manual-27859.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/japanese-manual-27859",
+        "metadataApiUrl": "https://archive.org/metadata/japanese-manual-27859",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "japanese-manual-27867",
+      "title": "japanese manual 27867 :  クラウン の取扱説明書・マニュアル",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OTHER_AUTOMOTIVE",
+      "systemCategories": [
+        "body_electrical",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "japanese",
+      "licenseUrl": null,
+      "downloads": 63,
+      "itemSizeBytes": 175801576,
+      "subjects": [
+        "japanese manuals",
+        "toyota"
+      ],
+      "descriptionExcerpt": "クラウンのサポート サイト。設定・故障などトラブルについて質問し、自動車に詳しいエキスパートに解決してもらいましょう。型番: DSC-T99/B, DSC-T99/G, DSC-T99/P, DSC-T99/S, DSC-T99/V, サイバーショット DSC-T99",
+      "pdfAssets": [
+        {
+          "fileName": "japanese-manual-27867.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 12575652,
+          "pageCount": 448,
+          "downloadUrl": "https://archive.org/download/japanese-manual-27867/japanese-manual-27867.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/japanese-manual-27867",
+        "metadataApiUrl": "https://archive.org/metadata/japanese-manual-27867",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "openmanuals-1755b3648bc78119-01hf7yat00kg8a95tyefhm9wpq",
+      "title": "KENWOOD UA-Y50D TOYOTA車用取付キット",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OTHER_AUTOMOTIVE",
+      "systemCategories": [
+        "body_electrical",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "jpn",
+      "licenseUrl": null,
+      "downloads": 0,
+      "itemSizeBytes": 22523200,
+      "subjects": [
+        "manuals",
+        "openmanuals"
+      ],
+      "descriptionExcerpt": "TOYOTA車用取付キット (Japanese) for the KENWOOD UA-Y50D, from JVCKenwood's manual site: https://manuals.jvckenwood.com/download/UA-Y50D_JA_JAJP_1FCD On OpenManuals: https://openmanuals.win/manual/01HF7YAT00KG8A95TYEFHM9WPQ",
+      "pdfAssets": [
+        {
+          "fileName": "UA-Y50D.pdf",
+          "format": "Image Container PDF",
+          "sizeBytes": 3103494,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/openmanuals-1755b3648bc78119-01hf7yat00kg8a95tyefhm9wpq/UA-Y50D.pdf"
+        },
+        {
+          "fileName": "UA-Y50D_imgonly_pdfmeta.json",
+          "format": "Image-Only PDF Metadata JSON",
+          "sizeBytes": 64148,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/openmanuals-1755b3648bc78119-01hf7yat00kg8a95tyefhm9wpq/UA-Y50D_imgonly_pdfmeta.json"
+        },
+        {
+          "fileName": "UA-Y50D_text.pdf",
+          "format": "Additional Text PDF",
+          "sizeBytes": 2287666,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/openmanuals-1755b3648bc78119-01hf7yat00kg8a95tyefhm9wpq/UA-Y50D_text.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/openmanuals-1755b3648bc78119-01hf7yat00kg8a95tyefhm9wpq",
+        "metadataApiUrl": "https://archive.org/metadata/openmanuals-1755b3648bc78119-01hf7yat00kg8a95tyefhm9wpq",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manual-lhd-1-hz-205-1712",
+      "title": "Manual LHD 1 HZ 205 1712",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [
+        "1HZ"
+      ],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OTHER_AUTOMOTIVE",
+      "systemCategories": [
+        "body_electrical",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "eng",
+      "licenseUrl": null,
+      "downloads": 18,
+      "itemSizeBytes": 665231185,
+      "subjects": [
+        "1HZ"
+      ],
+      "descriptionExcerpt": "LHD Toyota 1HZ manual",
+      "pdfAssets": [
+        {
+          "fileName": "Manual-LHD-1HZ-205-1712.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 249260277,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manual-lhd-1-hz-205-1712/Manual-LHD-1HZ-205-1712.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manual-lhd-1-hz-205-1712",
+        "metadataApiUrl": "https://archive.org/metadata/manual-lhd-1-hz-205-1712",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manualzilla-id-6262294",
+      "title": "Manual usario Toyota HC325",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OWNERS_MANUAL",
+      "systemCategories": [
+        "body_electrical"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": null,
+      "licenseUrl": null,
+      "downloads": 234,
+      "itemSizeBytes": 36168511,
+      "subjects": [
+        "manualzilla",
+        "manuals"
+      ],
+      "descriptionExcerpt": "Internet Archive cataloged Toyota reference PDF (see archive.org details URL for full document).",
+      "pdfAssets": [
+        {
+          "fileName": "6262294.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 3391960,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manualzilla-id-6262294/6262294.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manualzilla-id-6262294",
+        "metadataApiUrl": "https://archive.org/metadata/manualzilla-id-6262294",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manual_8612060020_SM_TOYOTA_EN",
+      "title": "Manual: 8612060020 SM TOYOTA EN",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OTHER_AUTOMOTIVE",
+      "systemCategories": [
+        "body_electrical",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "eng",
+      "licenseUrl": null,
+      "downloads": 121,
+      "itemSizeBytes": 8637650,
+      "subjects": [],
+      "descriptionExcerpt": "Manual: 8612060020 SM TOYOTA EN",
+      "pdfAssets": [
+        {
+          "fileName": "8612060020_SM_TOYOTA_EN.pdf",
+          "format": "Image Container PDF",
+          "sizeBytes": 902830,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manual_8612060020_SM_TOYOTA_EN/8612060020_SM_TOYOTA_EN.pdf"
+        },
+        {
+          "fileName": "8612060020_SM_TOYOTA_EN_text.pdf",
+          "format": "Additional Text PDF",
+          "sizeBytes": 1501214,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manual_8612060020_SM_TOYOTA_EN/8612060020_SM_TOYOTA_EN_text.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manual_8612060020_SM_TOYOTA_EN",
+        "metadataApiUrl": "https://archive.org/metadata/manual_8612060020_SM_TOYOTA_EN",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manual_LS430_SM_TOYOTA_PIONEER_EN",
+      "title": "Manual: LS430 SM TOYOTA PIONEER EN",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OTHER_AUTOMOTIVE",
+      "systemCategories": [
+        "body_electrical",
+        "diagnostics_obd_dtc"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "eng",
+      "licenseUrl": null,
+      "downloads": 125,
+      "itemSizeBytes": 56879901,
+      "subjects": [],
+      "descriptionExcerpt": "Manual: LS430 SM TOYOTA PIONEER EN",
+      "pdfAssets": [
+        {
+          "fileName": "LS430_SM_TOYOTA_PIONEER_EN.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 9081407,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manual_LS430_SM_TOYOTA_PIONEER_EN/LS430_SM_TOYOTA_PIONEER_EN.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manual_LS430_SM_TOYOTA_PIONEER_EN",
+        "metadataApiUrl": "https://archive.org/metadata/manual_LS430_SM_TOYOTA_PIONEER_EN",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manualzilla-id-6964041",
+      "title": "Toyota 250-3642 User's Manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OWNERS_MANUAL",
+      "systemCategories": [
+        "body_electrical"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": null,
+      "licenseUrl": null,
+      "downloads": 210,
+      "itemSizeBytes": 703566,
+      "subjects": [
+        "manualzilla",
+        "manuals"
+      ],
+      "descriptionExcerpt": "Internet Archive cataloged Toyota reference PDF (see archive.org details URL for full document).",
+      "pdfAssets": [
+        {
+          "fileName": "6964041.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 160197,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manualzilla-id-6964041/6964041.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manualzilla-id-6964041",
+        "metadataApiUrl": "https://archive.org/metadata/manualzilla-id-6964041",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manualsbase-id-16746",
+      "title": "Toyota 250-4211 user manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OWNERS_MANUAL",
+      "systemCategories": [
+        "body_electrical"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "English",
+      "licenseUrl": null,
+      "downloads": 149,
+      "itemSizeBytes": 801406,
+      "subjects": [
+        "manualsbase",
+        "manuals"
+      ],
+      "descriptionExcerpt": "Internet Archive cataloged Toyota reference PDF (see archive.org details URL for full document).",
+      "pdfAssets": [
+        {
+          "fileName": "16746.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 200032,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manualsbase-id-16746/16746.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manualsbase-id-16746",
+        "metadataApiUrl": "https://archive.org/metadata/manualsbase-id-16746",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manualzilla-id-6964035",
+      "title": "Toyota 86120-YZA59 User's Manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OWNERS_MANUAL",
+      "systemCategories": [
+        "body_electrical"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": null,
+      "licenseUrl": null,
+      "downloads": 780,
+      "itemSizeBytes": 11259484,
+      "subjects": [
+        "manualzilla",
+        "manuals"
+      ],
+      "descriptionExcerpt": "Internet Archive cataloged Toyota reference PDF (see archive.org details URL for full document).",
+      "pdfAssets": [
+        {
+          "fileName": "6964035.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 628368,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manualzilla-id-6964035/6964035.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manualzilla-id-6964035",
+        "metadataApiUrl": "https://archive.org/metadata/manualzilla-id-6964035",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manualsbase-id-13810",
+      "title": "Toyota KIT #250-4221 user manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OWNERS_MANUAL",
+      "systemCategories": [
+        "body_electrical"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "English",
+      "licenseUrl": null,
+      "downloads": 143,
+      "itemSizeBytes": 962063,
+      "subjects": [
+        "manualsbase",
+        "manuals"
+      ],
+      "descriptionExcerpt": "Internet Archive cataloged Toyota reference PDF (see archive.org details URL for full document).",
+      "pdfAssets": [
+        {
+          "fileName": "13810.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 222915,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manualsbase-id-13810/13810.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manualsbase-id-13810",
+        "metadataApiUrl": "https://archive.org/metadata/manualsbase-id-13810",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manualzilla-id-6964025",
+      "title": "Toyota V8 User's Manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Multi-Model / General",
+      "modelSlug": "general",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OWNERS_MANUAL",
+      "systemCategories": [
+        "body_electrical"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": null,
+      "licenseUrl": null,
+      "downloads": 233,
+      "itemSizeBytes": 14537975,
+      "subjects": [
+        "manualzilla",
+        "manuals"
+      ],
+      "descriptionExcerpt": "Internet Archive cataloged Toyota reference PDF (see archive.org details URL for full document).",
+      "pdfAssets": [
+        {
+          "fileName": "6964025.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 4757253,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manualzilla-id-6964025/6964025.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manualzilla-id-6964025",
+        "metadataApiUrl": "https://archive.org/metadata/manualzilla-id-6964025",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "2012-toyota-prius",
+      "title": "2012 Toyota Prius",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Prius",
+      "modelSlug": "prius",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": 2012,
+      "yearEnd": 2012,
+      "yearsLabel": "2012",
+      "category": "OWNERS_MANUAL",
+      "systemCategories": [
+        "body_electrical"
+      ],
+      "creator": "Toyota",
+      "publisher": null,
+      "language": "eng",
+      "licenseUrl": null,
+      "downloads": 186,
+      "itemSizeBytes": 171317658,
+      "subjects": [
+        "Owner manual. Cars."
+      ],
+      "descriptionExcerpt": "Owner manual",
+      "pdfAssets": [
+        {
+          "fileName": "2012_toyota_prius.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 25481831,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/2012-toyota-prius/2012_toyota_prius.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/2012-toyota-prius",
+        "metadataApiUrl": "https://archive.org/metadata/2012-toyota-prius",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manualsbase-id-552140",
+      "title": "Toyota SIENNA user manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Sienna",
+      "modelSlug": "sienna",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OWNERS_MANUAL",
+      "systemCategories": [
+        "body_electrical"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "English",
+      "licenseUrl": null,
+      "downloads": 127,
+      "itemSizeBytes": 19088205,
+      "subjects": [
+        "manualsbase",
+        "manuals"
+      ],
+      "descriptionExcerpt": "Internet Archive cataloged Toyota reference PDF (see archive.org details URL for full document).",
+      "pdfAssets": [
+        {
+          "fileName": "552140.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 619206,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manualsbase-id-552140/552140.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manualsbase-id-552140",
+        "metadataApiUrl": "https://archive.org/metadata/manualsbase-id-552140",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manual-coche-toyota-yaris-cross-hybrid",
+      "title": "Manual Coche Toyota Yaris Cross Hybrid",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Yaris",
+      "modelSlug": "yaris",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": 2024,
+      "yearEnd": 2024,
+      "yearsLabel": "2024",
+      "category": "NAVIGATION_AUDIO_MANUAL",
+      "systemCategories": [
+        "body_electrical"
+      ],
+      "creator": "Toyota",
+      "publisher": null,
+      "language": "spa",
+      "licenseUrl": null,
+      "downloads": 0,
+      "itemSizeBytes": 567408670,
+      "subjects": [
+        "coche",
+        "vehículo",
+        "Toyota",
+        "Yaris",
+        "manual",
+        "guía",
+        "ayuda"
+      ],
+      "descriptionExcerpt": "Documentación del coche Toyota Yaris Cross Hybrid -Manual del coche. -Manual de navegación. -Manual multimedia. -Servicio y garantía.",
+      "pdfAssets": [
+        {
+          "fileName": "Garantia_Toyota.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 2305683,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manual-coche-toyota-yaris-cross-hybrid/Garantia_Toyota.pdf"
+        },
+        {
+          "fileName": "Garantia_Toyota_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 13535,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manual-coche-toyota-yaris-cross-hybrid/Garantia_Toyota_text_pdfmeta.json"
+        },
+        {
+          "fileName": "Manual_Coche_Toyota_Yaris_Cross_Hybrid.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 103894782,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manual-coche-toyota-yaris-cross-hybrid/Manual_Coche_Toyota_Yaris_Cross_Hybrid.pdf"
+        },
+        {
+          "fileName": "Manual_Coche_Toyota_Yaris_Cross_Hybrid_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 819710,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manual-coche-toyota-yaris-cross-hybrid/Manual_Coche_Toyota_Yaris_Cross_Hybrid_text_pdfmeta.json"
+        },
+        {
+          "fileName": "Manual_Multimedia_Toyota_Yaris_Cross_Hybrid.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 9623634,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manual-coche-toyota-yaris-cross-hybrid/Manual_Multimedia_Toyota_Yaris_Cross_Hybrid.pdf"
+        },
+        {
+          "fileName": "Manual_Multimedia_Toyota_Yaris_Cross_Hybrid_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 199739,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manual-coche-toyota-yaris-cross-hybrid/Manual_Multimedia_Toyota_Yaris_Cross_Hybrid_text_pdfmeta.json"
+        },
+        {
+          "fileName": "Manual_Navegacion_Toyota_Yaris_Cross_Hybrid.pdf",
+          "format": "Text PDF",
+          "sizeBytes": 13386622,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manual-coche-toyota-yaris-cross-hybrid/Manual_Navegacion_Toyota_Yaris_Cross_Hybrid.pdf"
+        },
+        {
+          "fileName": "Manual_Navegacion_Toyota_Yaris_Cross_Hybrid_text_pdfmeta.json",
+          "format": "Text PDF Metadata JSON",
+          "sizeBytes": 724900,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manual-coche-toyota-yaris-cross-hybrid/Manual_Navegacion_Toyota_Yaris_Cross_Hybrid_text_pdfmeta.json"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manual-coche-toyota-yaris-cross-hybrid",
+        "metadataApiUrl": "https://archive.org/metadata/manual-coche-toyota-yaris-cross-hybrid",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    },
+    {
+      "identifier": "manualsbase-id-552153",
+      "title": "Toyota Yaris-Liftback user manual",
+      "make": "Toyota",
+      "makeSlug": "toyota",
+      "model": "Yaris",
+      "modelSlug": "yaris",
+      "chassisCodes": [],
+      "engineCodes": [],
+      "yearStart": null,
+      "yearEnd": null,
+      "yearsLabel": "Unspecified Year",
+      "category": "OWNERS_MANUAL",
+      "systemCategories": [
+        "body_electrical"
+      ],
+      "creator": null,
+      "publisher": null,
+      "language": "English",
+      "licenseUrl": null,
+      "downloads": 216,
+      "itemSizeBytes": 12981072,
+      "subjects": [
+        "manualsbase",
+        "manuals"
+      ],
+      "descriptionExcerpt": "Internet Archive cataloged Toyota reference PDF (see archive.org details URL for full document).",
+      "pdfAssets": [
+        {
+          "fileName": "552153.pdf",
+          "format": "Image Container PDF",
+          "sizeBytes": 5721513,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manualsbase-id-552153/552153.pdf"
+        },
+        {
+          "fileName": "552153_text.pdf",
+          "format": "Additional Text PDF",
+          "sizeBytes": 1359429,
+          "pageCount": null,
+          "downloadUrl": "https://archive.org/download/manualsbase-id-552153/552153_text.pdf"
+        }
+      ],
+      "provenance": {
+        "sourceSite": "archive.org",
+        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
+        "detailsUrl": "https://archive.org/details/manualsbase-id-552153",
+        "metadataApiUrl": "https://archive.org/metadata/manualsbase-id-552153",
+        "crawledAt": "2026-11-28T03:37:28.764Z",
+        "tier": "COMMUNITY_UNVERIFIED",
+        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
+        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
+      }
+    }
+  ],
+  "filteredOutItems": [
+    {
+      "identifier": "toyota-830-user-guide",
+      "title": "TOYOTA 830 User Guide",
+      "mediatype": "texts",
+      "reason": "Non-automotive textile/sewing machine manual"
+    },
+    {
+      "identifier": "The_Tech_Guy_Audio_196",
+      "title": "The Tech Guy 196",
+      "mediatype": "audio",
+      "reason": "Unsupported mediatype \"audio\" (only \"texts\" manuals indexed)"
+    },
+    {
+      "identifier": "privileg-5006-nova-super-nutzstich-toyota-2260-2640-nahmaschine-betriebsanleitun",
+      "title": "Privileg 5006 Nova Super Nutzstich & Toyota 2260 2640 Nähmaschine Betriebsanleitung. Sewing Machine Manual",
+      "mediatype": "texts",
+      "reason": "Non-automotive textile/sewing machine manual"
+    }
+  ]
+}

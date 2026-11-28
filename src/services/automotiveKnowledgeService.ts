@@ -23,6 +23,10 @@ import {
   migrateCatalogV1ToV2,
   validateKnowledgeRecordProvenance,
 } from './knowledgeMigrationService';
+import {
+  buildArchiveOrgToyotaRepairReferences,
+  buildArchiveOrgToyotaVehicleModels,
+} from './archiveOrgToyotaKnowledgeService';
 
 const STORAGE_KEY = 'autolab_automotive_knowledge_index_v1';
 
@@ -90,6 +94,9 @@ function buildEnrichedDefaultCatalog(): AutomotiveKnowledgeCatalog {
     compiled.manufacturers || []
   );
 
+  const archiveOrgVehicles = buildArchiveOrgToyotaVehicleModels();
+  const archiveOrgRefs = buildArchiveOrgToyotaRepairReferences();
+
   const deduplicated = deduplicateCatalog({
     ...INITIAL_AUTOMOTIVE_CATALOG,
     generatedAt: pickLatestIsoTimestamp(
@@ -100,10 +107,12 @@ function buildEnrichedDefaultCatalog(): AutomotiveKnowledgeCatalog {
     vehicles: [
       ...INITIAL_AUTOMOTIVE_CATALOG.vehicles,
       ...(compiled.vehicleModelRecords || []),
+      ...archiveOrgVehicles,
     ],
     repairReferences: [
       ...INITIAL_AUTOMOTIVE_CATALOG.repairReferences,
       ...(compiled.knowledgeIndexEntries || []),
+      ...archiveOrgRefs,
     ],
   });
 
