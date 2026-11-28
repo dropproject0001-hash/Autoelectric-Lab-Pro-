@@ -3439,11 +3439,18 @@ function maskUidForDiagnostics(uid) {
 }
 
 // src/lib/firebase-admin.ts
-import { getApp, getApps, initializeApp } from "firebase-admin/app";
-import { getAuth } from "firebase-admin/auth";
-var resolvedProjectId = resolveFirebaseProjectId() || process.env.GOOGLE_CLOUD_PROJECT || void 0;
-var adminApp = getApps().length ? getApp() : initializeApp(resolvedProjectId ? { projectId: resolvedProjectId } : void 0);
-var adminAuth = getAuth(adminApp);
+var cachedAdminAuth = null;
+async function getAdminAuth() {
+  if (cachedAdminAuth) return cachedAdminAuth;
+  const [{ getApp, getApps, initializeApp }, { getAuth }] = await Promise.all([
+    import("firebase-admin/app"),
+    import("firebase-admin/auth")
+  ]);
+  const resolvedProjectId = resolveFirebaseProjectId() || process.env.GOOGLE_CLOUD_PROJECT || void 0;
+  const adminApp = getApps().length ? getApp() : initializeApp(resolvedProjectId ? { projectId: resolvedProjectId } : void 0);
+  cachedAdminAuth = getAuth(adminApp);
+  return cachedAdminAuth;
+}
 
 // src/middleware/auth.ts
 var requireAuth = async (req, res, next) => {
@@ -3456,9 +3463,24 @@ var requireAuth = async (req, res, next) => {
     return res.status(401).json({ error: "Unauthorized: Missing token" });
   }
   try {
-    const decodedToken = await adminAuth.verifyIdToken(token);
-    req.user = decodedToken;
-    next();
+    try {
+      const adminAuth = await getAdminAuth();
+      const decodedToken = await adminAuth.verifyIdToken(token);
+      req.user = decodedToken;
+      return next();
+    } catch (adminErr) {
+      const code = adminErr && typeof adminErr === "object" && "code" in adminErr ? String(adminErr.code) : "";
+      if (code === "ERR_REQUIRE_ESM" || code === "MODULE_NOT_FOUND" || code === "ERR_MODULE_NOT_FOUND") {
+        const verified = await verifyFirebaseIdToken(token);
+        req.user = {
+          uid: verified.uid,
+          email: verified.email ?? void 0,
+          email_verified: verified.emailVerified
+        };
+        return next();
+      }
+      throw adminErr;
+    }
   } catch (error) {
     console.error("Error verifying Firebase ID token:", error);
     return res.status(401).json({ error: "Unauthorized: Invalid token" });
