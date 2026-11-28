@@ -40,85 +40,64 @@ export interface PhysicalBenchEnergizeAuthorization {
 }
 
 /**
- * Probes the current runtime environment for physical hardware communication APIs
- * (Web Serial, Web USB, Web Bluetooth) and reports honest simulation vs. hardware status.
- * Unless an external hardware bridge is explicitly connected and verified, all measurements
- * are strictly labeled SOFTWARE_SIMULATION_ONLY / SIMULATED_BENCH_VALUE.
+ * Strict Virtual Simulation Enforcer (Master Developer Instruction v1.1, Section 4).
+ * AutoElectric Lab Pro is strictly virtual simulation only: NO ELM327, OBD-II live, J1939 live,
+ * Bluetooth/USB/Serial ECU communication, ECU flashing, or physical output activation.
+ * Never probes browser hardware APIs; always reports SOFTWARE_SIMULATION_ONLY / SIMULATED_BENCH_VALUE.
  */
 export function inspectBenchHardwareAbstractionStatus(): HardwareAbstractionStatus {
-  const nav =
-    typeof navigator !== 'undefined'
-      ? (navigator as unknown as Record<string, unknown>)
-      : {};
-
-  const hasWebSerial = Boolean(nav && typeof nav.serial === 'object' && nav.serial !== null);
-  const hasWebUsb = Boolean(nav && typeof nav.usb === 'object' && nav.usb !== null);
-  const hasWebBluetooth = Boolean(
-    nav && typeof nav.bluetooth === 'object' && nav.bluetooth !== null
-  );
-
   const transports: TransportCapabilityReport[] = [
     {
       transport: 'WEB_SERIAL',
-      browserApiAvailable: hasWebSerial,
+      browserApiAvailable: false,
       connectedDeviceName: null,
       isConnected: false,
-      statusNote: hasWebSerial
-        ? 'Web Serial API present; no physical programmable PSU or UART adapter paired.'
-        : 'Web Serial API unavailable in this browser context.',
+      statusNote: 'Disabled by design: Virtual simulation only (no physical serial/ECU bridge).',
     },
     {
       transport: 'WEB_USB',
-      browserApiAvailable: hasWebUsb,
+      browserApiAvailable: false,
       connectedDeviceName: null,
       isConnected: false,
-      statusNote: hasWebUsb
-        ? 'Web USB API present; no USB oscilloscope or logic analyzer paired.'
-        : 'Web USB API unavailable in this browser context.',
+      statusNote: 'Disabled by design: Virtual simulation only (no physical USB hardware bridge).',
     },
     {
       transport: 'WEB_BLUETOOTH',
-      browserApiAvailable: hasWebBluetooth,
+      browserApiAvailable: false,
       connectedDeviceName: null,
       isConnected: false,
-      statusNote: hasWebBluetooth
-        ? 'Web Bluetooth API present; no BLE OBD/DMM probe paired.'
-        : 'Web Bluetooth API unavailable in this browser context.',
+      statusNote: 'Disabled by design: Virtual simulation only (no physical Bluetooth/ELM327 bridge).',
     },
     {
       transport: 'J2534_PASSTHRU',
       browserApiAvailable: false,
       connectedDeviceName: null,
       isConnected: false,
-      statusNote: 'SAE J2534 PassThru local daemon not connected (Software MNA simulation active).',
+      statusNote: 'Disabled by design: Virtual simulation only (no J2534 flashing or live ECU comm).',
     },
     {
       transport: 'SOCKETCAN_BRIDGE',
       browserApiAvailable: false,
       connectedDeviceName: null,
       isConnected: false,
-      statusNote: 'Physical CAN transceiver bridge not connected (Simulated CAN bus frame generator active).',
+      statusNote: 'Disabled by design: Virtual simulation only (simulated CAN bus frame model active).',
     },
     {
       transport: 'PHYSICAL_DSO',
       browserApiAvailable: false,
       connectedDeviceName: null,
       isConnected: false,
-      statusNote: 'Physical DSO acquisition channel not connected (Mathematical SignalGenerator active).',
+      statusNote: 'Disabled by design: Virtual simulation only (mathematical SignalGenerator active).',
     },
   ];
 
-  const isPhysicalHardwareConnected = transports.some((t) => t.isConnected);
-
   return {
-    mode: isPhysicalHardwareConnected ? 'PHYSICAL_HARDWARE_BRIDGE' : 'SOFTWARE_SIMULATION_ONLY',
-    isPhysicalHardwareConnected,
-    measurementOriginLabel: isPhysicalHardwareConnected
-      ? 'VERIFIED_PHYSICAL_ACQUISITION'
-      : 'SIMULATED_BENCH_VALUE',
+    mode: 'SOFTWARE_SIMULATION_ONLY',
+    isPhysicalHardwareConnected: false,
+    measurementOriginLabel: 'SIMULATED_BENCH_VALUE',
     transports,
     disclosureNotice:
-      'All DMM, oscilloscope, power supply, gauge, and 3D twin readouts are computed by the Modified Nodal Analysis (MNA) software simulator unless a verified physical hardware acquisition bridge is paired.',
+      'SIMULATED VIRTUAL BENCH ONLY: All DMM, oscilloscope, power supply, gauge, and 3D twin readouts are computed by the Modified Nodal Analysis (MNA) software simulator and are not physical ECU measurements.',
   };
 }
 

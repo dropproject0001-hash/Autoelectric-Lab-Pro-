@@ -81,6 +81,69 @@ export interface SourceMetadata {
   confidenceScore: number;
 }
 
+/**
+ * 6-Tier Evidence Hierarchy (Master Developer Instruction v1.1, Section 5).
+ * Every automotive answer and knowledge record carries an explicit evidence tier.
+ */
+export type EvidenceHierarchyLevel =
+  | 'VERIFIED_OEM'
+  | 'TECHNICIAN_CONFIRMED'
+  | 'UNVERIFIED_DB'
+  | 'GENERAL_AI'
+  | 'SIMULATED_RESULT'
+  | 'USER_MEASUREMENT';
+
+/**
+ * 6-State Knowledge Lifecycle Status (Master Developer Instruction v1.1, Section 8).
+ */
+export type KnowledgeLifecycleStatus =
+  | 'CAPTURED'
+  | 'PENDING'
+  | 'VERIFIED'
+  | 'TECHNICIAN_CONFIRMED'
+  | 'REJECTED'
+  | 'SUPERSEDED';
+
+export interface EcuComponentIdentity {
+  manufacturer: string;
+  ecuModel?: string | null;
+  partNumber?: string | null;
+  hardwareId?: string | null;
+  softwareId?: string | null;
+  engineCode?: string | null;
+  connectorId?: string | null;
+  componentName?: string | null;
+}
+
+export interface KnowledgeVersionHistoryEntry {
+  version: number;
+  updatedAt: string;
+  actor: string;
+  lifecycleStatus: KnowledgeLifecycleStatus;
+  changeSummary: string;
+}
+
+export interface RecordProvenanceEnvelope {
+  sourceDocument: string;
+  pageOrSection: string;
+  revision: string;
+  captureDate: string;
+  verificationStatus: KnowledgeLifecycleStatus;
+  evidenceType: EvidenceHierarchyLevel;
+  testConditions: string;
+  versionHistory: KnowledgeVersionHistoryEntry[];
+  copyrightNotice?: string;
+}
+
+export interface ElectricalSpecClaim {
+  pinNumber?: string;
+  signalName?: string;
+  voltageRange?: string;
+  resistanceRange?: string;
+  frequencyRange?: string;
+  testCondition?: string;
+}
+
 export interface RepairReferenceRecord {
   id: string;
   vehicleId: string;
@@ -94,6 +157,16 @@ export interface RepairReferenceRecord {
   source: SourceMetadata;
   tags: string[];
   verified: boolean;
+  /** M1 Structured ECU / component identity for exact-match-first lookup */
+  ecuIdentity?: EcuComponentIdentity;
+  /** M1 Mandatory provenance, lifecycle, test conditions & version history */
+  provenance?: RecordProvenanceEnvelope;
+  /** Optional structured electrical specs extracted from verified records */
+  electricalSpecs?: ElectricalSpecClaim[];
+  /** Monotonic record version for incremental sync */
+  recordVersion?: number;
+  /** Soft-delete tombstone for incremental sync propagation */
+  deletedAt?: string | null;
 }
 
 export interface AutomotiveKnowledgeCatalog {

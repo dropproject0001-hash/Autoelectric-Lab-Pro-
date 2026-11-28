@@ -6,6 +6,7 @@
 import crypto from 'node:crypto';
 import { isStrictProductionSecrets } from './secretsPolicy';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 
 export type SubscriptionDurationDays = 30 | 90 | 180 | 365 | 36500;
@@ -50,6 +51,9 @@ function resolveOfflineDataDir(): string {
   const envDir = (process.env.VECL_DATA_DIR || '').trim();
   if (envDir) {
     return path.resolve(envDir);
+  }
+  if (process.env.VERCEL === '1') {
+    return path.join(os.tmpdir(), 'autoelectric-lab-pro-data');
   }
   return path.resolve(process.cwd(), '.data');
 }
