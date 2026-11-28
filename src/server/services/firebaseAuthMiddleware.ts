@@ -195,10 +195,14 @@ export function resolveFirebaseProjectId(
     return fileProjectId;
   }
 
+  const authDomainRaw = (env.VITE_FIREBASE_AUTH_DOMAIN || '').trim().toLowerCase();
+  const derivedFromAuthDomain = authDomainRaw.match(/^([a-z0-9-]+)\.(?:firebaseapp\.com|web\.app)$/)?.[1] || '';
+
   return (
     (env.FIREBASE_PROJECT_ID || '').trim() ||
     (env.VITE_FIREBASE_PROJECT_ID || '').trim() ||
     fileProjectId ||
+    derivedFromAuthDomain ||
     ''
   );
 }

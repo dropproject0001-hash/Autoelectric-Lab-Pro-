@@ -60,6 +60,13 @@ export function sanitizeFirestoreDatabaseId(raw: string | undefined | null): str
   return '(default)';
 }
 
+export function deriveProjectIdFromAuthDomain(authDomain: string | undefined | null): string {
+  const clean = String(authDomain || '').trim().toLowerCase();
+  if (!clean) return '';
+  const match = clean.match(/^([a-z0-9-]+)\.(?:firebaseapp\.com|web\.app)$/);
+  return match ? match[1] : '';
+}
+
 export function resolveFirebaseClientConfig(
   fileCfg: FirebaseAppletConfigShape,
   env: Record<string, string | undefined>
@@ -79,11 +86,19 @@ export function resolveFirebaseClientConfig(
     };
   }
 
+  const resolvedAuthDomain =
+    (env.VITE_FIREBASE_AUTH_DOMAIN || '').trim() || (fileCfg.authDomain || '').trim() || '';
+  const resolvedProjectId =
+    (env.VITE_FIREBASE_PROJECT_ID || '').trim() ||
+    fileProjectId ||
+    deriveProjectIdFromAuthDomain(resolvedAuthDomain) ||
+    '';
+
   return {
-    projectId: (env.VITE_FIREBASE_PROJECT_ID || '').trim() || fileProjectId || '',
+    projectId: resolvedProjectId,
     appId: (env.VITE_FIREBASE_APP_ID || '').trim() || (fileCfg.appId || '').trim() || '',
     apiKey: (env.VITE_FIREBASE_API_KEY || '').trim() || fileApiKey || '',
-    authDomain: (env.VITE_FIREBASE_AUTH_DOMAIN || '').trim() || (fileCfg.authDomain || '').trim() || '',
+    authDomain: resolvedAuthDomain,
     firestoreDatabaseId: sanitizeFirestoreDatabaseId(
       env.VITE_FIREBASE_DATABASE_ID || fileCfg.firestoreDatabaseId
     ),
