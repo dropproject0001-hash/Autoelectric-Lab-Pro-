@@ -39,6 +39,10 @@ import {
   getAllOscilloscopeWaveforms,
   searchOscilloscopeWaveforms,
 } from '../oscilloscopeWaveformKnowledgeService';
+import {
+  getAllEcuPcbComponents,
+  identifyPcbComponentFromVisualScan,
+} from '../ecuPcbComponentKnowledgeService';
 import { listAdaptiveKnowledgeQueue } from './adaptiveKnowledgeEngine';
 import { formatEvidenceHeader } from './evidenceHierarchy';
 import { getLocalAiRuntimeStatus } from './localWebLlmService';
@@ -46,6 +50,7 @@ import { getLocalAiRuntimeStatus } from './localWebLlmService';
 export type KnowledgeAdoptionStore =
   | 'ECU_REPAIR_KB'
   | 'OSCILLOSCOPE_OEM_WAVEFORMS'
+  | 'ECU_PCB_COMPONENTS'
   | 'FUSE_BOX_INFO'
   | 'START_MY_CAR'
   | 'PH_TROUBLE_SCENARIOS'
@@ -111,6 +116,7 @@ export function adoptMultiStoreLocalKnowledge(params: {
   const storesQueried: KnowledgeAdoptionStore[] = [
     'ECU_REPAIR_KB',
     'OSCILLOSCOPE_OEM_WAVEFORMS',
+    'ECU_PCB_COMPONENTS',
     'FUSE_BOX_INFO',
     'START_MY_CAR',
     'PH_TROUBLE_SCENARIOS',
@@ -200,6 +206,33 @@ export function adoptMultiStoreLocalKnowledge(params: {
           ...rec.knownGood.extractedFrequencyOrTimingSpecs,
           ...rec.faultyComparison.associatedDtcs.slice(0, 6),
         ].join(' '),
+      });
+    }
+  }
+
+  // 1c. OEM ECU PCB Component & Guided Repair Catalog (IGBTs, Drivers, CAN/K-Line, LDO/SBC, EEPROMs, MCUs, Passives)
+  const isPcbComponentQuery =
+    /\b(?:pcb|igbt|mosfet|tja1050|tja1051|tle6240|tle4275|tle7209|tle8888|l9132|l9637|mc33186|mc33810|mcp2551|uln2003|isl9v5036|stgb10nb|ngb8201|lm2940|95160|95080|93c56|tc1797|tc1766|r5f72531|smbj18a|tvs|shunt|crystal|eeprom|h[\s-]*bridge|transceiver|regulator|capacitor|diode|solder|desolder|rework|marking)\b/i.test(
+      lowerQuery
+    );
+  if (isPcbComponentQuery && tokens.length > 0) {
+    const pcbHits = identifyPcbComponentFromVisualScan({
+      markingText: query,
+      notes: query,
+    }).slice(0, 3);
+    for (const hit of pcbHits) {
+      const comp = hit.component;
+      candidates.push({
+        id: `adopt-pcb-${comp.id}`,
+        store: 'ECU_PCB_COMPONENTS',
+        title: `${comp.partNumber} (${comp.packageType}) — ${comp.role.replace(/_/g, ' ')}`,
+        summary: `${comp.functionalSummary} Bench Check: ${comp.electricalBenchSpecs.diodeOrResistanceCheck} Pro Tip: ${comp.technicianProTips[0] || ''}`,
+        sourceDocument: comp.provenance.sourceUrl,
+        pageOrSection: `${comp.manufacturer} / ${comp.packageType}`,
+        revision: 'v1.0',
+        evidenceLevel: comp.provenance.evidenceType,
+        score: Math.round(hit.matchConfidence * 98),
+        specsText: `${comp.partNumber} ${comp.electricalBenchSpecs.supplyVoltage} ${comp.electricalBenchSpecs.diodeOrResistanceCheck}`,
       });
     }
   }
@@ -533,12 +566,14 @@ export function runEndToEndCalibrationAudit(): EndToEndCalibrationReport {
   const smcProfiles = getAllIngestedVehicleProfiles();
   const archiveManuals = getAllArchiveOrgToyotaManuals();
   const oscWaveforms = getAllOscilloscopeWaveforms();
+  const pcbComponents = getAllEcuPcbComponents();
 
   const storeAudits: StoreDuplicateAuditEntry[] = [
     auditKeys('Catalog Manufacturers (slug)', catalog.manufacturers.map((m) => m.slug.toLowerCase())),
     auditKeys('Catalog Vehicles (id)', catalog.vehicles.map((v) => v.id)),
     auditKeys('Catalog RepairReferences (id)', catalog.repairReferences.map((r) => r.id)),
     auditKeys('OEM Oscilloscope Waveforms (agtCode)', oscWaveforms.map((w) => w.agtCode)),
+    auditKeys('OEM ECU PCB Components (partNumber)', pcbComponents.map((c) => c.partNumber.toLowerCase())),
     auditKeys(
       'FuseBoxInfo Profiles (make+model+years)',
       fbiProfiles.map(

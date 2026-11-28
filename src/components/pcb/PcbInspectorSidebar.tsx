@@ -38,6 +38,7 @@ import {
   InteractionMode,
   ResolveMnaFn,
 } from './pcbScannerTypes';
+import { PcbComponentScannerPanel } from './PcbComponentScannerPanel';
 
 interface PcbInspectorSidebarProps {
   mobileTab: 'CANVAS' | 'DRAWER';
@@ -263,6 +264,10 @@ export const PcbInspectorSidebar: React.FC<PcbInspectorSidebarProps> = ({
         {/* SUB-TAB 1: SELECTED COMPONENT DATASHEET & PINOUT EDITOR */}
         {inspectorSubTab === 'PART' && (
           <>
+            <PcbComponentScannerPanel
+              selectedComponent={selectedComponent}
+              onOpenOfflineBot={onOpenOfflineBot}
+            />
             {selectedComponent ? (
               <div className="flex flex-col gap-3">
                 {/* AutoElectric Lab Pro Section Heading */}

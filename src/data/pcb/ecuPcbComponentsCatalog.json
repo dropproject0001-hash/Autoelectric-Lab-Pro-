@@ -1,0 +1,2232 @@
+{
+  "schemaVersion": "1.0.0",
+  "databaseName": "AutoElectric Lab Pro — OEM ECU PCB Component & Guided Repair Catalog",
+  "generatedAt": "2026-11-28T05:27:07.877Z",
+  "zeroFabricationIntegrity": true,
+  "totalComponents": 26,
+  "liveVerifiedPagesCount": 16,
+  "rolesBreakdown": {
+    "IGNITION_IGBT_DRIVER": 3,
+    "INJECTOR_SOLENOID_DRIVER": 5,
+    "ETC_H_BRIDGE_DRIVER": 2,
+    "CAN_LIN_KLINE_TRANSCEIVER": 5,
+    "VOLTAGE_REGULATOR_SBC": 3,
+    "SERIAL_EEPROM_FLASH": 2,
+    "ECU_MICROCONTROLLER": 2,
+    "POWER_PROTECTION_PASSIVE": 4
+  },
+  "records": [
+    {
+      "id": "pcb-ic-l9637d",
+      "partNumber": "L9637D",
+      "markingAliases": [
+        "L9637",
+        "L9637D",
+        "9637D",
+        "E-L9637D"
+      ],
+      "refDesPrefixes": [
+        "U",
+        "IC"
+      ],
+      "manufacturer": "STMicroelectronics",
+      "role": "CAN_LIN_KLINE_TRANSCEIVER",
+      "systemCategoryId": "diagnostics_obd_dtc",
+      "packageType": "SO-8",
+      "pinCount": 8,
+      "oemEcuPlatforms": [
+        "Nissan Hitachi MEC11/MEC22",
+        "Bosch ME7/EDC15",
+        "Toyota/Honda/VW ISO-9141 K-Line ECUs"
+      ],
+      "crossReferences": [
+        "MC33290",
+        "MC33199",
+        "Si9241A"
+      ],
+      "functionalSummary": "Monolithic ISO 9141 / KWP2000 bidirectional K-Line diagnostic bus transceiver converting 5V MCU UART (RX/TX) to 12V single-wire OBD-II Pin 7 K-Line.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "Pin 7 (VS) = +12V Battery, Pin 3 (VCC) = 5.0V Logic, Pin 5 = GND",
+        "keyPinChecks": [
+          "Pin 1 (RX): 5V UART receive to MCU",
+          "Pin 4 (TX): 5V UART transmit from MCU",
+          "Pin 6 (K): Bidirectional 12V K-Line to OBD-II Pin 7 (idle ~11V–12V)",
+          "Pin 7 (VS): +12V supply"
+        ],
+        "diodeOrResistanceCheck": "Pin 6 (K-Line) to GND must read high impedance (>10kΩ) unpowered; live idle ~11–12V.",
+        "thermalNote": "Standard SO-8; check series 510Ω pull-up resistor and protection zener on K-Line."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Burnt K-Line protection diode/resistor next to Pin 6",
+          "Cracked SO-8 body"
+        ],
+        "commonFailureModes": [
+          "Scanner cannot communicate via OBD-II Pin 7 K-Line while engine still runs normally"
+        ],
+        "associatedDtcs": [
+          "U0100"
+        ]
+      },
+      "technicianProTips": [
+        "On Hitachi MEC11/MEC22 or Bosch ME7 K-Line ECUs, if K-Line idles at 0V instead of ~11.5V, check L9637D Pin 6 for a shorted protection zener or shorted L9637D."
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Measure Live K-Line Idle Voltage & Supplies",
+          "action": "Check Pin 7 (VS = 12V), Pin 3 (VCC = 5V), and Pin 6 (K-Line idle voltage).",
+          "targetSpec": "VS ≈ 12.6V, VCC = 5.0V, K-Line idle 10.5V–12.2V."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Replace L9637D & Verify 10.4 kbps K-Line Pulses",
+          "action": "Swap SO-8 L9637D and verify 0V–12V K-Line diagnostic pulses when scanner initiates handshake.",
+          "targetSpec": "Clean 0V-to-12V serial frames on Pin 6 and full scanner communication."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "st.com",
+        "sourceUrl": "https://www.st.com/en/automotive-analog-and-power/l9637.html",
+        "liveVerifiedHttpStatus": null,
+        "liveScrapedSummary": null,
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-ic-mcp2551",
+      "partNumber": "MCP2551",
+      "markingAliases": [
+        "MCP2551",
+        "2551I",
+        "MCP2551-I/SN"
+      ],
+      "refDesPrefixes": [
+        "U",
+        "IC"
+      ],
+      "manufacturer": "Microchip Technology",
+      "role": "CAN_LIN_KLINE_TRANSCEIVER",
+      "systemCategoryId": "diagnostics_obd_dtc",
+      "packageType": "SOIC-8 / PDIP-8",
+      "pinCount": 8,
+      "oemEcuPlatforms": [
+        "Aftermarket / Standalone ECUs",
+        "Commercial/Industrial CAN Modules",
+        "Automotive Gateways"
+      ],
+      "crossReferences": [
+        "TJA1050",
+        "TJA1051T",
+        "MCP2561"
+      ],
+      "functionalSummary": "High-Speed ISO-11898 CAN protocol transceiver (1 Mbps) with slope-control resistor input (Pin 8 RS) for EMI reduction.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "5.0V on Pin 3 (VDD), Pin 2 = VSS (GND)",
+        "keyPinChecks": [
+          "Pin 3 VDD = 5.0V",
+          "Pin 6 CANL / Pin 7 CANH = 2.5V recessive",
+          "Pin 8 RS = GND or slope resistor"
+        ],
+        "diodeOrResistanceCheck": "CANH/CANL to GND >10kΩ unpowered.",
+        "thermalNote": "Pin-compatible with TJA1050 on 5V boards (verify Pin 8 RS wiring)."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Heat spot on SOIC-8 after bus short to +24V/12V"
+        ],
+        "commonFailureModes": [
+          "Dead CAN bus communication",
+          "Excessive 5V rail draw"
+        ],
+        "associatedDtcs": [
+          "U0100",
+          "U0001",
+          "U0073"
+        ]
+      },
+      "technicianProTips": [
+        "Check Pin 8 (RS): if the slope-control resistor to GND is open, MCP2551 stays in standby and will not transmit!"
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Verify VDD, RS & CAN Bias",
+          "action": "Measure Pin 3 (5V), Pin 8 (RS <1V), and Pin 6/7 (~2.5V recessive).",
+          "targetSpec": "5.0V VDD and balanced 2.5V CAN bias."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Replace MCP2551 & Test Communication",
+          "action": "Replace SOIC-8 IC (or upgrade to MCP2561/TJA1050) and verify differential frames.",
+          "targetSpec": "Clean CAN-H/CAN-L waveform and scanner link."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "microchip.com",
+        "sourceUrl": "https://www.microchip.com/en-us/product/MCP2551",
+        "liveVerifiedHttpStatus": 403,
+        "liveScrapedSummary": null,
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-ic-tja1020",
+      "partNumber": "TJA1020",
+      "markingAliases": [
+        "TJA1020",
+        "A1020",
+        "TJA1021",
+        "1020T"
+      ],
+      "refDesPrefixes": [
+        "U",
+        "IC"
+      ],
+      "manufacturer": "NXP Semiconductors",
+      "role": "CAN_LIN_KLINE_TRANSCEIVER",
+      "systemCategoryId": "body_electrical",
+      "packageType": "SO-8",
+      "pinCount": 8,
+      "oemEcuPlatforms": [
+        "Smart Alternator LIN",
+        "Cooling Fan / Water Pump LIN",
+        "BCM / HVAC Modules"
+      ],
+      "crossReferences": [
+        "TJA1021",
+        "TLE7259",
+        "MCP2003"
+      ],
+      "functionalSummary": "LIN 2.x / SAE J2602 single-wire 12V transceiver (up to 20 kbps) linking ECU UART to smart alternators, radiator shutters, and body actuators.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "Pin 7 (VBAT) = 12V, Pin 6 (LIN) = 12V recessive / ~1V dominant",
+        "keyPinChecks": [
+          "Pin 7 VBAT = 12.6V",
+          "Pin 6 LIN = 10–12V idle with 19.2kbps bursts",
+          "Pin 2 NSLP = 5V awake"
+        ],
+        "diodeOrResistanceCheck": "Pin 6 (LIN) to GND >10kΩ unpowered.",
+        "thermalNote": "Standard SO-8 rework."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Blown LIN ESD diode near Pin 6"
+        ],
+        "commonFailureModes": [
+          "Smart alternator charging fault (P0620/U012D)",
+          "Cooling fan stuck full-speed or off"
+        ],
+        "associatedDtcs": [
+          "U012D",
+          "P0620",
+          "U1000"
+        ]
+      },
+      "technicianProTips": [
+        "A healthy LIN bus toggles cleanly between ~12V (recessive) and <1.5V (dominant) at 9.6–19.2 kbps. A flat 0V LIN bus usually means a shorted slave (like an alternator regulator) or shorted TJA1020."
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Scope Pin 6 (LIN) & Pin 7 (VBAT)",
+          "action": "Verify 12V on VBAT and check LIN waveform on oscilloscope.",
+          "targetSpec": "12V recessive idle with crisp 0V–12V data frames."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Replace TJA1020 if Output Driver is Dead",
+          "action": "Swap SO-8 transceiver and verify LIN communication restores.",
+          "targetSpec": "LIN slave responds cleanly and charging/fan DTC clears."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "nxp.com",
+        "sourceUrl": "https://www.nxp.com/products/TJA1021",
+        "liveVerifiedHttpStatus": 200,
+        "liveScrapedSummary": "TJA1021 | LIN2.1/SAE J2602 Transceiver | NXP Semiconductors — NXP",
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-ic-tja1050",
+      "partNumber": "TJA1050",
+      "markingAliases": [
+        "TJA1050",
+        "A1050",
+        "1050T",
+        "TJA1050T"
+      ],
+      "refDesPrefixes": [
+        "U",
+        "IC"
+      ],
+      "manufacturer": "NXP Semiconductors",
+      "role": "CAN_LIN_KLINE_TRANSCEIVER",
+      "systemCategoryId": "diagnostics_obd_dtc",
+      "packageType": "SO-8 (SOT96-1)",
+      "pinCount": 8,
+      "oemEcuPlatforms": [
+        "Toyota / Denso",
+        "Ford",
+        "Nissan",
+        "VW/Audi",
+        "Honda",
+        "Universal High-Speed CAN ECUs"
+      ],
+      "crossReferences": [
+        "TJA1051T",
+        "TJA1040",
+        "TJA1042",
+        "MCP2551",
+        "TLE6250G"
+      ],
+      "functionalSummary": "Industry-standard ISO 11898 High-Speed CAN Transceiver (up to 1 Mbps) bridging the ECU microcontroller CAN controller (TXD/RXD) to the physical CAN-H / CAN-L bus.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "5.0V ±5% on Pin 3 (VCC), Pin 2 = GND",
+        "keyPinChecks": [
+          "Pin 1 (TXD): 5V logic transmit from MCU",
+          "Pin 2 (GND): 0.0V ground",
+          "Pin 3 (VCC): 5.0V ±0.25V",
+          "Pin 4 (RXD): 5V logic receive to MCU",
+          "Pin 5 (VREF): ~2.5V reference output",
+          "Pin 6 (CANL): 2.5V recessive -> 1.5V dominant",
+          "Pin 7 (CANH): 2.5V recessive -> 3.5V dominant",
+          "Pin 8 (S): Silent mode control (0V = Normal mode)"
+        ],
+        "diodeOrResistanceCheck": "Unpowered CANH-to-CANL resistance: ~120Ω (if terminal ECU) or >10kΩ (if non-terminal). CANH or CANL shorted to GND/5V (<100Ω) confirms blown transceiver or ESD diode!",
+        "thermalNote": "Tiny SO-8 package — easy 350°C hot-air swap; watch nearby 120Ω split termination resistors and common-mode choke."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Cracked or burnt common-mode choke (L1) right next to Pins 6 & 7",
+          "Burnt ESD TVS diode (PESD1CAN / NUP2105L) beside CAN pins",
+          "Slight bulge or crack on SO-8 TJA1050 body after jump-start surge"
+        ],
+        "commonFailureModes": [
+          "No OBD-II / CAN communication (U0100) while ECU 5V rail is still healthy",
+          "CAN-H or CAN-L stuck at 0V or 5V dragging down the entire vehicle powertrain CAN bus"
+        ],
+        "associatedDtcs": [
+          "U0100",
+          "U0001",
+          "U0073",
+          "U0101",
+          "U0121"
+        ]
+      },
+      "technicianProTips": [
+        "Always check the tiny 3-pin CAN ESD protection diode (PESD1CAN / NUP2105L) and the 4-pin common-mode choke BEFORE replacing the TJA1050 — an open choke causes U0100 even when the transceiver is fine!",
+        "Confirm Pin 3 (VCC) = 5.0V and Pin 8 (S) = 0V (normal mode) on bench."
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Measure Unpowered CAN-H / CAN-L & Choke Continuity",
+          "action": "Check CAN-H to CAN-L resistance (expect ~120Ω on terminating ECU) and check both lines to GND and VCC, plus continuity across the CAN common-mode choke.",
+          "targetSpec": "No short to GND/VCC; both choke windings <2Ω."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Check Live Recessive Bias & Differential Scope",
+          "action": "Power ECU at 12.6V and measure Pin 3 (VCC), Pin 7 (CANH), and Pin 6 (CANL).",
+          "targetSpec": "VCC = 5.0V; Recessive CANH ≈ 2.5V, CANL ≈ 2.5V; Dominant mirrored 3.5V / 1.5V."
+        },
+        {
+          "stepNumber": 3,
+          "title": "Replace TJA1050 (and ESD Diode if Shorted)",
+          "action": "Hot-air remove SO-8 TJA1050 at 350°C, verify pad impedance clears, solder replacement TJA1050 (or TJA1051T/3), and re-verify CAN bus frames.",
+          "targetSpec": "Clean mirrored CAN-H/CAN-L square frames on oscilloscope; scan tool connects."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "nxp.com",
+        "sourceUrl": "https://www.nxp.com/products/TJA1050",
+        "liveVerifiedHttpStatus": 200,
+        "liveScrapedSummary": "High-Speed CAN Transceiver | NXP Semiconductors — Industry-proven CAN transceiver with standby mode enables reliable automotive networking up to 1 Mbps while reducing power consumption in sleep mode",
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-ic-tja1051",
+      "partNumber": "TJA1051T",
+      "markingAliases": [
+        "TJA1051",
+        "A1051",
+        "1051T",
+        "TJA1051T/3",
+        "TJA1042"
+      ],
+      "refDesPrefixes": [
+        "U",
+        "IC"
+      ],
+      "manufacturer": "NXP Semiconductors",
+      "role": "CAN_LIN_KLINE_TRANSCEIVER",
+      "systemCategoryId": "diagnostics_obd_dtc",
+      "packageType": "SO-8 / HVSON8",
+      "pinCount": 8,
+      "oemEcuPlatforms": [
+        "Modern 2015–2026 Toyota / Ford / Nissan / Bosch MED17 / MG1 CAN-FD ECUs"
+      ],
+      "crossReferences": [
+        "TJA1050",
+        "TJA1042",
+        "TCAN1042",
+        "TLE6250G"
+      ],
+      "functionalSummary": "High-Speed CAN / CAN-FD transceiver (up to 5 Mbps in FD) with silent mode and optional Pin 5 VIO (3.3V/5V MCU logic level shifting on /3 variant).",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "5.0V on Pin 3 (VCC); 3.3V or 5.0V on Pin 5 (VIO on TJA1051T/3)",
+        "keyPinChecks": [
+          "Pin 3 VCC = 5.0V",
+          "Pin 5 VIO = 3.3V or 5.0V",
+          "Pin 6 CANL / Pin 7 CANH = 2.5V recessive"
+        ],
+        "diodeOrResistanceCheck": "CANH/CANL to GND must not be shorted (<100Ω).",
+        "thermalNote": "Check variant suffix (/3 has VIO on Pin 5 vs non-/3 N.C.) before swapping with TJA1050!"
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Burn mark on Pin 6/7 after reverse jump-start or welder surge"
+        ],
+        "commonFailureModes": [
+          "Bus-off U0073",
+          "No ECU communication U0100"
+        ],
+        "associatedDtcs": [
+          "U0100",
+          "U0073",
+          "U0001"
+        ]
+      },
+      "technicianProTips": [
+        "CRITICAL: Do NOT drop a TJA1050 into a 3.3V MCU board that originally used TJA1051T/3 — TJA1050 lacks Pin 5 VIO level shifting and will output 5V into the 3.3V MCU RXD pin!"
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Confirm Pin 5 (VIO) Voltage",
+          "action": "Measure Pin 5 on powered board to verify whether the MCU uses 3.3V VIO logic.",
+          "targetSpec": "3.3V on Pin 5 requires TJA1051T/3 or TJA1042T/3."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Replace Transceiver & Verify CAN-FD Traffic",
+          "action": "Swap SO-8 transceiver, inspect common-mode choke, and verify differential waveform.",
+          "targetSpec": "Clean 2.5V recessive / 3.5V-1.5V dominant differential signals."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "nxp.com",
+        "sourceUrl": "https://www.nxp.com/products/TJA1051",
+        "liveVerifiedHttpStatus": 200,
+        "liveScrapedSummary": "TJA1051 | High-Speed CAN Transceiver | NXP Semiconductors — NXP",
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-ic-r5f72531",
+      "partNumber": "R5F72531 / SH72531 (Renesas SuperH)",
+      "markingAliases": [
+        "72531",
+        "R5F72531",
+        "76F0040",
+        "76F0070",
+        "76F0085",
+        "D151803",
+        "RENESAS"
+      ],
+      "refDesPrefixes": [
+        "U",
+        "IC",
+        "MCU",
+        "CPU"
+      ],
+      "manufacturer": "Renesas Electronics",
+      "role": "ECU_MICROCONTROLLER",
+      "systemCategoryId": "engine_management_ecu",
+      "packageType": "LQFP-176 / QFP-144 / BGA",
+      "pinCount": 176,
+      "oemEcuPlatforms": [
+        "Toyota / Lexus Denso (Corolla, Hilux, Fortuner, Camry, RAV4)",
+        "Subaru / Mazda / Mitsubishi Denso"
+      ],
+      "crossReferences": [
+        "R5F72533",
+        "76F0070",
+        "76F0085"
+      ],
+      "functionalSummary": "32-bit Automotive RISC Microcontroller (SuperH / NEC 76F family) powering modern Toyota/Denso gasoline and common-rail diesel ECMs.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "5.0V I/O & ADC Reference + 3.3V / 1.25V Core Supplies",
+        "keyPinChecks": [
+          "VCC (5.0V) and Core VDD (1.25V–3.3V) decoupling capacitors",
+          "RES (Reset) pin HIGH",
+          "Crystal oscillator (10–20 MHz) active sine wave"
+        ],
+        "diodeOrResistanceCheck": "Check 5V VREG and 3.3V rails to GND for shorts before powering.",
+        "thermalNote": "Denso boards have heavy conformal coating — clean probe tips gently to get accurate readings."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Conformal coating peeling near moisture entry",
+          "Corroded vias near connector header"
+        ],
+        "commonFailureModes": [
+          "P0606 ECM Processor Fault (often triggered by faulty O2 heater short or 5V VREF sag!)"
+        ],
+        "associatedDtcs": [
+          "P0606",
+          "P0607",
+          "U0100"
+        ]
+      },
+      "technicianProTips": [
+        "TOYOTA P0606 PRO TIP: On Toyota/Denso ECUs, P0606 (\"ECM Processor\") is very frequently triggered by a shorted downstream O2 sensor heater or leaky A/F sensor ground — ALWAYS test O2 sensors before replacing the Denso ECU!"
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Check Regulated Rails & Conformal Coating Integrity",
+          "action": "Verify 5.0V and 3.3V/core rails at MCU decoupling capacitors.",
+          "targetSpec": "Clean 5.0V and core voltages with no thermal hotspots."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Rule Out External O2 Sensor / 5V VREF Faults",
+          "action": "Verify bench ECU boots and communicates cleanly without P0606 when isolated from vehicle O2 harness.",
+          "targetSpec": "Clean bench OBD-II/CAN communication and stable crystal oscillation."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "renesas.com",
+        "sourceUrl": "https://www.renesas.com/en/products/microcontrollers-microprocessors/automotive-microcontrollers",
+        "liveVerifiedHttpStatus": 404,
+        "liveScrapedSummary": null,
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-ic-tc1797",
+      "partNumber": "SAK-TC1797 / TC1766 (TriCore)",
+      "markingAliases": [
+        "TC1797",
+        "TC1766",
+        "TC1767",
+        "TC1796",
+        "TC1782",
+        "TC277",
+        "TRICORE"
+      ],
+      "refDesPrefixes": [
+        "U",
+        "IC",
+        "MCU",
+        "CPU"
+      ],
+      "manufacturer": "Infineon Technologies",
+      "role": "ECU_MICROCONTROLLER",
+      "systemCategoryId": "engine_management_ecu",
+      "packageType": "PG-LFBGA-292 / PG-LQFP-176",
+      "pinCount": 176,
+      "oemEcuPlatforms": [
+        "Bosch MED17 / EDC17",
+        "Continental / Siemens",
+        "Modern Turbo Gasoline & Common-Rail Diesel"
+      ],
+      "crossReferences": [
+        "SAK-TC1766",
+        "SAK-TC1767",
+        "SAK-TC1793"
+      ],
+      "functionalSummary": "32-bit TriCore Automotive Powertrain Microcontroller with integrated Flash, DSP, and multi-channel GPTA timer unit for high-precision injection & ignition.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "Multi-rail: 5.0V ADC/IO, 3.3V Flash/IO, 1.5V (or 1.3V) Core VDD",
+        "keyPinChecks": [
+          "Core VDD (1.3V–1.5V) decoupling caps around MCU perimeter",
+          "3.3V & 5.0V I/O rails",
+          "20.000 MHz Quartz Crystal oscillation (~1Vpp sine wave on XTAL pins)",
+          "PORST / Reset pin held HIGH after power stabilization"
+        ],
+        "diodeOrResistanceCheck": "Core 1.5V rail naturally reads lower resistance (20Ω–150Ω) than 5V rails; dead short (<2Ω) indicates shorted MLCC decoupling cap or fried MCU core.",
+        "thermalNote": "If MCU heats rapidly >70°C at idle (<30s), check decoupling MLCCs around the MCU before condemning the MCU."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Cracked ceramic decoupling capacitor around MCU perimeter",
+          "Water-corrosion bridging LQFP-176 pins"
+        ],
+        "commonFailureModes": [
+          "Dead ECU / no-comm due to missing 1.5V/3.3V rail or dead 20MHz crystal",
+          "Internal processor fault P0606"
+        ],
+        "associatedDtcs": [
+          "P0606",
+          "P0607",
+          "U0100"
+        ]
+      },
+      "technicianProTips": [
+        "A \"dead\" TriCore ECU is 80% of the time a missing 3.3V/1.5V SBC power rail, a shorted ceramic decoupling cap, or a dead 20MHz crystal — ALWAYS check all 3 rails + crystal sine wave before condemning the MCU!"
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Verify Core (1.3–1.5V), 3.3V, and 5.0V Rails",
+          "action": "Measure voltage on decoupling capacitors surrounding the TriCore MCU.",
+          "targetSpec": "All 3 rails present and within ±3% with low ripple."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Scope Quartz Crystal & Reset Line",
+          "action": "Use 10x oscilloscope probe on crystal pins and verify PORST is HIGH.",
+          "targetSpec": "Clean 20 MHz sine wave (0.8–1.5Vpp) and stable HIGH reset."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "infineon.com",
+        "sourceUrl": "https://www.infineon.com/cms/en/product/microcontroller/32-bit-tricore-microcontroller/",
+        "liveVerifiedHttpStatus": 200,
+        "liveScrapedSummary": "AURIX™ TriCore™ MCUs | Infineon Technologies — Explore Infineon AURIX™ TriCore™ MCUs that deliver 32-bit real-time performance with ISO 26262 functional safety for automotive and industrial designs",
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-ic-mc33186dh",
+      "partNumber": "MC33186DH",
+      "markingAliases": [
+        "MC33186",
+        "33186DH",
+        "33186",
+        "MC33926"
+      ],
+      "refDesPrefixes": [
+        "U",
+        "IC"
+      ],
+      "manufacturer": "NXP / Freescale",
+      "role": "ETC_H_BRIDGE_DRIVER",
+      "systemCategoryId": "engine_management_ecu",
+      "packageType": "HSOP-20 (Exposed Pad)",
+      "pinCount": 20,
+      "oemEcuPlatforms": [
+        "Ford EEC-VI",
+        "Chrysler/Jeep",
+        "GM / Delphi",
+        "Nissan"
+      ],
+      "crossReferences": [
+        "MC33926",
+        "TLE7209-2R",
+        "L9958"
+      ],
+      "functionalSummary": "5A Automotive H-Bridge DC Motor Driver for Electronic Throttle Control (ETC) with short-circuit, overtemperature, and undervoltage shutdown.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "5V–28V Power Supply (VPWR)",
+        "keyPinChecks": [
+          "VPWR (+12V)",
+          "OUT1 / OUT2 (Throttle Motor)",
+          "SF (Status Flag active-low fault output)"
+        ],
+        "diodeOrResistanceCheck": "OUT1 & OUT2 diode drops to GND and VPWR must be balanced (~0.5V).",
+        "thermalNote": "Large exposed bottom pad soldered to GND copper pour."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Blistered HSOP-20 top surface",
+          "Burnt copper trace feeding VPWR"
+        ],
+        "commonFailureModes": [
+          "Throttle limp mode (no pedal response)",
+          "SF fault flag permanently pulled low"
+        ],
+        "associatedDtcs": [
+          "P2101",
+          "P2110",
+          "P2118",
+          "P2119"
+        ]
+      },
+      "technicianProTips": [
+        "Check throttle body motor winding resistance (typically 1.5Ω–4.5Ω) and check for carbon-jammed throttle plates before reinstalling the ECU."
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Measure OUT1/OUT2 & SF Pin",
+          "action": "Verify OUT1/OUT2 unpowered diode drops and live VPWR voltage.",
+          "targetSpec": "VPWR ~12.6V; balanced 0.45–0.65V diode drops on OUT1/OUT2."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Replace MC33186DH & Verify PWM Drive",
+          "action": "Preheat PCB, replace HSOP-20 IC, and verify clean complementary PWM output.",
+          "targetSpec": "Stable motor drive with SF pin released high."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "nxp.com",
+        "sourceUrl": "https://www.nxp.com/products/MC33186",
+        "liveVerifiedHttpStatus": 200,
+        "liveScrapedSummary": "H-Bridge, Brushed DC Motor Driver, 5-28V, 5A, 20kHz | NXP Semiconductors — Archived content is no longer updated and is made available for historical reference only. The NXP<sup>&#174;</sup> MC33186 is a monolithic H-Bridge ideal for fractional horsepower DC-m",
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-ic-tle7209-2r",
+      "partNumber": "TLE7209-2R",
+      "markingAliases": [
+        "TLE7209",
+        "7209-2R",
+        "TLE6209R",
+        "6209R",
+        "30595"
+      ],
+      "refDesPrefixes": [
+        "U",
+        "IC"
+      ],
+      "manufacturer": "Infineon Technologies",
+      "role": "ETC_H_BRIDGE_DRIVER",
+      "systemCategoryId": "engine_management_ecu",
+      "packageType": "PG-DSO-20-32 (Power-SO20)",
+      "pinCount": 20,
+      "oemEcuPlatforms": [
+        "Bosch ME7.5 / MED17",
+        "VW/Audi/BMW",
+        "Toyota/Ford/Hyundai Drive-by-Wire"
+      ],
+      "crossReferences": [
+        "TLE6209R",
+        "MC33186DH",
+        "L9958"
+      ],
+      "functionalSummary": "5A–7A Protected Full H-Bridge DC Motor Driver with SPI diagnostics specifically engineered for Electronic Throttle Control (ETC) and EGR DC motors.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "12V Power Supply (VS) + 5V Logic Supply (VDD)",
+        "keyPinChecks": [
+          "VS: Switched +12V battery feed (from Main Relay)",
+          "OUT1 & OUT2: Complementary PWM H-bridge motor terminals",
+          "DIS / IN / DIR / SPI: 5V control & safety disable lines"
+        ],
+        "diodeOrResistanceCheck": "OUT1 and OUT2 to GND and to VS must read symmetrical body diode drops (~0.50V). Shorted OUT-to-GND or OUT-to-VS locks throttle in limp mode.",
+        "thermalNote": "Heavy side/bottom heatsink tabs — preheat PCB before desoldering."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Thermal stress browning around Power-SO20",
+          "Cracked solder joints on heavy center GND pins"
+        ],
+        "commonFailureModes": [
+          "Throttle stuck in limp-home position (P2101 / P2119)",
+          "Internal H-bridge short blowing ETCS fuse"
+        ],
+        "associatedDtcs": [
+          "P2101",
+          "P2102",
+          "P2103",
+          "P2118",
+          "P2119",
+          "P0638"
+        ]
+      },
+      "technicianProTips": [
+        "Before replacing a TLE7209-2R, verify the ETCS 10A/15A fuse and main relay +12V feed to the VS pin — a blown external ETCS fuse mimics a dead H-bridge IC!"
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Verify VS (+12V) & VDD (+5V) Feeds",
+          "action": "Power bench and confirm +12V on VS and +5V on VDD pins.",
+          "targetSpec": "VS = 12.0–12.8V, VDD = 4.95–5.05V."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Check H-Bridge OUT1/OUT2 Symmetry",
+          "action": "Unpowered diode check from OUT1 & OUT2 to GND and VS.",
+          "targetSpec": "Both motor outputs read matching ~0.45–0.65V drops with no dead shorts."
+        },
+        {
+          "stepNumber": 3,
+          "title": "Rework H-Bridge & Test Throttle Motor Sweep",
+          "action": "Replace TLE7209-2R using preheater and confirm complementary PWM on OUT1/OUT2.",
+          "targetSpec": "Smooth bidirectional PWM drive and zero P2101/P2118 fault codes."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "infineon.com",
+        "sourceUrl": "https://www.infineon.com/cms/en/product/power/motor-control-ics/brushed-dc-motor-driver-ics/",
+        "liveVerifiedHttpStatus": 200,
+        "liveScrapedSummary": "BDC motor drivers | Infineon Technologies — MOTIX™ motor control ICs for BDC motors: Explore our portfolio of gate drivers, bridge ICs, and motor system ICs with advanced protection and diagnosi",
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-ic-isl9v5036p3",
+      "partNumber": "ISL9V5036P3",
+      "markingAliases": [
+        "V5036P",
+        "V5036S",
+        "ISL9V5036",
+        "5036P",
+        "V5036D3S"
+      ],
+      "refDesPrefixes": [
+        "Q",
+        "TR",
+        "IGBT"
+      ],
+      "manufacturer": "onsemi / Fairchild",
+      "role": "IGNITION_IGBT_DRIVER",
+      "systemCategoryId": "engine_management_ecu",
+      "packageType": "TO-220AB / TO-263 (D2PAK)",
+      "pinCount": 3,
+      "oemEcuPlatforms": [
+        "Ford EEC-V / EEC-VI",
+        "Bosch ME7 / ME9",
+        "GM Delco",
+        "Toyota/Nissan COP retrofits"
+      ],
+      "crossReferences": [
+        "NGB8201N",
+        "STGB10NB37LZ",
+        "ISL9V3040D3S",
+        "BIP373"
+      ],
+      "functionalSummary": "500mJ, 360V internally clamped N-Channel EcoSPARK Automotive Ignition IGBT designed to switch primary ignition coils directly from 5V logic gate drive.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "5V Logic Gate Drive (Pin 1 Gate, Pin 2 Collector/Tab to Coil Primary, Pin 3 Emitter to PGND)",
+        "keyPinChecks": [
+          "Pin 1 (Gate): 10kΩ–22kΩ pull-down to Emitter (PGND)",
+          "Pin 2 (Collector/Tab): Connects to Ignition Coil primary low-side pin",
+          "Pin 3 (Emitter): Direct heavy-trace return to Power Ground (PGND)"
+        ],
+        "diodeOrResistanceCheck": "Unpowered DMM Resistance: Collector-to-Emitter must read OPEN (>100kΩ) in both directions. Short (<10Ω) confirms blown IGBT.",
+        "thermalNote": "Collector tab dissipates coil energy; inspect PCB thermal vias and silicone pad under tab."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Pin-hole crater or blister on plastic face of TO-263/TO-220 body",
+          "Discolored or lifted Collector copper pad / burnt solder mask",
+          "Cracked Emitter shunt resistor (0.02Ω–0.1Ω) next to IGBT"
+        ],
+        "commonFailureModes": [
+          "Dead Collector-to-Emitter short keeping ignition coil permanently energized (melts coil & blows IGN fuse)",
+          "Open Gate drive resistor (100Ω–330Ω) causing dead cylinder misfire"
+        ],
+        "associatedDtcs": [
+          "P0351",
+          "P0352",
+          "P0353",
+          "P0354",
+          "P0301",
+          "P0302",
+          "P0303",
+          "P0304"
+        ]
+      },
+      "technicianProTips": [
+        "NEVER install the repaired ECU back onto the vehicle without first testing the external ignition coil primary resistance (typically 0.5Ω–1.2Ω). A shorted coil will instantly destroy the new IGBT.",
+        "Always check the small SMD gate drive resistor (100Ω–470Ω) and current-sense shunt resistor beside the failed IGBT."
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Unpowered Collector-Emitter Short Check",
+          "action": "Measure resistance between Pin 2 (Collector tab) and Pin 3 (Emitter) with ECU unpowered.",
+          "targetSpec": "Known-Good: >100kΩ (OL). Faulty: <20Ω indicates shorted IGBT.",
+          "safetyNote": "Disconnect bench PSU before resistance/diode checks."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Verify Gate Drive Resistor & Pre-Driver",
+          "action": "Measure the SMD gate series resistor feeding Pin 1 and compare diode-mode drop on Pin 1 to GND against an adjacent working cylinder IGBT.",
+          "targetSpec": "Gate-to-GND resistance matches healthy neighbor channel within ±10%."
+        },
+        {
+          "stepNumber": 3,
+          "title": "Hot-Air Desolder & Clean Thermal Pad",
+          "action": "Preheat PCB underside to 150°C, use 380°C hot air with flux to lift the failed D2PAK/TO-220 IGBT, wick old solder, and inspect copper pad integrity.",
+          "targetSpec": "Clean, flat Collector thermal pad with intact vias and zero lifted traces."
+        },
+        {
+          "stepNumber": 4,
+          "title": "Solder Replacement & Verify Bench Dwell",
+          "action": "Solder new ISL9V5036P3 (or NGB8201N), clean flux with 99% IPA, power bench at 12.6V with current limit 1.5A, and verify clean 3–4ms dwell pulse on oscilloscope.",
+          "targetSpec": "No idle current spike; crisp Collector pull-down to <0.5V during dwell."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "onsemi.com",
+        "sourceUrl": "https://www.onsemi.com/products/discrete-power-modules/igbts/isl9v5036p3",
+        "liveVerifiedHttpStatus": 200,
+        "liveScrapedSummary": "Insulated Gate Bipolar Transistors - IGBT — onsemi supplies insulated gate bipolar transistors (IGBTs) for electronic ignition, flash, motor drive, and other high current switching applications.",
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-ic-ngb8201n",
+      "partNumber": "NGB8201N",
+      "markingAliases": [
+        "GB8201N",
+        "8201N",
+        "NGB8201NT4G",
+        "NGB8202N"
+      ],
+      "refDesPrefixes": [
+        "Q",
+        "TR",
+        "IGBT"
+      ],
+      "manufacturer": "onsemi",
+      "role": "IGNITION_IGBT_DRIVER",
+      "systemCategoryId": "engine_management_ecu",
+      "packageType": "D2PAK (TO-263)",
+      "pinCount": 3,
+      "oemEcuPlatforms": [
+        "Ford PCM",
+        "Chrysler / Dodge NGC",
+        "Bosch Automotive ECUs"
+      ],
+      "crossReferences": [
+        "ISL9V5036P3",
+        "STGB10NB37LZ",
+        "ISL9V3040D3S"
+      ],
+      "functionalSummary": "20A, 350V–400V clamped automotive ignition IGBT with internal gate-emitter ESD zener clamp for harsh inductive coil switching.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "5V Logic Gate / 350V+ Clamped Collector",
+        "keyPinChecks": [
+          "Pin 1 Gate (5V TTL)",
+          "Pin 2 Collector Tab",
+          "Pin 3 Emitter (PGND)"
+        ],
+        "diodeOrResistanceCheck": "Unpowered C-E >100kΩ; Gate-to-Emitter internal resistor ~15kΩ–22kΩ.",
+        "thermalNote": "Use high-thermal-mass soldering iron or preheater to avoid lifting D2PAK tab."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Soot/burn marks near coil driver bank",
+          "Melted solder on Emitter pin"
+        ],
+        "commonFailureModes": [
+          "Shorted C-E locking coil ON",
+          "Failed open causing single-cylinder no-spark"
+        ],
+        "associatedDtcs": [
+          "P0351",
+          "P0352",
+          "P0353",
+          "P0354"
+        ]
+      },
+      "technicianProTips": [
+        "Verify spark plug gap and coil secondary boot insulation on the vehicle — high-voltage flashover backfeeds the IGBT collector and kills replacements."
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Isolate Shorted Channel",
+          "action": "Measure C-E resistance across every coil IGBT.",
+          "targetSpec": "Open (>100kΩ) on healthy channels; replace any channel reading <50Ω."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Rework & Bench Oscilloscope Dwell Test",
+          "action": "Replace NGB8201N, clean board, and verify clean ignition trigger pulse on bench.",
+          "targetSpec": "Stable 5V gate pulse and crisp collector ground switching."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "onsemi.com",
+        "sourceUrl": "https://www.onsemi.com/products/discrete-power-modules/igbts/ngb8201n",
+        "liveVerifiedHttpStatus": 200,
+        "liveScrapedSummary": "Insulated Gate Bipolar Transistors - IGBT — onsemi supplies insulated gate bipolar transistors (IGBTs) for electronic ignition, flash, motor drive, and other high current switching applications.",
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-ic-stgb10nb37lz",
+      "partNumber": "STGB10NB37LZ",
+      "markingAliases": [
+        "GB10NB37LZ",
+        "B10NB37LZ",
+        "10NB37LZ",
+        "VB025MSP"
+      ],
+      "refDesPrefixes": [
+        "Q",
+        "TR",
+        "IGBT"
+      ],
+      "manufacturer": "STMicroelectronics",
+      "role": "IGNITION_IGBT_DRIVER",
+      "systemCategoryId": "engine_management_ecu",
+      "packageType": "D2PAK (TO-263)",
+      "pinCount": 3,
+      "oemEcuPlatforms": [
+        "Magneti Marelli IAW",
+        "Bosch ME7.4 / ME7.9",
+        "Fiat / Peugeot / VW"
+      ],
+      "crossReferences": [
+        "ISL9V5036P3",
+        "NGB8201N",
+        "STGB10NB37LZT4"
+      ],
+      "functionalSummary": "370V logic-level clamped automotive ignition IGBT with integrated ESD gate-emitter protection and rugged avalanche energy capability.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "5V Logic Gate Input / 370V Clamped Collector",
+        "keyPinChecks": [
+          "Pin 1 (Gate): 5V logic pulse from ECU ignition pre-driver",
+          "Pin 2 (Collector/Tab): Primary coil low-side switch output",
+          "Pin 3 (Emitter): Power ground return"
+        ],
+        "diodeOrResistanceCheck": "Collector-to-Emitter must be open (>100kΩ) unpowered; Gate-to-Emitter typically 10kΩ–25kΩ.",
+        "thermalNote": "Requires full solder fillet on D2PAK collector tab for thermal dissipation."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Cracked D2PAK epoxy",
+          "Darkened PCB around Collector tab",
+          "Open solder joint on Emitter leg"
+        ],
+        "commonFailureModes": [
+          "Shorted C-E causing blown coil fuse",
+          "Intermittent thermal open when engine bay heats up"
+        ],
+        "associatedDtcs": [
+          "P0351",
+          "P0352",
+          "P0353",
+          "P0354",
+          "P0300"
+        ]
+      },
+      "technicianProTips": [
+        "Always compare all 4 (or 6) ignition channels in diode mode before powering the bench — a mismatched Gate drop reveals a damaged pre-driver IC."
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Compare All Ignition Channels in Diode Mode",
+          "action": "Probe Gate-to-GND and Collector-to-GND across all ignition IGBTs with red probe on GND.",
+          "targetSpec": "All channels match within ±0.03V; shorted channel reads ~0.00V–0.05V."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Replace IGBT & Verify Coil Primary Resistance",
+          "action": "Replace failed STGB10NB37LZ with preheated hot-air rework and confirm vehicle ignition coil resistance is within OEM spec before reinstallation.",
+          "targetSpec": "New IGBT reads OL C-E; bench standby current stays normal (<0.35A)."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "st.com",
+        "sourceUrl": "https://www.st.com/en/automotive-analog-and-power/stgb10nb37lz.html",
+        "liveVerifiedHttpStatus": null,
+        "liveScrapedSummary": null,
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-ic-irlr2905",
+      "partNumber": "IRLR2905",
+      "markingAliases": [
+        "LR2905",
+        "IRLR2905Z",
+        "2905",
+        "FDP5800",
+        "B55NF06"
+      ],
+      "refDesPrefixes": [
+        "Q",
+        "TR",
+        "FET"
+      ],
+      "manufacturer": "Infineon / International Rectifier",
+      "role": "INJECTOR_SOLENOID_DRIVER",
+      "systemCategoryId": "engine_management_ecu",
+      "packageType": "DPAK (TO-252)",
+      "pinCount": 3,
+      "oemEcuPlatforms": [
+        "Toyota Denso Diesel/Petrol",
+        "Nissan Hitachi",
+        "Ford/Mazda",
+        "Bosch EDC15/16"
+      ],
+      "crossReferences": [
+        "IRLR2905Z",
+        "STD60NF06",
+        "NTD5867NL"
+      ],
+      "functionalSummary": "55V, 42A, 27mΩ logic-level N-Channel Power MOSFET widely used for fuel injectors, SCV/IMV diesel metering valves, VVT solenoids, and heater circuits.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "5V Logic-Level Gate Drive (Pin 1 Gate, Pin 2 Drain/Tab, Pin 3 Source)",
+        "keyPinChecks": [
+          "Pin 1 Gate",
+          "Pin 2 Drain (Tab)",
+          "Pin 3 Source (GND or Shunt)"
+        ],
+        "diodeOrResistanceCheck": "Body diode (Red on Source, Black on Drain) reads ~0.45V–0.60V; reverse reads OL. Short (<5Ω) = failed MOSFET.",
+        "thermalNote": "DPAK tab requires clean thermal solder joint."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Blistered DPAK epoxy",
+          "Lifted Source leg solder joint"
+        ],
+        "commonFailureModes": [
+          "Drain-Source dead short keeping solenoid/injector constantly ON",
+          "Gate-Source short loading down MCU/driver"
+        ],
+        "associatedDtcs": [
+          "P0201",
+          "P0202",
+          "P0203",
+          "P0204",
+          "P0089",
+          "P0010"
+        ]
+      },
+      "technicianProTips": [
+        "When replacing an ECU MOSFET, always verify it is a LOGIC-LEVEL (Vgs(th) 1V–2V) MOSFET like IRLR2905 — a standard 10V-gate MOSFET will overheat and fail under 5V ECU gate drive."
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Test Body Diode & Gate-Source Resistance",
+          "action": "Use DMM diode mode across Drain-Source and resistance across Gate-Source.",
+          "targetSpec": "Forward body diode 0.45–0.60V, reverse OL, Gate-Source >10kΩ."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Replace Logic-Level MOSFET & Scope PWM",
+          "action": "Replace DPAK MOSFET, clean flux, and confirm crisp PWM switching on bench.",
+          "targetSpec": "Clean Drain switching to <0.2V ON-state with zero thermal runaway."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "infineon.com",
+        "sourceUrl": "https://www.infineon.com/cms/en/product/power/mosfet/",
+        "liveVerifiedHttpStatus": 200,
+        "liveScrapedSummary": "MOSFETs | Infineon Technologies — Explore Infineon's MOSFET portfolio for industrial, automotive and computing. Filter by voltage, package, and key FOMs to shortlist parts fast.",
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-ic-l9132",
+      "partNumber": "L9132",
+      "markingAliases": [
+        "L9132",
+        "L9131",
+        "L9134",
+        "L9177A"
+      ],
+      "refDesPrefixes": [
+        "U",
+        "IC"
+      ],
+      "manufacturer": "STMicroelectronics",
+      "role": "INJECTOR_SOLENOID_DRIVER",
+      "systemCategoryId": "engine_management_ecu",
+      "packageType": "PowerSSO-36 (HSSOP-36)",
+      "pinCount": 36,
+      "oemEcuPlatforms": [
+        "Magneti Marelli IAW 4AF / 59F / 5SF",
+        "Bosch / ST Engine Management ECUs"
+      ],
+      "crossReferences": [
+        "L9131",
+        "L9177A",
+        "L9935"
+      ],
+      "functionalSummary": "Smart Power multi-channel engine management actuator driver integrating injector drivers, relay drivers, stepper/idle control, and 5V regulator/watchdog supervision.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "12V Battery Feed + 5.0V Internal/Regulated Logic Rail",
+        "keyPinChecks": [
+          "VBAT input pin: ~12.6V on bench",
+          "5V Regulated output / Reset pin: 5.0V steady, RESET high after boot",
+          "Injector & Relay driver pins: Open-drain low-side switches"
+        ],
+        "diodeOrResistanceCheck": "Compare diode drop across injector output pins (0.45V–0.65V typical); check VBAT-to-GND for shorts.",
+        "thermalNote": "PowerSSO-36 bottom slug is soldered directly to PCB ground plane."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Blistered epoxy on PowerSSO-36 body",
+          "Oxidized legs near ECU connector moisture path"
+        ],
+        "commonFailureModes": [
+          "No fuel pump relay prime",
+          "Dead injector bank",
+          "Missing 5V / stuck MCU Reset"
+        ],
+        "associatedDtcs": [
+          "P0201",
+          "P0202",
+          "P0203",
+          "P0204",
+          "P0627",
+          "P0685"
+        ]
+      },
+      "technicianProTips": [
+        "Because L9132 integrates multiple powertrain functions, always verify both 5V output and MCU RESET pin before condemning the main CPU."
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Verify VBAT, 5V Rail & RESET Line",
+          "action": "Power ECU on bench at 12.6V and measure VBAT, 5V supply, and RESET pin.",
+          "targetSpec": "VBAT 12.6V, 5V rail 4.95V–5.05V, RESET ~5.0V high."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Diode-Check Outputs & Rework PowerSSO-36",
+          "action": "Test all actuator outputs unpowered; if shorted/open, preheat board and replace L9132 with flux and microscope verification.",
+          "targetSpec": "Balanced diode drops across injector outputs and normal main relay latch."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "st.com",
+        "sourceUrl": "https://www.st.com/en/automotive-analog-and-power/smart-power-ics.html",
+        "liveVerifiedHttpStatus": null,
+        "liveScrapedSummary": null,
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-ic-mc33810",
+      "partNumber": "MC33810",
+      "markingAliases": [
+        "MC33810",
+        "33810",
+        "MC33810EK",
+        "MC33812"
+      ],
+      "refDesPrefixes": [
+        "U",
+        "IC"
+      ],
+      "manufacturer": "NXP Semiconductors",
+      "role": "INJECTOR_SOLENOID_DRIVER",
+      "systemCategoryId": "engine_management_ecu",
+      "packageType": "32-SOICW-EP (Exposed Pad)",
+      "pinCount": 32,
+      "oemEcuPlatforms": [
+        "Small Engine / 4-Cyl EFI ECUs",
+        "Automotive & Powersports ECUs"
+      ],
+      "crossReferences": [
+        "MC33812",
+        "MC33814",
+        "TLE8888QK"
+      ],
+      "functionalSummary": "Automotive engine control IC providing 4 low-side injector/solenoid drivers and 4 ignition IGBT pre-drivers with SPI fault diagnostics.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "5.0V VDD + 12V VPWR",
+        "keyPinChecks": [
+          "VDD = 5.0V",
+          "OUT0–OUT3 Injector low-side drivers",
+          "GD0–GD3 Ignition IGBT gate pre-drivers"
+        ],
+        "diodeOrResistanceCheck": "OUT0–OUT3 diode drop 0.45V–0.65V to GND; GD0–GD3 symmetrical impedance.",
+        "thermalNote": "Exposed pad must be well soldered to GND."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Heat discoloration near OUT0–OUT3 pins"
+        ],
+        "commonFailureModes": [
+          "Loss of ignition gate drive to one cylinder after an external IGBT short backfed GDx"
+        ],
+        "associatedDtcs": [
+          "P0201",
+          "P0202",
+          "P0351",
+          "P0352"
+        ]
+      },
+      "technicianProTips": [
+        "Whenever an ignition IGBT shorts Gate-to-Collector, it can send 12V–300V back into the MC33810 GDx pre-driver pin. Always check GDx impedance!"
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Check GD0–GD3 Pre-Driver Outputs",
+          "action": "Measure diode-mode drop on GD0–GD3 pins to GND and compare all 4 channels.",
+          "targetSpec": "All 4 GDx channels read identical voltage drop within ±0.03V."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Replace MC33810 & Verify SPI Comm",
+          "action": "Reflow replacement 32-SOICW-EP with preheater and test both injector and ignition gate pulses on bench.",
+          "targetSpec": "Clean 5V gate pulses on GD0–GD3 and crisp low-side switching on OUT0–OUT3."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "nxp.com",
+        "sourceUrl": "https://www.nxp.com/products/MC33810",
+        "liveVerifiedHttpStatus": 200,
+        "liveScrapedSummary": "MC33810 | Automotive Engine Control IC | NXP Semiconductors — Power management IC with 4 high-side drivers and 4 low-side drivers for automotive ignition and injector control in powertrain applications",
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-ic-tle6240gp",
+      "partNumber": "TLE6240GP",
+      "markingAliases": [
+        "TLE6240",
+        "6240GP",
+        "30402",
+        "30344",
+        "TLE6240SL"
+      ],
+      "refDesPrefixes": [
+        "U",
+        "IC"
+      ],
+      "manufacturer": "Infineon Technologies",
+      "role": "INJECTOR_SOLENOID_DRIVER",
+      "systemCategoryId": "engine_management_ecu",
+      "packageType": "PG-DSO-36 (Power-SSO-36)",
+      "pinCount": 36,
+      "oemEcuPlatforms": [
+        "Bosch ME7.5 / MED9 / EDC16 / EDC17",
+        "VW/Audi",
+        "Hyundai/Kia Kefico",
+        "BMW"
+      ],
+      "crossReferences": [
+        "TLE7240SL",
+        "TLE6240SL",
+        "Bosch 30402 (functional family)"
+      ],
+      "functionalSummary": "16-channel Smart Power low-side DMOS switch with 16-bit SPI diagnostics and 8 parallel direct inputs for driving fuel injectors, relays, purge valves, and warning lamps.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "5.0V Logic Supply (VDD) + Exposed Ground Thermal Slug",
+        "keyPinChecks": [
+          "VDD (5V logic rail): Must read 4.9V–5.1V with ignition ON",
+          "SPI Bus (SCLK, SI, SO, CS): Active 5V logic bursts during ECU boot",
+          "OUT1–OUT16: Open-drain outputs clamping inductive loads at ~45V–60V"
+        ],
+        "diodeOrResistanceCheck": "Diode mode (Red on GND, Black on OUTx): healthy DMOS output reads ~0.45V–0.65V body diode drop. <0.05V indicates shorted output MOSFET.",
+        "thermalNote": "Has a large exposed ground slug underneath — MUST preheat PCB bottom to 160°C before hot-air removal."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Tiny pin-hole burn mark on top package epoxy",
+          "Green/white corrosion bridges between fine-pitch 0.65mm pins (water ingress)",
+          "Thermal camera shows >85°C hotspot immediately when +12V is applied"
+        ],
+        "commonFailureModes": [
+          "One or more injector/relay outputs stuck continuously grounded (flooding cylinder or main relay stuck ON)",
+          "Internal VDD-to-GND short pulling down the entire ECU 5V regulator rail (no-comm / dead ECU)"
+        ],
+        "associatedDtcs": [
+          "P0201",
+          "P0202",
+          "P0203",
+          "P0204",
+          "P0443",
+          "P0685",
+          "P0627"
+        ]
+      },
+      "technicianProTips": [
+        "If the ECU 5V rail is shorted to ground, inject 1.0V / 1.0A current-limited onto the 5V rail and inspect with a thermal camera — a shorted TLE6240GP lights up immediately.",
+        "Check the fuel injector or purge solenoid coil resistance on the vehicle before returning the ECU; a shorted 1Ω solenoid will re-blow the new channel."
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Check 5V Rail & All 16 Output Channels in Diode Mode",
+          "action": "With ECU unpowered, probe VDD-to-GND and compare diode-mode voltage on OUT1–OUT16 against GND.",
+          "targetSpec": "VDD-to-GND >0.35V diode drop; all OUT channels 0.45V–0.65V."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Preheat & Remove PG-DSO-36 with Hot Air",
+          "action": "Use underside PCB preheater (150–165°C) + 390°C hot air with tacky flux to evenly melt the center ground slug and all 36 pins.",
+          "targetSpec": "Zero lifted fine-pitch pads; intact center ground thermal pad."
+        },
+        {
+          "stepNumber": 3,
+          "title": "Solder New TLE6240GP & Verify Under Microscope",
+          "action": "Tin center pad lightly, align Pin 1 dot, reflow until IC self-centers, then touch up all 36 legs with bevel tip and verify zero solder bridges.",
+          "targetSpec": "Clean shiny fillets on all 36 pins; no adjacent pin shorts."
+        },
+        {
+          "stepNumber": 4,
+          "title": "Bench Power-Up & Actuator Load Test",
+          "action": "Power ECU at 12.6V (1A limit), confirm stable 5.0V rail, and verify clean injector/relay switching on oscilloscope.",
+          "targetSpec": "5.0V ±0.1V rail; crisp low-side pulse with clean inductive flyback."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "infineon.com",
+        "sourceUrl": "https://www.infineon.com/cms/en/product/power/smart-power-switches/low-side-switches/",
+        "liveVerifiedHttpStatus": 200,
+        "liveScrapedSummary": "Low-side switches | Infineon Technologies — Smart low-side switches for automotive & industrial applications with integrated protective. Explore Classic HITFET™, HITFET™+ and TEMPFET™ families.",
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-ic-uln2003a",
+      "partNumber": "ULN2003A",
+      "markingAliases": [
+        "ULN2003",
+        "ULN2003A",
+        "ULN2003AD",
+        "2003A",
+        "TD62003"
+      ],
+      "refDesPrefixes": [
+        "U",
+        "IC"
+      ],
+      "manufacturer": "Texas Instruments / STMicroelectronics",
+      "role": "INJECTOR_SOLENOID_DRIVER",
+      "systemCategoryId": "body_electrical",
+      "packageType": "SOIC-16 / DIP-16",
+      "pinCount": 16,
+      "oemEcuPlatforms": [
+        "Legacy Toyota / Nissan / Mitsubishi ECUs",
+        "BCM Relay Drivers",
+        "Instrument Clusters"
+      ],
+      "crossReferences": [
+        "ULN2003AD",
+        "TD62003APG",
+        "TPL7407LA"
+      ],
+      "functionalSummary": "7-channel 50V / 500mA Darlington transistor array with built-in common-cathode flyback clamping diodes for relays, solenoids, and cluster lamps.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "5V Logic Inputs (Pins 1–7), Pin 8 = GND, Pin 9 = COM (+12V Flyback Clamp), Pins 10–16 = Outputs",
+        "keyPinChecks": [
+          "Pin 8: Direct GND (0.0V)",
+          "Pin 9 (COM): +12V ignition supply for internal flyback clamp diodes",
+          "Pins 1–7 -> Pins 16–10: Inverting low-side Darlington drivers"
+        ],
+        "diodeOrResistanceCheck": "Pin 10–16 to Pin 9 (COM) reads ~0.55V–0.70V forward clamp diode drop.",
+        "thermalNote": "No bottom thermal pad — easy hot-air or iron rework."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Cracked SOIC-16 package",
+          "Burnt trace on Pin 8 (GND) or Pin 9 (COM)"
+        ],
+        "commonFailureModes": [
+          "Relay stuck ON (shorted output channel)",
+          "Relay will not energize despite 5V input on Pin 1–7"
+        ],
+        "associatedDtcs": [
+          "P0685",
+          "P0627",
+          "P0480"
+        ]
+      },
+      "technicianProTips": [
+        "Quick live test: if an input pin (1–7) is 5V high, its opposite output pin (16–10) MUST pull down below 1.2V. If it stays at 12V, that Darlington channel is open."
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Verify Input vs Opposite Output Voltage",
+          "action": "Measure input pin (1–7) and opposite output pin (16–10) with bench powered.",
+          "targetSpec": "Input >3.5V -> Output <1.2V; Input <0.5V -> Output ~VBAT."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Replace SOIC-16 Array & Verify Relay Load",
+          "action": "Swap ULN2003A and confirm external relay coil resistance is >60Ω.",
+          "targetSpec": "Clean relay pull-in with zero excessive IC heating."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "ti.com",
+        "sourceUrl": "https://www.ti.com/product/ULN2003A",
+        "liveVerifiedHttpStatus": 200,
+        "liveScrapedSummary": "ULN2003A data sheet, product information and support | TI.com — TI’s ULN2003A is a 50V 7-ch darlington transistor array. Find parameters, ordering and quality information",
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-part-quartz-crystal",
+      "partNumber": "Automotive Quartz Crystal Oscillator (4–20 MHz)",
+      "markingAliases": [
+        "4.000",
+        "8.000",
+        "10.000",
+        "16.000",
+        "20.000",
+        "XTAL",
+        "OSC",
+        "CRYSTAL"
+      ],
+      "refDesPrefixes": [
+        "Y",
+        "X",
+        "XTAL",
+        "Q"
+      ],
+      "manufacturer": "NDK / Murata / Kyocera / Epson",
+      "role": "POWER_PROTECTION_PASSIVE",
+      "systemCategoryId": "engine_management_ecu",
+      "packageType": "SMD 2-Pin / 4-Pin Ceramic or HC-49S Metal Can",
+      "pinCount": 2,
+      "oemEcuPlatforms": [
+        "Every Automotive ECU Microcontroller Clock Circuit"
+      ],
+      "crossReferences": [
+        "NX5032GA-20.000MHz",
+        "CSTCE16M0V53"
+      ],
+      "functionalSummary": "Precision quartz crystal or ceramic resonator generating the master clock frequency for the ECU microcontroller and CAN baud-rate timing.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "0.8V–2.5Vpp sine wave centered near 1.5V–2.5V on XTAL1/XTAL2",
+        "keyPinChecks": [
+          "Use 10x oscilloscope probe (1x probe capacitance can stall oscillation!)"
+        ],
+        "diodeOrResistanceCheck": "Check the two tiny load capacitors (15pF–22pF) beside the crystal for shorts.",
+        "thermalNote": "Mechanical shock (dropped ECU) frequently fractures the internal quartz wafer."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Dented metal crystal can",
+          "Cracked ceramic SMD resonator after impact"
+        ],
+        "commonFailureModes": [
+          "ECU completely dead (5V rail OK, no CAN/K-Line, zero activity)",
+          "Off-frequency clock causing CAN baud mismatch U0100"
+        ],
+        "associatedDtcs": [
+          "U0100",
+          "P0606"
+        ]
+      },
+      "technicianProTips": [
+        "ALWAYS switch your oscilloscope probe to 10x attenuation when probing a quartz crystal — a 1x probe adds ~100pF capacitance and can stop a healthy crystal from oscillating!"
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Probe Crystal Pins with 10x Oscilloscope Probe",
+          "action": "Power ECU on bench and probe both crystal pins with 10x scope probe.",
+          "targetSpec": "Clean, steady sine wave matching stamped MHz frequency (e.g. 16.000 or 20.000 MHz)."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Replace Crystal if Flatline (with Healthy 5V/3.3V)",
+          "action": "Verify load caps are not shorted, replace crystal with exact MHz automotive-grade part, and re-verify oscillation.",
+          "targetSpec": "Crisp clock sine wave and immediate ECU wake-up / scanner response."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "murata.com",
+        "sourceUrl": "https://www.murata.com/en-global/products/timingdevice",
+        "liveVerifiedHttpStatus": 200,
+        "liveScrapedSummary": "Timing Devices (Crystal Unit / Ceramic Resonator) | Products | Murata Manufacturing Co., Ltd. — Murata's timing devices include a full range of crystal units and ceramic resonators. Compact and highly precise, they are widely used in mobile phones, wearable de",
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-part-current-sense-shunt",
+      "partNumber": "Current-Sense Shunt Resistor (0.01Ω–0.1Ω 1W–3W)",
+      "markingAliases": [
+        "R010",
+        "R020",
+        "R050",
+        "R100",
+        "0R05",
+        "0R10",
+        "SHUNT"
+      ],
+      "refDesPrefixes": [
+        "R",
+        "RS",
+        "SH"
+      ],
+      "manufacturer": "Vishay / Bourns / Susumu",
+      "role": "POWER_PROTECTION_PASSIVE",
+      "systemCategoryId": "engine_management_ecu",
+      "packageType": "SMD 2512 / 2010 Metal Strip",
+      "pinCount": 2,
+      "oemEcuPlatforms": [
+        "Universal ECU Ignition IGBT & Injector Current-Feedback Stages"
+      ],
+      "crossReferences": [
+        "WSL2512R0500FEA",
+        "WSL2512R1000FEA"
+      ],
+      "functionalSummary": "Low-value precision metal-strip shunt resistor placed in series with IGBT emitters or injector MOSFET sources so the ECU can measure real-time coil/injector current.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "Millivolt drop proportional to load current (V = I × R)",
+        "keyPinChecks": [
+          "Reads near 0.0Ω–0.2Ω on standard DMM (subtract probe lead resistance)"
+        ],
+        "diodeOrResistanceCheck": "If an R050 (0.05Ω) or R100 (0.10Ω) shunt reads >1Ω or OL, it is blown open!",
+        "thermalNote": "Blows open like a fuse when an IGBT or injector driver suffers a catastrophic short."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Crack across wide 2512 resistor body",
+          "Charred solder joints"
+        ],
+        "commonFailureModes": [
+          "No spark / no injector pulse even after replacing the IGBT because the Emitter/Source shunt is open"
+        ],
+        "associatedDtcs": [
+          "P0351",
+          "P0352",
+          "P0201",
+          "P0202"
+        ]
+      },
+      "technicianProTips": [
+        "NEVER replace a blown 0.05Ω current-sense shunt with a straight wire jumper! Without the exact resistance value, the ECU cannot detect coil saturation or short circuits and will destroy the new IGBT."
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Zero DMM Leads & Measure Shunt Resistance",
+          "action": "Short DMM probes together to note lead offset, then measure across the 2512 shunt.",
+          "targetSpec": "Matches printed code (R050 = 0.05Ω, R100 = 0.10Ω) within ±5%."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Replace with Exact Value & Wattage Shunt",
+          "action": "Solder exact-value automotive metal-strip shunt resistor and re-verify driver channel.",
+          "targetSpec": "Normal current feedback and clean coil/injector dwell waveform."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "vishay.com",
+        "sourceUrl": "https://www.vishay.com/en/resistors/current-sensing/",
+        "liveVerifiedHttpStatus": 404,
+        "liveScrapedSummary": null,
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-part-smbj18a-tvs",
+      "partNumber": "SMBJ18A / SMBJ22A / P6KE18A (TVS Diode)",
+      "markingAliases": [
+        "SMBJ18A",
+        "SMBJ22A",
+        "SMCJ18A",
+        "P6KE18A",
+        "BE",
+        "BM",
+        "TVS"
+      ],
+      "refDesPrefixes": [
+        "D",
+        "ZD",
+        "TVS",
+        "VR"
+      ],
+      "manufacturer": "Littelfuse / Vishay / Bourns",
+      "role": "POWER_PROTECTION_PASSIVE",
+      "systemCategoryId": "electrical_charging",
+      "packageType": "SMB (DO-214AA) / SMC (DO-214AB)",
+      "pinCount": 2,
+      "oemEcuPlatforms": [
+        "Universal 12V Automotive ECUs (located directly beside +B / +12V connector pins)"
+      ],
+      "crossReferences": [
+        "SMCJ18A",
+        "SMBJ20A",
+        "1.5KE18A"
+      ],
+      "functionalSummary": "600W–1500W Automotive Transient Voltage Suppressor (TVS) diode protecting the ECU +12V power input against reverse polarity, jump-start spikes, and alternator load-dump.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "18V Reverse Stand-Off / ~20V–22V Breakdown Clamp",
+        "keyPinChecks": [
+          "Cathode (striped end) -> +12V BATT/IGN input",
+          "Anode -> Power Ground (PGND)"
+        ],
+        "diodeOrResistanceCheck": "Unpowered Diode Mode: ~0.45V–0.65V forward (Red on Anode/GND, Black on Cathode/+12V), OL reverse. A reading of 0.00V–0.05V in BOTH directions confirms a sacrificed shorted TVS diode!",
+        "thermalNote": "When shorted after a reverse-polarity jump start, it intentionally sacrifices itself to blow the main EFI fuse and save the MCU."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Cracked black rectangular SMB/SMC diode right next to the ECU main connector",
+          "Soot or burnt copper trace leading from +12V pin to the TVS diode"
+        ],
+        "commonFailureModes": [
+          "Dead +12V-to-GND short blowing the vehicle EFI/ECM fuse immediately upon key-on"
+        ],
+        "associatedDtcs": [
+          "U0100",
+          "P0685"
+        ]
+      },
+      "technicianProTips": [
+        "REVERSE JUMP-START MIRACLE FIX: 70% of ECUs brought in after a reverse-polarity jump start ONLY have a shorted input TVS diode (and possibly one burnt PCB ground trace). Remove the shorted TVS, verify the +12V rail short clears, replace with a new SMBJ18A/SMCJ18A, and repair the fuse trace!"
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Diode-Check Input TVS Beside Main Connector",
+          "action": "Probe both ends of the large SMB/SMC protection diode near the +12V connector pins.",
+          "targetSpec": "Healthy: ~0.55V one way, OL reverse. Shorted: ~0.00V both ways."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Remove Shorted TVS & Verify Short Clears",
+          "action": "Desolder the shorted TVS diode and re-measure +12V-to-GND resistance.",
+          "targetSpec": "+12V-to-GND resistance rises from <5Ω to >1kΩ (short cleared!)."
+        },
+        {
+          "stepNumber": 3,
+          "title": "Install New TVS Diode & Repair Burnt Trace",
+          "action": "Solder new SMBJ18A/SMCJ18A observing cathode stripe orientation, repair any blown copper trace with insulated jumper wire, and power up with 1A current limit.",
+          "targetSpec": "Normal bench standby draw (0.15A–0.35A) and 5.0V rail restored."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "vishay.com",
+        "sourceUrl": "https://www.vishay.com/en/diodes/protection-tvs-esd/",
+        "liveVerifiedHttpStatus": 404,
+        "liveScrapedSummary": null,
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-part-smd-electrolytic-cap",
+      "partNumber": "SMD / Radial Electrolytic Cap (47µF–220µF 35V–50V 105°C)",
+      "markingAliases": [
+        "100UF",
+        "47UF",
+        "220UF",
+        "33UF",
+        "35V",
+        "50V",
+        "ELECTROLYTIC"
+      ],
+      "refDesPrefixes": [
+        "C",
+        "EC",
+        "CE"
+      ],
+      "manufacturer": "Nichicon / Rubycon / Panasonic (Automotive 105°C Low-ESR)",
+      "role": "POWER_PROTECTION_PASSIVE",
+      "systemCategoryId": "electrical_charging",
+      "packageType": "Radial Can / SMD Aluminum Can",
+      "pinCount": 2,
+      "oemEcuPlatforms": [
+        "Toyota Denso (90s–2000s)",
+        "Mitsubishi Melco",
+        "Nissan Hitachi",
+        "Honda/Mazda ECUs"
+      ],
+      "crossReferences": [
+        "Panasonic EEE-FK (105°C Automotive)",
+        "Nichicon UBT / UHE 105°C"
+      ],
+      "functionalSummary": "Bulk power-rail decoupling & noise-filtering electrolytic capacitors stabilizing the +12V input and +5V regulated ECU rails.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "Rated 35V–50V on 12V rail; 16V–25V on 5V rail (105°C–125°C Automotive Grade)",
+        "keyPinChecks": [
+          "Verify capacitance within ±20% and ESR <1.0Ω",
+          "Check surrounding copper traces for corrosive electrolyte damage"
+        ],
+        "diodeOrResistanceCheck": "Must NOT read dead short across terminals; leaking electrolyte creates conductive greenish/brown residue between adjacent traces.",
+        "thermalNote": "Always replace with 105°C or 125°C low-ESR automotive-grade capacitors — never 85°C consumer caps."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Fishy odor when heated with soldering iron",
+          "Dull/oxidized solder joints or dark brown/green crust beneath capacitor base",
+          "Bulging top vent or corroded nearby PCB vias"
+        ],
+        "commonFailureModes": [
+          "Intermittent no-start / random stalling",
+          "Corroded open PCB traces under cap causing injector/idle/5V failures"
+        ],
+        "associatedDtcs": [
+          "P0606",
+          "P0641",
+          "P0505",
+          "P0300"
+        ]
+      },
+      "technicianProTips": [
+        "CLASSIC TOYOTA & MITSUBISHI ECU FIX: Even if an old capacitor looks fine from above, electrolyte leaks underneath and eats through the copper traces! Always wash the area thoroughly with isopropyl alcohol + brush and continuity-test every via under the cap."
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Inspect Base for Electrolyte Crust & Measure ESR",
+          "action": "Inspect under magnification for dull joints/residue and test capacitance/ESR.",
+          "targetSpec": "Zero leakage; ESR <1Ω and capacitance within ±20%."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Remove, Neutralize & Continuity-Test Hidden Traces",
+          "action": "Desolder aged caps, scrub board cleanly with 99% IPA, and beep-test every trace/via underneath.",
+          "targetSpec": "Clean bright copper pads; jump any eaten traces with enameled wire."
+        },
+        {
+          "stepNumber": 3,
+          "title": "Install 105°C Low-ESR Replacements (Verify Polarity)",
+          "action": "Solder new 105°C/125°C automotive capacitors observing exact +/- polarity.",
+          "targetSpec": "Ripple <25mV on 5V rail; ECU boots cleanly."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "nichicon.co.jp",
+        "sourceUrl": "https://www.nichicon.co.jp/english/products/alm_mini/",
+        "liveVerifiedHttpStatus": 200,
+        "liveScrapedSummary": "Home | Nichicon —",
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "TECHNICIAN_CONFIRMED"
+      }
+    },
+    {
+      "id": "pcb-ic-93c56",
+      "partNumber": "93C56 / 93C66 / 93C86",
+      "markingAliases": [
+        "93C56",
+        "93C66",
+        "93C86",
+        "RH56",
+        "RA57",
+        "S93A56",
+        "RL56",
+        "L56R"
+      ],
+      "refDesPrefixes": [
+        "U",
+        "IC",
+        "EE"
+      ],
+      "manufacturer": "Microchip / Rohm / Seiko",
+      "role": "SERIAL_EEPROM_FLASH",
+      "systemCategoryId": "engine_management_ecu",
+      "packageType": "SOIC-8 / TSSOP-8 / MSOP-8",
+      "pinCount": 8,
+      "oemEcuPlatforms": [
+        "Toyota Denso (Corolla/Hilux/Camry/Fortuner)",
+        "Honda Keihin",
+        "Subaru/Mazda/Suzuki Denso"
+      ],
+      "crossReferences": [
+        "93LC56B",
+        "BR93L56RF",
+        "S-93C56B"
+      ],
+      "functionalSummary": "Microwire 3-wire Serial EEPROM (2Kbit–16Kbit) universally used in Japanese Denso/Keihin ECUs and immobilizer boxes for key/VIN/trim storage.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "Pin 8 (VCC) = 5.0V (or 3.3V), Pin 5 (VSS) = GND (NOTE: Pin 5 is GND, NOT Pin 4!)",
+        "keyPinChecks": [
+          "Pin 1 (CS), Pin 2 (CLK), Pin 3 (DI), Pin 4 (DO)",
+          "Pin 5 (GND) — WARNING: rotated vs SPI 95xxx!",
+          "Pin 6 (ORG: 8-bit vs 16-bit organization), Pin 8 (VCC)"
+        ],
+        "diodeOrResistanceCheck": "Pin 8 (VCC) to Pin 5 (GND) >0.40V diode mode.",
+        "thermalNote": "Watch for rotated pinout variants (e.g. Rohm BR93L56RF-W vs standard)!"
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Tiny TSSOP-8/MSOP-8 labeled RH56 / RA57 / L56R near main Denso MCU"
+        ],
+        "commonFailureModes": [
+          "Immobilizer mismatch (B2799 on Toyota)",
+          "Corrupted learned idle/fuel trim memory"
+        ],
+        "associatedDtcs": [
+          "B2799",
+          "P0603",
+          "P0605"
+        ]
+      },
+      "technicianProTips": [
+        "Toyota Denso ECUs often mark 93C56 as \"RH56\", \"RA57\", or \"L56R\". Remember Pin 5 is GND on Microwire 93Cxx (whereas Pin 4 is GND on SPI 95xxx and I2C 24Cxx)!"
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Confirm Package Marking & Pin 5 GND Orientation",
+          "action": "Identify exact marking (RH56/RA57/93C66) and verify Pin 5 continuity to board GND.",
+          "targetSpec": "Pin 5 = 0Ω to GND; Pin 8 = 5.0V (or 3.3V) when powered."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Verify Boot Clock/Data Activity",
+          "action": "Probe Pin 2 (CLK) and Pin 4 (DO) with oscilloscope at ignition ON.",
+          "targetSpec": "Short digital burst on CLK/DO within 100ms of ECU wake-up."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "microchip.com",
+        "sourceUrl": "https://www.microchip.com/en-us/product/93LC56B",
+        "liveVerifiedHttpStatus": 403,
+        "liveScrapedSummary": null,
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-ic-st95160",
+      "partNumber": "M95160 / ST95160",
+      "markingAliases": [
+        "95160",
+        "ST95160",
+        "95080",
+        "95320",
+        "95640",
+        "25160",
+        "5P08C3"
+      ],
+      "refDesPrefixes": [
+        "U",
+        "IC",
+        "EE"
+      ],
+      "manufacturer": "STMicroelectronics",
+      "role": "SERIAL_EEPROM_FLASH",
+      "systemCategoryId": "engine_management_ecu",
+      "packageType": "SO-8 / TSSOP-8",
+      "pinCount": 8,
+      "oemEcuPlatforms": [
+        "Bosch ME7 / EDC15 / EDC16",
+        "Magneti Marelli",
+        "Toyota/Ford/Nissan/Peugeot ECUs"
+      ],
+      "crossReferences": [
+        "M95160-WMN6TP",
+        "AT25160B",
+        "25LC160"
+      ],
+      "functionalSummary": "16-Kbit (2KB) Automotive SPI Serial EEPROM storing VIN, immobilizer keys, injector trim codes, and adaptive fault memory.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "Pin 8 (VCC) = 3.3V or 5.0V, Pin 4 (VSS) = GND",
+        "keyPinChecks": [
+          "Pin 1 (/S Chip Select), Pin 2 (Q Data Out), Pin 5 (D Data In), Pin 6 (C Clock)",
+          "Pin 3 (/W Write Protect) & Pin 7 (/HOLD): Normally tied HIGH to VCC",
+          "Pin 4 = GND, Pin 8 = VCC (3.3V or 5.0V)"
+        ],
+        "diodeOrResistanceCheck": "Pin 8 to Pin 4 >0.40V diode mode; verify continuity of SPI traces to MCU.",
+        "thermalNote": "Keep hot-air temperature <=330°C and brief duration (<15s) to prevent thermal data retention loss!"
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Prior sloppy rework flux or lifted Pin 1/Pin 8 pad",
+          "Missing tiny 0402 pull-up resistor on /CS"
+        ],
+        "commonFailureModes": [
+          "Corrupted EEPROM checksum (P0601/P0602/P0603)",
+          "Immobilizer no-start after battery cranking voltage drop"
+        ],
+        "associatedDtcs": [
+          "P0601",
+          "P0602",
+          "P0603",
+          "P0605",
+          "B2799"
+        ]
+      },
+      "technicianProTips": [
+        "ALWAYS take a verified read backup of the EEPROM BEFORE any hot-air rework near it, and never exceed 330°C on SO-8 EEPROMs.",
+        "NOTE: AutoElectric Lab Pro is a virtual diagnostic/repair learning lab — physical EEPROM reading/programming requires dedicated bench programmer hardware and OEM authorization."
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Verify VCC, GND & /HOLD /WP Pins",
+          "action": "Check Pin 8 (3.3V/5V), Pin 4 (0V), and confirm Pin 3 & Pin 7 are high on powered bench.",
+          "targetSpec": "Stable 3.3V or 5.0V VCC with zero rail dropout."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Inspect SPI Pins & Solder Joints Under Microscope",
+          "action": "Inspect Pins 1, 2, 5, 6 for cold joints or corroded vias; reflow gently with iron if cracked.",
+          "targetSpec": "Clean SPI clock/data burst visible on oscilloscope during ECU ignition-ON boot."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "st.com",
+        "sourceUrl": "https://www.st.com/en/memories/m95160-w.html",
+        "liveVerifiedHttpStatus": null,
+        "liveScrapedSummary": null,
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-ic-lm2940-5",
+      "partNumber": "LM2940-N (5.0V)",
+      "markingAliases": [
+        "LM2940",
+        "LM2940IMP-5.0",
+        "LM2940CS-5.0",
+        "2940-5.0"
+      ],
+      "refDesPrefixes": [
+        "U",
+        "IC",
+        "VR",
+        "REG"
+      ],
+      "manufacturer": "Texas Instruments",
+      "role": "VOLTAGE_REGULATOR_SBC",
+      "systemCategoryId": "electrical_charging",
+      "packageType": "SOT-223 / TO-263 / TO-220",
+      "pinCount": 3,
+      "oemEcuPlatforms": [
+        "Automotive Bench Trainers",
+        "Legacy 12V ECUs",
+        "BCM & Sensor Modules"
+      ],
+      "crossReferences": [
+        "TLE4275G",
+        "LM2940CT-5.0",
+        "L4949ED"
+      ],
+      "functionalSummary": "1A, 26V Automotive Low-Dropout (0.5V dropout) 5.0V Voltage Regulator with reverse-battery and load-dump transient protection.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "Pin 1 = IN (6.5V–26V), Pin 2/Tab = GND, Pin 3 = OUT (5.0V)",
+        "keyPinChecks": [
+          "Pin 1 IN ≈ 12V",
+          "Pin 2 GND = 0V",
+          "Pin 3 OUT = 5.0V ±3%"
+        ],
+        "diodeOrResistanceCheck": "Pin 3 (5V) to GND >0.35V diode mode; requires >=22µF output capacitor for stability.",
+        "thermalNote": "Requires >=22µF low-ESR output capacitor or the 5V rail will oscillate!"
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Overheated SOT-223 tab",
+          "Dry/leaking 22µF output capacitor"
+        ],
+        "commonFailureModes": [
+          "Oscillating 5V rail causing random ECU resets",
+          "Zero 5V output"
+        ],
+        "associatedDtcs": [
+          "P0641",
+          "P0606"
+        ]
+      },
+      "technicianProTips": [
+        "LM2940 MUST have at least a 22µF output capacitor with proper ESR (0.1Ω–1Ω); a dried-out electrolytic cap causes high-frequency oscillation on the 5V rail that crashes the MCU."
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Scope 5V Output for Ripple / Oscillation",
+          "action": "Connect oscilloscope AC-coupled on Pin 3 (5V OUT).",
+          "targetSpec": "DC 5.0V with <30mV peak-to-peak ripple."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Replace LM2940 & 22µF Output Cap",
+          "action": "Replace regulator and output capacitor if voltage sags or oscillates.",
+          "targetSpec": "Clean 5.0V output under load."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "ti.com",
+        "sourceUrl": "https://www.ti.com/product/LM2940-N",
+        "liveVerifiedHttpStatus": 200,
+        "liveScrapedSummary": "LM2940-N data sheet, product information and support | TI.com — TI’s LM2940-N is a 1-A, 26-V, high-PSRR, low-dropout voltage regulator. Find parameters, ordering and quality information",
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-ic-tle4275g",
+      "partNumber": "TLE4275G",
+      "markingAliases": [
+        "TLE4275",
+        "4275G",
+        "TLE4275-Q1",
+        "4275D",
+        "TLE4267"
+      ],
+      "refDesPrefixes": [
+        "U",
+        "IC",
+        "VR",
+        "REG"
+      ],
+      "manufacturer": "Infineon Technologies",
+      "role": "VOLTAGE_REGULATOR_SBC",
+      "systemCategoryId": "electrical_charging",
+      "packageType": "TO-263-5 (D2PAK-5) / TO-252-5",
+      "pinCount": 5,
+      "oemEcuPlatforms": [
+        "Bosch / Siemens / Continental ECUs",
+        "Toyota / Nissan / Ford Sensor 5V Reference Rails"
+      ],
+      "crossReferences": [
+        "TLE4275-Q1",
+        "TLE42754G",
+        "LM2940IMP-5.0"
+      ],
+      "functionalSummary": "450mA Automotive 5.0V Low-Dropout (LDO) Voltage Regulator with integrated Power-On Reset (RO) and 42V load-dump protection.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "Pin 1 (I) = 12V Input, Pin 3 (GND/Tab) = GND, Pin 5 (Q) = 5.0V ±2% Output",
+        "keyPinChecks": [
+          "Pin 1 (Input): 11.5V–14.5V from reverse-polarity diode",
+          "Pin 2 (RO Reset Output): ~5.0V high when rail is healthy",
+          "Pin 3 (GND/Tab): 0.0V",
+          "Pin 5 (Q Output): 4.90V–5.10V steady with <20mV ripple"
+        ],
+        "diodeOrResistanceCheck": "Pin 5 (5V out) to GND must read >0.35V in diode mode; <0.05V means downstream 5V short!",
+        "thermalNote": "If TLE4275G is scorching hot (>90°C), check for a shorted external 5V sensor or shorted tantalum/ceramic cap on the 5V rail BEFORE replacing the regulator."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Blistered 5-pin D2PAK",
+          "Cracked/burnt input or output SMD electrolytic/tantalum capacitor"
+        ],
+        "commonFailureModes": [
+          "Dead ECU (0V on 5V rail)",
+          "Sensor 5V reference drop (P0641 / P0651)",
+          "Continuous MCU reset loop"
+        ],
+        "associatedDtcs": [
+          "P0641",
+          "P0651",
+          "P0606",
+          "U0100"
+        ]
+      },
+      "technicianProTips": [
+        "A hot 5V LDO regulator is often a VICTIM, not the culprit! Unpowered, check Pin 5 (5V) to GND — if shorted, remove shorted filter caps or trace the 5V bus before replacing the TLE4275G."
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Check 5V Output Rail for Downstream Short",
+          "action": "Measure resistance/diode drop from Pin 5 (Q) to Pin 3 (GND) unpowered.",
+          "targetSpec": ">300Ω / >0.35V diode drop. Clear any downstream 5V short first."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Verify Input Voltage (Pin 1) & Output (Pin 5)",
+          "action": "Apply 12.6V bench power and measure Pin 1, Pin 5, and Pin 2 (Reset).",
+          "targetSpec": "Pin 1 ≈ 12V, Pin 5 = 5.00V ±0.10V, Pin 2 ≈ 5.0V."
+        },
+        {
+          "stepNumber": 3,
+          "title": "Replace Regulator & Output Filter Capacitors",
+          "action": "Preheat PCB, replace TLE4275G, and inspect/replace aged 22µF–100µF output caps.",
+          "targetSpec": "Rock-solid 5.00V rail with <20mV ripple on oscilloscope."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "infineon.com",
+        "sourceUrl": "https://www.infineon.com/cms/en/product/power/linear-voltage-regulator/",
+        "liveVerifiedHttpStatus": 200,
+        "liveScrapedSummary": "Linear voltage regulators | Infineon Technologies — Infineon's automotive LDO IC family portfolio. Explore our AEC-Q100 qualified OPTIREG™ LDO voltage regulators for all automotive applications.",
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    },
+    {
+      "id": "pcb-ic-tle8888qk",
+      "partNumber": "TLE8888QK",
+      "markingAliases": [
+        "TLE8888",
+        "8888QK",
+        "TLE8888-1QK",
+        "TLE8888-2QK"
+      ],
+      "refDesPrefixes": [
+        "U",
+        "IC"
+      ],
+      "manufacturer": "Infineon Technologies",
+      "role": "VOLTAGE_REGULATOR_SBC",
+      "systemCategoryId": "engine_management_ecu",
+      "packageType": "PG-LQFP-100 (Exposed Pad)",
+      "pinCount": 100,
+      "oemEcuPlatforms": [
+        "Modern 4-Cyl Gasoline/Hybrid ECUs",
+        "Bosch/Continental/Asian Smart Engine ECUs"
+      ],
+      "crossReferences": [
+        "TLE8888-1QK",
+        "TLE8888-2QK"
+      ],
+      "functionalSummary": "All-in-one Automotive Engine Management System Basis Chip (SBC) integrating 5V/3.3V regulators, sensor trackers, 4 ignition pre-drivers, 4 injector drivers, CAN/K-Line, and watchdog.",
+      "electricalBenchSpecs": {
+        "supplyVoltage": "12V VBAT -> 5V (V5V), 5V Sensor Trackers (T5V1/T5V2), 3.3V/1.2V Core Supplies",
+        "keyPinChecks": [
+          "VBAT input: 12.6V",
+          "V5V / T5V1 / T5V2: 5.0V ±2% (tracker supplies for TPS/MAP/CKP)",
+          "MR (Main Relay Driver): Pulls low when IGN wake-up is active"
+        ],
+        "diodeOrResistanceCheck": "Check T5V1, T5V2, and V5V rails to GND in diode mode before powering.",
+        "thermalNote": "100-pin LQFP with bottom ground slug — requires precision preheater + hot air and microscope inspection."
+      },
+      "visualAndFaultSignatures": {
+        "visualInspectionClues": [
+          "Corrosion along LQFP-100 perimeter pins",
+          "Hotspot on SBC die during 5V rail fault"
+        ],
+        "commonFailureModes": [
+          "Missing 5V tracker output (P0641/P0651)",
+          "ECU fails to wake up on IGN switch"
+        ],
+        "associatedDtcs": [
+          "P0641",
+          "P0651",
+          "P0685",
+          "P0606",
+          "U0100"
+        ]
+      },
+      "technicianProTips": [
+        "Always test IGN wake-up input voltage right at the TLE8888QK pin before condemning the SBC — an open wake-up resistor prevents main relay latch."
+      ],
+      "guidedRepairSteps": [
+        {
+          "stepNumber": 1,
+          "title": "Audit All Internal Supply Rails (V5V, T5V1, T5V2)",
+          "action": "Power bench with IGN ON and measure each regulated rail and IGN wake pin.",
+          "targetSpec": "All 5V rails within 4.90V–5.10V; Main Relay driver active."
+        },
+        {
+          "stepNumber": 2,
+          "title": "Precision LQFP-100 Rework",
+          "action": "Preheat PCB to 160°C, replace TLE8888QK, inspect all 100 pins under magnification, and clean thoroughly.",
+          "targetSpec": "Zero bridges; all regulated rails and CAN/K-Line restored."
+        }
+      ],
+      "provenance": {
+        "sourceSite": "infineon.com",
+        "sourceUrl": "https://www.infineon.com/cms/en/product/power/system-basis-chips/",
+        "liveVerifiedHttpStatus": 404,
+        "liveScrapedSummary": null,
+        "crawledAt": "2026-11-28T05:27:07.877Z",
+        "evidenceType": "VERIFIED_OEM"
+      }
+    }
+  ]
+}

@@ -28,6 +28,7 @@ import {
   buildArchiveOrgToyotaVehicleModels,
 } from './archiveOrgToyotaKnowledgeService';
 import { buildOscilloscopeWaveformRepairReferences } from './oscilloscopeWaveformKnowledgeService';
+import { buildEcuPcbComponentRepairReferences } from './ecuPcbComponentKnowledgeService';
 
 const STORAGE_KEY = 'autolab_automotive_knowledge_index_v1';
 
@@ -98,6 +99,7 @@ function buildEnrichedDefaultCatalog(): AutomotiveKnowledgeCatalog {
   const archiveOrgVehicles = buildArchiveOrgToyotaVehicleModels();
   const archiveOrgRefs = buildArchiveOrgToyotaRepairReferences();
   const oscWaveformRefs = buildOscilloscopeWaveformRepairReferences();
+  const pcbComponentRefs = buildEcuPcbComponentRepairReferences();
 
   const deduplicated = deduplicateCatalog({
     ...INITIAL_AUTOMOTIVE_CATALOG,
@@ -115,6 +117,7 @@ function buildEnrichedDefaultCatalog(): AutomotiveKnowledgeCatalog {
       ...INITIAL_AUTOMOTIVE_CATALOG.repairReferences,
       ...(compiled.knowledgeIndexEntries || []),
       ...oscWaveformRefs,
+      ...pcbComponentRefs,
       ...archiveOrgRefs,
     ],
   });
