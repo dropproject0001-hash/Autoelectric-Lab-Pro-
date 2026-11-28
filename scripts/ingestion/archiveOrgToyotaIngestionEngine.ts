@@ -492,14 +492,32 @@ export async function runArchiveOrgToyotaPage2Ingestion(): Promise<ArchiveOrgToy
     return { record };
   });
 
-  const records: ArchiveOrgManualRecord[] = [];
+  const rawRecords: ArchiveOrgManualRecord[] = [];
   for (const item of enriched) {
     if (item.rejected) {
       filteredOutItems.push(item.rejected);
     } else if (item.record) {
-      records.push(item.record);
+      rawRecords.push(item.record);
     }
   }
+
+  // Strict semantic deduplication by normalized (title | modelSlug | yearsLabel):
+  // retain the richer record (more PDF assets, then higher downloads, then longer excerpt).
+  const dedupMap = new Map<string, ArchiveOrgManualRecord>();
+  for (const rec of rawRecords) {
+    const semanticKey = `${rec.title.toLowerCase().replace(/\s+/g, ' ').trim()}|${rec.modelSlug}|${rec.yearsLabel}`;
+    const prev = dedupMap.get(semanticKey);
+    if (!prev) {
+      dedupMap.set(semanticKey, rec);
+    } else {
+      const prevScore = prev.pdfAssets.length * 1000 + (prev.downloads ?? 0);
+      const currScore = rec.pdfAssets.length * 1000 + (rec.downloads ?? 0);
+      if (currScore > prevScore) {
+        dedupMap.set(semanticKey, rec);
+      }
+    }
+  }
+  const records = [...dedupMap.values()];
 
   records.sort(
     (a, b) =>

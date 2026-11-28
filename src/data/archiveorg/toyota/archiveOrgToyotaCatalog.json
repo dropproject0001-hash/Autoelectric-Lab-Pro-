@@ -9,9 +9,9 @@
   "zeroFabricationIntegrity": true,
   "totalSearchHitsReported": 463,
   "rawPageDocsFetched": 50,
-  "automotiveManualsIngested": 47,
+  "automotiveManualsIngested": 46,
   "filteredOutNonAutomotiveCount": 3,
-  "totalPdfAssetsIndexed": 129,
+  "totalPdfAssetsIndexed": 128,
   "modelsDiscovered": [
     "Avalon",
     "Camry",
@@ -30,7 +30,7 @@
     "WIRING_DIAGRAM": 2,
     "REPAIR_SERVICE_MANUAL": 5,
     "ENGINE_ECU_MANUAL": 1,
-    "OWNERS_MANUAL": 18,
+    "OWNERS_MANUAL": 17,
     "NAVIGATION_AUDIO_MANUAL": 2,
     "PARTS_CATALOG": 0,
     "TECHNICAL_BULLETIN": 0,
@@ -1157,53 +1157,6 @@
         "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
         "detailsUrl": "https://archive.org/details/toyotarepairmanu0000vari",
         "metadataApiUrl": "https://archive.org/metadata/toyotarepairmanu0000vari",
-        "crawledAt": "2026-11-28T03:37:28.764Z",
-        "tier": "COMMUNITY_UNVERIFIED",
-        "evidenceType": "UNVERIFIED_DATABASE_RECORD",
-        "copyrightNotice": "Reference metadata and short catalog excerpt only; full PDF remains hosted on archive.org."
-      }
-    },
-    {
-      "identifier": "manualsbase-id-552366",
-      "title": "Toyota 2005 user manual",
-      "make": "Toyota",
-      "makeSlug": "toyota",
-      "model": "Multi-Model / General",
-      "modelSlug": "general",
-      "chassisCodes": [],
-      "engineCodes": [],
-      "yearStart": 2005,
-      "yearEnd": 2005,
-      "yearsLabel": "2005",
-      "category": "OWNERS_MANUAL",
-      "systemCategories": [
-        "body_electrical"
-      ],
-      "creator": null,
-      "publisher": null,
-      "language": "English",
-      "licenseUrl": null,
-      "downloads": 103,
-      "itemSizeBytes": 14158436,
-      "subjects": [
-        "manualsbase",
-        "manuals"
-      ],
-      "descriptionExcerpt": "Internet Archive cataloged Toyota reference PDF (see archive.org details URL for full document).",
-      "pdfAssets": [
-        {
-          "fileName": "552366.pdf",
-          "format": "Text PDF",
-          "sizeBytes": 1683596,
-          "pageCount": null,
-          "downloadUrl": "https://archive.org/download/manualsbase-id-552366/552366.pdf"
-        }
-      ],
-      "provenance": {
-        "sourceSite": "archive.org",
-        "sourceSearchUrl": "https://archive.org/search?tab=all&query=Toyota+manual+pdf&page=2",
-        "detailsUrl": "https://archive.org/details/manualsbase-id-552366",
-        "metadataApiUrl": "https://archive.org/metadata/manualsbase-id-552366",
         "crawledAt": "2026-11-28T03:37:28.764Z",
         "tier": "COMMUNITY_UNVERIFIED",
         "evidenceType": "UNVERIFIED_DATABASE_RECORD",

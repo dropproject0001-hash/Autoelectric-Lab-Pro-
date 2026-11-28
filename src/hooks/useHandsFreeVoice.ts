@@ -34,6 +34,8 @@ import {
 } from '../services/ai/voiceInteractionCache';
 import type { VoiceModalAction } from '../services/ai/systemVoiceKnowledgeBase';
 import { queryAiDiagnosticRouter } from '../services/ai/aiRouter';
+import { runUnifiedAiOrchestrator } from '../services/ai/unifiedAiOrchestrator';
+import { formatOrchestratorResponseForVoice } from '../services/ai/localKnowledgeAdoptionEngine';
 import { offlineVoiceAssistant } from '../services/offlineVoiceService';
 import {
   parseThreeDVoiceCommand,
@@ -641,13 +643,121 @@ export function useHandsFreeVoice(params: {
           pcbOverlayHook: partialTel?.pcbOverlayHook,
         };
 
-        void queryAiDiagnosticRouter({
+        void runUnifiedAiOrchestrator({
           query: cleaned,
           lang: currentLang,
-          telemetry: fullTelemetry,
-          timeoutMs: 9500,
+          allowLocalLlm: true,
+          includeUnverifiedDb: true,
+          isOffline: typeof navigator !== 'undefined' ? !navigator.onLine : false,
+          simulationContext: {
+            ecuName: fullTelemetry.ecuProfileLabel,
+            selectedComponent: fullTelemetry.selectedPin?.label,
+            injectedFaults: fullTelemetry.activeFaults.map(
+              (f) => `${f.pinId}:${f.faultType} (${f.description})`
+            ),
+            activeDtcs: fullTelemetry.activeDtcs.map(
+              (d) => `${d.code} (${d.description})`
+            ),
+            dmmReadingSummary: `${fullTelemetry.dmm.mode}: ${fullTelemetry.dmm.displayReading} ${fullTelemetry.dmm.unit}`,
+            psuSummary: `${fullTelemetry.psuEnabled ? 'ON' : 'OFF'} ${fullTelemetry.psuVoltageSetting}V / ${fullTelemetry.psuCurrentDrawAmps}A`,
+            telemetry: fullTelemetry,
+          },
         })
-          .then((aiResult) => {
+          .then(async (orchRes) => {
+            if (reqSeq !== aiRequestSeqRef.current) return;
+
+            // If Unified Orchestrator (Multi-Store Local DB + Local WebGPU LLM) found grounded evidence,
+            // deliver it immediately without any cloud round-trip!
+            if (!orchRes.hasEvidenceGap) {
+              const prevMem = memoryRef.current;
+              const formatted = formatOrchestratorResponseForVoice({
+                answer: orchRes.answer,
+                evidenceLevel: orchRes.evidenceLevel,
+                executionMode: orchRes.executionMode,
+                sources: orchRes.sources,
+                hasEvidenceGap: orchRes.hasEvidenceGap,
+                lang: currentLang,
+                hasSimulationContext:
+                  (fullTelemetry.activeFaults?.length || 0) > 0 ||
+                  (fullTelemetry.activeDtcs?.length || 0) > 0,
+              });
+
+              const updatedMemory: VoiceSessionMemory = {
+                ...prevMem,
+                lastIntent: 'DTC_OR_COMPONENT_LOOKUP',
+                lastFiveResponses: [...prevMem.lastFiveResponses.slice(-4), formatted.spokenText],
+                activeTab: activeTabRef.current,
+                lang: currentLang,
+              };
+
+              const voiceConfidence =
+                orchRes.evidenceLevel === 'VERIFIED_OEM'
+                  ? 0.96
+                  : orchRes.evidenceLevel === 'TECHNICIAN_CONFIRMED'
+                    ? 0.9
+                    : 0.82;
+
+              const orchTurn: VoiceCoachTurnResult = {
+                intent: 'DTC_OR_COMPONENT_LOOKUP',
+                confidence: voiceConfidence,
+                spokenText: formatted.spokenText,
+                displayText: formatted.displayText,
+                whyTip: formatted.whyTip,
+                nextStepIndex: prevMem.currentStepIndex,
+                matchedSource: formatted.matchedSource,
+                usedClarificationFallback: false,
+                updatedMemory,
+                navigationAction: null,
+                suggestedAction: null,
+                detailsBullets: formatted.detailsBullets,
+                followUpChips: formatted.followUpChips,
+              };
+
+              lastLiveTurnSourceRef.current = isLiveBypass
+                ? { transcript: cleaned, intent: orchTurn.intent }
+                : null;
+              memoryRef.current = updatedMemory;
+              setMemory(updatedMemory);
+              setLastTurn(orchTurn);
+              setLastTurnCacheMeta({
+                servedFromCache: false,
+                cacheHitCount: 0,
+                bypassedForLiveTelemetry: isLiveBypass,
+              });
+
+              if (!isLiveBypass && voiceConfidence >= VOICE_CACHE_MIN_CONFIDENCE) {
+                void saveVoiceInteractionCache({
+                  channel: 'VOICE_COACH',
+                  lang: currentLang,
+                  query: cleaned,
+                  intent: 'DTC_OR_COMPONENT_LOOKUP',
+                  spokenText: orchTurn.spokenText,
+                  displayText: orchTurn.displayText,
+                  whyTip: orchTurn.whyTip,
+                  matchedSource: orchTurn.matchedSource,
+                  detailsBullets: orchTurn.detailsBullets,
+                  followUpChips: orchTurn.followUpChips,
+                  suggestedAction: null,
+                  sourceOrigin: 'LOCAL_VOICE_BRAIN',
+                  confidence: voiceConfidence,
+                }).catch(() => {});
+              }
+
+              if (speakReply) {
+                speakWithEchoShield(orchTurn.spokenText);
+              } else {
+                setStatus(isHandsFreeRef.current ? 'NAKIKINIG' : 'STANDBY');
+              }
+              return;
+            }
+
+            // Fallback to diagnostic router only if local multi-store DB reported an evidence gap
+            const aiResult = await queryAiDiagnosticRouter({
+              query: cleaned,
+              lang: currentLang,
+              telemetry: fullTelemetry,
+              timeoutMs: 9500,
+            });
             if (reqSeq !== aiRequestSeqRef.current) return;
             const prevMem = memoryRef.current;
             const rootCard = aiResult.cards.find((c) => c.stepNumber === 2);

@@ -19,6 +19,11 @@ import {
   type NumericValidationReport,
 } from './numericValidator';
 import { scrubSensitiveDataForCloud, type PrivacyScrubResult } from './privacyFilter';
+import {
+  adoptMultiStoreLocalKnowledge,
+  type AdoptedKnowledgeItem,
+} from './localKnowledgeAdoptionEngine';
+import { getActiveLocalExplainer } from './localWebLlmService';
 
 export type OrchestratorRequestKind =
   | 'SPEC_LOOKUP'
@@ -133,6 +138,7 @@ export function classifyDiagnosticRequest(
 function buildDatabaseOnlyAnswer(params: {
   query: string;
   hits: ScoredReference[];
+  adoptedItems?: AdoptedKnowledgeItem[];
   requestKind: OrchestratorRequestKind;
   simContext?: OrchestratorSimulationContext;
   userMeasurements?: OrchestratorUserMeasurement[];
@@ -141,14 +147,15 @@ function buildDatabaseOnlyAnswer(params: {
   evidenceLevel: EvidenceHierarchyLevel;
   hasEvidenceGap: boolean;
 } {
-  const { query, hits, requestKind, simContext, userMeasurements } = params;
+  const { query, hits, adoptedItems = [], requestKind, simContext, userMeasurements } = params;
 
-  // Case A: Retrieved database records exist
-  if (hits.length > 0) {
+  // Case A: Retrieved database records (primary catalog or multi-store local adoption) exist
+  if (hits.length > 0 || adoptedItems.length > 0) {
     const top = hits[0];
-    const evidenceLevel: EvidenceHierarchyLevel =
-      top.reference.provenance?.evidenceType ||
-      (top.reference.verified ? 'VERIFIED_OEM' : 'UNVERIFIED_DB');
+    const evidenceLevel: EvidenceHierarchyLevel = top
+      ? top.reference.provenance?.evidenceType ||
+        (top.reference.verified ? 'VERIFIED_OEM' : 'UNVERIFIED_DB')
+      : adoptedItems[0].evidenceLevel;
 
     const lines: string[] = [formatEvidenceHeader(evidenceLevel)];
 
@@ -173,9 +180,11 @@ function buildDatabaseOnlyAnswer(params: {
       );
     }
 
+    const seenTitles = new Set<string>();
     for (const hit of hits.slice(0, 3)) {
       const ref: RepairReferenceRecord = hit.reference;
       const prov = ref.provenance;
+      seenTitles.add(ref.title.toLowerCase().trim());
       const unverifiedTag =
         !ref.verified || prov?.verificationStatus === 'PENDING' || prov?.verificationStatus === 'CAPTURED'
           ? ' [UNVERIFIED RECORD]'
@@ -204,6 +213,15 @@ function buildDatabaseOnlyAnswer(params: {
       if (hit.incompleteIdentificationDisclosure) {
         lines.push(`  - Identification Notice: ${hit.incompleteIdentificationDisclosure}`);
       }
+    }
+
+    for (const item of adoptedItems.slice(0, 3)) {
+      const normTitle = item.title.toLowerCase().trim();
+      if (seenTitles.has(normTitle)) continue;
+      seenTitles.add(normTitle);
+      const badge = item.evidenceLevel === 'UNVERIFIED_DB' ? ' [UNVERIFIED RECORD]' : '';
+      lines.push(`• [${item.store}] ${item.title}${badge}: ${item.summary}`);
+      lines.push(`  - Source: ${item.sourceDocument} (${item.pageOrSection}, Rev: ${item.revision})`);
     }
 
     return {
@@ -329,25 +347,38 @@ export async function runUnifiedAiOrchestrator(
   });
   const hits = filterHighPrecisionHits(query, rawHits);
 
+  // 1b. Multi-store local knowledge adoption (ECU PCB KB, FuseBoxInfo, StartMyCar, PH 2080, Adaptive KB, opt-in Archive.org)
+  const adopted = adoptMultiStoreLocalKnowledge({
+    query,
+    make: req.make,
+    model: req.model,
+    includeUnverified: Boolean(req.includeUnverifiedDb),
+    maxItems: 4,
+  });
+
   // 2. Build deterministic database-only baseline answer
   const dbBaseline = buildDatabaseOnlyAnswer({
     query,
     hits,
+    adoptedItems: adopted.items,
     requestKind,
     simContext: req.simulationContext,
     userMeasurements: req.userMeasurements,
   });
 
   // Build strict evidence corpus for the Numeric Validator
-  const evidenceTexts: string[] = hits.slice(0, 5).map((h) => {
-    const specText = (h.reference.electricalSpecs || [])
-      .map(
-        (s) =>
-          `${s.pinNumber || ''} ${s.signalName || ''} ${s.voltageRange || ''} ${s.resistanceRange || ''} ${s.frequencyRange || ''}`
-      )
-      .join(' ');
-    return `${h.reference.title} ${h.reference.summary} ${specText} ${h.reference.ecuIdentity?.partNumber || ''}`;
-  });
+  const evidenceTexts: string[] = [
+    ...hits.slice(0, 5).map((h) => {
+      const specText = (h.reference.electricalSpecs || [])
+        .map(
+          (s) =>
+            `${s.pinNumber || ''} ${s.signalName || ''} ${s.voltageRange || ''} ${s.resistanceRange || ''} ${s.frequencyRange || ''}`
+        )
+        .join(' ');
+      return `${h.reference.title} ${h.reference.summary} ${specText} ${h.reference.ecuIdentity?.partNumber || ''}`;
+    }),
+    ...adopted.items.map((a) => `${a.title} ${a.summary} ${a.specsText}`),
+  ];
   if (req.simulationContext) {
     evidenceTexts.push(
       [
@@ -370,15 +401,22 @@ export async function runUnifiedAiOrchestrator(
   let executionMode: OrchestratorExecutionMode = 'DATABASE_ONLY';
   let privacyScrub: PrivacyScrubResult | undefined;
 
-  // 3. Optional Local WebGPU LLM explainer (only explains retrieved records; never invents missing specs)
-  if (!dbBaseline.hasEvidenceGap && req.allowLocalLlm && req.localExplainerFn) {
+  // 3. Optional Local WebGPU LLM explainer (auto-connects to loaded LocalWebLlmService when allowLocalLlm=true)
+  const resolvedLocalExplainer = req.localExplainerFn ?? (req.allowLocalLlm ? getActiveLocalExplainer() : null);
+  if (!dbBaseline.hasEvidenceGap && req.allowLocalLlm && resolvedLocalExplainer) {
     try {
       const localPrompt = [
-        'Explain ONLY the retrieved automotive evidence below. Quote exact values verbatim; do NOT invent new pin numbers, voltages, ohms, or frequencies.',
+        'Explain ONLY the retrieved automotive evidence below in concise, technician-friendly language. Quote exact values verbatim; do NOT invent new pin numbers, voltages, ohms, or frequencies.',
+        `Language: ${req.lang === 'TL' ? 'Taglish / Filipino-English' : 'English'}`,
         `Query: ${query}`,
+        adopted.localLlmContextBlock
+          ? `Multi-Store Adopted Context:\n${adopted.localLlmContextBlock}`
+          : '',
         `Evidence:\n${dbBaseline.text}`,
-      ].join('\n\n');
-      const llmOutput = await req.localExplainerFn(localPrompt);
+      ]
+        .filter(Boolean)
+        .join('\n\n');
+      const llmOutput = await resolvedLocalExplainer(localPrompt);
       if (llmOutput && llmOutput.trim()) {
         finalCandidateText = `${formatEvidenceHeader(dbBaseline.evidenceLevel)}\n${llmOutput.trim()}`;
         executionMode = 'LOCAL_WEBGPU_LLM';
@@ -416,7 +454,7 @@ export async function runUnifiedAiOrchestrator(
     mode: 'FLAG',
   });
 
-  const sources: OrchestratorSourceAttribution[] = hits.slice(0, 5).map((h) => ({
+  const primarySources: OrchestratorSourceAttribution[] = hits.slice(0, 5).map((h) => ({
     id: h.reference.id,
     title: h.reference.title,
     sourceDocument: h.reference.provenance?.sourceDocument || h.reference.source.sourceName,
@@ -427,6 +465,20 @@ export async function runUnifiedAiOrchestrator(
       (h.reference.verified ? 'VERIFIED_OEM' : 'UNVERIFIED_DB'),
     incompleteIdentificationDisclosure: h.incompleteIdentificationDisclosure,
   }));
+
+  const seenSourceIds = new Set(primarySources.map((s) => s.title.toLowerCase()));
+  const adoptedSources: OrchestratorSourceAttribution[] = adopted.items
+    .filter((a) => !seenSourceIds.has(a.title.toLowerCase()))
+    .map((a) => ({
+      id: a.id,
+      title: a.title,
+      sourceDocument: a.sourceDocument,
+      pageOrSection: a.pageOrSection,
+      revision: a.revision,
+      evidenceLevel: a.evidenceLevel,
+    }));
+
+  const sources: OrchestratorSourceAttribution[] = [...primarySources, ...adoptedSources].slice(0, 6);
 
   const incompleteIdentificationDisclosures = Array.from(
     new Set(
