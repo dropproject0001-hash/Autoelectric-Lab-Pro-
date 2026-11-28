@@ -39,7 +39,24 @@ function restoreRewrittenApiUrl(req: IncomingMessage): void {
   }
 }
 
-export default function handler(req: IncomingMessage, res: ServerResponse): void {
+export default function handler(req: IncomingMessage, res: ServerResponse): Promise<void> {
   restoreRewrittenApiUrl(req);
-  app(req as Parameters<typeof app>[0], res as Parameters<typeof app>[1]);
+  return new Promise<void>((resolve, reject) => {
+    const onDone = () => {
+      res.off('finish', onDone);
+      res.off('close', onDone);
+      res.off('error', onErr);
+      resolve();
+    };
+    const onErr = (err: Error) => {
+      res.off('finish', onDone);
+      res.off('close', onDone);
+      res.off('error', onErr);
+      reject(err);
+    };
+    res.on('finish', onDone);
+    res.on('close', onDone);
+    res.on('error', onErr);
+    app(req as Parameters<typeof app>[0], res as Parameters<typeof app>[1]);
+  });
 }
