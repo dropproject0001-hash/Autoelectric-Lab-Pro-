@@ -669,3 +669,96 @@ body {
 .gsi-material-button:not(:disabled):hover .gsi-material-button-state {
   opacity: 0.08;
 }
+
+/* ============================================================================
+ * Industrial Flat Brushed-Alloy Instrument Trim & LED Green/Red Digital Readouts
+ * (Keysight / Rohde & Schwarz / Bosch KTS Bench Aesthetic — Preserves OEM Wiring Colors)
+ * ============================================================================ */
+.font-instrument-num {
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.dso-alloy-chassis {
+  position: relative;
+  background: linear-gradient(180deg, #161a20 0%, #101318 100%);
+  border: 1px solid #525b68;
+  border-top-color: #8c96a6;
+  box-shadow:
+    inset 0 1px 0 rgba(235, 240, 248, 0.22),
+    inset 0 -1px 0 rgba(8, 10, 14, 0.9),
+    0 12px 28px rgba(0, 0, 0, 0.52);
+  overflow: hidden;
+}
+
+.dso-alloy-top-rail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    #48505c 0%,
+    #9aa3b2 18%,
+    #636c7a 44%,
+    #c2cad6 70%,
+    #6c7584 86%,
+    #454d59 100%
+  );
+  border-bottom: 1px solid #12151a;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.dso-alloy-screen-bezel {
+  background: #06080b;
+  border: 1px solid #566070;
+  border-top-color: #848f9f;
+  border-bottom-color: #323944;
+  border-radius: 6px;
+  box-shadow:
+    inset 0 1px 0 rgba(230, 236, 245, 0.16),
+    inset 0 2px 14px rgba(0, 0, 0, 0.94);
+}
+
+.dso-alloy-frame {
+  background: linear-gradient(180deg, #0d1015 0%, #070a0e 100%);
+  border: 1px solid #4e5765;
+  border-top-color: #798495;
+  border-bottom-color: #303641;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 1px 0 rgba(230, 236, 245, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.78);
+}
+
+.dso-led-green {
+  color: #4ade80;
+  text-shadow: 0 0 8px rgba(74, 222, 128, 0.22);
+}
+
+.dso-led-red {
+  color: #f05252;
+  text-shadow: 0 0 8px rgba(240, 82, 82, 0.24);
+}
+
+.dso-micro-led {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  display: inline-block;
+  border: 1px solid rgba(0, 0, 0, 0.75);
+}
+
+.dso-micro-led-green {
+  background: radial-gradient(circle at 35% 35%, #86efac, #2f7d57 70%);
+}
+
+.dso-micro-led-red {
+  background: radial-gradient(circle at 35% 35%, #fca5a5, #b91c1c 70%);
+}
+
+.dso-micro-led-standby {
+  background: radial-gradient(circle at 35% 35%, #9ca3af, #4b5563 70%);
+}

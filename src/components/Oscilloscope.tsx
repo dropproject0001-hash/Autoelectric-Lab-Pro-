@@ -4,11 +4,12 @@
  */
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Activity, ArrowLeftRight, ArrowUpDown, GitCompare, Pause, Play, Zap } from 'lucide-react';
+import { Activity, ArrowLeftRight, ArrowUpDown, GitCompare, Layers, Pause, Play, Zap } from 'lucide-react';
 import { EcuPin, InjectedFault } from '../types/ecu';
 import { SignalGenerator } from '../simulation/signals/SignalGenerator';
 import { RackCornerScrews, RotaryEncoderDial } from './HardwareControls';
 import { OscilloscopeZoomControls } from './OscilloscopeZoomControls';
+import { OemOscilloscopeReferenceDrawer } from './OemOscilloscopeReferenceDrawer';
 import {
   DEFAULT_SCOPE_ZOOM,
   ScopeDragInteractionMode,
@@ -87,6 +88,8 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isRunning, setIsRunning] = useState(true);
+  const [phosphorEnabled, setPhosphorEnabled] = useState(true);
+  const [isOemDrawerOpen, setIsOemDrawerOpen] = useState(false);
   const [voltDiv, setVoltDiv] = useState(1.0);
   const [timeDiv, setTimeDiv] = useState(1.0);
   const [activeSignal, setActiveSignal] = useState<ScopeSignalMode>(selectedSignal);
@@ -433,6 +436,7 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
     zoomViewport,
     isAutoScale,
     triggerLevelV,
+    phosphorEnabled,
   });
 
   drawParamsRef.current = {
@@ -469,6 +473,7 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
     zoomViewport,
     isAutoScale,
     triggerLevelV,
+    phosphorEnabled,
   };
 
   const drawFrameRef = useRef<(() => void) | null>(null);
@@ -518,12 +523,12 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
       ctx.save();
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      // Dark oscilloscope phosphor CRT screen background
-      ctx.fillStyle = '#030807';
+      // Deep calibrated bench DSO CRT background
+      ctx.fillStyle = '#03060a';
       ctx.fillRect(0, 0, width, height);
 
-      // Draw Reticle Grid
-      ctx.strokeStyle = '#0a231f';
+      // Draw Precision 10×8 Reticle Grid
+      ctx.strokeStyle = '#0d1a22';
       ctx.lineWidth = 1;
 
       const numX = 10;
@@ -532,29 +537,45 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
       const stepY = height / numY;
 
       ctx.beginPath();
-      for (let x = 0; x <= width; x += stepX) {
+      for (let i = 1; i < numX; i++) {
+        const x = Math.round(i * stepX) + 0.5;
         ctx.moveTo(x, 0);
         ctx.lineTo(x, height);
       }
-      for (let y = 0; y <= height; y += stepY) {
+      for (let j = 1; j < numY; j++) {
+        const y = Math.round(j * stepY) + 0.5;
         ctx.moveTo(0, y);
         ctx.lineTo(width, y);
       }
       ctx.stroke();
 
-      // Center crosshair axis
-      ctx.strokeStyle = '#143c34';
+      // Center crosshair axis + 50×40 vernier sub-ticks
+      const cx = Math.round(width / 2) + 0.5;
+      const cy = Math.round(height / 2) + 0.5;
+      ctx.strokeStyle = '#18303d';
       ctx.beginPath();
-      ctx.moveTo(width / 2, 0);
-      ctx.lineTo(width / 2, height);
-      ctx.moveTo(0, height / 2);
-      ctx.lineTo(width, height / 2);
+      ctx.moveTo(cx, 0);
+      ctx.lineTo(cx, height);
+      ctx.moveTo(0, cy);
+      ctx.lineTo(width, cy);
+      for (let i = 1; i < 50; i++) {
+        const tx = (i / 50) * width;
+        ctx.moveTo(tx, cy - 2.5);
+        ctx.lineTo(tx, cy + 2.5);
+      }
+      for (let j = 1; j < 40; j++) {
+        const ty = (j / 40) * height;
+        ctx.moveTo(cx - 2.5, ty);
+        ctx.lineTo(cx + 2.5, ty);
+      }
       ctx.stroke();
 
       if (!p.isPowerOn) {
-        ctx.fillStyle = '#10b98144';
-        ctx.font = '12px monospace';
-        ctx.fillText('[ CIRCUIT DE-ENERGIZED - ZERO SIGNAL VOLTAGE ]', width / 2 - 140, height / 2);
+        ctx.fillStyle = 'rgba(240, 82, 82, 0.72)';
+        ctx.font = '11px "IBM Plex Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('[ CIRCUIT DE-ENERGIZED — ZERO SIGNAL VOLTAGE ]', width / 2, height / 2 - 6);
+        ctx.textAlign = 'left';
         ctx.restore();
         return;
       }
@@ -572,7 +593,44 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
         height / 2 + (rawY - height / 2) * zoomY + panYPx;
       const pxDenom = Math.max(1, width - 1);
 
-      ctx.lineWidth = 2.5;
+      // Hardware-authentic 1.15px fine-beam stroke with optional 2.3px @ 20% tight phosphor halo
+      const strokeFineBeam = (color: string, buildPath: () => void) => {
+        ctx.save();
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.shadowBlur = 0;
+        if (p.phosphorEnabled) {
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 2.3;
+          ctx.globalAlpha = 0.2;
+          ctx.beginPath();
+          buildPath();
+          ctx.stroke();
+        }
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.15;
+        ctx.globalAlpha = 0.96;
+        ctx.beginPath();
+        buildPath();
+        ctx.stroke();
+        ctx.restore();
+      };
+
+      const drawEdgeMarker = (label: string, yPos: number, color: string, side: 'left' | 'right' = 'left') => {
+        const clampedY = Math.max(14, Math.min(height - 14, yPos));
+        ctx.save();
+        ctx.fillStyle = color;
+        ctx.font = 'bold 9px "IBM Plex Mono", monospace';
+        ctx.textBaseline = 'middle';
+        if (side === 'left') {
+          ctx.textAlign = 'left';
+          ctx.fillText(`${label}►`, 3, clampedY);
+        } else {
+          ctx.textAlign = 'right';
+          ctx.fillText(`◄${label}`, width - 3, clampedY);
+        }
+        ctx.restore();
+      };
 
       if (p.activeSignal === 'DUAL_PIN' && p.ch1Pin && p.ch2Pin) {
         const dualStats = SignalGenerator.sampleDualPinIntoBuffers({
@@ -604,11 +662,11 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
         if (p.isAutoScale) {
           // Shared normalized 0–100% viewport with 0%, 50%, and 100% guide lines
           ctx.save();
-          ctx.strokeStyle = '#10b98133';
+          ctx.strokeStyle = 'rgba(74, 222, 128, 0.16)';
           ctx.lineWidth = 1;
           ctx.setLineDash([4, 4]);
-          ctx.font = '9px monospace';
-          ctx.fillStyle = '#34d399cc';
+          ctx.font = '9px "IBM Plex Mono", monospace';
+          ctx.fillStyle = 'rgba(74, 222, 128, 0.72)';
           ctx.textAlign = 'right';
           const guidePcts = [100, 50, 0];
           const guideLabels = ['100%', '50%', '0%'];
@@ -628,38 +686,33 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
           const ch1Flat = ch1Span <= 1e-3;
           const ch2Flat = ch2Span <= 1e-3;
 
-          ctx.lineWidth = 2.25;
-          // CH1 Normalized (Safety Amber) across shared full viewport
-          ctx.strokeStyle = '#f59e0b';
-          ctx.shadowColor = '#f59e0b';
-          ctx.shadowBlur = 4;
-          ctx.beginPath();
-          for (let i = 0; i < n; i++) {
-            const normRatio = ch1Flat
-              ? 0.5
-              : Math.max(0, Math.min(1, (dualCh1Buf[i] - dualStats.ch1Min) / ch1Span));
-            const x = (i / Math.max(1, n - 1)) * width;
-            const y = projectY(padTop + (1 - normRatio) * usableH);
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-          }
-          ctx.stroke();
+          // CH1 Normalized (Instrument Amber) across shared full viewport
+          strokeFineBeam('#e5a93c', () => {
+            for (let i = 0; i < n; i++) {
+              const normRatio = ch1Flat
+                ? 0.5
+                : Math.max(0, Math.min(1, (dualCh1Buf[i] - dualStats.ch1Min) / ch1Span));
+              const x = (i / Math.max(1, n - 1)) * width;
+              const y = projectY(padTop + (1 - normRatio) * usableH);
+              if (i === 0) ctx.moveTo(x, y);
+              else ctx.lineTo(x, y);
+            }
+          });
 
-          // CH2 Normalized (Phosphor Green) across exact same shared viewport
-          ctx.strokeStyle = '#4ade80';
-          ctx.shadowColor = '#4ade80';
-          ctx.shadowBlur = 4;
-          ctx.beginPath();
-          for (let i = 0; i < n; i++) {
-            const normRatio = ch2Flat
-              ? 0.5
-              : Math.max(0, Math.min(1, (dualCh2Buf[i] - dualStats.ch2Min) / ch2Span));
-            const x = (i / Math.max(1, n - 1)) * width;
-            const y = projectY(padTop + (1 - normRatio) * usableH);
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-          }
-          ctx.stroke();
+          // CH2 Normalized (Instrument LED Green) across exact same shared viewport
+          strokeFineBeam('#4ade80', () => {
+            for (let i = 0; i < n; i++) {
+              const normRatio = ch2Flat
+                ? 0.5
+                : Math.max(0, Math.min(1, (dualCh2Buf[i] - dualStats.ch2Min) / ch2Span));
+              const x = (i / Math.max(1, n - 1)) * width;
+              const y = projectY(padTop + (1 - normRatio) * usableH);
+              if (i === 0) ctx.moveTo(x, y);
+              else ctx.lineTo(x, y);
+            }
+          });
+          drawEdgeMarker('1', projectY(padTop + usableH * 0.4), '#e5a93c');
+          drawEdgeMarker('2', projectY(padTop + usableH * 0.65), '#4ade80');
         } else {
           const ch1BandMax = Math.max(5, dualStats.ch1Max > 15 ? 68 : Math.ceil(dualStats.ch1Max + 1));
           const ch2BandMax = Math.max(5, dualStats.ch2Max > 15 ? 68 : Math.ceil(dualStats.ch2Max + 1));
@@ -667,43 +720,39 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
           const halfBand = Math.max(18, usableH * 0.42);
 
           // Band separator for dual-pin CRT clarity
-          ctx.strokeStyle = '#1e352a';
+          ctx.save();
+          ctx.strokeStyle = '#1b2b36';
           ctx.lineWidth = 1;
           ctx.setLineDash([4, 4]);
           ctx.beginPath();
           ctx.moveTo(0, projectY(midY));
           ctx.lineTo(width, projectY(midY));
           ctx.stroke();
-          ctx.setLineDash([]);
+          ctx.restore();
 
-          ctx.lineWidth = 2.25;
-          // CH1 (Upper band, Safety Amber)
-          ctx.strokeStyle = '#f59e0b';
-          ctx.shadowColor = '#f59e0b';
-          ctx.shadowBlur = 4;
-          ctx.beginPath();
-          for (let i = 0; i < n; i++) {
-            const x = (i / Math.max(1, n - 1)) * width;
-            const norm = Math.min(1.15, Math.max(-0.15, dualCh1Buf[i] / ch1BandMax));
-            const y = projectY(midY - 6 - norm * halfBand * Math.min(1.3, p.voltDiv));
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-          }
-          ctx.stroke();
+          // CH1 (Upper band, Instrument Amber)
+          strokeFineBeam('#e5a93c', () => {
+            for (let i = 0; i < n; i++) {
+              const x = (i / Math.max(1, n - 1)) * width;
+              const norm = Math.min(1.15, Math.max(-0.15, dualCh1Buf[i] / ch1BandMax));
+              const y = projectY(midY - 6 - norm * halfBand * Math.min(1.3, p.voltDiv));
+              if (i === 0) ctx.moveTo(x, y);
+              else ctx.lineTo(x, y);
+            }
+          });
 
-          // CH2 (Lower band, Phosphor Green)
-          ctx.strokeStyle = '#4ade80';
-          ctx.shadowColor = '#4ade80';
-          ctx.shadowBlur = 4;
-          ctx.beginPath();
-          for (let i = 0; i < n; i++) {
-            const x = (i / Math.max(1, n - 1)) * width;
-            const norm = Math.min(1.15, Math.max(-0.15, dualCh2Buf[i] / ch2BandMax));
-            const y = projectY(height - padBottom - norm * halfBand * Math.min(1.3, p.voltDiv));
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-          }
-          ctx.stroke();
+          // CH2 (Lower band, Instrument LED Green)
+          strokeFineBeam('#4ade80', () => {
+            for (let i = 0; i < n; i++) {
+              const x = (i / Math.max(1, n - 1)) * width;
+              const norm = Math.min(1.15, Math.max(-0.15, dualCh2Buf[i] / ch2BandMax));
+              const y = projectY(height - padBottom - norm * halfBand * Math.min(1.3, p.voltDiv));
+              if (i === 0) ctx.moveTo(x, y);
+              else ctx.lineTo(x, y);
+            }
+          });
+          drawEdgeMarker('1', projectY(midY - 6), '#e5a93c');
+          drawEdgeMarker('2', projectY(height - padBottom), '#4ade80');
         }
       } else if (p.activeSignal === 'CAN_BUS') {
         const halfH = height / 2;
@@ -730,27 +779,23 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
           }
         }
 
-        // CH1 CAN_H Safety Amber
-        ctx.strokeStyle = '#f59e0b';
-        ctx.shadowColor = '#f59e0b';
-        ctx.shadowBlur = 4;
-        ctx.beginPath();
-        for (let x = 0; x < width; x++) {
-          if (x === 0) ctx.moveTo(x, canHighBuf[x]);
-          else ctx.lineTo(x, canHighBuf[x]);
-        }
-        ctx.stroke();
+        // CH1 CAN_H (Red if bus faulted, else Instrument Amber)
+        strokeFineBeam(canHardFault ? '#f05252' : '#e5a93c', () => {
+          for (let x = 0; x < width; x++) {
+            if (x === 0) ctx.moveTo(x, canHighBuf[x]);
+            else ctx.lineTo(x, canHighBuf[x]);
+          }
+        });
 
-        // CH2 CAN_L Phosphor Green
-        ctx.strokeStyle = '#4ade80';
-        ctx.shadowColor = '#4ade80';
-        ctx.shadowBlur = 4;
-        ctx.beginPath();
-        for (let x = 0; x < width; x++) {
-          if (x === 0) ctx.moveTo(x, canLowBuf[x]);
-          else ctx.lineTo(x, canLowBuf[x]);
-        }
-        ctx.stroke();
+        // CH2 CAN_L (Instrument LED Green)
+        strokeFineBeam(canHardFault ? '#f05252' : '#4ade80', () => {
+          for (let x = 0; x < width; x++) {
+            if (x === 0) ctx.moveTo(x, canLowBuf[x]);
+            else ctx.lineTo(x, canLowBuf[x]);
+          }
+        });
+        drawEdgeMarker('1', projectY(halfH - 20), canHardFault ? '#f05252' : '#e5a93c');
+        drawEdgeMarker('2', projectY(halfH + 20), canHardFault ? '#f05252' : '#4ade80');
       } else if (p.activeSignal === 'INJECTOR_PWM') {
         const injHardFault =
           !p.isEcuAwake ||
@@ -759,131 +804,118 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
           p.injPinFault === 'SHORT_TO_GND' ||
           p.injPinFault === 'SHORT_TO_VBAT' ||
           p.injPinFault === 'OPEN_CIRCUIT';
-        ctx.strokeStyle = injHardFault ? '#f43f5e' : '#4ade80';
-        ctx.shadowColor = injHardFault ? '#f43f5e' : '#4ade80';
-        ctx.shadowBlur = 4;
-        ctx.beginPath();
-        for (let x = 0; x < width; x++) {
-          const tPoint = tVisibleStartSec + (x / pxDenom) * tVisibleSpanSec;
-          const v =
-            p.isInjectorFiring && !injHardFault
-              ? SignalGenerator.getInjectorWaveform(tPoint, false, p.injMnaV, p.activeRpm)
-              : p.injMnaV;
-          const y = projectY(height - 30 - v * 2.6 * p.voltDiv);
-          if (x === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
+        const traceColor = injHardFault ? '#f05252' : '#4ade80';
+        strokeFineBeam(traceColor, () => {
+          for (let x = 0; x < width; x++) {
+            const tPoint = tVisibleStartSec + (x / pxDenom) * tVisibleSpanSec;
+            const v =
+              p.isInjectorFiring && !injHardFault
+                ? SignalGenerator.getInjectorWaveform(tPoint, false, p.injMnaV, p.activeRpm)
+                : p.injMnaV;
+            const y = projectY(height - 30 - v * 2.6 * p.voltDiv);
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+        });
+        drawEdgeMarker('1', projectY(height - 30 - 12 * 2.6 * p.voltDiv), traceColor);
       } else if (p.activeSignal === 'CRANK_CKP') {
-        // CH1: Crankshaft 60-2 VR signal (upper band, Phosphor Green)
-        ctx.strokeStyle = p.ckpSignalLost ? '#f43f5e' : '#4ade80';
-        ctx.shadowColor = p.ckpSignalLost ? '#f43f5e' : '#4ade80';
-        ctx.shadowBlur = 4;
-        ctx.beginPath();
+        const ckpColor = p.ckpSignalLost ? '#f05252' : '#4ade80';
         const ckpCenterY = height * 0.38;
-        for (let x = 0; x < width; x++) {
-          const tPoint = tVisibleStartSec + (x / pxDenom) * tVisibleSpanSec;
-          const v = SignalGenerator.getCrankshaftVrSignal(tPoint, p.activeRpm, p.ckpSignalLost);
-          const y = projectY(ckpCenterY - v * 8 * p.voltDiv);
-          if (x === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
+        strokeFineBeam(ckpColor, () => {
+          for (let x = 0; x < width; x++) {
+            const tPoint = tVisibleStartSec + (x / pxDenom) * tVisibleSpanSec;
+            const v = SignalGenerator.getCrankshaftVrSignal(tPoint, p.activeRpm, p.ckpSignalLost);
+            const y = projectY(ckpCenterY - v * 8 * p.voltDiv);
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+        });
 
-        // CH2: Camshaft Hall 5V sync pulse (lower band, Safety Amber) with phase offset
-        ctx.strokeStyle = '#f59e0b';
-        ctx.shadowColor = '#f59e0b';
-        ctx.shadowBlur = 4;
-        ctx.beginPath();
+        const cmpColor = Math.abs(p.camPhaseOffsetDeg) > 15 ? '#f05252' : '#e5a93c';
         const cmpBaseY = height * 0.80;
-        for (let x = 0; x < width; x++) {
-          const tPoint = tVisibleStartSec + (x / pxDenom) * tVisibleSpanSec;
-          const vCmp = SignalGenerator.getCamshaftHallSignal(tPoint, p.activeRpm, p.camPhaseOffsetDeg);
-          const y = projectY(cmpBaseY - vCmp * 6 * p.voltDiv);
-          if (x === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
+        strokeFineBeam(cmpColor, () => {
+          for (let x = 0; x < width; x++) {
+            const tPoint = tVisibleStartSec + (x / pxDenom) * tVisibleSpanSec;
+            const vCmp = SignalGenerator.getCamshaftHallSignal(tPoint, p.activeRpm, p.camPhaseOffsetDeg);
+            const y = projectY(cmpBaseY - vCmp * 6 * p.voltDiv);
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+        });
+        drawEdgeMarker('1', projectY(ckpCenterY), ckpColor);
+        drawEdgeMarker('2', projectY(cmpBaseY), cmpColor);
       } else if (p.activeSignal === 'O2_LAMBDA') {
         const o2HardFault =
           p.o2PinFault === 'SHORT_TO_GND' ||
           p.o2PinFault === 'SHORT_TO_VBAT' ||
           p.o2PinFault === 'OPEN_CIRCUIT';
-        ctx.strokeStyle = '#f59e0b';
-        ctx.shadowColor = '#f59e0b';
-        ctx.shadowBlur = 4;
-        ctx.beginPath();
-        for (let x = 0; x < width; x++) {
-          const tPoint = tVisibleStartSec + (x / pxDenom) * tVisibleSpanSec;
-          const v = o2HardFault
-            ? p.o2MnaV
-            : Math.min(1.1, Math.max(0.05, p.o2MnaV + 0.35 * Math.sin(tPoint * 2 * Math.PI * 1.25)));
-          const y = projectY(height / 2 - (v - 0.5) * 100 * p.voltDiv);
-          if (x === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
+        const o2Color = o2HardFault ? '#f05252' : '#4ade80';
+        strokeFineBeam(o2Color, () => {
+          for (let x = 0; x < width; x++) {
+            const tPoint = tVisibleStartSec + (x / pxDenom) * tVisibleSpanSec;
+            const v = o2HardFault
+              ? p.o2MnaV
+              : Math.min(1.1, Math.max(0.05, p.o2MnaV + 0.35 * Math.sin(tPoint * 2 * Math.PI * 1.25)));
+            const y = projectY(height / 2 - (v - 0.5) * 100 * p.voltDiv);
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+        });
+        drawEdgeMarker('1', projectY(height / 2), o2Color);
       } else if (p.activeSignal === 'GPT_BENCH') {
-        // CH1: GPT1 1.0 kHz 5V Bench Wake-Up Square Wave (Upper band, Safety Amber)
         const gpt1BaseY = height * 0.40;
         const gpt2BaseY = height * 0.80;
         const ampPx = 28 * Math.min(1.5, p.voltDiv);
 
-        ctx.strokeStyle = '#f59e0b';
-        ctx.shadowColor = '#f59e0b';
-        ctx.shadowBlur = 4;
-        ctx.beginPath();
-        for (let x = 0; x < width; x++) {
-          const tPoint = tVisibleStartSec + (x / pxDenom) * tVisibleSpanSec;
-          const sig = SignalGenerator.getGptBenchSignals(tPoint);
-          const y = projectY(gpt1BaseY - (sig.gpt1V / 5.0) * ampPx);
-          if (x === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
+        strokeFineBeam('#e5a93c', () => {
+          for (let x = 0; x < width; x++) {
+            const tPoint = tVisibleStartSec + (x / pxDenom) * tVisibleSpanSec;
+            const sig = SignalGenerator.getGptBenchSignals(tPoint);
+            const y = projectY(gpt1BaseY - (sig.gpt1V / 5.0) * ampPx);
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+        });
 
-        // CH2: GPT2 2.0 kHz 5V Complementary Square Wave (Lower band, Phosphor Green)
-        ctx.strokeStyle = '#4ade80';
-        ctx.shadowColor = '#4ade80';
-        ctx.shadowBlur = 4;
-        ctx.beginPath();
-        for (let x = 0; x < width; x++) {
-          const tPoint = tVisibleStartSec + (x / pxDenom) * tVisibleSpanSec;
-          const sig = SignalGenerator.getGptBenchSignals(tPoint);
-          const y = projectY(gpt2BaseY - (sig.gpt2V / 5.0) * ampPx);
-          if (x === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
+        strokeFineBeam('#4ade80', () => {
+          for (let x = 0; x < width; x++) {
+            const tPoint = tVisibleStartSec + (x / pxDenom) * tVisibleSpanSec;
+            const sig = SignalGenerator.getGptBenchSignals(tPoint);
+            const y = projectY(gpt2BaseY - (sig.gpt2V / 5.0) * ampPx);
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+        });
+        drawEdgeMarker('1', projectY(gpt1BaseY), '#e5a93c');
+        drawEdgeMarker('2', projectY(gpt2BaseY), '#4ade80');
       } else {
         // TPS_DC analog level anchored strictly to live MNA node voltage on Pin 7
-        ctx.strokeStyle = '#4ade80';
-        ctx.shadowColor = '#4ade80';
-        ctx.shadowBlur = 4;
-        ctx.beginPath();
-        const y = projectY(height - 35 - p.tpsMnaV * 28 * p.voltDiv);
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
+        const tpsY = projectY(height - 35 - p.tpsMnaV * 28 * p.voltDiv);
+        strokeFineBeam('#4ade80', () => {
+          ctx.moveTo(0, tpsY);
+          ctx.lineTo(width, tpsY);
+        });
+        drawEdgeMarker('1', tpsY, '#4ade80');
       }
 
-      // Draw Trigger Level dashed marker
+      // Draw Trigger Level dashed marker + right-edge T► indicator
       ctx.save();
       ctx.shadowBlur = 0;
       const trigRatio = Math.min(0.88, Math.max(0.12, 1 - p.triggerLevelV / 15));
       const trigY = projectY(trigRatio * height);
-      ctx.strokeStyle = 'rgba(245, 158, 11, 0.32)';
+      ctx.strokeStyle = 'rgba(203, 213, 225, 0.24)';
       ctx.lineWidth = 1;
       ctx.setLineDash([3, 4]);
       ctx.beginPath();
       ctx.moveTo(0, trigY);
       ctx.lineTo(width, trigY);
       ctx.stroke();
+      drawEdgeMarker('T', trigY, 'rgba(226, 232, 240, 0.72)', 'right');
 
       // Calibrated CRT bottom timebase reticle tick labels (auto-switches ms / µs under zoom)
       ctx.setLineDash([]);
-      ctx.font = '9px monospace';
-      ctx.fillStyle = 'rgba(148, 163, 184, 0.72)';
+      ctx.font = '9px "IBM Plex Mono", monospace';
+      ctx.fillStyle = 'rgba(148, 163, 184, 0.68)';
       const tickDivs = [0, 2, 4, 6, 8];
       for (let idx = 0; idx < tickDivs.length; idx++) {
         const div = tickDivs[idx];
@@ -993,6 +1025,7 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
     zoomViewport,
     isAutoScale,
     triggerLevelV,
+    phosphorEnabled,
   ]);
 
   // Cursor-anchored wheel zoom on the CRT screen (non-passive so wheel does not scroll page while zooming)
@@ -1104,42 +1137,71 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
     setCh2PinId(prev1);
   };
 
+  const hasActiveScopeFault =
+    !isPowerOn ||
+    (activeSignal === 'CAN_BUS' && !isCanBusHealthy) ||
+    (activeSignal === 'INJECTOR_PWM' && (hasInjectorFault || ckpSignalLost || !isEcuAwake)) ||
+    (activeSignal === 'CRANK_CKP' && (ckpSignalLost || Math.abs(camPhaseOffsetDeg) > 15)) ||
+    (activeSignal === 'O2_LAMBDA' && o2PinFault !== 'NONE');
+
   return (
-    <div className="relative hud-panel px-3.5 py-3 text-[#EAF3FF] flex flex-col gap-3 shrink-0">
+    <div className="relative dso-alloy-chassis rounded-xl px-3.5 pt-4 pb-3 text-[#E6EDF3] flex flex-col gap-3 shrink-0 overflow-hidden">
+      {/* Thin Flat Brushed-Aluminum Top Frame Rail */}
+      <div className="dso-alloy-top-rail" aria-hidden="true" />
       <RackCornerScrews />
 
       {/* Scope Module Header */}
       <div className="hud-panel-header flex flex-wrap items-center justify-between pb-2 gap-2">
         <div className="flex items-center gap-2 min-w-0">
-          <Activity className="w-4 h-4 text-[#19C8F5] shrink-0" aria-hidden="true" />
-          <span className="text-xs sm:text-sm font-mono font-bold tracking-[0.08em] text-[#EAF3FF] uppercase truncate">
+          <Activity className="w-4 h-4 text-[#b4c2d0] shrink-0" aria-hidden="true" />
+          <span className="text-xs sm:text-sm font-mono font-bold tracking-[0.08em] text-[#E6EDF3] uppercase truncate">
             OSCILLOSCOPE DIAGNOSTIC MODULE
           </span>
-          <span className="hidden sm:inline text-[10px] font-mono text-[#91A4BD] font-semibold shrink-0">
+          <span className="hidden sm:inline text-[10px] font-instrument-num text-[#8b98a8] font-semibold shrink-0">
             2-CH 50MS/s
           </span>
-          <span className="text-[9.5px] font-mono font-bold px-1.5 py-0.5 rounded-md bg-[#FFB020]/10 border border-[#FFB020]/45 text-[#FFB020] uppercase shrink-0">
+          <span className="text-[9.5px] font-instrument-num font-bold px-1.5 py-0.5 rounded-[4px] dso-alloy-frame text-[#c5d0dc] uppercase shrink-0">
             SIMULATED
           </span>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
+          <button
+            type="button"
+            onClick={() => setPhosphorEnabled((prev) => !prev)}
+            aria-pressed={phosphorEnabled}
+            title="Toggle realistic phosphor beam persistence halo"
+            className="dso-alloy-frame px-2 py-1 text-[10px] font-instrument-num rounded-[5px] flex items-center gap-1.5 font-semibold uppercase transition cursor-pointer whitespace-nowrap text-[#c9d3de] hover:text-white"
+          >
+            <span className={`dso-micro-led ${phosphorEnabled ? 'dso-micro-led-green' : ''}`} />
+            <span>PHOSPHOR {phosphorEnabled ? 'ON' : 'OFF'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsOemDrawerOpen(true)}
+            title="Open OEM Reference Waveforms Drawer (118 PicoAuto Guided Tests + AI Voice Control)"
+            className="dso-alloy-frame px-2.5 py-1 text-[10px] font-instrument-num rounded-[5px] flex items-center gap-1.5 font-semibold uppercase transition cursor-pointer whitespace-nowrap text-[#e2e8f0] hover:border-[#9fb0c4]"
+          >
+            <Layers className="w-3 h-3 text-[#4ade80]" />
+            <span>OEM DRAWER (118)</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setIsRunning(!isRunning)}
-            className={`px-2.5 py-1 text-[10px] font-mono rounded-lg border flex items-center gap-1.5 font-bold uppercase transition cursor-pointer whitespace-nowrap ${
-              isRunning
-                ? 'hw-btn-green text-[#93F7C8]'
-                : 'hw-btn-amber text-[#FFE29E]'
+            className={`dso-alloy-frame px-2.5 py-1 text-[10px] font-instrument-num rounded-[5px] flex items-center gap-1.5 font-bold uppercase transition cursor-pointer whitespace-nowrap ${
+              isRunning ? 'dso-led-green' : 'dso-led-red'
             }`}
           >
+            <span className={`dso-micro-led ${isRunning ? 'dso-micro-led-green' : 'dso-micro-led-red'}`} />
             {isRunning ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
             <span>{isRunning ? 'RUNNING' : 'HOLD'}</span>
           </button>
         </div>
       </div>
 
-      {/* Recessed Phosphor CRT Screen Container */}
+      {/* Recessed Phosphor CRT Screen Container (Flat Brushed-Alloy Bezel) */}
       <div
         ref={containerRef}
         onPointerDown={handleCrtPointerDown}
@@ -1150,7 +1212,7 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
           if (!crtPointerRef.current?.active) setHoverTimeRatio(null);
         }}
         onDoubleClick={() => setZoomViewport(DEFAULT_SCOPE_ZOOM)}
-        className={`relative hw-lcd-well border border-[#203653] rounded-xl overflow-hidden bg-[#050A12] h-[200px] sm:h-[230px] w-full select-none touch-none ${
+        className={`relative dso-alloy-screen-bezel rounded-lg overflow-hidden bg-[#03060a] h-[200px] sm:h-[230px] w-full select-none touch-none ${
           interactionMode === 'PAN'
             ? isScopeZoomed(zoomViewport)
               ? 'cursor-grab active:cursor-grabbing'
@@ -1163,7 +1225,7 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
         {/* Hover Crosshair & Transient Probe Line */}
         {hoverTimeRatio !== null && !dragSelection && (
           <div
-            className="pointer-events-none absolute inset-y-0 border-l border-cyan-400/45"
+            className="pointer-events-none absolute inset-y-0 border-l border-[#94a3b8]/45"
             style={{ left: `${hoverTimeRatio * 100}%` }}
           />
         )}
@@ -1171,13 +1233,13 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
         {/* Drag-to-Zoom Transient Selection Marquee */}
         {dragSelection && Math.abs(dragSelection.currentRatio - dragSelection.startRatio) >= 0.01 && (
           <div
-            className="pointer-events-none absolute inset-y-0 border-x border-cyan-300 bg-cyan-400/15"
+            className="pointer-events-none absolute inset-y-0 border-x border-[#94a3b8]/70 bg-[#94a3b8]/10"
             style={{
               left: `${Math.min(dragSelection.startRatio, dragSelection.currentRatio) * 100}%`,
               width: `${Math.abs(dragSelection.currentRatio - dragSelection.startRatio) * 100}%`,
             }}
           >
-            <span className="absolute top-8 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-[2px] bg-[#050A12]/95 border border-cyan-400/60 text-[9px] font-mono font-bold text-cyan-200 whitespace-nowrap tabular-nums">
+            <span className="absolute top-8 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-[3px] dso-alloy-frame text-[9px] font-instrument-num font-bold dso-led-green whitespace-nowrap">
               Δt {formatScopeTimeUnit(
                 Math.abs(dragSelection.currentRatio - dragSelection.startRatio) *
                   visibleTimeWindow.spanMs
@@ -1186,18 +1248,18 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
           </div>
         )}
 
-        {/* Channel Readout Chips */}
-        <div className="absolute top-2 left-2 right-2 flex flex-wrap gap-1.5 text-[9.5px] sm:text-[10px] font-mono pointer-events-none">
+        {/* Channel Readout Chips (Thin Flat Alloy Bezel + Instrument LED Green/Red) */}
+        <div className="absolute top-2 left-2 right-2 flex flex-wrap gap-1.5 text-[9.5px] sm:text-[10px] font-instrument-num pointer-events-none">
           {activeSignal === 'DUAL_PIN' && ch1Pin && ch2Pin ? (
             <>
-              <span className="text-[#FFB020] font-bold bg-[#050A12]/90 px-1.5 py-0.5 rounded-md border border-[#FFB020]/45 truncate">
+              <span className="dso-alloy-frame font-semibold px-1.5 py-0.5 rounded-[4px] dso-led-green truncate">
                 CH1: #{ch1Pin.pinNumber} {ch1Pin.label} ({ch1MnaVoltage.toFixed(2)}V)
               </span>
-              <span className="text-[#20D889] font-bold bg-[#050A12]/90 px-1.5 py-0.5 rounded-md border border-[#20D889]/45 truncate">
+              <span className="dso-alloy-frame font-semibold px-1.5 py-0.5 rounded-[4px] dso-led-green truncate">
                 CH2: #{ch2Pin.pinNumber} {ch2Pin.label} ({ch2MnaVoltage.toFixed(2)}V)
               </span>
               {dualTelemetry && (
-                <span className="text-[#EAF3FF] font-bold bg-[#050A12]/90 px-1.5 py-0.5 rounded-md border border-[#203653] truncate">
+                <span className="dso-alloy-frame font-semibold px-1.5 py-0.5 rounded-[4px] text-[#cbd5e1] truncate">
                   {dualTelemetry.correlationMode.replace('_', ' ')}
                   {dualTelemetry.timeLagMs !== null
                     ? ` · Δt ${dualTelemetry.timeLagMs >= 0 ? '+' : ''}${dualTelemetry.timeLagMs.toFixed(2)}ms`
@@ -1207,7 +1269,11 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
             </>
           ) : (
             <>
-              <span className="text-[#FFB020] font-bold bg-[#050A12]/90 px-1.5 py-0.5 rounded-md border border-[#FFB020]/45 truncate">
+              <span
+                className={`dso-alloy-frame font-semibold px-1.5 py-0.5 rounded-[4px] truncate ${
+                  hasActiveScopeFault ? 'dso-led-red' : 'dso-led-green'
+                }`}
+              >
                 {activeSignal === 'CAN_BUS'
                   ? `CH1: CAN_H (${canHMnaV.toFixed(2)}V)`
                   : activeSignal === 'INJECTOR_PWM'
@@ -1221,21 +1287,23 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
                   : `CH1: TPS_SIG (${tpsMnaV.toFixed(2)}V)`}
               </span>
               {activeSignal === 'GPT_BENCH' && (
-                <span className="text-[#20D889] font-bold bg-[#050A12]/90 px-1.5 py-0.5 rounded-md border border-[#20D889]/45 truncate">
+                <span className="dso-alloy-frame font-semibold px-1.5 py-0.5 rounded-[4px] dso-led-green truncate">
                   CH2: GPT2 Bench Clock (2.0 kHz · 5.0V)
                 </span>
               )}
               {activeSignal === 'CAN_BUS' && (
-                <span className="text-[#20D889] font-bold bg-[#050A12]/90 px-1.5 py-0.5 rounded-md border border-[#20D889]/45 truncate">
+                <span
+                  className={`dso-alloy-frame font-semibold px-1.5 py-0.5 rounded-[4px] truncate ${
+                    isCanBusHealthy ? 'dso-led-green' : 'dso-led-red'
+                  }`}
+                >
                   CH2: CAN_L ({canLMnaV.toFixed(2)}V · {isCanBusHealthy ? '2.0V Diff' : 'FAULT'})
                 </span>
               )}
               {activeSignal === 'CRANK_CKP' && (
                 <span
-                  className={`font-bold bg-[#050A12]/90 px-1.5 py-0.5 rounded-md border truncate ${
-                    Math.abs(camPhaseOffsetDeg) > 15
-                      ? 'text-[#FF4D62] border-[#FF4D62]/50'
-                      : 'text-[#20D889] border-[#20D889]/45'
+                  className={`dso-alloy-frame font-semibold px-1.5 py-0.5 rounded-[4px] truncate ${
+                    Math.abs(camPhaseOffsetDeg) > 15 ? 'dso-led-red' : 'dso-led-green'
                   }`}
                 >
                   CH2: CMP Hall ({camPhaseOffsetDeg > 0 ? '+' : ''}{camPhaseOffsetDeg}°{Math.abs(camPhaseOffsetDeg) > 15 ? ' · P0016' : ''})
@@ -1247,7 +1315,7 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
 
         {/* Hover Cursor Probe Readout (Bottom-Left) */}
         {hoverTimeRatio !== null && (
-          <div className="absolute bottom-5 left-2 text-[9px] font-mono text-cyan-200 bg-[#050A12]/92 border border-cyan-500/45 px-1.5 py-0.5 rounded-[2px] pointer-events-none tabular-nums">
+          <div className="absolute bottom-5 left-2 text-[9px] font-instrument-num dso-led-green dso-alloy-frame px-1.5 py-0.5 rounded-[3px] pointer-events-none">
             t = {formatScopeTimeUnit(
               visibleTimeWindow.startMs + hoverTimeRatio * visibleTimeWindow.spanMs
             )}
@@ -1258,7 +1326,7 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
         )}
 
         {/* Trigger Status Overlay Strip */}
-        <div className="absolute bottom-5 right-2 text-[9px] font-mono text-[#91A4BD] bg-[#050A12]/90 border border-[#203653] px-2 py-0.5 rounded-md pointer-events-none tabular-nums">
+        <div className="absolute bottom-5 right-2 text-[9px] font-instrument-num text-[#cbd5e1] dso-alloy-frame px-2 py-0.5 rounded-[4px] pointer-events-none">
           TRIG: {triggerSource} · {triggerMode.toUpperCase()} @ {triggerLevelV.toFixed(1)}V
         </div>
       </div>
@@ -1504,29 +1572,68 @@ export const Oscilloscope: React.FC<OscilloscopeProps> = ({
         </div>
       </div>
 
-      {/* Bottom 3-Column Recessed Hardware LCD Readout Cards */}
-      <div className="grid grid-cols-3 gap-2 font-mono">
-        <div className="hw-lcd-well rounded-xl px-2.5 py-2 flex flex-col">
-          <span className="text-[10px] text-[#91A4BD] uppercase tracking-wider">Vpk-pk</span>
-          <strong className="text-base sm:text-lg font-bold text-[#19C8F5] tabular-nums mt-0.5 truncate">
+      {/* Bottom 3-Column Recessed Hardware Digital Parameter Cards (Thin Flat Alloy Frame + Green/Red Instrument LEDs) */}
+      <div className="grid grid-cols-3 gap-2 font-instrument-num">
+        <div className="dso-alloy-frame rounded-md px-2.5 py-2 flex flex-col">
+          <div className="flex items-center justify-between gap-1">
+            <span className="text-[9.5px] text-[#8b98a8] uppercase tracking-[0.08em] font-semibold">Vpk-pk</span>
+            <span className={`dso-micro-led ${hasActiveScopeFault ? 'dso-micro-led-red' : 'dso-micro-led-green'}`} />
+          </div>
+          <strong
+            className={`text-base sm:text-lg font-semibold mt-0.5 truncate ${
+              hasActiveScopeFault ? 'dso-led-red' : 'dso-led-green'
+            }`}
+          >
             {measuredVpp}
           </strong>
         </div>
-        <div className="hw-lcd-well rounded-xl px-2.5 py-2 flex flex-col">
-          <span className="text-[10px] text-[#91A4BD] uppercase tracking-wider">Freq</span>
-          <strong className="text-base sm:text-lg font-bold text-[#20D889] tabular-nums mt-0.5 truncate">
+        <div className="dso-alloy-frame rounded-md px-2.5 py-2 flex flex-col">
+          <div className="flex items-center justify-between gap-1">
+            <span className="text-[9.5px] text-[#8b98a8] uppercase tracking-[0.08em] font-semibold">Freq</span>
+            <span className={`dso-micro-led ${hasActiveScopeFault ? 'dso-micro-led-red' : 'dso-micro-led-green'}`} />
+          </div>
+          <strong
+            className={`text-base sm:text-lg font-semibold mt-0.5 truncate ${
+              hasActiveScopeFault ? 'dso-led-red' : 'dso-led-green'
+            }`}
+          >
             {measuredFreq}
           </strong>
         </div>
-        <div className="hw-lcd-well rounded-xl px-2.5 py-2 flex flex-col">
-          <span className="text-[10px] text-[#91A4BD] uppercase tracking-wider">
-            {activeSignal === 'DUAL_PIN' ? 'Phase / Corr' : 'RMS / Duty'}
-          </span>
-          <strong className="text-base sm:text-lg font-bold text-[#EAF3FF] tabular-nums mt-0.5 truncate">
-            {measuredVrms} <span className="text-[11px] text-[#FFB020]">· {measuredDuty}</span>
+        <div className="dso-alloy-frame rounded-md px-2.5 py-2 flex flex-col">
+          <div className="flex items-center justify-between gap-1">
+            <span className="text-[9.5px] text-[#8b98a8] uppercase tracking-[0.08em] font-semibold truncate">
+              {activeSignal === 'DUAL_PIN' ? 'Phase / Corr' : 'RMS / Duty'}
+            </span>
+            <span className={`dso-micro-led ${hasActiveScopeFault ? 'dso-micro-led-red' : 'dso-micro-led-green'}`} />
+          </div>
+          <strong
+            className={`text-base sm:text-lg font-semibold mt-0.5 truncate ${
+              hasActiveScopeFault ? 'dso-led-red' : 'dso-led-green'
+            }`}
+          >
+            {measuredVrms}{' '}
+            <span className="text-[11px] opacity-85">· {measuredDuty}</span>
           </strong>
         </div>
       </div>
+
+      {/* Slide-Over OEM Reference Waveforms Drawer (118 PicoAuto Guided Tests + Integrated Sliding Hands-Free AI Voice Controller) */}
+      <OemOscilloscopeReferenceDrawer
+        isOpen={isOemDrawerOpen}
+        onClose={() => setIsOemDrawerOpen(false)}
+        scopeState={{
+          voltDiv,
+          timeDiv,
+          rpm: activeRpm,
+          isRunning,
+          phosphorEnabled,
+        }}
+        onSetVoltDiv={setVoltDiv}
+        onSetTimeDiv={setTimeDiv}
+        onToggleRun={setIsRunning}
+        onTogglePhosphor={setPhosphorEnabled}
+      />
     </div>
   );
 };
