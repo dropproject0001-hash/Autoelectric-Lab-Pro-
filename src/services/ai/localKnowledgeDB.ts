@@ -113,6 +113,7 @@ function persistMemoryToLocalStorageMirror(): void {
 
 function openVerifiedKnowledgeDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
+    let settled = false;
     const request = indexedDB.open(
       VERIFIED_KNOWLEDGE_DB_NAME,
       VERIFIED_KNOWLEDGE_DB_VERSION
@@ -120,18 +121,53 @@ function openVerifiedKnowledgeDb(): Promise<IDBDatabase> {
 
     request.onupgradeneeded = () => {
       const db = request.result;
+      const tx = request.transaction;
+      let store: IDBObjectStore;
       if (!db.objectStoreNames.contains(VERIFIED_KNOWLEDGE_STORE_NAME)) {
-        const store = db.createObjectStore(VERIFIED_KNOWLEDGE_STORE_NAME, {
+        store = db.createObjectStore(VERIFIED_KNOWLEDGE_STORE_NAME, {
           keyPath: 'id',
         });
+      } else if (tx) {
+        store = tx.objectStore(VERIFIED_KNOWLEDGE_STORE_NAME);
+      } else {
+        return;
+      }
+      if (!store.indexNames.contains('normalizedKey')) {
         store.createIndex('normalizedKey', 'normalizedKey', { unique: false });
+      }
+      if (!store.indexNames.contains('savedAtMs')) {
         store.createIndex('savedAtMs', 'savedAtMs', { unique: false });
       }
     };
 
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () =>
-      reject(request.error || new Error('Failed to open AutoLabPro_VerifiedKnowledge IndexedDB'));
+    request.onblocked = () => {
+      if (!settled) {
+        settled = true;
+        reject(new Error('AutoLabPro_VerifiedKnowledge IndexedDB upgrade blocked by another open tab.'));
+      }
+    };
+
+    request.onsuccess = () => {
+      const db = request.result;
+      db.onversionchange = () => {
+        try {
+          db.close();
+        } catch {
+          // Ignore close error on version change
+        }
+      };
+      if (!settled) {
+        settled = true;
+        resolve(db);
+      }
+    };
+
+    request.onerror = () => {
+      if (!settled) {
+        settled = true;
+        reject(request.error || new Error('Failed to open AutoLabPro_VerifiedKnowledge IndexedDB'));
+      }
+    };
   });
 }
 

@@ -288,16 +288,66 @@ export async function resetLocalAiServiceForTests(): Promise<void> {
   };
 }
 
+export const DEFAULT_WEBLLM_INIT_TIMEOUT_MS = 180_000;
+export const DEFAULT_WEBLLM_INFERENCE_TIMEOUT_MS = 45_000;
+
+const statusListeners = new Set<(status: LocalAiRuntimeStatus) => void>();
+
+function notifyLocalAiStatus(): void {
+  const snapshot = getLocalAiRuntimeStatus();
+  statusListeners.forEach((listener) => {
+    try {
+      listener(snapshot);
+    } catch {
+      // Ignore subscriber errors
+    }
+  });
+}
+
+export function subscribeLocalAiStatus(
+  listener: (status: LocalAiRuntimeStatus) => void
+): () => void {
+  statusListeners.add(listener);
+  listener(getLocalAiRuntimeStatus());
+  return () => {
+    statusListeners.delete(listener);
+  };
+}
+
+export async function unloadLocalWebGpuModel(): Promise<void> {
+  if (activeModelHandle?.unload) {
+    try {
+      await activeModelHandle.unload();
+    } catch {
+      // Ignore cleanup errors
+    }
+  }
+  activeModelHandle = null;
+  runtimeStatus = {
+    ...runtimeStatus,
+    executionState: 'DATABASE_ONLY',
+    activeProfileId: null,
+    activeModelId: null,
+    isLoading: false,
+    loadProgress: 0,
+  };
+  notifyLocalAiStatus();
+}
+
 /**
  * Loads a quantized local model after verifying:
  * 1) Explicit user consent for the model download size
  * 2) Storage budget compliance
- * 3) Real worker initialization + inference self-test
+ * 3) Real worker initialization + inference self-test (with timeout & crash recovery)
  * On ANY failure, drops gracefully to DATABASE_ONLY without throwing an unhandled crash.
  */
 export async function loadLocalWebGpuModel(
   profileId: string,
-  options?: { availableStorageMb?: number | null }
+  options?: {
+    availableStorageMb?: number | null;
+    initTimeoutMs?: number;
+    inferenceTimeoutMs?: number;
+  }
 ): Promise<{
   ok: boolean;
   executionState: LocalAiExecutionState;
@@ -335,6 +385,7 @@ export async function loadLocalWebGpuModel(
       lastError: `Insufficient storage for ${profile.displayName} (requires ${profile.storageBudgetMb} MB within ${MAX_LOCAL_MODEL_STORAGE_BUDGET_MB} MB budget).`,
       lastTestedAt: new Date().toISOString(),
     };
+    notifyLocalAiStatus();
     return {
       ok: false,
       executionState: 'DATABASE_ONLY',
@@ -342,12 +393,23 @@ export async function loadLocalWebGpuModel(
     };
   }
 
+  // Cleanly unload any previously loaded worker before starting a new one
+  if (activeModelHandle?.unload) {
+    await unloadLocalWebGpuModel();
+  }
+
+  const initTimeoutMs = options?.initTimeoutMs ?? DEFAULT_WEBLLM_INIT_TIMEOUT_MS;
+  const inferenceTimeoutMs = options?.inferenceTimeoutMs ?? DEFAULT_WEBLLM_INFERENCE_TIMEOUT_MS;
+
   runtimeStatus = {
     ...runtimeStatus,
     isLoading: true,
     loadProgress: 0.1,
     lastError: null,
   };
+  notifyLocalAiStatus();
+
+  let workerRef: Worker | null = null;
 
   try {
     if (customLoaderForTests) {
@@ -363,6 +425,7 @@ export async function loadLocalWebGpuModel(
         lastError: null,
         lastTestedAt: new Date().toISOString(),
       };
+      notifyLocalAiStatus();
       return { ok: true, executionState: 'LOCAL_WEBGPU_INFERENCE' };
     }
 
@@ -375,43 +438,115 @@ export async function loadLocalWebGpuModel(
     const worker = new Worker(new URL('../../workers/webLlmWorker.ts', import.meta.url), {
       type: 'module',
     });
+    workerRef = worker;
+
+    const terminateOnCrash = (reason: string) => {
+      try {
+        worker.terminate();
+      } catch {
+        // Ignore terminate error
+      }
+      if (activeModelHandle?.profile.profileId === profile.profileId) {
+        activeModelHandle = null;
+        runtimeStatus = {
+          ...runtimeStatus,
+          executionState: 'DATABASE_ONLY',
+          activeProfileId: null,
+          activeModelId: null,
+          isLoading: false,
+          loadProgress: 0,
+          lastError: reason,
+          lastTestedAt: new Date().toISOString(),
+        };
+        notifyLocalAiStatus();
+      }
+    };
 
     await new Promise<void>((resolve, reject) => {
       const reqId = `init-${Date.now()}`;
+      const timer = setTimeout(() => {
+        cleanup();
+        reject(new Error(`WebLLM worker initialization timed out after ${initTimeoutMs}ms.`));
+      }, initTimeoutMs);
+
       const onMessage = (ev: MessageEvent) => {
         const msg = ev.data;
         if (!msg || msg.requestId !== reqId) return;
         if (msg.type === 'PROGRESS') {
           runtimeStatus = { ...runtimeStatus, loadProgress: Number(msg.progress || 0) };
+          notifyLocalAiStatus();
         } else if (msg.type === 'READY') {
-          worker.removeEventListener('message', onMessage);
+          cleanup();
           resolve();
         } else if (msg.type === 'ERROR') {
-          worker.removeEventListener('message', onMessage);
+          cleanup();
           reject(new Error(msg.error || 'WebLLM worker failed to initialize.'));
         }
       };
+
+      const onError = (ev: ErrorEvent) => {
+        cleanup();
+        reject(new Error(ev.message || 'WebLLM worker crashed during initialization.'));
+      };
+
+      const onMessageError = () => {
+        cleanup();
+        reject(new Error('WebLLM worker message deserialization error.'));
+      };
+
+      const cleanup = () => {
+        clearTimeout(timer);
+        worker.removeEventListener('message', onMessage);
+        worker.removeEventListener('error', onError);
+        worker.removeEventListener('messageerror', onMessageError);
+      };
+
       worker.addEventListener('message', onMessage);
+      worker.addEventListener('error', onError);
+      worker.addEventListener('messageerror', onMessageError);
       worker.postMessage({ type: 'INIT_MODEL', requestId: reqId, modelId: profile.modelId });
+    });
+
+    worker.addEventListener('error', (ev: ErrorEvent) => {
+      terminateOnCrash(ev.message || 'WebLLM worker runtime crashed; fell back to Database-Only mode.');
     });
 
     activeModelHandle = {
       profile,
       explain: async (prompt: string) =>
         new Promise<string>((resolve, reject) => {
-          const reqId = `gen-${Date.now()}`;
+          const reqId = `gen-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+          const timer = setTimeout(() => {
+            cleanup();
+            terminateOnCrash(`Local WebLLM inference timed out after ${inferenceTimeoutMs}ms.`);
+            reject(new Error(`Local WebLLM inference timed out after ${inferenceTimeoutMs}ms.`));
+          }, inferenceTimeoutMs);
+
           const onMessage = (ev: MessageEvent) => {
             const msg = ev.data;
             if (!msg || msg.requestId !== reqId) return;
             if (msg.type === 'RESULT') {
-              worker.removeEventListener('message', onMessage);
+              cleanup();
               resolve(String(msg.text || ''));
             } else if (msg.type === 'ERROR') {
-              worker.removeEventListener('message', onMessage);
+              cleanup();
               reject(new Error(msg.error || 'Local WebLLM inference error.'));
             }
           };
+
+          const onError = (ev: ErrorEvent) => {
+            cleanup();
+            reject(new Error(ev.message || 'WebLLM worker error during inference.'));
+          };
+
+          const cleanup = () => {
+            clearTimeout(timer);
+            worker.removeEventListener('message', onMessage);
+            worker.removeEventListener('error', onError);
+          };
+
           worker.addEventListener('message', onMessage);
+          worker.addEventListener('error', onError);
           worker.postMessage({
             type: 'GENERATE',
             requestId: reqId,
@@ -421,8 +556,11 @@ export async function loadLocalWebGpuModel(
           });
         }),
       unload: async () => {
-        worker.postMessage({ type: 'UNLOAD', requestId: `unload-${Date.now()}` });
-        worker.terminate();
+        try {
+          worker.postMessage({ type: 'UNLOAD', requestId: `unload-${Date.now()}` });
+        } finally {
+          worker.terminate();
+        }
       },
     };
 
@@ -436,9 +574,17 @@ export async function loadLocalWebGpuModel(
       lastError: null,
       lastTestedAt: new Date().toISOString(),
     };
+    notifyLocalAiStatus();
 
     return { ok: true, executionState: 'LOCAL_WEBGPU_INFERENCE' };
   } catch (err: unknown) {
+    if (workerRef) {
+      try {
+        workerRef.terminate();
+      } catch {
+        // Ignore terminate error
+      }
+    }
     activeModelHandle = null;
     const message = err instanceof Error ? err.message : String(err);
     runtimeStatus = {
@@ -451,6 +597,7 @@ export async function loadLocalWebGpuModel(
       lastError: message,
       lastTestedAt: new Date().toISOString(),
     };
+    notifyLocalAiStatus();
     return {
       ok: false,
       executionState: 'DATABASE_ONLY',

@@ -10,7 +10,7 @@ import { spawnSync } from 'node:child_process';
 const rootDir = process.cwd();
 const args = process.argv.slice(2);
 
-const TARGET_PROJECT_ID = 'infra-firefly-1mln4';
+const TARGET_PROJECT_ID = 'gen-lang-client-0822907731';
 const TARGET_DATABASE_ID = 'ai-studio-autoelectriclabp-25d98605-c678-411c-adce-09263788ae82';
 const TARGET_APP_ID = '1:7481410566:web:7924ac419ec8615bb16f87';
 const TARGET_MESSAGING_SENDER_ID = '7481410566';

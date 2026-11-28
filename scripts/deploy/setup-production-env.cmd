@@ -8,7 +8,7 @@ REM   scripts\deploy\setup-production-env.cmd [--from-cli] [--deploy-rules]
 
 setlocal enabledelayedexpansion
 
-set "PROJECT_ID=infra-firefly-1mln4"
+set "PROJECT_ID=gen-lang-client-0822907731"
 set "FIRESTORE_DB=ai-studio-autoelectriclabp-25d98605-c678-411c-adce-09263788ae82"
 set "USE_CLI=0"
 set "DEPLOY_RULES=0"

@@ -13,7 +13,7 @@ AutoElectric Lab Pro is an automotive electrical technician software platform en
 - **Hardware Abstraction & Safety:** `automotiveSafetyGuard.ts` and `benchHardwareAbstractionLayer.ts` enforcing strict separation between simulation-only training models and physical high-risk OEM ECU bench energizing.
 - **Backend API & Dev Server:** Express + Vite middlewares (`server.ts`, `createApiApp.ts`), mounted with strict HTTP security headers (CSP, HSTS, X-Content-Type-Options, Permissions-Policy).
 - **Authentication & Durable Licensing:**
-  - Firebase Authentication + Admin SDK integration (`infra-firefly-1mln4` / `ai-studio-autoelectriclabp-25d98605-c678-411c-adce-09263788ae82`).
+  - Firebase Authentication + Admin SDK integration (`gen-lang-client-0822907731` / `ai-studio-autoelectriclabp-25d98605-c678-411c-adce-09263788ae82`).
   - ECDSA P-256 asymmetric cryptographic offline licenses (`offlineLicenseCrypto.ts`).
   - Single-device timed trial PINs (`trialPinService.ts`) with durable disk persistence configured via `VECL_DATA_DIR`.
   - Immediate server-side admin token revocation via `jti` blacklist and session minimum issued-at timestamps.

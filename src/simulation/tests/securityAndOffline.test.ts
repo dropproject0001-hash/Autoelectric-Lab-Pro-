@@ -407,7 +407,7 @@ async function main() {
 
   await runTest('resolveFirebaseProjectId matches resolveFirebaseClientConfig and logFirebaseAuthStartupDiagnostics warns on env mismatch', () => {
     const provisionedFile = {
-      projectId: 'infra-firefly-1mln4',
+      projectId: 'gen-lang-client-0822907731',
       apiKey: 'AIzaProvisionedTestKey',
     };
     const staleEnv = {
@@ -417,7 +417,7 @@ async function main() {
 
     const clientCfg = resolveFirebaseClientConfig(provisionedFile, staleEnv);
     const serverProjectId = resolveFirebaseProjectId(provisionedFile, staleEnv);
-    assert.equal(clientCfg.projectId, 'infra-firefly-1mln4');
+    assert.equal(clientCfg.projectId, 'gen-lang-client-0822907731');
     assert.equal(serverProjectId, clientCfg.projectId);
 
     // Fallback when not provisioned
@@ -438,13 +438,13 @@ async function main() {
     console.info = (...args: unknown[]) => infos.push(args.map(String).join(' '));
     try {
       const result = logFirebaseAuthStartupDiagnostics(provisionedFile, staleEnv);
-      assert.equal(result.resolvedProjectId, 'infra-firefly-1mln4');
+      assert.equal(result.resolvedProjectId, 'gen-lang-client-0822907731');
       assert.equal(
         warns.some((w) => w.includes('VITE_FIREBASE_PROJECT_ID') && w.includes('FIREBASE_PROJECT_ID')),
         true
       );
       assert.equal(
-        infos.some((i) => i.includes('infra-firefly-1mln4')),
+        infos.some((i) => i.includes('gen-lang-client-0822907731')),
         true
       );
     } finally {

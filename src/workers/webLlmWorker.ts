@@ -75,18 +75,13 @@ async function handleInitModel(req: WebLlmWorkerInitRequest): Promise<void> {
   }
 
   try {
-    // Dynamic ESM load so environments without @mlc-ai/web-llm installed still build cleanly
-    // and drop gracefully to DATABASE_ONLY mode if the WebLLM runtime cannot be loaded.
-    const dynamicImport = new Function('specifier', 'return import(specifier)') as (
-      specifier: string
-    ) => Promise<{
+    // Direct ESM dynamic import (no unsafe new Function / eval; @mlc-ai/web-llm is declared in package.json)
+    const webllmModule = (await import('@mlc-ai/web-llm')) as unknown as {
       CreateMLCEngine?: (
         modelId: string,
         opts?: { initProgressCallback?: (report: { progress?: number; text?: string }) => void }
       ) => Promise<DynamicMlcEngine>;
-    }>;
-
-    const webllmModule = await dynamicImport('@mlc-ai/web-llm');
+    };
     if (!webllmModule?.CreateMLCEngine) {
       throw new Error('CreateMLCEngine export not available in @mlc-ai/web-llm.');
     }

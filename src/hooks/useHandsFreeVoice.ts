@@ -36,6 +36,7 @@ import type { VoiceModalAction } from '../services/ai/systemVoiceKnowledgeBase';
 import { queryAiDiagnosticRouter } from '../services/ai/aiRouter';
 import { runUnifiedAiOrchestrator } from '../services/ai/unifiedAiOrchestrator';
 import { formatOrchestratorResponseForVoice } from '../services/ai/localKnowledgeAdoptionEngine';
+import { microphoneManager } from '../services/ai/microphoneManager';
 import { offlineVoiceAssistant } from '../services/offlineVoiceService';
 import {
   parseThreeDVoiceCommand,
@@ -334,6 +335,7 @@ export function useHandsFreeVoice(params: {
       }
       recognitionRef.current = null;
     }
+    microphoneManager.releaseRecognitionSession('hands-free-voice-coach');
   }, [clearResumeTimer]);
 
   const cancelSpeechStrict = useCallback(() => {
@@ -1063,6 +1065,7 @@ export function useHandsFreeVoice(params: {
       };
 
       recognitionRef.current = recognition;
+      microphoneManager.claimRecognitionSession('hands-free-voice-coach', recognition);
       recognition.start();
     } catch {
       setErrorNotice(

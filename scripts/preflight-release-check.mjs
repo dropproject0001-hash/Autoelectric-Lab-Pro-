@@ -14,7 +14,7 @@ const skipBuild = isQuick || args.has('--skip-build');
 const skipTests = isQuick || args.has('--skip-tests');
 const allowMissingAppletConfig = args.has('--allow-missing-applet-config');
 
-const EXPECTED_PROJECT_ID = 'infra-firefly-1mln4';
+const EXPECTED_PROJECT_ID = 'gen-lang-client-0822907731';
 const EXPECTED_DATABASE_ID = 'ai-studio-autoelectriclabp-25d98605-c678-411c-adce-09263788ae82';
 
 const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';

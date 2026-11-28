@@ -4,6 +4,8 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import {
   AlertTriangle,
   Bot,
@@ -37,6 +39,15 @@ import {
   getKnowledgeCenterStats,
   subscribeVerifiedKnowledgeUpdates,
 } from '../../services/ai/localKnowledgeDB';
+import {
+  getLocalAiRuntimeStatus,
+  subscribeLocalAiStatus,
+  type LocalAiRuntimeStatus,
+} from '../../services/ai/localWebLlmService';
+import {
+  formatMicrophoneError,
+  microphoneManager,
+} from '../../services/ai/microphoneManager';
 import {
   BILINGUAL_LANG_STORAGE_KEY,
   loadPersistedBilingualLang,
@@ -241,8 +252,12 @@ const UnifiedAiAssistantDrawerComponent: React.FC<UnifiedAiAssistantDrawerProps>
   onVoiceTranscript,
   onBenchVoiceAction,
 }) => {
+  const shouldReduceMotion = useReducedMotion();
   const [routerSnapshot, setRouterSnapshot] = useState<AiRouterStatusSnapshot>(() =>
     getAiRouterStatus()
+  );
+  const [localWebLlmStatus, setLocalWebLlmStatus] = useState<LocalAiRuntimeStatus>(() =>
+    getLocalAiRuntimeStatus()
   );
   const [isQuickMicListening, setIsQuickMicListening] = useState(false);
   const [quickMicNotice, setQuickMicNotice] = useState<string | null>(null);
@@ -253,6 +268,10 @@ const UnifiedAiAssistantDrawerComponent: React.FC<UnifiedAiAssistantDrawerProps>
     return subscribeAiRouterStatus((next) => {
       setRouterSnapshot(next);
     });
+  }, []);
+
+  useEffect(() => {
+    return subscribeLocalAiStatus(setLocalWebLlmStatus);
   }, []);
 
   useEffect(() => {
@@ -272,15 +291,36 @@ const UnifiedAiAssistantDrawerComponent: React.FC<UnifiedAiAssistantDrawerProps>
     };
   }, [isOpen]);
 
+  // Centralized microphone cleanup whenever the drawer closes or unmounts
+  useEffect(() => {
+    if (!isOpen) {
+      microphoneManager.stopAllForDrawerClose();
+      recognitionRef.current = null;
+      setIsQuickMicListening(false);
+    }
+  }, [isOpen]);
+
   useEffect(() => {
     return () => {
-      try {
-        recognitionRef.current?.stop();
-      } catch {
-        // Ignore cleanup stop errors
-      }
+      microphoneManager.stopAllForDrawerClose();
+      recognitionRef.current = null;
     };
   }, []);
+
+  // Accessible Escape key close while open (non-blocking — does not lock body scroll)
+  useEffect(() => {
+    if (!isOpen || typeof document === 'undefined') return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   // Diagnostic debugging log: verify live telemetry reception inside UnifiedAiAssistantDrawer
   useEffect(() => {
@@ -311,22 +351,15 @@ const UnifiedAiAssistantDrawerComponent: React.FC<UnifiedAiAssistantDrawerProps>
   const handleQuickSpeechCapture = useCallback(() => {
     setQuickMicNotice(null);
     if (isQuickMicListening && recognitionRef.current) {
-      try {
-        recognitionRef.current.stop();
-      } catch {
-        // Ignore stop error
-      }
+      microphoneManager.releaseRecognitionSession('unified-drawer-quick-mic');
+      recognitionRef.current = null;
       setIsQuickMicListening(false);
       return;
     }
 
     const Ctor = getSpeechRecognitionCtor();
     if (!Ctor) {
-      setQuickMicNotice(
-        lang === 'TL'
-          ? 'Walang Web Speech Mic sa browser na ito — pwedeng i-type ang tanong sa ibaba po.'
-          : 'Web Speech API unavailable in this browser — type your question below.'
-      );
+      setQuickMicNotice(formatMicrophoneError('not-supported', lang));
       return;
     }
 
@@ -337,15 +370,20 @@ const UnifiedAiAssistantDrawerComponent: React.FC<UnifiedAiAssistantDrawerProps>
       recognition.maxAlternatives = 1;
       recognition.continuous = false;
 
+      // Claim centralized mic ownership (stops any competing recognition session first)
+      microphoneManager.claimRecognitionSession('unified-drawer-quick-mic', recognition);
+
       recognition.onstart = () => setIsQuickMicListening(true);
-      recognition.onend = () => setIsQuickMicListening(false);
+      recognition.onend = () => {
+        setIsQuickMicListening(false);
+        microphoneManager.releaseRecognitionSession('unified-drawer-quick-mic');
+      };
       recognition.onerror = (ev) => {
         setIsQuickMicListening(false);
-        setQuickMicNotice(
-          lang === 'TL'
-            ? `Mic error (${ev.error || 'blocked'}): paki-check po ang microphone permission.`
-            : `Mic error (${ev.error || 'blocked'}): verify microphone permission.`
-        );
+        microphoneManager.releaseRecognitionSession('unified-drawer-quick-mic');
+        const message = formatMicrophoneError(ev.error || 'blocked', lang);
+        microphoneManager.setSessionState('ERROR', message);
+        setQuickMicNotice(message);
       };
       recognition.onresult = (event) => {
         const transcript = event.results?.[0]?.[0]?.transcript?.trim();
@@ -356,15 +394,18 @@ const UnifiedAiAssistantDrawerComponent: React.FC<UnifiedAiAssistantDrawerProps>
 
       recognitionRef.current = recognition;
       recognition.start();
-    } catch {
+    } catch (err) {
       setIsQuickMicListening(false);
-      setQuickMicNotice(
-        lang === 'TL' ? 'Hindi masimulan ang Voice Mic.' : 'Could not start Voice Mic.'
+      microphoneManager.releaseRecognitionSession('unified-drawer-quick-mic');
+      const message = formatMicrophoneError(
+        err instanceof Error ? err.name || err.message : 'blocked',
+        lang
       );
+      setQuickMicNotice(message);
     }
   }, [isQuickMicListening, lang, onVoiceTranscript]);
 
-  if (!isOpen) return null;
+  if (typeof document === 'undefined') return null;
 
   const activeTierMeta =
     AI_TIER_CASCADE.find((t) => t.id === routerSnapshot.activeTier) ||
@@ -374,20 +415,84 @@ const UnifiedAiAssistantDrawerComponent: React.FC<UnifiedAiAssistantDrawerProps>
     routerSnapshot.isOfflineFallback
   );
 
-  return (
-    <aside
-      data-testid="unified-ai-assistant-drawer"
-      role="dialog"
-      aria-modal="false"
-      aria-label={
-        lang === 'TL'
-          ? 'AutoElectric AI Bench Coach at Diagnostic Drawer'
-          : 'AutoElectric AI Bench Coach and Diagnostic Drawer'
-      }
-      className="fixed inset-y-0 right-0 z-50 w-full max-w-[440px] bg-[#070E1B] border-l border-cyan-500/45 shadow-2xl flex flex-col text-slate-100"
-    >
+  const localProviderLabel =
+    localWebLlmStatus.executionState === 'LOCAL_WEBGPU_INFERENCE'
+      ? `WebLLM: ${localWebLlmStatus.activeProfileId || 'GPU'}`
+      : null;
+
+  const panelVariants = {
+    closed: {
+      x: '100%',
+      opacity: shouldReduceMotion ? 0 : 0.96,
+      transition: shouldReduceMotion
+        ? { duration: 0.01 }
+        : { duration: 0.2, ease: [0.4, 0, 1, 1] as const },
+    },
+    open: {
+      x: 0,
+      opacity: 1,
+      transition: shouldReduceMotion
+        ? { duration: 0.01 }
+        : { duration: 0.26, ease: [0.22, 1, 0.36, 1] as const },
+    },
+  };
+
+  const edgeScrimVariants = {
+    closed: {
+      opacity: 0,
+      transition: shouldReduceMotion ? { duration: 0.01 } : { duration: 0.18 },
+    },
+    open: {
+      opacity: 1,
+      transition: shouldReduceMotion ? { duration: 0.01 } : { duration: 0.22 },
+    },
+  };
+
+  return createPortal(
+    <AnimatePresence>
+      {isOpen && (
+        <React.Fragment key="unified-ai-drawer-portal">
+          {/* Non-blocking subtle right-edge depth scrim (keeps bench instruments interactive) */}
+          <motion.div
+            key="unified-ai-drawer-scrim"
+            aria-hidden="true"
+            initial="closed"
+            animate="open"
+            exit="closed"
+            variants={edgeScrimVariants}
+            className="pointer-events-none fixed inset-y-0 right-0 z-40 w-[min(100vw,520px)] bg-gradient-to-l from-[#02050B]/55 via-[#02050B]/20 to-transparent"
+          />
+
+          {/* Right-Sliding Frosted-Glass AI Assistant Drawer (AutoElectric Lab Pro Palette) */}
+          <motion.aside
+            key="unified-ai-drawer-panel"
+            data-testid="unified-ai-assistant-drawer"
+            role="dialog"
+            aria-modal="false"
+            aria-label={
+              lang === 'TL'
+                ? 'AutoElectric AI Bench Coach at Diagnostic Drawer'
+                : 'AutoElectric AI Bench Coach and Diagnostic Drawer'
+            }
+            initial="closed"
+            animate="open"
+            exit="closed"
+            variants={panelVariants}
+            className="hud-drawer-surface fixed inset-y-0 right-0 z-50 w-full max-w-[440px] h-[100dvh] bg-[#060C16]/88 backdrop-blur-[30px] border-l border-[#19C8F5]/35 shadow-[-14px_0_44px_rgba(2,6,14,0.75)] flex flex-col text-slate-100 will-change-transform"
+          >
+            {/* Electric Cyan Top Glass Reflection Edge */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[1.5px] bg-gradient-to-r from-transparent via-[#19C8F5]/85 to-[#1677FF]/45"
+            />
+            {/* Subtle Left Glass Rim Highlight */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-0 left-0 z-20 w-px bg-gradient-to-b from-[#19C8F5]/60 via-[#19C8F5]/20 to-transparent"
+            />
+
       {/* Unified Header */}
-      <div className="px-3.5 py-2.5 border-b border-slate-800 bg-[#0B1528] space-y-2 shrink-0">
+      <div className="px-3.5 py-2.5 border-b border-[#203653]/85 bg-[#0A1220]/82 backdrop-blur-md space-y-2 shrink-0">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <div className="w-8 h-8 rounded-lg border border-cyan-500/50 bg-cyan-950/60 flex items-center justify-center shrink-0">
@@ -547,8 +652,10 @@ const UnifiedAiAssistantDrawerComponent: React.FC<UnifiedAiAssistantDrawerProps>
                 <Cpu className="w-3 h-3 shrink-0" />
               )}
               <span className="font-semibold">
-                AI: {activeTierMeta.label}
-                {routerSnapshot.preQuotaRerouted && routerSnapshot.activeTier !== 'OFFLINE_AI'
+                {localProviderLabel ? localProviderLabel : `AI: ${activeTierMeta.label}`}
+                {!localProviderLabel &&
+                routerSnapshot.preQuotaRerouted &&
+                routerSnapshot.activeTier !== 'OFFLINE_AI'
                   ? ' (Auto)'
                   : ''}
               </span>
@@ -692,7 +799,11 @@ const UnifiedAiAssistantDrawerComponent: React.FC<UnifiedAiAssistantDrawerProps>
           <KnowledgeCenterPanel compact={true} lang={lang} />
         </div>
       </div>
-    </aside>
+          </motion.aside>
+        </React.Fragment>
+      )}
+    </AnimatePresence>,
+    document.body
   );
 };
 

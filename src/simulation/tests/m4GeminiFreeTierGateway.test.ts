@@ -144,7 +144,9 @@ async function runM4GatewayTests(): Promise<void> {
   const distAssetsDir = path.resolve(process.cwd(), 'dist', 'assets');
   if (fs.existsSync(distAssetsDir)) {
     const jsFiles = fs.readdirSync(distAssetsDir).filter((f) => f.endsWith('.js'));
-    const secretRe = new RegExp('AI' + 'za[0-9A-Za-z_-]{20,}|sk' + '-[0-9A-Za-z]{20,}');
+    // Word-bounded secret pattern: catches real Google (AIza + 35 chars) & OpenAI (sk-...) keys
+    // without false-positiving on random 4-byte substrings inside WebLLM base64 WASM binaries.
+    const secretRe = new RegExp('\\bAI' + 'za[0-9A-Za-z_-]{35}\\b|\\bsk' + '-[0-9A-Za-z]{20,}\\b');
     for (const file of jsFiles) {
       const content = fs.readFileSync(path.join(distAssetsDir, file), 'utf8');
       assert.equal(

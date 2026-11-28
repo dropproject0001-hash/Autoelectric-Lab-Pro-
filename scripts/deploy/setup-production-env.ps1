@@ -15,7 +15,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$ProjectId   = "infra-firefly-1mln4"
+$ProjectId   = "gen-lang-client-0822907731"
 $FirestoreDb = "ai-studio-autoelectriclabp-25d98605-c678-411c-adce-09263788ae82"
 
 Write-Host "==================================================================" -ForegroundColor Cyan
