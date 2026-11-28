@@ -5,8 +5,10 @@
 
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import {
+  getRedirectResult,
   onAuthStateChanged,
   signInWithPopup,
+  signInWithRedirect,
   signOut,
   type User,
 } from 'firebase/auth';
@@ -232,7 +234,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setAuthError(null);
     setAuthErrorDetails(null);
-    await ensureUserProfileDocument(signedInUser);
+    await ensureUserProfileDocument(signedInUser).catch(() => {});
     await promoteLocalWorkstationFaultSequencesToUser(signedInUser.uid).catch(() => 0);
     await flushQueuedBenchSync(signedInUser.uid).catch(() => {});
   }, []);
@@ -242,6 +244,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setAuthReady(true);
       return;
     }
+
+    // Complete any pending mobile/PWA redirect sign-in cleanly on mount
+    void getRedirectResult(firebaseAuth)
+      .then((redirectCred) => {
+        if (redirectCred?.user) {
+          setUser(redirectCred.user);
+          void syncSignedInUserBench(redirectCred.user);
+        }
+      })
+      .catch((err: unknown) => {
+        const details = formatFirebaseAuthErrorDetails(err);
+        setAuthError(details.message);
+        setAuthErrorDetails(details);
+      });
 
     const unsubscribe = onAuthStateChanged(firebaseAuth, (nextUser) => {
       setUser(nextUser);
@@ -285,6 +301,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const idToken = await signedInUser.getIdToken();
       return idToken;
     } catch (err: unknown) {
+      const errCode =
+        err && typeof err === 'object' && 'code' in err ? String((err as { code?: unknown }).code || '') : '';
+      // Automatic redirect fallback for Android browsers, installed PWAs, or strict popup blockers
+      if (
+        errCode === 'auth/popup-blocked' ||
+        errCode === 'auth/operation-not-supported-in-this-environment'
+      ) {
+        try {
+          await signInWithRedirect(firebaseAuth, googleAuthProvider);
+          return null;
+        } catch (redirectErr: unknown) {
+          const redirectDetails = formatFirebaseAuthErrorDetails(redirectErr);
+          setAuthError(redirectDetails.message);
+          setAuthErrorDetails(redirectDetails);
+          return null;
+        }
+      }
       const details = formatFirebaseAuthErrorDetails(err);
       setAuthError(details.message);
       setAuthErrorDetails(details);

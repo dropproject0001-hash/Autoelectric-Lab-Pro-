@@ -507,30 +507,49 @@ async function runProbe(rawUrl) {
         ...[...homeHtml.matchAll(/src="([^"]+\.js)"/g)].map((m) => m[1]),
         ...[...homeHtml.matchAll(/href="([^"]*firebase[^"]*\.js)"/g)].map((m) => m[1]),
       ]);
-      let foundFirebaseKey = false;
+      let foundFirebaseKey = '';
       let foundFirebaseAuthDomain = '';
       for (const relScript of [...assetUrls].slice(0, 6)) {
         const scriptUrl = relScript.startsWith('http')
           ? relScript
           : `${cleanUrl}${relScript.startsWith('/') ? '' : '/'}${relScript}`;
         const jsText = await fetch(scriptUrl).then((r) => (r.ok ? r.text() : '')).catch(() => '');
-        if (/AIza[0-9A-Za-z_-]{30,}/.test(jsText)) {
-          foundFirebaseKey = true;
+        const keyMatch = jsText.match(/AIza[0-9A-Za-z_-]{30,}/);
+        if (keyMatch && !foundFirebaseKey) {
+          foundFirebaseKey = keyMatch[0];
         }
         const domMatch = jsText.match(/([a-z0-9-]+\.firebaseapp\.com)/);
-        if (domMatch) {
+        if (domMatch && !foundFirebaseAuthDomain) {
           foundFirebaseAuthDomain = domMatch[1];
         }
       }
       if (foundFirebaseKey) {
+        const fbProjectId = foundFirebaseAuthDomain.replace(/\.firebaseapp\.com$/, '') || 'gen-lang-client-0822907731';
         console.log(
-          `  [PASS] Gmail / Firebase : Web API key detected in live bundle${
-            foundFirebaseAuthDomain ? ` (authDomain: ${foundFirebaseAuthDomain})` : ''
-          }`
+          `  [PASS] Gmail / Firebase : Web API key detected in live bundle (authDomain: ${foundFirebaseAuthDomain || 'unknown'})`
         );
-        console.log(
-          `         Verify "${hostname}" is listed in Firebase Console -> Authentication -> Settings -> Authorized domains.`
-        );
+        // Live-check Google Identity Toolkit authorizedDomains!
+        const idpCfg = await fetch(
+          `https://www.googleapis.com/identitytoolkit/v3/relyingparty/getProjectConfig?key=${encodeURIComponent(
+            foundFirebaseKey
+          )}`
+        )
+          .then((r) => (r.ok ? r.json() : null))
+          .catch(() => null);
+        const authDomains = Array.isArray(idpCfg?.authorizedDomains) ? idpCfg.authorizedDomains : null;
+        if (authDomains) {
+          if (authDomains.includes(hostname)) {
+            console.log(`  [PASS] Firebase Auth    : "${hostname}" IS AUTHORIZED for Google Sign-In!`);
+          } else {
+            failed = true;
+            console.error(
+              `  [FAIL] Firebase Auth    : "${hostname}" is MISSING from Firebase authorizedDomains (causes auth/unauthorized-domain)!`
+            );
+            console.error(
+              `  [ACTION] Add "${hostname}" at: https://console.firebase.google.com/project/${fbProjectId}/authentication/settings`
+            );
+          }
+        }
       } else {
         failed = true;
         console.error(
